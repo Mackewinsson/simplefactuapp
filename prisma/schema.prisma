@@ -1,0 +1,40 @@
+// Postgres (Neon for production; use Neon dev branch or local Postgres for dev).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  userId         String
+  number         String
+  issueDate      DateTime
+  dueDate        DateTime?
+  customerName   String
+  customerEmail  String?
+  currency       String        @default("EUR")
+  subtotalCents  Int
+  taxCents       Int
+  totalCents     Int
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  items          InvoiceItem[]
+
+  @@index([userId])
+  @@unique([userId, number])
+}
+
+model InvoiceItem {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description    String
+  quantity       Int
+  unitPriceCents Int
+  lineTotalCents Int
+}
