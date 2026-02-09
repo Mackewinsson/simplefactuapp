@@ -1,0 +1,24 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# Next.js
+.next
+out
+
+# Prisma (SQLite dev DB)
+dev.db
+dev.db-journal
+prisma/dev.db
+prisma/dev.db-journal
+
+# IDE / agents
+.cursor
+.claude
+.agents
+
+# misc
+.DS_Store
+*.log
+.env
+.env*.local
