@@ -12,7 +12,15 @@ const defaultItems: InvoiceItemRow[] = [
   { description: "", quantity: 1, unitPrice: "" },
 ];
 
-export function NewInvoiceForm() {
+type NewInvoiceFormProps = {
+  defaultCreatedByFirstName: string;
+  defaultCreatedByLastName: string;
+};
+
+export function NewInvoiceForm({
+  defaultCreatedByFirstName,
+  defaultCreatedByLastName,
+}: NewInvoiceFormProps) {
   const [state, formAction] = useActionState<CreateInvoiceState, FormData>(
     createInvoiceAction,
     null
@@ -54,6 +62,29 @@ export function NewInvoiceForm() {
           <input
             type="date"
             name="dueDate"
+            className="w-full rounded border border-gray-300 px-3 py-2"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-gray-700">Issued by (first name)</span>
+          <input
+            type="text"
+            name="createdByFirstName"
+            defaultValue={defaultCreatedByFirstName}
+            placeholder="First name"
+            className="w-full rounded border border-gray-300 px-3 py-2"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-gray-700">Issued by (last name)</span>
+          <input
+            type="text"
+            name="createdByLastName"
+            defaultValue={defaultCreatedByLastName}
+            placeholder="Last name"
             className="w-full rounded border border-gray-300 px-3 py-2"
           />
         </label>

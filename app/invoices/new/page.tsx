@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
 import { NewInvoiceForm } from "./NewInvoiceForm";
 
-export default function NewInvoicePage() {
+export default async function NewInvoicePage() {
+  const user = await currentUser();
   return (
     <div>
       <div className="mb-6">
@@ -10,7 +12,10 @@ export default function NewInvoicePage() {
         </Link>
       </div>
       <h1 className="mb-6 text-2xl font-semibold">New invoice</h1>
-      <NewInvoiceForm />
+      <NewInvoiceForm
+        defaultCreatedByFirstName={user?.firstName ?? ""}
+        defaultCreatedByLastName={user?.lastName ?? ""}
+      />
     </div>
   );
 }

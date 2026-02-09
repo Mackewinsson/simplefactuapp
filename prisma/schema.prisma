@@ -9,21 +9,23 @@ datasource db {
 }
 
 model Invoice {
-  id             String        @id @default(cuid())
-  userId         String
-  number         String
-  issueDate      DateTime
-  dueDate        DateTime?
-  customerName   String
-  customerEmail  String?
-  currency       String        @default("EUR")
-  subtotalCents  Int
-  taxCents       Int
-  totalCents     Int
-  notes          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  items          InvoiceItem[]
+  id                 String        @id @default(cuid())
+  userId             String
+  number             String
+  issueDate          DateTime
+  dueDate            DateTime?
+  customerName       String
+  customerEmail      String?
+  currency           String        @default("EUR")
+  subtotalCents      Int
+  taxCents           Int
+  totalCents         Int
+  notes              String?
+  createdByFirstName String?
+  createdByLastName  String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  items              InvoiceItem[]
 
   @@index([userId])
   @@unique([userId, number])

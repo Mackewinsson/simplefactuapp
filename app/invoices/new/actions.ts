@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { parseDecimalToCents } from "@/lib/money";
 
@@ -27,6 +27,8 @@ const schema = z
       .refine((v) => !v || v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Invalid email"),
     notes: z.string().optional(),
     taxRatePercent: z.coerce.number().min(0).max(100).default(21),
+    createdByFirstName: z.string().optional(),
+    createdByLastName: z.string().optional(),
     items: z.array(itemSchema).min(1, "At least one item required"),
   })
   .refine(
@@ -44,6 +46,8 @@ export async function createInvoiceAction(
   const { userId } = await auth();
   if (!userId) return { errors: ["You must be signed in to create an invoice."] };
 
+  const user = await currentUser();
+
   const raw = {
     number: formData.get("number") ?? "",
     issueDate: formData.get("issueDate") ?? "",
@@ -52,6 +56,8 @@ export async function createInvoiceAction(
     customerEmail: formData.get("customerEmail") || undefined,
     notes: formData.get("notes") || undefined,
     taxRatePercent: formData.get("taxRatePercent") ?? "21",
+    createdByFirstName: formData.get("createdByFirstName")?.toString().trim() || null,
+    createdByLastName: formData.get("createdByLastName")?.toString().trim() || null,
     items: (() => {
       try {
         return JSON.parse((formData.get("items") as string) || "[]");
@@ -73,8 +79,11 @@ export async function createInvoiceAction(
     return { errors: messages };
   }
 
-  const { number, issueDate, dueDate, customerName, customerEmail, notes, taxRatePercent, items } =
+  const { number, issueDate, dueDate, customerName, customerEmail, notes, taxRatePercent, createdByFirstName: formFirstName, createdByLastName: formLastName, items } =
     parsed.data;
+
+  const createdByFirstName = (formFirstName?.trim() || user?.firstName) ?? null;
+  const createdByLastName = (formLastName?.trim() || user?.lastName) ?? null;
 
   const itemRows = items.map((i) => {
     const unitPriceCents = parseDecimalToCents(i.unitPrice);
@@ -105,6 +114,8 @@ export async function createInvoiceAction(
         subtotalCents,
         taxCents,
         totalCents,
+        createdByFirstName,
+        createdByLastName,
         items: { create: itemRows },
       },
     });
