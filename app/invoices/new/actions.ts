@@ -113,6 +113,14 @@ export async function createInvoiceAction(
   const taxCents = Math.round((subtotalCents * taxRatePercent) / 100);
   const totalCents = subtotalCents + taxCents;
 
+  const existing = await prisma.invoice.findFirst({
+    where: { userId, number },
+    select: { id: true },
+  });
+  if (existing) {
+    return { errors: ["El número de factura ya existe en tu cuenta. Usa un número diferente."] };
+  }
+
   try {
     await prisma.invoice.create({
       data: {
@@ -137,7 +145,7 @@ export async function createInvoiceAction(
   } catch (e: unknown) {
     const err = e as { code?: string };
     if (err.code === "P2002")
-      return { errors: ["This invoice number is already in use."] };
+      return { errors: ["El número de factura ya existe en tu cuenta."] };
     return { errors: ["Failed to save invoice."] };
   }
 

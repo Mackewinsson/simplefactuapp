@@ -7,6 +7,7 @@ import {
   refreshVerifactuJobAction,
   cancelInvoiceVerifactuAction,
 } from "./verifactu-actions";
+import { humanizeAeatError } from "@/lib/simplefactu/aeat-error-messages";
 
 type Props = {
   invoiceId: string;
@@ -81,18 +82,27 @@ export function VerifactuSendPanel({
           </div>
         ) : null}
         {aeatCsv ? (
-          <div>
-            <span className="font-medium">CSV:</span> {aeatCsv}
-          </div>
-        ) : null}
-        {aeatQrText ? (
-          <div className="break-all">
-            <span className="font-medium">QR / URL:</span> {aeatQrText}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium">CSV:</span>
+            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">
+              {aeatCsv}
+            </code>
+            {aeatQrText ? (
+              <a
+                href={aeatQrText}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-blue-600 hover:underline"
+              >
+                Verificar en AEAT ↗
+              </a>
+            ) : null}
           </div>
         ) : null}
         {aeatLastError ? (
           <div className="text-red-700">
-            <span className="font-medium">Registration error:</span> {aeatLastError}
+            <span className="font-medium">Registration error:</span>{" "}
+            {humanizeAeatError(aeatLastError)}
           </div>
         ) : null}
         <div>
@@ -107,7 +117,7 @@ export function VerifactuSendPanel({
         {aeatCancellationLastError ? (
           <div className="text-red-700">
             <span className="font-medium">Cancellation error:</span>{" "}
-            {aeatCancellationLastError}
+            {humanizeAeatError(aeatCancellationLastError)}
           </div>
         ) : null}
       </dl>

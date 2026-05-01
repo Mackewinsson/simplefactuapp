@@ -60,10 +60,10 @@ export async function GET(
   if (!userId) redirect("/sign-in");
 
   const { id } = await params;
-  const invoice = await prisma.invoice.findUnique({
-    where: { id, userId },
-    include: { items: true },
-  });
+  const [invoice, account] = await Promise.all([
+    prisma.invoice.findUnique({ where: { id, userId }, include: { items: true } }),
+    prisma.userVerifactuAccount.findUnique({ where: { userId }, select: { issuerNif: true } }),
+  ]);
   if (!invoice) notFound();
 
   /* ── Setup ──────────────────────────────────────────── */
@@ -210,7 +210,7 @@ export async function GET(
   y -= GAP_MD;
 
   /* ── 4b. Verifactu (AEAT) ───────────────────────────── */
-  const qrPayload = verifactuQrPayload(invoice);
+  const qrPayload = verifactuQrPayload({ ...invoice, issuerNif: account?.issuerNif ?? null });
   if (invoice.aeatCsv || invoice.aeatQrText || qrPayload) {
     text("VERIFACTU (AEAT)", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
     y -= LH;

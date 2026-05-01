@@ -40,10 +40,18 @@ async function adminFetch(path: string, init: RequestInit): Promise<Response> {
 export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: string; tenantId: string }> {
   const existing = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
   if (existing) {
-    return {
-      tenantId: existing.simplefactuTenantId,
-      apiKey: decryptSecret(existing.apiKeyEncrypted),
-    };
+    const candidateKey = decryptSecret(existing.apiKeyEncrypted);
+    // Verify the key is still valid in simplefactu (may have been lost if DB was reset).
+    const probe = await fetch(
+      `${getSimplefactuBaseUrl().replace(/\/$/, "")}/jobs/__probe_nonexistent__`,
+      { headers: { "x-api-key": candidateKey } }
+    ).catch(() => null);
+    // 401 → stale key; anything else (404, 200, 5xx) → key is recognised, continue.
+    if (probe && probe.status !== 401) {
+      return { tenantId: existing.simplefactuTenantId, apiKey: candidateKey };
+    }
+    // Key is stale — delete the Neon row and fall through to re-provision.
+    await prisma.userVerifactuAccount.delete({ where: { userId } });
   }
 
   const tenantId = tenantIdForUser(userId);

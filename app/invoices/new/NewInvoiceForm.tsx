@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createInvoiceAction, type CreateInvoiceState } from "./actions";
 import { InvoiceItemsEditor, type InvoiceItemRow } from "./InvoiceItemsEditor";
+import { extractSerie } from "@/lib/simplefactu/invoice-series";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -15,16 +16,42 @@ const defaultItems: InvoiceItemRow[] = [
 type NewInvoiceFormProps = {
   defaultCreatedByFirstName: string;
   defaultCreatedByLastName: string;
+  existingSeries: string[];
 };
 
 export function NewInvoiceForm({
   defaultCreatedByFirstName,
   defaultCreatedByLastName,
+  existingSeries,
 }: NewInvoiceFormProps) {
   const [state, formAction] = useActionState<CreateInvoiceState, FormData>(
     createInvoiceAction,
     null
   );
+  const [numberValue, setNumberValue] = useState("");
+
+  const detectedSerie = numberValue.trim() ? extractSerie(numberValue.trim()) : null;
+  const isNewSeries =
+    detectedSerie !== null && !existingSeries.includes(detectedSerie);
+  const hasExistingSeries = existingSeries.length > 0;
+
+  const seriesHint =
+    detectedSerie && hasExistingSeries
+      ? isNewSeries
+        ? {
+            type: "warn" as const,
+            text: `Nueva serie — esta factura iniciará una cadena nueva en AEAT. Si quieres continuar la serie existente "${existingSeries[0]}", usa un número como "${existingSeries[0]}/F-001".`,
+          }
+        : {
+            type: "ok" as const,
+            text: `Continúa la serie "${detectedSerie}" — se encadenará con las facturas anteriores.`,
+          }
+      : detectedSerie && !hasExistingSeries
+      ? {
+          type: "info" as const,
+          text: `Serie detectada: "${detectedSerie}". Esta será la primera factura enviada a AEAT.`,
+        }
+      : null;
 
   return (
     <form action={formAction} className="space-y-6">
@@ -39,15 +66,43 @@ export function NewInvoiceForm({
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium text-gray-700">Number</span>
-          <input
-            type="text"
-            name="number"
-            placeholder="INV-0001"
-            className="w-full rounded border border-gray-300 px-3 py-2"
-          />
-        </label>
+        <div className="block">
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-gray-700">Number</span>
+            <input
+              type="text"
+              name="number"
+              list="series-suggestions"
+              placeholder={
+                hasExistingSeries ? `${existingSeries[0]}/F-001` : "2026/F-001"
+              }
+              value={numberValue}
+              onChange={(e) => setNumberValue(e.target.value)}
+              className="w-full rounded border border-gray-300 px-3 py-2"
+              autoComplete="off"
+            />
+          </label>
+          {hasExistingSeries ? (
+            <datalist id="series-suggestions">
+              {existingSeries.map((s) => (
+                <option key={s} value={`${s}/`} />
+              ))}
+            </datalist>
+          ) : null}
+          {seriesHint ? (
+            <p
+              className={`mt-1.5 text-xs ${
+                seriesHint.type === "warn"
+                  ? "text-amber-700"
+                  : seriesHint.type === "ok"
+                  ? "text-green-700"
+                  : "text-gray-500"
+              }`}
+            >
+              {seriesHint.text}
+            </p>
+          ) : null}
+        </div>
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-gray-700">Issue date</span>
           <input

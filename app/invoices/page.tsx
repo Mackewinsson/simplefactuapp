@@ -3,11 +3,38 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
+import { extractSerie } from "@/lib/simplefactu/invoice-series";
 
 const PAGE_SIZE = 50;
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "short" });
 
 export const dynamic = "force-dynamic";
+
+type AeatStatus = string;
+
+function aeatStatusBadge(
+  status: AeatStatus,
+  cancellationStatus: AeatStatus
+): { label: string; className: string } {
+  if (cancellationStatus === "SUCCEEDED") {
+    return {
+      label: "Anulada",
+      className: "line-through text-gray-400 bg-gray-100",
+    };
+  }
+  switch (status) {
+    case "SUCCEEDED":
+      return { label: "Registrada", className: "text-green-800 bg-green-100" };
+    case "PENDING":
+    case "PROCESSING":
+      return { label: "Enviando…", className: "text-amber-800 bg-amber-100" };
+    case "FAILED":
+    case "DEAD":
+      return { label: "Error", className: "text-red-800 bg-red-100" };
+    default:
+      return { label: "No enviada", className: "text-gray-500 bg-gray-100" };
+  }
+}
 
 export default async function InvoicesPage() {
   const { userId } = await auth();
@@ -44,42 +71,58 @@ export default async function InvoicesPage() {
         </div>
       ) : (
         <div className="overflow-x-auto rounded border border-gray-200 bg-white">
-          <table className="w-full min-w-[600px] text-left text-sm">
+          <table className="w-full min-w-[700px] text-left text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-4 py-3 font-medium text-gray-900">Number</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Serie</th>
                 <th className="px-4 py-3 font-medium text-gray-900">Customer</th>
                 <th className="px-4 py-3 font-medium text-gray-900">Issue Date</th>
                 <th className="px-4 py-3 font-medium text-gray-900">Total</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Created</th>
+                <th className="px-4 py-3 font-medium text-gray-900">AEAT</th>
               </tr>
             </thead>
             <tbody>
-              {invoices.map((inv: InvoiceRow) => (
-                <tr
-                  key={inv.id}
-                  className="border-b border-gray-100 last:border-0 hover:bg-gray-50"
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/invoices/${inv.id}`}
-                      className="font-medium text-blue-600 hover:underline"
-                    >
-                      {inv.number}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">{inv.customerName}</td>
-                  <td className="px-4 py-3 text-gray-700">
-                    {dateFormat.format(inv.issueDate)}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">
-                    {formatCents(inv.currency, inv.totalCents)}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {dateFormat.format(inv.createdAt)}
-                  </td>
-                </tr>
-              ))}
+              {invoices.map((inv: InvoiceRow) => {
+                const badge = aeatStatusBadge(
+                  inv.aeatStatus,
+                  inv.aeatCancellationStatus
+                );
+                return (
+                  <tr
+                    key={inv.id}
+                    className="border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/invoices/${inv.id}`}
+                        className="font-medium text-blue-600 hover:underline"
+                      >
+                        {inv.number}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 font-mono">
+                        {extractSerie(inv.number)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">{inv.customerName}</td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {dateFormat.format(inv.issueDate)}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {formatCents(inv.currency, inv.totalCents)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}
+                      >
+                        {badge.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
