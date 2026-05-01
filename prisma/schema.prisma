@@ -8,6 +8,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AeatJobStatus {
+  NOT_SENT
+  PENDING
+  SUCCEEDED
+  FAILED
+  DEAD
+}
+
+/// Clerk userId ↔ simplefactu tenant + encrypted API key (BFF only).
+model UserVerifactuAccount {
+  userId                String    @id
+  simplefactuTenantId   String
+  apiKeyEncrypted       String    @db.Text
+  issuerNif             String?
+  issuerLegalName       String?
+  certificateUploadedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("user_verifactu_accounts")
+}
+
 model Invoice {
   id                 String        @id @default(cuid())
   userId             String
@@ -16,13 +38,22 @@ model Invoice {
   dueDate            DateTime?
   customerName       String
   customerEmail      String?
+  customerNif        String?
   currency           String        @default("EUR")
   subtotalCents      Int
   taxCents           Int
   totalCents         Int
+  taxRatePercent     Int           @default(21)
   notes              String?
   createdByFirstName String?
   createdByLastName  String?
+  aeatStatus         AeatJobStatus @default(NOT_SENT)
+  aeatJobId          String?
+  aeatLastError      String?
+  aeatCsv            String?
+  aeatQrText         String?
+  aeatIdempotencyKey String?       @unique
+  aeatUpdatedAt      DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   items              InvoiceItem[]

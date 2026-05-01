@@ -107,6 +107,17 @@ export function NewInvoiceForm({
             className="w-full rounded border border-gray-300 px-3 py-2"
           />
         </label>
+        <label className="block sm:col-span-2">
+          <span className="mb-1 block text-sm font-medium text-gray-700">
+            Customer NIF / CIF (Verifactu)
+          </span>
+          <input
+            type="text"
+            name="customerNif"
+            placeholder="e.g. B12345678"
+            className="w-full max-w-md rounded border border-gray-300 px-3 py-2"
+          />
+        </label>
       </div>
 
       <label className="block">

@@ -40,6 +40,9 @@ export default function RootLayout({
                   <Link href="/invoices/new" className="text-gray-600 hover:text-gray-900">
                     New Invoice
                   </Link>
+                  <Link href="/settings/verifactu" className="text-gray-600 hover:text-gray-900">
+                    Verifactu
+                  </Link>
                 </nav>
               </div>
               <SignedOut>

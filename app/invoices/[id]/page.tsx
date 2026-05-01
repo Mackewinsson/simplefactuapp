@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
+import { VerifactuSendPanel } from "./VerifactuSendPanel";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -56,7 +57,23 @@ export default async function InvoiceDetailPage({ params }: Props) {
                 {invoice.dueDate.toLocaleDateString()}
               </div>
             ) : null}
+            {invoice.customerNif ? (
+              <div>
+                <span className="font-medium">Customer NIF:</span> {invoice.customerNif}
+              </div>
+            ) : null}
           </dl>
+        </div>
+
+        <div className="border-b border-gray-200 px-4 py-4">
+          <VerifactuSendPanel
+            invoiceId={invoice.id}
+            aeatStatus={invoice.aeatStatus}
+            aeatJobId={invoice.aeatJobId}
+            aeatLastError={invoice.aeatLastError}
+            aeatCsv={invoice.aeatCsv}
+            aeatQrText={invoice.aeatQrText}
+          />
         </div>
 
         <div className="overflow-x-auto">

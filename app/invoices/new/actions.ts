@@ -21,6 +21,7 @@ const schema = z
     issueDate: z.string().min(1, "Issue date is required"),
     dueDate: z.string().optional(),
     customerName: z.string().min(1, "Customer name is required"),
+    customerNif: z.string().min(1, "Customer NIF/CIF is required for Verifactu"),
     customerEmail: z
       .string()
       .optional()
@@ -53,6 +54,7 @@ export async function createInvoiceAction(
     issueDate: formData.get("issueDate") ?? "",
     dueDate: formData.get("dueDate") || undefined,
     customerName: formData.get("customerName") ?? "",
+    customerNif: formData.get("customerNif") ?? "",
     customerEmail: formData.get("customerEmail") || undefined,
     notes: formData.get("notes") || undefined,
     taxRatePercent: formData.get("taxRatePercent") ?? "21",
@@ -79,8 +81,19 @@ export async function createInvoiceAction(
     return { errors: messages };
   }
 
-  const { number, issueDate, dueDate, customerName, customerEmail, notes, taxRatePercent, createdByFirstName: formFirstName, createdByLastName: formLastName, items } =
-    parsed.data;
+  const {
+    number,
+    issueDate,
+    dueDate,
+    customerName,
+    customerNif,
+    customerEmail,
+    notes,
+    taxRatePercent,
+    createdByFirstName: formFirstName,
+    createdByLastName: formLastName,
+    items,
+  } = parsed.data;
 
   const createdByFirstName = (formFirstName?.trim() || user?.firstName) ?? null;
   const createdByLastName = (formLastName?.trim() || user?.lastName) ?? null;
@@ -108,7 +121,9 @@ export async function createInvoiceAction(
         issueDate: new Date(issueDate),
         dueDate: dueDate ? new Date(dueDate) : null,
         customerName,
+        customerNif: customerNif.trim(),
         customerEmail: customerEmail || null,
+        taxRatePercent: Math.round(taxRatePercent),
         notes: notes || null,
         currency: CURRENCY_DEFAULT,
         subtotalCents,
