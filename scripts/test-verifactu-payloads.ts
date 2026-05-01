@@ -6,6 +6,7 @@ import type { Invoice, InvoiceItem, UserVerifactuAccount } from "@prisma/client"
 import { buildSendInvoicePayload } from "../lib/simplefactu/build-send-invoice-payload";
 import { buildCancelInvoicePayload } from "../lib/simplefactu/build-cancel-invoice-payload";
 import { formatSimplefactuHttpError } from "../lib/simplefactu/api-errors";
+import { verifactuQrPayload } from "../lib/pdf/verifactu-qr-content";
 
 process.env.VERIFACTU_SI_ID = process.env.VERIFACTU_SI_ID || "01";
 
@@ -75,5 +76,13 @@ assert.equal((cancel.facturaAnulada as { numSerieFacturaAnulada: string }).numSe
 
 assert.ok(formatSimplefactuHttpError(402, { message: "cap" }).includes("Plan limit"));
 assert.ok(formatSimplefactuHttpError(429, { retryAfterSeconds: 30 }).includes("30"));
+
+assert.equal(
+  verifactuQrPayload({ aeatQrText: "https://example.com/verify?x=1", aeatCsv: null }),
+  "https://example.com/verify?x=1"
+);
+assert.ok(
+  verifactuQrPayload({ aeatQrText: null, aeatCsv: "A-TEST" })?.includes("csv=A-TEST")
+);
 
 console.log("test-verifactu-payloads: OK");

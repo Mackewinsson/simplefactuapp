@@ -1,9 +1,11 @@
 import { NextRequest } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import QRCode from "qrcode";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
+import { verifactuQrPayload } from "@/lib/pdf/verifactu-qr-content";
 
 /* ── Layout constants ────────────────────────────────── */
 const FALLBACK_COMPANY_NAME = process.env.INVOICE_COMPANY_NAME ?? "";
@@ -34,6 +36,9 @@ const COL_UNIT = MARGIN + 380;
 const COL_AMT = RIGHT;
 const AMT_RIGHT_PADDING = 4; // avoid amount touching edge (e.g. € clipping)
 const TOTALS_AMOUNT_EDGE = RIGHT - AMT_RIGHT_PADDING;
+
+/** QR image size in PDF points (72 pt ≈ 1 in). */
+const VERIFACTU_QR_PDF_PT = 108;
 
 function safeFilename(number: string): string {
   return number.replace(/[^a-zA-Z0-9-_]/g, "-");
@@ -205,7 +210,8 @@ export async function GET(
   y -= GAP_MD;
 
   /* ── 4b. Verifactu (AEAT) ───────────────────────────── */
-  if (invoice.aeatCsv || invoice.aeatQrText) {
+  const qrPayload = verifactuQrPayload(invoice);
+  if (invoice.aeatCsv || invoice.aeatQrText || qrPayload) {
     text("VERIFACTU (AEAT)", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
     y -= LH;
     if (invoice.aeatCsv) {
@@ -217,8 +223,32 @@ export async function GET(
         invoice.aeatQrText.length > 95
           ? invoice.aeatQrText.slice(0, 92) + "..."
           : invoice.aeatQrText;
-      text(`Verification: ${qrLine}`, MARGIN, { size: FONT_SM, color: GRAY });
+      text(`Verification URL: ${qrLine}`, MARGIN, { size: FONT_SM, color: GRAY });
       y -= LH_SM;
+    }
+    if (qrPayload) {
+      text("Verification QR:", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
+      y -= LH_SM;
+      try {
+        const pngBuffer = await QRCode.toBuffer(qrPayload, {
+          type: "png",
+          width: 240,
+          margin: 1,
+          errorCorrectionLevel: "M",
+        });
+        const qrImage = await doc.embedPng(pngBuffer);
+        const dim = VERIFACTU_QR_PDF_PT;
+        page.drawImage(qrImage, {
+          x: MARGIN,
+          y: y - dim,
+          width: dim,
+          height: dim,
+        });
+        y -= dim + 6;
+      } catch {
+        text("(QR could not be generated)", MARGIN, { size: FONT_SM, color: GRAY });
+        y -= LH_SM;
+      }
     }
     y -= GAP_SM;
   }
