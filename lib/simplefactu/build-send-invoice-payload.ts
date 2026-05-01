@@ -11,14 +11,17 @@ export type SistemaInformaticoEnv = {
   indicadorMultiplesOT: "S" | "N";
 };
 
-function toDdMmYyyy(d: Date): string {
+export function toDdMmYyyy(d: Date): string {
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
   return `${day}-${month}-${year}`;
 }
 
-function readSiFromEnv(issuer: { issuerNif: string | null; issuerLegalName: string | null }): SistemaInformaticoEnv {
+export function readSiFromEnv(issuer: {
+  issuerNif: string | null;
+  issuerLegalName: string | null;
+}): SistemaInformaticoEnv {
   const nombreRazon = (process.env.VERIFACTU_SI_NOMBRE_RAZON || issuer.issuerLegalName || "").trim();
   const nif = (process.env.VERIFACTU_SI_NIF || issuer.issuerNif || "").trim();
   const nombreSistemaInformatico = (process.env.VERIFACTU_SI_NOMBRE || "SimpleFactuApp").trim().slice(0, 30);

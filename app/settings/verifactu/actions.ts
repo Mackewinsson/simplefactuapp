@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
+import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
 
 export type VerifactuSettingsState = { ok: true; message: string } | { ok: false; errors: string[] };
 
@@ -71,4 +72,48 @@ export async function uploadCertificateAction(
 
   revalidatePath("/settings/verifactu");
   return { ok: true, message: "Certificate uploaded to Verifactu." };
+}
+
+export async function verifyNifAction(
+  _prev: VerifactuSettingsState | null,
+  formData: FormData
+): Promise<VerifactuSettingsState> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, errors: ["Sign in required."] };
+
+  const nif = String(formData.get("verifyNif") ?? "").trim();
+  const nombre = String(formData.get("verifyNombre") ?? "").trim();
+  if (!nif || !nombre) {
+    return { ok: false, errors: ["NIF and name (razón social) are required for VNIF."] };
+  }
+
+  const { apiKey } = await ensureVerifactuApiKey(userId);
+  const client = createSimplefactuClient({
+    baseUrl: getSimplefactuBaseUrl(),
+    apiKey,
+  });
+
+  const res = await client.postVerifyNif({ nif, nombre });
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (!res.ok) {
+    const msg =
+      res.status === 403
+        ? "API key lacks nif:read. Delete UserVerifactuAccount row or revoke key and sign in again to reprovision."
+        : formatSimplefactuHttpError(res.status, json);
+    return { ok: false, errors: [msg] };
+  }
+
+  const success = json.success === true;
+  const resultado = json.resultado != null ? String(json.resultado) : "";
+  const summary = success
+    ? `VNIF: identified (${resultado || "OK"})`
+    : typeof json.message === "string"
+      ? json.message
+      : resultado
+        ? `VNIF: ${resultado}`
+        : "VNIF check finished.";
+
+  revalidatePath("/settings/verifactu");
+  return { ok: true, message: summary };
 }

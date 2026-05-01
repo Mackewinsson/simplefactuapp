@@ -204,6 +204,25 @@ export async function GET(
 
   y -= GAP_MD;
 
+  /* ── 4b. Verifactu (AEAT) ───────────────────────────── */
+  if (invoice.aeatCsv || invoice.aeatQrText) {
+    text("VERIFACTU (AEAT)", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
+    y -= LH;
+    if (invoice.aeatCsv) {
+      text(`CSV: ${invoice.aeatCsv}`, MARGIN, { size: FONT_SM, color: GRAY });
+      y -= LH_SM;
+    }
+    if (invoice.aeatQrText) {
+      const qrLine =
+        invoice.aeatQrText.length > 95
+          ? invoice.aeatQrText.slice(0, 92) + "..."
+          : invoice.aeatQrText;
+      text(`Verification: ${qrLine}`, MARGIN, { size: FONT_SM, color: GRAY });
+      y -= LH_SM;
+    }
+    y -= GAP_SM;
+  }
+
   /* ── 5. Notes ───────────────────────────────────────── */
   if (invoice.notes) {
     text("NOTES", MARGIN, { size: FONT_SM, font: bold, color: GRAY });

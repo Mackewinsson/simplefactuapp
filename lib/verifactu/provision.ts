@@ -5,6 +5,7 @@ import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 const BFF_KEY_SCOPES = [
   "invoices:write",
   "invoices:read",
+  "nif:read",
   "tenant:certificates:read",
   "tenant:certificates:write",
 ] as const;

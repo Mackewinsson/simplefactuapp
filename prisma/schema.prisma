@@ -16,6 +16,14 @@ enum AeatJobStatus {
   DEAD
 }
 
+enum AeatCancellationStatus {
+  NONE
+  PENDING
+  SUCCEEDED
+  FAILED
+  DEAD
+}
+
 /// Clerk userId ↔ simplefactu tenant + encrypted API key (BFF only).
 model UserVerifactuAccount {
   userId                String    @id
@@ -53,6 +61,10 @@ model Invoice {
   aeatCsv            String?
   aeatQrText         String?
   aeatIdempotencyKey String?       @unique
+  aeatCancellationJobId     String?
+  aeatCancellationStatus    AeatCancellationStatus @default(NONE)
+  aeatCancellationLastError String?
+  aeatCancellationIdempotencyKey String? @unique
   aeatUpdatedAt      DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt

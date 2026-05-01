@@ -73,6 +73,9 @@ export default async function InvoiceDetailPage({ params }: Props) {
             aeatLastError={invoice.aeatLastError}
             aeatCsv={invoice.aeatCsv}
             aeatQrText={invoice.aeatQrText}
+            aeatCancellationStatus={invoice.aeatCancellationStatus}
+            aeatCancellationJobId={invoice.aeatCancellationJobId}
+            aeatCancellationLastError={invoice.aeatCancellationLastError}
           />
         </div>
 

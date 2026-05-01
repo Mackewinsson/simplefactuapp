@@ -67,6 +67,25 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       return fetch(joinUrl(baseUrl, `/jobs/${jobId}`), { method: "GET", headers });
     },
 
+    async postCancelInvoice(body: Record<string, unknown>, idempotencyKey: string): Promise<Response> {
+      return fetch(joinUrl(baseUrl, "/cancel-invoice"), {
+        method: "POST",
+        headers: {
+          ...headers,
+          "x-idempotency-key": idempotencyKey,
+        },
+        body: JSON.stringify(body),
+      });
+    },
+
+    async postVerifyNif(body: { nif: string; nombre: string }): Promise<Response> {
+      return fetch(joinUrl(baseUrl, "/verify-nif"), {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+    },
+
     parseJson,
   };
 }

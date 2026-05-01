@@ -9,7 +9,9 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
-    "test:money": "tsx scripts/test-money.ts"
+    "test:money": "tsx scripts/test-money.ts",
+    "test:payloads": "tsx scripts/test-verifactu-payloads.ts",
+    "test": "npm run test:money && npm run test:payloads"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -2,10 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
-import { AeatJobStatus } from "@prisma/client";
+import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { buildSendInvoicePayload } from "@/lib/simplefactu/build-send-invoice-payload";
+import { buildCancelInvoicePayload } from "@/lib/simplefactu/build-cancel-invoice-payload";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
+import { syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 
 function sleep(ms: number) {
@@ -13,6 +16,37 @@ function sleep(ms: number) {
 }
 
 export type SendVerifactuResult = { ok: boolean; message: string };
+
+async function pollUntilTerminal(
+  client: ReturnType<typeof createSimplefactuClient>,
+  params: {
+    invoiceId: string;
+    userId: string;
+    jobId: string;
+    kind: "SEND_INVOICE" | "CANCEL_INVOICE";
+    maxRounds?: number;
+  }
+): Promise<SendVerifactuResult> {
+  const max = params.maxRounds ?? 10;
+  for (let i = 0; i < max; i++) {
+    await sleep(1500);
+    const r = await syncJobStatusToInvoice(client, {
+      invoiceId: params.invoiceId,
+      userId: params.userId,
+      jobId: params.jobId,
+      kind: params.kind,
+    });
+    if (r.terminal) {
+      revalidatePath(`/invoices/${params.invoiceId}`);
+      return { ok: r.ok, message: r.message };
+    }
+  }
+  revalidatePath(`/invoices/${params.invoiceId}`);
+  return {
+    ok: true,
+    message: "Still processing — use “Refresh status” or reload the page.",
+  };
+}
 
 export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
   const { userId } = await auth();
@@ -63,17 +97,10 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
   }
 
   const post = await client.postSendInvoice(body, idempotencyKey);
-  const postJson = (await post.json().catch(() => ({}))) as {
-    jobId?: string;
-    message?: string;
-    error?: string;
-  };
+  const postJson = (await post.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (post.status !== 202) {
-    const msg =
-      postJson.message ||
-      postJson.error ||
-      `Verifactu returned HTTP ${post.status}`;
+    const msg = formatSimplefactuHttpError(post.status, postJson);
     await prisma.invoice.update({
       where: { id: invoice.id },
       data: {
@@ -86,7 +113,7 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
     return { ok: false, message: msg };
   }
 
-  const jobId = postJson.jobId;
+  const jobId = postJson.jobId as string | undefined;
   if (!jobId) {
     return { ok: false, message: "No jobId returned from Verifactu." };
   }
@@ -101,54 +128,153 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
     },
   });
 
-  for (let i = 0; i < 10; i++) {
-    await sleep(1500);
-    const jr = await client.getJob(jobId);
-    const job = (await jr.json().catch(() => ({}))) as {
-      status?: string;
-      lastError?: string | null;
-      result?: { qrInfo?: { csv?: string; qrText?: string } | null };
-    };
+  return pollUntilTerminal(client, {
+    invoiceId: invoice.id,
+    userId,
+    jobId,
+    kind: "SEND_INVOICE",
+  });
+}
 
-    const st = job.status;
-    if (st === "SUCCEEDED") {
-      const csv = job.result?.qrInfo?.csv ?? null;
-      const qrText = job.result?.qrInfo?.qrText ?? null;
-      await prisma.invoice.update({
-        where: { id: invoice.id },
-        data: {
-          aeatStatus: AeatJobStatus.SUCCEEDED,
-          aeatCsv: csv,
-          aeatQrText: qrText,
-          aeatLastError: null,
-          aeatUpdatedAt: new Date(),
-        },
-      });
-      revalidatePath(`/invoices/${invoice.id}`);
-      return {
-        ok: true,
-        message: csv ? `Accepted (CSV: ${csv})` : "Accepted by Verifactu.",
-      };
-    }
+export async function refreshVerifactuJobAction(invoiceId: string): Promise<SendVerifactuResult> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, message: "Sign in required." };
 
-    if (st === "FAILED" || st === "DEAD") {
-      const err = (job.lastError || "Verifactu job failed").slice(0, 2000);
-      await prisma.invoice.update({
-        where: { id: invoice.id },
-        data: {
-          aeatStatus: st === "DEAD" ? AeatJobStatus.DEAD : AeatJobStatus.FAILED,
-          aeatLastError: err,
-          aeatUpdatedAt: new Date(),
-        },
-      });
-      revalidatePath(`/invoices/${invoice.id}`);
-      return { ok: false, message: err };
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+  });
+  if (!invoice) return { ok: false, message: "Invoice not found." };
+
+  let kind: "SEND_INVOICE" | "CANCEL_INVOICE" | null = null;
+  let jobId: string | null = null;
+
+  if (
+    invoice.aeatCancellationStatus === AeatCancellationStatus.PENDING &&
+    invoice.aeatCancellationJobId
+  ) {
+    kind = "CANCEL_INVOICE";
+    jobId = invoice.aeatCancellationJobId;
+  } else if (invoice.aeatStatus === AeatJobStatus.PENDING && invoice.aeatJobId) {
+    kind = "SEND_INVOICE";
+    jobId = invoice.aeatJobId;
+  }
+
+  if (!kind || !jobId) {
+    return { ok: false, message: "No pending Verifactu job to refresh." };
+  }
+
+  const { apiKey } = await ensureVerifactuApiKey(userId);
+  const client = createSimplefactuClient({
+    baseUrl: getSimplefactuBaseUrl(),
+    apiKey,
+  });
+
+  const r = await syncJobStatusToInvoice(client, {
+    invoiceId,
+    userId,
+    jobId,
+    kind,
+  });
+  revalidatePath(`/invoices/${invoiceId}`);
+  return { ok: r.ok, message: r.message };
+}
+
+export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, message: "Sign in required." };
+
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+  });
+  if (!invoice) return { ok: false, message: "Invoice not found." };
+
+  if (invoice.aeatStatus !== AeatJobStatus.SUCCEEDED) {
+    return { ok: false, message: "Only invoices accepted by Verifactu can be cancelled in AEAT." };
+  }
+
+  if (invoice.aeatCancellationStatus === AeatCancellationStatus.SUCCEEDED) {
+    return { ok: false, message: "This invoice is already cancelled in Verifactu." };
+  }
+
+  if (invoice.aeatCancellationStatus === AeatCancellationStatus.PENDING) {
+    return { ok: false, message: "Cancellation is already in progress. Use Refresh status." };
+  }
+
+  const needsNewCancelKey =
+    invoice.aeatCancellationStatus === AeatCancellationStatus.FAILED ||
+    invoice.aeatCancellationStatus === AeatCancellationStatus.DEAD;
+
+  const account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
+  if (!account?.issuerNif || !account.issuerLegalName) {
+    return { ok: false, message: "Set issuer NIF and legal name under Settings → Verifactu." };
+  }
+
+  const { apiKey } = await ensureVerifactuApiKey(userId);
+  const client = createSimplefactuClient({
+    baseUrl: getSimplefactuBaseUrl(),
+    apiKey,
+  });
+
+  const certRes = await client.getMeCertificate();
+  if (certRes.ok) {
+    const cj = (await certRes.json()) as { hasCertificate?: boolean };
+    if (!cj.hasCertificate) {
+      return { ok: false, message: "Upload your PFX certificate under Settings → Verifactu first." };
     }
   }
 
-  revalidatePath(`/invoices/${invoice.id}`);
-  return {
-    ok: true,
-    message: "Still processing — refresh this page in a few seconds to see the final status.",
-  };
+  let body: Record<string, unknown>;
+  try {
+    body = buildCancelInvoicePayload(invoice, account);
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Invalid cancellation payload." };
+  }
+
+  let cancelKey =
+    invoice.aeatCancellationIdempotencyKey || `cancel-inv-${invoice.id}`;
+  if (needsNewCancelKey) {
+    cancelKey = `cancel-inv-${invoice.id}-${Date.now()}`;
+  }
+  await prisma.invoice.update({
+    where: { id: invoice.id },
+    data: { aeatCancellationIdempotencyKey: cancelKey },
+  });
+
+  const post = await client.postCancelInvoice(body, cancelKey);
+  const postJson = (await post.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (post.status !== 202) {
+    const msg = formatSimplefactuHttpError(post.status, postJson);
+    await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: {
+        aeatCancellationLastError: msg.slice(0, 2000),
+        aeatUpdatedAt: new Date(),
+      },
+    });
+    revalidatePath(`/invoices/${invoice.id}`);
+    return { ok: false, message: msg };
+  }
+
+  const jobId = postJson.jobId as string | undefined;
+  if (!jobId) {
+    return { ok: false, message: "No cancellation jobId returned from Verifactu." };
+  }
+
+  await prisma.invoice.update({
+    where: { id: invoice.id },
+    data: {
+      aeatCancellationJobId: jobId,
+      aeatCancellationStatus: AeatCancellationStatus.PENDING,
+      aeatCancellationLastError: null,
+      aeatUpdatedAt: new Date(),
+    },
+  });
+
+  return pollUntilTerminal(client, {
+    invoiceId: invoice.id,
+    userId,
+    jobId,
+    kind: "CANCEL_INVOICE",
+  });
 }
