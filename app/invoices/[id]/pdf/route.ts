@@ -227,7 +227,7 @@ export async function GET(
       y -= LH_SM;
     }
     if (qrPayload) {
-      text("Verification QR:", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
+      text("QR tributario:", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
       y -= LH_SM;
       try {
         const pngBuffer = await QRCode.toBuffer(qrPayload, {
@@ -244,7 +244,9 @@ export async function GET(
           width: dim,
           height: dim,
         });
-        y -= dim + 6;
+        y -= dim + 4;
+        text("VERI*FACTU", MARGIN, { size: FONT_SM, color: GRAY });
+        y -= LH_SM;
       } catch {
         text("(QR could not be generated)", MARGIN, { size: FONT_SM, color: GRAY });
         y -= LH_SM;

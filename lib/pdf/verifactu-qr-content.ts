@@ -1,22 +1,40 @@
 /**
  * Payload string for the Verifactu verification QR (URL AEAT).
- * Prefers stored qrText; if only CSV exists, builds the standard ValidarQR URL.
- * AEAT's ValidarQR endpoint requires both `nif` (issuer NIF) and `csv`.
+ * Always computes from invoice data so old invoices with stale aeatQrText are
+ * retroactively fixed. URL format per AEAT spec:
+ *   ValidarQR?nif={NIF}&numserie={numSerie}&fecha={DD-MM-AAAA}&importe={total}
+ *
+ * Returns null when the invoice has not been submitted to AEAT yet or when the
+ * issuer NIF is not available.
  */
 export function verifactuQrPayload(invoice: {
-  aeatQrText: string | null;
-  aeatCsv: string | null;
   issuerNif?: string | null;
+  number: string;
+  issueDate: Date;
+  totalCents: number;
+  aeatCsv?: string | null;
+  aeatQrText?: string | null;
 }): string | null {
-  const url = invoice.aeatQrText?.trim();
-  if (url) return url;
-  const csv = invoice.aeatCsv?.trim();
-  if (!csv) return null;
-  const defaultBase = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR";
+  const hasSubmission = !!(invoice.aeatCsv?.trim() || invoice.aeatQrText?.trim());
+  const nif = invoice.issuerNif?.trim();
+  if (!hasSubmission || !nif) return null;
+
   const raw = process.env.VERIFACTU_VERIFY_QR_BASE?.trim();
-  const base = (raw || defaultBase).split("?")[0].replace(/\/$/, "") || defaultBase;
-  const nifParam = invoice.issuerNif?.trim()
-    ? `nif=${encodeURIComponent(invoice.issuerNif.trim())}&`
-    : "";
-  return `${base}?${nifParam}csv=${encodeURIComponent(csv)}`;
+  const base = (raw || "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR")
+    .split("?")[0]
+    .replace(/\/$/, "");
+
+  const d = invoice.issueDate;
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const fecha = `${dd}-${mm}-${yyyy}`;
+
+  const params = new URLSearchParams({
+    nif,
+    numserie: invoice.number,
+    fecha,
+    importe: (invoice.totalCents / 100).toFixed(2),
+  });
+  return `${base}?${params.toString()}`;
 }
