@@ -44,9 +44,17 @@ model Invoice {
   number             String
   issueDate          DateTime
   dueDate            DateTime?
+  fechaOperacion     DateTime?
   customerName       String
   customerEmail      String?
   customerNif        String?
+  customerTipoPersona String?
+  /// NIF | ID_OTRO — destinatario AEAT
+  customerIdScheme   String        @default("NIF")
+  /// Códigos AEAT IDType (02 NIF-IVA, 03 Pasaporte, etc.) cuando customerIdScheme = ID_OTRO
+  customerIdType     String?
+  customerCodigoPais String?
+  customerForeignId  String?
   currency           String        @default("EUR")
   subtotalCents      Int
   taxCents           Int
@@ -81,5 +89,41 @@ model InvoiceItem {
   description    String
   quantity       Int
   unitPriceCents Int
+  discountCents  Int      @default(0)
+  discountConcept String?
   lineTotalCents Int
+  claveRegimen   String   @default("01")
+  calificacion   String   @default("S1")
+  tipoImpositivo String   @default("21.0")
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  nif         String?
+  email       String?
+  tipoPersona String?
+  idScheme    String   @default("NIF")
+  idType      String?
+  codigoPais  String?
+  foreignId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  userId         String
+  description    String
+  unitPriceCents Int
+  tipoImpositivo String   @default("21.0")
+  claveRegimen   String   @default("01")
+  calificacion   String   @default("S1")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
 }

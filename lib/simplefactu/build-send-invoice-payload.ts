@@ -54,6 +54,52 @@ export function readSiFromEnv(issuer: {
   };
 }
 
+function formatImporte(v: number): number {
+  // Keep as float but round to 2 decimal places to match AEAT canonical format
+  return Math.round(v * 100) / 100;
+}
+
+/**
+ * Build the detalles array from invoice items.
+ * Groups by (claveRegimen, calificacion, tipoImpositivo) and sums base/cuota per group.
+ */
+function buildDetalles(items: InvoiceItem[]): Record<string, unknown>[] {
+  type Key = string;
+  const groups = new Map<
+    Key,
+    { clave: string; calif: string; tipo: number; baseCents: number; cuotaCents: number }
+  >();
+
+  for (const item of items) {
+    const claveRegimen = (item as unknown as Record<string, string>).claveRegimen ?? "01";
+    const calificacion = (item as unknown as Record<string, string>).calificacion ?? "S1";
+    const tipoImpositivo = parseFloat(
+      (item as unknown as Record<string, string>).tipoImpositivo ?? "21.0"
+    ) || 0;
+
+    const key: Key = `${claveRegimen}|${calificacion}|${tipoImpositivo}`;
+    const discountCents = (item as unknown as Record<string, number>).discountCents ?? 0;
+    const baseCents = Math.max(0, item.quantity * item.unitPriceCents - discountCents);
+    const cuotaCents = Math.round((baseCents * tipoImpositivo) / 100);
+
+    const existing = groups.get(key);
+    if (existing) {
+      existing.baseCents += baseCents;
+      existing.cuotaCents += cuotaCents;
+    } else {
+      groups.set(key, { clave: claveRegimen, calif: calificacion, tipo: tipoImpositivo, baseCents, cuotaCents });
+    }
+  }
+
+  return Array.from(groups.values()).map(({ clave, calif, tipo, baseCents, cuotaCents }) => ({
+    clave,
+    calif,
+    tipo,
+    base: formatImporte(baseCents / 100),
+    cuota: formatImporte(cuotaCents / 100),
+  }));
+}
+
 /**
  * Build JSON body for POST /send-invoice. Omits huella / primerRegistro so the API infers and generates.
  */
@@ -67,43 +113,64 @@ export function buildSendInvoicePayload(
     throw new Error("Configure issuer NIF and legal name in Verifactu settings before sending.");
   }
 
-  const destNif = (invoice.customerNif || "").trim();
-  if (!destNif) {
-    throw new Error("Customer NIF/CIF is required for Verifactu.");
+  const inv = invoice as unknown as Record<string, unknown>;
+  const scheme = String(inv.customerIdScheme || "NIF");
+
+  let destNif: string | undefined;
+  let destIdOtro: { codigoPais?: string; idType: string; id: string } | undefined;
+
+  if (scheme === "ID_OTRO") {
+    const idType = String(inv.customerIdType || "").trim();
+    const id = String(inv.customerForeignId || "").trim();
+    const codigoPais = String(inv.customerCodigoPais || "").trim().toUpperCase();
+    if (!idType || !id) {
+      throw new Error("Complete el identificador del destinatario (tipo e ID) para Verifactu.");
+    }
+    if (idType !== "02" && !/^[A-Z]{2}$/.test(codigoPais)) {
+      throw new Error("Código país ISO-2 obligatorio para este tipo de identificación.");
+    }
+    destIdOtro = {
+      idType,
+      id,
+      ...(idType === "02" ? {} : { codigoPais }),
+    };
+  } else {
+    const n = (invoice.customerNif || "").trim();
+    if (!n) {
+      throw new Error("Customer NIF/CIF is required for Verifactu.");
+    }
+    destNif = n;
   }
 
   const si = readSiFromEnv({ issuerNif, issuerLegalName: issuerName });
 
-  const subtotal = invoice.subtotalCents / 100;
-  const cuota = invoice.taxCents / 100;
-  const total = invoice.totalCents / 100;
-  const tipo = invoice.taxRatePercent;
+  const cuotaTotal = formatImporte(invoice.taxCents / 100);
+  const total = formatImporte(invoice.totalCents / 100);
 
   const descripcion =
     (invoice.notes || "").trim() ||
     (invoice.items[0]?.description || "Operación sujeta").trim() ||
     "Operación sujeta";
 
+  const detalles = invoice.items.length > 0
+    ? buildDetalles(invoice.items)
+    : [{ clave: "01", calif: "S1", tipo: 21, base: formatImporte(invoice.subtotalCents / 100), cuota: cuotaTotal }];
+
+  const fechaOperacionVal = inv.fechaOperacion as Date | null | undefined;
+
   return {
     nif: issuerNif,
     nombre: issuerName,
     numSerie: invoice.number,
     fecha: toDdMmYyyy(invoice.issueDate),
+    ...(fechaOperacionVal ? { fechaOperacion: toDdMmYyyy(fechaOperacionVal) } : {}),
     tipoFactura: "F1",
     descripcion,
     destNombre: invoice.customerName.trim(),
-    destNif,
-    cuotaTotal: cuota,
+    ...(destIdOtro ? { destIdOtro } : { destNif: destNif! }),
+    cuotaTotal,
     total,
-    detalles: [
-      {
-        clave: "01",
-        calif: "S1",
-        tipo,
-        base: subtotal,
-        cuota,
-      },
-    ],
+    detalles,
     sistemaInformatico: {
       nombreRazon: si.nombreRazon,
       nif: si.nif,

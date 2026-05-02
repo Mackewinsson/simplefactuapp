@@ -12,12 +12,13 @@ export function verifactuQrPayload(invoice: {
   number: string;
   issueDate: Date;
   totalCents: number;
+  /** @deprecated unused, kept for backwards compatibility */
   aeatCsv?: string | null;
+  /** @deprecated unused, kept for backwards compatibility */
   aeatQrText?: string | null;
 }): string | null {
-  const hasSubmission = !!(invoice.aeatCsv?.trim() || invoice.aeatQrText?.trim());
   const nif = invoice.issuerNif?.trim();
-  if (!hasSubmission || !nif) return null;
+  if (!nif || !invoice.number?.trim()) return null;
 
   const raw = process.env.VERIFACTU_VERIFY_QR_BASE?.trim();
   const base = (raw || "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR")

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import {
   sendInvoiceToVerifactuAction,
   refreshVerifactuJobAction,
@@ -19,6 +19,7 @@ type Props = {
   aeatCancellationStatus: string;
   aeatCancellationJobId: string | null;
   aeatCancellationLastError: string | null;
+  autoSend?: boolean;
 };
 
 export function VerifactuSendPanel({
@@ -31,14 +32,27 @@ export function VerifactuSendPanel({
   aeatCancellationStatus,
   aeatCancellationJobId,
   aeatCancellationLastError,
+  autoSend,
 }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
+  const autoSendFired = useRef(false);
+
+  const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
+
+  // Auto-trigger send when ?send=1 is present and invoice hasn't been sent yet
+  useEffect(() => {
+    if (autoSend && canSendNow && !autoSendFired.current) {
+      autoSendFired.current = true;
+      run(sendInvoiceToVerifactuAction, invoiceId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const sendPending = aeatStatus === "PENDING";
   const cancelPending = aeatCancellationStatus === "PENDING";
-  const canSend = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
+  const canSend = canSendNow;
   const canRefresh = sendPending || cancelPending;
   const canCancelAeat =
     aeatStatus === "SUCCEEDED" &&

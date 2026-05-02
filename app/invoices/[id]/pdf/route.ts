@@ -210,8 +210,11 @@ export async function GET(
   y -= GAP_MD;
 
   /* ── 4b. Verifactu (AEAT) ───────────────────────────── */
-  const qrPayload = verifactuQrPayload({ ...invoice, issuerNif: account?.issuerNif ?? null });
-  if (invoice.aeatCsv || invoice.aeatQrText || qrPayload) {
+  const hasAeatSubmission = !!(invoice.aeatCsv?.trim() || invoice.aeatStatus === "SUCCEEDED");
+  const qrPayload = hasAeatSubmission
+    ? verifactuQrPayload({ ...invoice, issuerNif: account?.issuerNif ?? null })
+    : null;
+  if (invoice.aeatCsv || qrPayload) {
     text("VERIFACTU (AEAT)", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
     y -= LH;
     if (invoice.aeatCsv) {

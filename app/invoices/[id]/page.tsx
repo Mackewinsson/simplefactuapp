@@ -5,13 +5,18 @@ import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { VerifactuSendPanel } from "./VerifactuSendPanel";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
+};
 
-export default async function InvoiceDetailPage({ params }: Props) {
+export default async function InvoiceDetailPage({ params, searchParams }: Props) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
   const { id } = await params;
+  const sp = await searchParams;
+  const autoSend = sp.send === "1";
 
   const invoice = await prisma.invoice.findUnique({
     where: { id, userId },
@@ -76,6 +81,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
             aeatCancellationStatus={invoice.aeatCancellationStatus}
             aeatCancellationJobId={invoice.aeatCancellationJobId}
             aeatCancellationLastError={invoice.aeatCancellationLastError}
+            autoSend={autoSend}
           />
         </div>
 

@@ -27,7 +27,11 @@ const item: InvoiceItem = {
   description: "Service",
   quantity: 1,
   unitPriceCents: 10000,
+  discountCents: 0,
   lineTotalCents: 10000,
+  claveRegimen: "01",
+  calificacion: "S1",
+  tipoImpositivo: "21.0",
 };
 
 const invoiceBase: Invoice & { items: InvoiceItem[] } = {
@@ -36,9 +40,11 @@ const invoiceBase: Invoice & { items: InvoiceItem[] } = {
   number: "2026/F-001",
   issueDate: new Date(Date.UTC(2026, 2, 15)),
   dueDate: null,
+  fechaOperacion: null,
   customerName: "Cliente SA",
   customerEmail: null,
   customerNif: "A12345678",
+  customerTipoPersona: null,
   currency: "EUR",
   subtotalCents: 10000,
   taxCents: 2100,
