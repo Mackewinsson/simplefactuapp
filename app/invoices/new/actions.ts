@@ -200,7 +200,7 @@ export async function createInvoiceAction(
         dueDate: dueDate ? new Date(dueDate) : null,
         fechaOperacion: fechaOperacion ? new Date(fechaOperacion) : null,
         customerName,
-        customerNif: customerIdScheme === "NIF" ? customerNif.trim() : null,
+        customerNif: customerIdScheme === "NIF" ? (customerNif?.trim() || null) : null,
         customerEmail: customerEmail || null,
         customerTipoPersona: customerTipoPersona || null,
         customerIdScheme,

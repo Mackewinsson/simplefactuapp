@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCustomerAction, updateCustomerAction, type CustomerRow } from "./actions";
@@ -51,9 +52,9 @@ export function CustomerList({ customers }: Props) {
     return (
       <p className="text-sm text-gray-600">
         No hay clientes guardados. Puedes crear uno desde{" "}
-        <a href="/invoices/new" className="text-blue-600 hover:underline">
+        <Link href="/invoices/new" className="text-blue-600 hover:underline">
           Nueva factura
-        </a>
+        </Link>
         .
       </p>
     );

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/money";
@@ -61,9 +62,9 @@ export function ProductList({ products }: Props) {
     return (
       <p className="text-sm text-gray-600">
         No hay productos en catálogo. Añade líneas en{" "}
-        <a href="/invoices/new" className="text-blue-600 hover:underline">
+        <Link href="/invoices/new" className="text-blue-600 hover:underline">
           Nueva factura
-        </a>{" "}
+        </Link>{" "}
         y guárdalos desde el flujo de productos, o crea uno aquí más adelante.
       </p>
     );
