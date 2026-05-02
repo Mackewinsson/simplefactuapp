@@ -127,3 +127,17 @@ model Product {
 
   @@index([userId])
 }
+
+/// Audit trail for simplefactuapp /admin server actions (who did what).
+model AdminActionLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  target    String?
+  metadata  String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("admin_action_logs")
+}

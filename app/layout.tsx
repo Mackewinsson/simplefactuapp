@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
+import { AppNav } from "./AppNav";
+import { HeaderUserArea } from "./HeaderUserArea";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,34 +24,11 @@ export default function RootLayout({
                 <span className="text-lg font-semibold text-gray-900">
                   SimpleFactu
                 </span>
-                <nav className="flex gap-6">
-                  <Link href="/" className="text-gray-600 hover:text-gray-900">
-                    Home
-                  </Link>
-                  <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
-                    Invoices
-                  </Link>
-                  <Link href="/invoices/new" className="text-gray-600 hover:text-gray-900">
-                    New Invoice
-                  </Link>
-                  <Link href="/customers" className="text-gray-600 hover:text-gray-900">
-                    Clientes
-                  </Link>
-                  <Link href="/products" className="text-gray-600 hover:text-gray-900">
-                    Productos
-                  </Link>
-                  <Link href="/settings/verifactu" className="text-gray-600 hover:text-gray-900">
-                    Verifactu
-                  </Link>
-                </nav>
+                <AppNav />
               </div>
-              <SignedOut>
-                <SignInButton />
-                <SignUpButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton afterSignOutUrl="/" />
-              </SignedIn>
+              <div className="flex items-center gap-3">
+                <HeaderUserArea />
+              </div>
             </div>
           </header>
           <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>

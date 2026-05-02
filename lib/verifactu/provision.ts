@@ -3,7 +3,8 @@ import { encryptSecret, decryptSecret } from "@/lib/verifactu/crypto";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
 
-const BFF_KEY_SCOPES = [
+/** Scopes for app-provisioned API keys (also used when creating keys from the admin panel). */
+export const BFF_KEY_SCOPES = [
   "invoices:write",
   "invoices:read",
   "nif:read",

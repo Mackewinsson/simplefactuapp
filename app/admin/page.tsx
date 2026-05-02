@@ -86,6 +86,11 @@ export default async function AdminDashboardPage() {
             Explorar jobs AEAT
           </Link>
         </li>
+        <li>
+          <Link href="/admin/system" className="hover:underline">
+            Métricas y rate limit
+          </Link>
+        </li>
       </ul>
     </div>
   );

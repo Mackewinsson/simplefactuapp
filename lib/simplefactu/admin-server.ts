@@ -19,15 +19,24 @@ export function requireSimplefactuAdminKey(): string {
   return adminKey;
 }
 
+function adminFetchTimeoutMs(): number {
+  const n = parseInt(process.env.SIMPLEFACTU_ADMIN_FETCH_TIMEOUT_MS ?? "30000", 10);
+  return Number.isFinite(n) && n > 0 ? n : 30000;
+}
+
 /**
  * Server-only fetch to simplefactu admin routes (x-admin-key).
+ * Uses AbortSignal.timeout unless `init.signal` is provided.
  */
 export async function adminFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const adminKey = requireSimplefactuAdminKey();
   const base = getSimplefactuBaseUrl();
   const url = `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+  const ms = adminFetchTimeoutMs();
+  const signal = init.signal ?? AbortSignal.timeout(ms);
   return fetch(url, {
     ...init,
+    signal,
     headers: {
       "Content-Type": "application/json",
       "x-admin-key": adminKey,
@@ -48,10 +57,13 @@ export async function adminJson<T>(path: string, init: RequestInit = {}): Promis
     }
   }
   if (!res.ok) {
-    const msg =
+    let msg =
       typeof body === "object" && body !== null && "message" in body
         ? String((body as { message?: string }).message)
         : res.statusText;
+    if (res.status === 401) {
+      msg = "simplefactu rechazó la admin key (401).";
+    }
     throw new SimplefactuAdminError(msg || `HTTP ${res.status}`, res.status, body);
   }
   return body as T;
@@ -201,4 +213,116 @@ export async function getAdminJob(jobId: string): Promise<AdminJobDetailResponse
   return adminJson<AdminJobDetailResponse>(`/admin/jobs/${encodeURIComponent(jobId)}`, {
     method: "GET",
   });
+}
+
+export type RateLimitConfigResponse = {
+  success: boolean;
+  message?: string;
+  rateLimitWindowSec?: number;
+  rateLimitMaxRequests?: number;
+};
+
+export async function getRateLimitConfig(): Promise<RateLimitConfigResponse> {
+  return adminJson<RateLimitConfigResponse>("/admin/rate-limit-config", { method: "GET" });
+}
+
+export type AdminMetricsResponse = {
+  success: boolean;
+  tenantId: string;
+  from: string;
+  to: string;
+  metrics: unknown;
+  totals: unknown;
+};
+
+export async function getAdminMetrics(
+  tenantId: string,
+  from: string,
+  to: string
+): Promise<AdminMetricsResponse> {
+  const q = new URLSearchParams({ tenantId, from, to });
+  return adminJson<AdminMetricsResponse>(`/admin/metrics?${q}`, { method: "GET" });
+}
+
+export type AdminApiKeyRow = {
+  id: string;
+  tenant_id: string;
+  name: string | null;
+  scopes: string[];
+  status: string;
+  revoked_at: string | null;
+  last_used_at: string | null;
+  created_at: string;
+};
+
+export async function listApiKeysForTenant(tenantId: string): Promise<{ success: boolean; keys: AdminApiKeyRow[] }> {
+  const q = new URLSearchParams({ tenantId });
+  return adminJson(`/admin/api-keys?${q}`, { method: "GET" });
+}
+
+export async function postCreateApiKey(params: {
+  tenantId: string;
+  name?: string;
+  scopes: string[];
+}): Promise<{
+  success: boolean;
+  apiKey: { id: string; key?: string; warning?: string; name: string | null; scopes: string[] };
+}> {
+  return adminJson("/admin/api-keys", {
+    method: "POST",
+    body: JSON.stringify({
+      tenantId: params.tenantId,
+      name: params.name ?? "admin-panel",
+      scopes: params.scopes,
+    }),
+  });
+}
+
+export async function postRevokeApiKey(keyId: string): Promise<{ success: boolean; message?: string }> {
+  return adminJson(`/admin/api-keys/${encodeURIComponent(keyId)}/revoke`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function postUploadTenantCertificate(params: {
+  tenantId: string;
+  pfxBase64: string;
+  pfxPassphrase: string;
+}): Promise<{ success: boolean; tenantId?: string; updated?: boolean }> {
+  return adminJson("/admin/tenant/certificate", {
+    method: "POST",
+    body: JSON.stringify({
+      tenantId: params.tenantId,
+      pfxBase64: params.pfxBase64,
+      pfxPassphrase: params.pfxPassphrase,
+    }),
+  });
+}
+
+export async function deleteTenantCertificate(tenantId: string): Promise<{
+  success: boolean;
+  tenantId?: string;
+  deleted?: boolean;
+}> {
+  return adminJson(`/admin/tenant/${encodeURIComponent(tenantId)}/certificate`, {
+    method: "DELETE",
+  });
+}
+
+export type AdminChainRow = {
+  id: string;
+  tenantId: string;
+  chainKey: string;
+  lastHuella: string;
+  lastTimestamp: string | null;
+  updatedAt: string;
+};
+
+export async function getTenantChains(tenantId: string): Promise<{
+  success: boolean;
+  tenantId: string;
+  chains: AdminChainRow[];
+}> {
+  return adminJson(`/admin/tenants/${encodeURIComponent(tenantId)}/chains`, { method: "GET" });
 }
