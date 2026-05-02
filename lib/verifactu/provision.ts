@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { encryptSecret, decryptSecret } from "@/lib/verifactu/crypto";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { adminFetch } from "@/lib/simplefactu/admin-server";
 
 const BFF_KEY_SCOPES = [
   "invoices:write",
@@ -15,23 +16,6 @@ function tenantIdForUser(userId: string): string {
     throw new Error("Invalid user id for tenant mapping");
   }
   return `sf_${userId}`;
-}
-
-async function adminFetch(path: string, init: RequestInit): Promise<Response> {
-  const adminKey = process.env.SIMPLEFACTU_ADMIN_KEY?.trim();
-  if (!adminKey) {
-    throw new Error("SIMPLEFACTU_ADMIN_KEY is not set (server-only tenant provisioning)");
-  }
-  const base = getSimplefactuBaseUrl();
-  const url = `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
-  return fetch(url, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      "x-admin-key": adminKey,
-      ...init.headers,
-    },
-  });
 }
 
 /**

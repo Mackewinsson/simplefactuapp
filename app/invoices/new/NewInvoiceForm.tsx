@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState, useRef, useEffect } from "react";
+import { useActionState, useState, useRef, useEffect, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { createInvoiceAction, type CreateInvoiceState } from "./actions";
 import {
@@ -19,6 +19,7 @@ import {
   type ProductRow,
 } from "@/app/products/actions";
 import { parseDecimalToCents, formatCents } from "@/lib/money";
+import { verifyRecipientNif } from "./verify-recipient-nif";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -371,6 +372,12 @@ export function NewInvoiceForm({
   const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
   const [showSelectCustomerModal, setShowSelectCustomerModal] = useState(false);
 
+  const [vnifPending, startVnifTransition] = useTransition();
+  const [vnifFeedback, setVnifFeedback] = useState<{
+    variant: "ok" | "warn" | "err";
+    text: string;
+  } | null>(null);
+
   // Items state
   const [items, setItems] = useState<InvoiceItemRow[]>([{ ...DEFAULT_ITEM }]);
   const [showProductModal, setShowProductModal] = useState(false);
@@ -381,6 +388,7 @@ export function NewInvoiceForm({
   const composedNumber = serie && numero ? `${serie}/${numero}` : numero;
 
   function fillCustomer(c: { name: string; nif: string; email: string; tipoPersona: string } | CustomerRow) {
+    setVnifFeedback(null);
     setCustomerName(c.name);
     setCustomerNif(c.nif ?? "");
     setCustomerEmail(c.email ?? "");
@@ -417,6 +425,28 @@ export function NewInvoiceForm({
   const totalCents = totals.base + totals.cuota;
 
   const isNewSeries = serie && existingSeries.length > 0 && !existingSeries.includes(serie);
+
+  function runVerifyRecipientNif() {
+    setVnifFeedback(null);
+    startVnifTransition(async () => {
+      const r = await verifyRecipientNif(customerNif, customerName);
+      if (r.kind === "identified") {
+        setCustomerNif(r.nif);
+        setCustomerName(r.nombre);
+        setVnifFeedback({
+          variant: "ok",
+          text: `VNIF AEAT: ${r.resultado}. NIF y nombre actualizados con los datos devueltos.`,
+        });
+      } else if (r.kind === "not_identified") {
+        setVnifFeedback({
+          variant: "warn",
+          text: r.message ?? r.resultado,
+        });
+      } else {
+        setVnifFeedback({ variant: "err", text: r.error });
+      }
+    });
+  }
 
   return (
     <>
@@ -541,6 +571,12 @@ export function NewInvoiceForm({
             </div>
           </div>
 
+          <p className="text-xs text-gray-500">
+            La verificación VNIF (calidad de datos identificativos AEAT) solo aplica a{" "}
+            <strong>NIF/CIF españoles</strong>. No sustituye identificadores extranjeros u otros (ID_OTRO
+            en Verifactu).
+          </p>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block sm:col-span-2">
               <span className="mb-1 block text-sm font-medium text-gray-700">
@@ -549,22 +585,53 @@ export function NewInvoiceForm({
               <input
                 type="text"
                 value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
+                onChange={(e) => {
+                  setCustomerName(e.target.value);
+                  setVnifFeedback(null);
+                }}
                 className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
               />
             </label>
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">
-                NIF / CIF <span className="text-red-500">*</span>
-              </span>
-              <input
-                type="text"
-                value={customerNif}
-                onChange={(e) => setCustomerNif(e.target.value)}
-                placeholder="B12345678"
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
-              />
-            </label>
+            <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-end">
+              <label className="block min-w-0 flex-1">
+                <span className="mb-1 block text-sm font-medium text-gray-700">
+                  NIF / CIF <span className="text-red-500">*</span>
+                </span>
+                <input
+                  type="text"
+                  value={customerNif}
+                  onChange={(e) => {
+                    setCustomerNif(e.target.value);
+                    setVnifFeedback(null);
+                  }}
+                  placeholder="B12345678"
+                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={runVerifyRecipientNif}
+                disabled={
+                  vnifPending || !customerNif.trim() || !customerName.trim()
+                }
+                className="shrink-0 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {vnifPending ? "Verificando…" : "Verificar con AEAT (VNIF)"}
+              </button>
+            </div>
+            {vnifFeedback ? (
+              <div
+                className={`sm:col-span-2 rounded border px-3 py-2 text-sm ${
+                  vnifFeedback.variant === "ok"
+                    ? "border-green-200 bg-green-50 text-green-900"
+                    : vnifFeedback.variant === "warn"
+                      ? "border-amber-200 bg-amber-50 text-amber-900"
+                      : "border-red-200 bg-red-50 text-red-800"
+                }`}
+              >
+                {vnifFeedback.text}
+              </div>
+            ) : null}
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-gray-700">Email</span>
               <input
