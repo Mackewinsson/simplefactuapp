@@ -2,12 +2,36 @@ import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { SimplefactuClient } from "@/lib/simplefactu/client";
 
+type AeatError = {
+  code?: string | null;
+  description?: string | null;
+  category?: string | null;
+};
+
 type JobJson = {
   status?: string;
   type?: string;
   lastError?: string | null;
-  result?: { qrInfo?: { csv?: string; qrText?: string } | null };
+  result?: {
+    qrInfo?: { csv?: string; qrText?: string } | null;
+    aeatErrors?: AeatError[] | null;
+  } | null;
 };
+
+/**
+ * Build a concise error string from structured AEAT errors returned by the backend.
+ * Falls back to `lastError` when no structured errors are present.
+ */
+function buildErrorMessage(job: JobJson): string {
+  const errors = job.result?.aeatErrors;
+  if (errors && errors.length > 0) {
+    const parts = errors
+      .filter((e) => e.code || e.description)
+      .map((e) => (e.description ? `[${e.code}] ${e.description}` : `Error ${e.code}`));
+    if (parts.length) return parts.join(" | ").slice(0, 2000);
+  }
+  return (job.lastError || "Verifactu job failed").slice(0, 2000);
+}
 
 /**
  * Fetches job status from simplefactu and persists terminal state to the invoice.
@@ -64,7 +88,7 @@ export async function syncJobStatusToInvoice(
       };
     }
     if (st === "FAILED" || st === "DEAD") {
-      const err = (job.lastError || "Verifactu job failed").slice(0, 2000);
+      const err = buildErrorMessage(job);
       await prisma.invoice.update({
         where: { id: invoiceId },
         data: {
@@ -95,7 +119,7 @@ export async function syncJobStatusToInvoice(
     return { ok: true, message: "Cancellation accepted by Verifactu.", terminal: true };
   }
   if (st === "FAILED" || st === "DEAD") {
-    const err = (job.lastError || "Cancellation job failed").slice(0, 2000);
+    const err = buildErrorMessage(job);
     await prisma.invoice.update({
       where: { id: invoiceId },
       data: {

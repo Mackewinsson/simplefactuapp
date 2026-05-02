@@ -28,8 +28,9 @@ export function readSiFromEnv(issuer: {
   const idSistemaInformatico = (process.env.VERIFACTU_SI_ID || "01").trim().slice(0, 2);
   const version = (process.env.VERIFACTU_SI_VERSION || "1.0.0").trim().slice(0, 50);
   const tipoUsoPosibleSoloVerifactu = (process.env.VERIFACTU_SI_SOLO_VERI || "S") as "S" | "N";
-  const tipoUsoPosibleMultiOT = (process.env.VERIFACTU_SI_MULTI_OT || "N") as "S" | "N";
-  const indicadorMultiplesOT = (process.env.VERIFACTU_SI_IND_MULTI_OT || "N") as "S" | "N";
+  // simplefactu is a multi-tenant SaaS: these must be "S" per OM HAC/1177/2024
+  const tipoUsoPosibleMultiOT = (process.env.VERIFACTU_SI_MULTI_OT || "S") as "S" | "N";
+  const indicadorMultiplesOT = (process.env.VERIFACTU_SI_IND_MULTI_OT || "S") as "S" | "N";
 
   if (!nombreRazon) {
     throw new Error("Missing issuer legal name (UserVerifactuAccount or VERIFACTU_SI_NOMBRE_RAZON)");
