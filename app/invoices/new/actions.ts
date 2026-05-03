@@ -10,8 +10,8 @@ import { parseDecimalToCents } from "@/lib/money";
 const CURRENCY_DEFAULT = "EUR";
 
 const itemSchema = z.object({
-  description: z.string().min(1, "Description required"),
-  quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  description: z.string().min(1, "La descripción es obligatoria"),
+  quantity: z.coerce.number().int().min(1, "La cantidad debe ser al menos 1"),
   unitPrice: z.string(),
   discountCents: z.coerce.number().int().min(0).default(0),
   discountConcept: z.string().max(250).optional().nullable(),
@@ -24,16 +24,16 @@ const AEAT_ID_TYPES = ["02", "03", "04", "05", "06"] as const;
 
 const schema = z
   .object({
-    number: z.string().min(1, "Number is required"),
-    issueDate: z.string().min(1, "Issue date is required"),
+    number: z.string().min(1, "El número es obligatorio"),
+    issueDate: z.string().min(1, "La fecha de expedición es obligatoria"),
     dueDate: z.string().optional(),
     fechaOperacion: z.string().optional(),
-    customerName: z.string().min(1, "Customer name is required"),
+    customerName: z.string().min(1, "El nombre del cliente es obligatorio"),
     customerNif: z.string().optional(),
     customerEmail: z
       .string()
       .optional()
-      .refine((v) => !v || v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Invalid email"),
+      .refine((v) => !v || v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Email no válido"),
     customerTipoPersona: z.enum(["F", "J"]).optional(),
     customerIdScheme: z.enum(["NIF", "ID_OTRO"]).default("NIF"),
     customerIdType: z.string().optional(),
@@ -43,17 +43,21 @@ const schema = z
     createdByFirstName: z.string().optional(),
     createdByLastName: z.string().optional(),
     sendToAeat: z.enum(["0", "1"]).default("0"),
-    items: z.array(itemSchema).min(1, "At least one item required"),
+    items: z.array(itemSchema).min(1, "Añade al menos una línea"),
   })
   .refine(
     (data) => data.items.every((i) => parseDecimalToCents(i.unitPrice) >= 0),
-    { message: "Unit price must be >= 0", path: ["items"] }
+    { message: "El precio unitario debe ser ≥ 0", path: ["items"] }
   )
   .superRefine((data, ctx) => {
     if (data.customerIdScheme === "NIF") {
       const nif = (data.customerNif ?? "").trim();
       if (!nif) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Customer NIF/CIF is required.", path: ["customerNif"] });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "El NIF/CIF del cliente es obligatorio.",
+          path: ["customerNif"],
+        });
       }
       return;
     }
@@ -90,7 +94,7 @@ export async function createInvoiceAction(
   formData: FormData
 ): Promise<CreateInvoiceState> {
   const { userId } = await auth();
-  if (!userId) return { errors: ["You must be signed in to create an invoice."] };
+  if (!userId) return { errors: ["Debes iniciar sesión para crear una factura."] };
 
   const user = await currentUser();
 
@@ -227,7 +231,7 @@ export async function createInvoiceAction(
     const err = e as { code?: string };
     if (err.code === "P2002")
       return { errors: ["El número de factura ya existe en tu cuenta."] };
-    return { errors: ["Failed to save invoice."] };
+    return { errors: ["No se pudo guardar la factura."] };
   }
 
   revalidatePath("/invoices");

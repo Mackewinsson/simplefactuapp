@@ -45,7 +45,7 @@ function safeFilename(number: string): string {
 }
 
 function fmtDate(d: Date): string {
-  return d.toLocaleDateString("en-GB", {
+  return d.toLocaleDateString("es", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -121,22 +121,22 @@ export async function GET(
     text(topLeftLabel, MARGIN, { size: FONT_LG, font: bold });
   }
 
-  const invLabel = `Invoice ${invoice.number}`;
+  const invLabel = `Factura ${invoice.number}`;
   textR(invLabel, RIGHT, { size: FONT_MD, font: bold });
   y -= LH + 2;
 
-  textR(`Issue date: ${fmtDate(invoice.issueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
+  textR(`Fecha expedición: ${fmtDate(invoice.issueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
   y -= LH_SM;
 
   if (invoice.dueDate) {
-    textR(`Due date: ${fmtDate(invoice.dueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
+    textR(`Vencimiento: ${fmtDate(invoice.dueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
     y -= LH_SM;
   }
 
   y -= GAP_MD;
 
   /* ── 2. Bill To ─────────────────────────────────────── */
-  text("BILL TO", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
+  text("DATOS DEL CLIENTE", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
   y -= LH;
   text(invoice.customerName, MARGIN, { size: FONT_MD, font: bold });
   y -= LH;
@@ -149,10 +149,10 @@ export async function GET(
 
   /* ── 3. Items table ─────────────────────────────────── */
   // Column headers
-  text("Description", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
-  textR("Qty", COL_QTY, { size: FONT_SM, font: bold, color: GRAY });
-  textR("Unit Price", COL_UNIT, { size: FONT_SM, font: bold, color: GRAY });
-  textR("Amount", COL_AMT, { size: FONT_SM, font: bold, color: GRAY });
+  text("Concepto", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
+  textR("Cant.", COL_QTY, { size: FONT_SM, font: bold, color: GRAY });
+  textR("Precio u.", COL_UNIT, { size: FONT_SM, font: bold, color: GRAY });
+  textR("Importe", COL_AMT, { size: FONT_SM, font: bold, color: GRAY });
   y -= 12;
   rule(MARGIN, RIGHT);
   y -= 14;
@@ -188,11 +188,11 @@ export async function GET(
   const totalsLabelEdge = COL_UNIT - 20; // label column (more space before amount)
   const totalsAmountEdge = TOTALS_AMOUNT_EDGE;
 
-  textR("Subtotal", totalsLabelEdge, { size: FONT_MD, color: GRAY });
+  textR("Base imponible", totalsLabelEdge, { size: FONT_MD, color: GRAY });
   textR(formatCents(invoice.currency, invoice.subtotalCents), totalsAmountEdge, { size: FONT_MD });
   y -= LH;
 
-  textR("Tax", totalsLabelEdge, { size: FONT_MD, color: GRAY });
+  textR("IVA", totalsLabelEdge, { size: FONT_MD, color: GRAY });
   textR(formatCents(invoice.currency, invoice.taxCents), totalsAmountEdge, { size: FONT_MD });
   y -= LH;
 
@@ -226,7 +226,7 @@ export async function GET(
         invoice.aeatQrText.length > 95
           ? invoice.aeatQrText.slice(0, 92) + "..."
           : invoice.aeatQrText;
-      text(`Verification URL: ${qrLine}`, MARGIN, { size: FONT_SM, color: GRAY });
+      text(`URL de verificación: ${qrLine}`, MARGIN, { size: FONT_SM, color: GRAY });
       y -= LH_SM;
     }
     if (qrPayload) {
@@ -251,7 +251,7 @@ export async function GET(
         text("VERI*FACTU", MARGIN, { size: FONT_SM, color: GRAY });
         y -= LH_SM;
       } catch {
-        text("(QR could not be generated)", MARGIN, { size: FONT_SM, color: GRAY });
+        text("(No se pudo generar el código QR)", MARGIN, { size: FONT_SM, color: GRAY });
         y -= LH_SM;
       }
     }
@@ -260,7 +260,7 @@ export async function GET(
 
   /* ── 5. Notes ───────────────────────────────────────── */
   if (invoice.notes) {
-    text("NOTES", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
+    text("NOTAS", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
     y -= LH;
     for (const line of invoice.notes.replace(/\r\n/g, "\n").split(/\n/)) {
       if (y < MARGIN) break;
@@ -271,7 +271,7 @@ export async function GET(
 
   /* ── Serialize ──────────────────────────────────────── */
   const pdfBytes = await doc.save();
-  const filename = `invoice-${safeFilename(invoice.number)}.pdf`;
+  const filename = `factura-${safeFilename(invoice.number)}.pdf`;
   const body = Buffer.from(pdfBytes);
 
   return new Response(body, {

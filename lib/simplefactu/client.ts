@@ -27,7 +27,9 @@ async function parseJson(res: Response): Promise<unknown> {
 export function getSimplefactuBaseUrl(): string {
   const u = process.env.SIMPLEFACTU_API_BASE_URL?.trim();
   if (!u) {
-    throw new Error("SIMPLEFACTU_API_BASE_URL is not set (e.g. http://localhost:3000/v1)");
+    throw new Error(
+      "SIMPLEFACTU_API_BASE_URL no está definida (p. ej. http://localhost:3000/v1)"
+    );
   }
   return u.replace(/\/$/, "");
 }

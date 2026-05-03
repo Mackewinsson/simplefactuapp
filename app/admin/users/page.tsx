@@ -38,7 +38,7 @@ export default async function AdminUsersPage({
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
-              <th className="px-3 py-2">User ID</th>
+              <th className="px-3 py-2">ID de usuario</th>
               <th className="px-3 py-2">Email</th>
               <th className="px-3 py-2">Nombre</th>
               <th className="px-3 py-2">Tenant simplefactu</th>

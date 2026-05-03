@@ -13,7 +13,7 @@ export default async function AdminAuditPage() {
   return (
     <div className="space-y-4">
       <Link href="/admin" className="text-sm text-blue-600 hover:underline">
-        ← Dashboard
+        ← Inicio
       </Link>
       <h1 className="text-xl font-semibold text-gray-900">Auditoría admin</h1>
       <p className="text-sm text-gray-600">
@@ -27,7 +27,7 @@ export default async function AdminAuditPage() {
               <th className="px-2 py-2">Usuario</th>
               <th className="px-2 py-2">Acción</th>
               <th className="px-2 py-2">Target</th>
-              <th className="px-2 py-2">Metadata</th>
+              <th className="px-2 py-2">Metadatos</th>
             </tr>
           </thead>
           <tbody>

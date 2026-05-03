@@ -14,12 +14,12 @@ export async function saveIssuerProfileAction(
   formData: FormData
 ): Promise<VerifactuSettingsState> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Sign in required."] };
+  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
 
   const issuerNif = String(formData.get("issuerNif") ?? "").trim();
   const issuerLegalName = String(formData.get("issuerLegalName") ?? "").trim();
   if (!issuerNif || !issuerLegalName) {
-    return { ok: false, errors: ["Issuer NIF and legal name are required."] };
+    return { ok: false, errors: ["El NIF y la razón social del emisor son obligatorios."] };
   }
 
   await ensureVerifactuApiKey(userId);
@@ -29,7 +29,7 @@ export async function saveIssuerProfileAction(
   });
 
   revalidatePath("/settings/verifactu");
-  return { ok: true, message: "Issuer profile saved." };
+  return { ok: true, message: "Datos del emisor guardados." };
 }
 
 export async function uploadCertificateAction(
@@ -37,15 +37,15 @@ export async function uploadCertificateAction(
   formData: FormData
 ): Promise<VerifactuSettingsState> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Sign in required."] };
+  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
 
   const file = formData.get("pfxFile");
   const passphrase = String(formData.get("pfxPassphrase") ?? "");
   if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, errors: ["Choose a .pfx / .p12 file."] };
+    return { ok: false, errors: ["Elige un archivo .pfx o .p12."] };
   }
   if (!passphrase) {
-    return { ok: false, errors: ["PFX passphrase is required."] };
+    return { ok: false, errors: ["La contraseña del PFX es obligatoria."] };
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
@@ -71,7 +71,7 @@ export async function uploadCertificateAction(
   });
 
   revalidatePath("/settings/verifactu");
-  return { ok: true, message: "Certificate uploaded to Verifactu." };
+  return { ok: true, message: "Certificado subido a Verifactu." };
 }
 
 export async function verifyNifAction(
@@ -79,12 +79,15 @@ export async function verifyNifAction(
   formData: FormData
 ): Promise<VerifactuSettingsState> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Sign in required."] };
+  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
 
   const nif = String(formData.get("verifyNif") ?? "").trim();
   const nombre = String(formData.get("verifyNombre") ?? "").trim();
   if (!nif || !nombre) {
-    return { ok: false, errors: ["NIF and name (razón social) are required for VNIF."] };
+    return {
+      ok: false,
+      errors: ["El NIF y el nombre (razón social) son obligatorios para VNIF."],
+    };
   }
 
   const { apiKey } = await ensureVerifactuApiKey(userId);
@@ -99,7 +102,7 @@ export async function verifyNifAction(
   if (!res.ok) {
     const msg =
       res.status === 403
-        ? "API key lacks nif:read. Delete UserVerifactuAccount row or revoke key and sign in again to reprovision."
+        ? "La API key no tiene nif:read. Borra la fila UserVerifactuAccount o revoca la clave e inicia sesión de nuevo para reprovisionar."
         : formatSimplefactuHttpError(res.status, json);
     return { ok: false, errors: [msg] };
   }
@@ -107,12 +110,12 @@ export async function verifyNifAction(
   const success = json.success === true;
   const resultado = json.resultado != null ? String(json.resultado) : "";
   const summary = success
-    ? `VNIF: identified (${resultado || "OK"})`
+    ? `VNIF: identificado (${resultado || "OK"})`
     : typeof json.message === "string"
       ? json.message
       : resultado
         ? `VNIF: ${resultado}`
-        : "VNIF check finished.";
+        : "Consulta VNIF finalizada.";
 
   revalidatePath("/settings/verifactu");
   return { ok: true, message: summary };

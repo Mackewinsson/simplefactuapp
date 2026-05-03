@@ -7,11 +7,13 @@ const TAG_LEN = 16;
 function getKey(): Buffer {
   const b64 = process.env.VERIFACTU_ENCRYPTION_KEY;
   if (!b64) {
-    throw new Error("VERIFACTU_ENCRYPTION_KEY is not set (use openssl rand -base64 32)");
+    throw new Error(
+      "VERIFACTU_ENCRYPTION_KEY no está definida (usa openssl rand -base64 32)"
+    );
   }
   const key = Buffer.from(b64, "base64");
   if (key.length !== 32) {
-    throw new Error("VERIFACTU_ENCRYPTION_KEY must decode to 32 bytes");
+    throw new Error("VERIFACTU_ENCRYPTION_KEY debe decodificar a 32 bytes");
   }
   return key;
 }
@@ -30,7 +32,7 @@ export function decryptSecret(stored: string): string {
   const key = getKey();
   const buf = Buffer.from(stored, "base64");
   if (buf.length < IV_LEN + TAG_LEN + 1) {
-    throw new Error("Invalid ciphertext");
+    throw new Error("Texto cifrado no válido");
   }
   const iv = buf.subarray(0, IV_LEN);
   const tag = buf.subarray(IV_LEN, IV_LEN + TAG_LEN);

@@ -40,12 +40,13 @@ export default async function VerifactuSettingsPage() {
     <div>
       <div className="mb-6">
         <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
-          ← Back
+          ← Volver
         </Link>
       </div>
       <h1 className="mb-2 text-2xl font-semibold">Verifactu (AEAT)</h1>
       <p className="mb-8 text-sm text-gray-600">
-        Tenant on API: <code className="rounded bg-gray-100 px-1">{account?.simplefactuTenantId}</code>
+        Tenant en el API:{" "}
+        <code className="rounded bg-gray-100 px-1">{account?.simplefactuTenantId}</code>
       </p>
       <VerifactuSettingsForm
         initialIssuerNif={account?.issuerNif ?? ""}

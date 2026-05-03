@@ -27,10 +27,12 @@ function buildErrorMessage(job: JobJson): string {
   if (errors && errors.length > 0) {
     const parts = errors
       .filter((e) => e.code || e.description)
-      .map((e) => (e.description ? `[${e.code}] ${e.description}` : `Error ${e.code}`));
+      .map((e) =>
+        e.description ? `[${e.code}] ${e.description}` : `Error ${e.code}`
+      );
     if (parts.length) return parts.join(" | ").slice(0, 2000);
   }
-  return (job.lastError || "Verifactu job failed").slice(0, 2000);
+  return (job.lastError || "El trabajo Verifactu falló").slice(0, 2000);
 }
 
 /**
@@ -51,7 +53,7 @@ export async function syncJobStatusToInvoice(
     where: { id: invoiceId, userId },
   });
   if (!invoice) {
-    return { ok: false, message: "Invoice not found.", terminal: true };
+    return { ok: false, message: "Factura no encontrada.", terminal: true };
   }
 
   const jr = await client.getJob(jobId);
@@ -60,7 +62,7 @@ export async function syncJobStatusToInvoice(
   if (!jr.ok) {
     return {
       ok: false,
-      message: `Could not load job (${jr.status}).`,
+      message: `No se pudo cargar el trabajo (${jr.status}).`,
       terminal: false,
     };
   }
@@ -83,7 +85,7 @@ export async function syncJobStatusToInvoice(
       });
       return {
         ok: true,
-        message: csv ? `Accepted (CSV: ${csv})` : "Accepted by Verifactu.",
+        message: csv ? `Aceptada (CSV: ${csv})` : "Aceptada por Verifactu.",
         terminal: true,
       };
     }
@@ -101,7 +103,7 @@ export async function syncJobStatusToInvoice(
     }
     return {
       ok: true,
-      message: "Job still processing (PENDING or PROCESSING).",
+      message: "El trabajo sigue en curso (PENDING o PROCESSING).",
       terminal: false,
     };
   }
@@ -116,7 +118,7 @@ export async function syncJobStatusToInvoice(
         aeatUpdatedAt: new Date(),
       },
     });
-    return { ok: true, message: "Cancellation accepted by Verifactu.", terminal: true };
+    return { ok: true, message: "Anulación aceptada por Verifactu.", terminal: true };
   }
   if (st === "FAILED" || st === "DEAD") {
     const err = buildErrorMessage(job);
@@ -133,7 +135,7 @@ export async function syncJobStatusToInvoice(
 
   return {
     ok: true,
-    message: "Cancellation job still processing.",
+    message: "La anulación sigue en curso.",
     terminal: false,
   };
 }

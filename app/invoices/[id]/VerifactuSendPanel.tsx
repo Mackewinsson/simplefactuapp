@@ -8,6 +8,12 @@ import {
   cancelInvoiceVerifactuAction,
 } from "./verifactu-actions";
 import { humanizeAeatError } from "@/lib/simplefactu/aeat-error-messages";
+import {
+  registrationStatusDetailLabel,
+  cancellationStatusDetailLabel,
+  registrationStatusBadgeClass,
+  cancellationStatusBadgeClass,
+} from "@/lib/simplefactu/aeat-status-ui";
 
 type Props = {
   invoiceId: string;
@@ -74,7 +80,7 @@ export function VerifactuSendPanel({
   function onCancelClick() {
     if (
       !window.confirm(
-        "Cancel this invoice in AEAT Verifactu? This submits a cancellation record to the tax agency."
+        "¿Anular esta factura en Verifactu (AEAT)? Se enviará un registro de anulación a la Agencia Tributaria."
       )
     ) {
       return;
@@ -86,12 +92,17 @@ export function VerifactuSendPanel({
     <div className="rounded border border-gray-200 bg-white p-4">
       <h2 className="text-sm font-semibold text-gray-900">Verifactu (AEAT)</h2>
       <dl className="mt-2 grid gap-1 text-sm text-gray-700">
-        <div>
-          <span className="font-medium">Registration status:</span> {aeatStatus}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-medium">Estado del alta:</span>
+          <span
+            className={`rounded px-1.5 py-0.5 text-xs font-medium ${registrationStatusBadgeClass(aeatStatus)}`}
+          >
+            {registrationStatusDetailLabel(aeatStatus)}
+          </span>
         </div>
         {aeatJobId ? (
           <div>
-            <span className="font-medium">Registration job:</span>{" "}
+            <span className="font-medium">Trabajo (job) de alta:</span>{" "}
             <code className="text-xs">{aeatJobId}</code>
           </div>
         ) : null}
@@ -108,29 +119,34 @@ export function VerifactuSendPanel({
                 rel="noreferrer"
                 className="text-xs text-blue-600 hover:underline"
               >
-                Verificar en AEAT ↗
+                Comprobar en AEAT ↗
               </a>
             ) : null}
           </div>
         ) : null}
         {aeatLastError ? (
           <div className="text-red-700">
-            <span className="font-medium">Registration error:</span>{" "}
+            <span className="font-medium">Error de alta:</span>{" "}
             {humanizeAeatError(aeatLastError)}
           </div>
         ) : null}
-        <div>
-          <span className="font-medium">Cancellation status:</span> {aeatCancellationStatus}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-medium">Estado de la anulación:</span>
+          <span
+            className={`rounded px-1.5 py-0.5 text-xs font-medium ${cancellationStatusBadgeClass(aeatCancellationStatus)}`}
+          >
+            {cancellationStatusDetailLabel(aeatCancellationStatus)}
+          </span>
         </div>
         {aeatCancellationJobId ? (
           <div>
-            <span className="font-medium">Cancellation job:</span>{" "}
+            <span className="font-medium">Trabajo (job) de anulación:</span>{" "}
             <code className="text-xs">{aeatCancellationJobId}</code>
           </div>
         ) : null}
         {aeatCancellationLastError ? (
           <div className="text-red-700">
-            <span className="font-medium">Cancellation error:</span>{" "}
+            <span className="font-medium">Error de anulación:</span>{" "}
             {humanizeAeatError(aeatCancellationLastError)}
           </div>
         ) : null}
@@ -142,7 +158,7 @@ export function VerifactuSendPanel({
       ) : null}
       {canRefresh ? (
         <p className="mt-2 text-sm text-amber-800">
-          Job in progress. Use refresh to update status without leaving the page.
+          Trabajo en curso. Usa «Actualizar estado» para refrescar sin salir de la página.
         </p>
       ) : null}
       <div className="mt-3 flex flex-wrap gap-2">
@@ -153,7 +169,7 @@ export function VerifactuSendPanel({
             disabled={pending}
             className="rounded bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
           >
-            {pending ? "Working…" : "Send to Verifactu"}
+            {pending ? "Procesando…" : "Enviar a Verifactu"}
           </button>
         ) : null}
         {canRefresh ? (
@@ -163,7 +179,7 @@ export function VerifactuSendPanel({
             disabled={pending}
             className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:opacity-50"
           >
-            {pending ? "…" : "Refresh status"}
+            {pending ? "…" : "Actualizar estado"}
           </button>
         ) : null}
         {canCancelAeat ? (
@@ -173,7 +189,7 @@ export function VerifactuSendPanel({
             disabled={pending}
             className="rounded border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-900 hover:bg-red-100 disabled:opacity-50"
           >
-            {pending ? "…" : "Cancel in Verifactu"}
+            {pending ? "…" : "Anular en Verifactu"}
           </button>
         ) : null}
       </div>

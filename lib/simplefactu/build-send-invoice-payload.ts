@@ -33,13 +33,15 @@ export function readSiFromEnv(issuer: {
   const indicadorMultiplesOT = (process.env.VERIFACTU_SI_IND_MULTI_OT || "S") as "S" | "N";
 
   if (!nombreRazon) {
-    throw new Error("Missing issuer legal name (UserVerifactuAccount or VERIFACTU_SI_NOMBRE_RAZON)");
+    throw new Error(
+      "Falta la razón social del emisor (UserVerifactuAccount o VERIFACTU_SI_NOMBRE_RAZON)."
+    );
   }
   if (!nif) {
-    throw new Error("Missing issuer NIF (UserVerifactuAccount or VERIFACTU_SI_NIF)");
+    throw new Error("Falta el NIF del emisor (UserVerifactuAccount o VERIFACTU_SI_NIF).");
   }
   if (!/^[A-Z0-9]{2}$/.test(idSistemaInformatico)) {
-    throw new Error("VERIFACTU_SI_ID must be exactly 2 characters [A-Z0-9]");
+    throw new Error("VERIFACTU_SI_ID debe tener exactamente 2 caracteres [A-Z0-9].");
   }
 
   return {
@@ -110,7 +112,9 @@ export function buildSendInvoicePayload(
   const issuerNif = (account.issuerNif || "").trim();
   const issuerName = (account.issuerLegalName || "").trim();
   if (!issuerNif || !issuerName) {
-    throw new Error("Configure issuer NIF and legal name in Verifactu settings before sending.");
+    throw new Error(
+      "Configura el NIF y la razón social del emisor en Ajustes → Verifactu antes de enviar."
+    );
   }
 
   const inv = invoice as unknown as Record<string, unknown>;
@@ -137,7 +141,7 @@ export function buildSendInvoicePayload(
   } else {
     const n = (invoice.customerNif || "").trim();
     if (!n) {
-      throw new Error("Customer NIF/CIF is required for Verifactu.");
+      throw new Error("El NIF/CIF del cliente es obligatorio para Verifactu.");
     }
     destNif = n;
   }

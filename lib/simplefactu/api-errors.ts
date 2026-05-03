@@ -8,20 +8,22 @@ export function formatSimplefactuHttpError(
 
   if (status === 402) {
     return msg && typeof msg === "string"
-      ? `Plan limit: ${msg}`
-      : "Plan limit exceeded on the Verifactu API. Upgrade the tenant plan or try again next month.";
+      ? `Límite del plan: ${msg}`
+      : "Se superó el límite del plan en el API Verifactu. Mejora el plan del tenant o inténtalo el mes siguiente.";
   }
 
   if (status === 429) {
     const retry = body.retryAfterSeconds;
     const base =
-      msg && typeof msg === "string" ? msg : "Too many requests to the Verifactu API.";
+      msg && typeof msg === "string"
+        ? msg
+        : "Demasiadas peticiones al API Verifactu.";
     if (retry != null && typeof retry === "number") {
-      return `${base} Retry after ${retry}s.`;
+      return `${base} Reintenta tras ${retry} s.`;
     }
     return base;
   }
 
   if (msg && typeof msg === "string") return msg;
-  return `Verifactu returned HTTP ${status}`;
+  return `Verifactu respondió HTTP ${status}`;
 }

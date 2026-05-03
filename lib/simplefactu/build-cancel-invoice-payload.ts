@@ -11,7 +11,9 @@ export function buildCancelInvoicePayload(
   const issuerNif = (account.issuerNif || "").trim();
   const issuerName = (account.issuerLegalName || "").trim();
   if (!issuerNif || !issuerName) {
-    throw new Error("Configure issuer NIF and legal name in Verifactu settings.");
+    throw new Error(
+      "Configura el NIF y la razón social del emisor en Ajustes → Verifactu."
+    );
   }
 
   const si = readSiFromEnv({ issuerNif, issuerLegalName: issuerName });

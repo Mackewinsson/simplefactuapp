@@ -14,7 +14,7 @@ export const BFF_KEY_SCOPES = [
 
 function tenantIdForUser(userId: string): string {
   if (userId.includes("/") || userId.includes("\\") || userId.includes("..")) {
-    throw new Error("Invalid user id for tenant mapping");
+    throw new Error("Identificador de usuario no válido para el mapeo de tenant");
   }
   return `sf_${userId}`;
 }
@@ -52,7 +52,7 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
 
   if (tenantRes.status !== 201 && tenantRes.status !== 409) {
     const t = await tenantRes.text();
-    throw new Error(`simplefactu POST /admin/tenants failed: ${tenantRes.status} ${t}`);
+    throw new Error(`simplefactu POST /admin/tenants falló: ${tenantRes.status} ${t}`);
   }
 
   const keyRes = await adminFetch("/admin/api-keys", {
@@ -66,7 +66,7 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
 
   if (keyRes.status !== 201) {
     const t = await keyRes.text();
-    throw new Error(`simplefactu POST /admin/api-keys failed: ${keyRes.status} ${t}`);
+    throw new Error(`simplefactu POST /admin/api-keys falló: ${keyRes.status} ${t}`);
   }
 
   const body = (await keyRes.json()) as {
@@ -74,7 +74,7 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
   };
   const plainKey = body.apiKey?.key;
   if (!plainKey) {
-    throw new Error("simplefactu did not return api key");
+    throw new Error("simplefactu no devolvió la API key");
   }
 
   try {

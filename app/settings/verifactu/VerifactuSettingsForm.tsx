@@ -17,7 +17,7 @@ function SubmitButton({ label }: { label: string }) {
       disabled={pending}
       className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
     >
-      {pending ? "…" : label}
+      {pending ? "Guardando…" : label}
     </button>
   );
 }
@@ -44,9 +44,9 @@ export function VerifactuSettingsForm({
   return (
     <div className="space-y-10">
       <section className="rounded border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-gray-900">Issuer (Obligado emisión)</h2>
+        <h2 className="text-lg font-medium text-gray-900">Emisor (obligado emisión)</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Must match your certificate and AEAT registration. Used for every invoice sent to Verifactu.
+          Debe coincidir con tu certificado y el alta en AEAT. Se usa en cada factura enviada a Verifactu.
         </p>
         {issuerState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-red-700">
@@ -60,7 +60,7 @@ export function VerifactuSettingsForm({
         ) : null}
         <form action={issuerAction} className="mt-4 space-y-4">
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">Issuer NIF / CIF</span>
+            <span className="mb-1 block text-sm font-medium text-gray-700">NIF / CIF del emisor</span>
             <input
               name="issuerNif"
               defaultValue={initialIssuerNif}
@@ -69,7 +69,7 @@ export function VerifactuSettingsForm({
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">Legal name</span>
+            <span className="mb-1 block text-sm font-medium text-gray-700">Razón social o nombre completo</span>
             <input
               name="issuerLegalName"
               defaultValue={initialIssuerLegalName}
@@ -77,28 +77,29 @@ export function VerifactuSettingsForm({
               autoComplete="organization"
             />
           </label>
-          <SubmitButton label="Save issuer" />
+          <SubmitButton label="Guardar emisor" />
         </form>
       </section>
 
       <section className="rounded border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-gray-900">AEAT certificate (.pfx / .p12)</h2>
+        <h2 className="text-lg font-medium text-gray-900">Certificado AEAT (.pfx / .p12)</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Uploaded only through this server form — never from the browser directly to the API.
+          Solo se sube desde este formulario en servidor — nunca envíes el PFX directamente desde el
+          navegador al API.
         </p>
         <dl className="mt-3 grid gap-1 text-sm text-gray-700">
           <div>
-            <span className="font-medium">Last upload (app):</span>{" "}
-            {certUploadedAt ? certUploadedAt.toLocaleString() : "—"}
+            <span className="font-medium">Última subida (app):</span>{" "}
+            {certUploadedAt ? certUploadedAt.toLocaleString("es") : "—"}
           </div>
           <div>
-            <span className="font-medium">API reports certificate:</span>{" "}
+            <span className="font-medium">El API indica certificado:</span>{" "}
             {remoteHasCertificate === null
-              ? "Could not load"
+              ? "No se pudo consultar"
               : remoteHasCertificate
-                ? "Yes"
+                ? "Sí"
                 : "No"}
-            {remoteUpdatedAt ? ` (updated ${remoteUpdatedAt})` : ""}
+            {remoteUpdatedAt ? ` (actualizado ${remoteUpdatedAt})` : ""}
           </div>
         </dl>
         {certState?.ok === false ? (
@@ -113,7 +114,7 @@ export function VerifactuSettingsForm({
         ) : null}
         <form action={certAction} className="mt-4 space-y-4">
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">PFX file</span>
+            <span className="mb-1 block text-sm font-medium text-gray-700">Archivo PFX</span>
             <input
               name="pfxFile"
               type="file"
@@ -122,7 +123,7 @@ export function VerifactuSettingsForm({
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">PFX passphrase</span>
+            <span className="mb-1 block text-sm font-medium text-gray-700">Contraseña del PFX</span>
             <input
               name="pfxPassphrase"
               type="password"
@@ -130,16 +131,16 @@ export function VerifactuSettingsForm({
               autoComplete="new-password"
             />
           </label>
-          <SubmitButton label="Upload certificate" />
+          <SubmitButton label="Subir certificado" />
         </form>
       </section>
 
       <section className="rounded border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-gray-900">Verify NIF (AEAT VNIF)</h2>
+        <h2 className="text-lg font-medium text-gray-900">Verificar NIF (VNIF AEAT)</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Optional check against AEAT. Requires API key scope <code className="text-xs">nif:read</code>{" "}
-          (new provisions include it; older accounts may need to clear Verifactu account data and
-          reprovision).
+          Comprobación opcional contra AEAT. Requiere el scope <code className="text-xs">nif:read</code>{" "}
+          en la API key (las cuentas nuevas ya lo incluyen; en cuentas antiguas puede hacer falta
+          borrar datos de Verifactu y reprovisionar).
         </p>
         {vnifState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-red-700">
@@ -157,18 +158,20 @@ export function VerifactuSettingsForm({
             <input
               name="verifyNif"
               className="w-full max-w-md rounded border border-gray-300 px-3 py-2"
-              placeholder="e.g. B12345678"
+              placeholder="p. ej. B12345678"
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">Name (must match AEAT)</span>
+            <span className="mb-1 block text-sm font-medium text-gray-700">
+              Nombre (debe coincidir con AEAT)
+            </span>
             <input
               name="verifyNombre"
               className="w-full max-w-md rounded border border-gray-300 px-3 py-2"
-              placeholder="Company or full name"
+              placeholder="Razón social o nombre completo"
             />
           </label>
-          <SubmitButton label="Verify with AEAT" />
+          <SubmitButton label="Verificar con AEAT" />
         </form>
       </section>
     </div>

@@ -19,6 +19,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.5.8",
     "@clerk/nextjs": "^6.37.3",
     "@prisma/client": "^6.19.2",
     "next": "^15.0.0",

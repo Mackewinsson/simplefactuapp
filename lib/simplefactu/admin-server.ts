@@ -14,7 +14,7 @@ export class SimplefactuAdminError extends Error {
 export function requireSimplefactuAdminKey(): string {
   const adminKey = process.env.SIMPLEFACTU_ADMIN_KEY?.trim();
   if (!adminKey) {
-    throw new Error("SIMPLEFACTU_ADMIN_KEY is not set");
+    throw new Error("SIMPLEFACTU_ADMIN_KEY no está definida");
   }
   return adminKey;
 }

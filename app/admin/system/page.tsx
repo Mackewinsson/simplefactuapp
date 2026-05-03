@@ -43,13 +43,15 @@ export default async function AdminSystemPage({
     <div className="space-y-8">
       <div>
         <Link href="/admin" className="text-sm text-blue-600 hover:underline">
-          ← Dashboard
+          ← Inicio
         </Link>
         <h1 className="mt-2 text-xl font-semibold text-gray-900">Sistema (simplefactu)</h1>
       </div>
 
       <section className="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 className="mb-2 text-sm font-semibold text-gray-800">Rate limit (config)</h2>
+        <h2 className="mb-2 text-sm font-semibold text-gray-800">
+          Límite de peticiones (configuración)
+        </h2>
         {rateErr ? (
           <p className="text-sm text-red-700">{rateErr}</p>
         ) : (

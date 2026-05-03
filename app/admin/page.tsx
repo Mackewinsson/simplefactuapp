@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">Dashboard admin</h1>
+      <h1 className="text-xl font-semibold text-gray-900">Panel de administración</h1>
 
       {err ? (
         <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{err}</p>
@@ -48,7 +48,7 @@ export default async function AdminDashboardPage() {
                 <dd className="inline">{diag.worker?.enabled ? "Sí" : "No"}</dd>
               </div>
               <div>
-                <dt className="inline text-gray-500">Async mode:</dt>{" "}
+                <dt className="inline text-gray-500">Modo asíncrono:</dt>{" "}
                 <dd className="inline">{diag.worker?.asyncMode ? "Sí" : "No"}</dd>
               </div>
               <div>

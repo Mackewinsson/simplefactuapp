@@ -44,27 +44,32 @@ async function pollUntilTerminal(
   revalidatePath(`/invoices/${params.invoiceId}`);
   return {
     ok: true,
-    message: "Still processing — use “Refresh status” or reload the page.",
+    message:
+      "Sigue procesándose — usa «Actualizar estado» o recarga la página.",
   };
 }
 
 export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Sign in required." };
+  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
     include: { items: true },
   });
-  if (!invoice) return { ok: false, message: "Invoice not found." };
+  if (!invoice) return { ok: false, message: "Factura no encontrada." };
 
   if (invoice.aeatStatus === AeatJobStatus.SUCCEEDED) {
-    return { ok: false, message: "This invoice was already accepted by Verifactu." };
+    return { ok: false, message: "Esta factura ya fue aceptada por Verifactu." };
   }
 
   const account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
   if (!account?.issuerNif || !account.issuerLegalName) {
-    return { ok: false, message: "Set issuer NIF and legal name under Settings → Verifactu." };
+    return {
+      ok: false,
+      message:
+        "Configura el NIF y la razón social del emisor en Ajustes → Verifactu.",
+    };
   }
 
   const { apiKey } = await ensureVerifactuApiKey(userId);
@@ -77,7 +82,11 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
   if (certRes.ok) {
     const cj = (await certRes.json()) as { hasCertificate?: boolean };
     if (!cj.hasCertificate) {
-      return { ok: false, message: "Upload your PFX certificate under Settings → Verifactu first." };
+      return {
+        ok: false,
+        message:
+          "Sube primero tu certificado PFX en Ajustes → Verifactu.",
+      };
     }
   }
 
@@ -85,7 +94,10 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
   try {
     body = buildSendInvoicePayload(invoice, account);
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Invalid invoice for Verifactu." };
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Factura no válida para Verifactu.",
+    };
   }
 
   const idempotencyKey = invoice.aeatIdempotencyKey || invoice.id;
@@ -115,7 +127,7 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
 
   const jobId = postJson.jobId as string | undefined;
   if (!jobId) {
-    return { ok: false, message: "No jobId returned from Verifactu." };
+    return { ok: false, message: "El API no devolvió jobId (Verifactu)." };
   }
 
   await prisma.invoice.update({
@@ -138,12 +150,12 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
 
 export async function refreshVerifactuJobAction(invoiceId: string): Promise<SendVerifactuResult> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Sign in required." };
+  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
   });
-  if (!invoice) return { ok: false, message: "Invoice not found." };
+  if (!invoice) return { ok: false, message: "Factura no encontrada." };
 
   let kind: "SEND_INVOICE" | "CANCEL_INVOICE" | null = null;
   let jobId: string | null = null;
@@ -160,7 +172,7 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
   }
 
   if (!kind || !jobId) {
-    return { ok: false, message: "No pending Verifactu job to refresh." };
+    return { ok: false, message: "No hay ningún trabajo Verifactu pendiente de actualizar." };
   }
 
   const { apiKey } = await ensureVerifactuApiKey(userId);
@@ -181,23 +193,29 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
 
 export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
   const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Sign in required." };
+  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
   });
-  if (!invoice) return { ok: false, message: "Invoice not found." };
+  if (!invoice) return { ok: false, message: "Factura no encontrada." };
 
   if (invoice.aeatStatus !== AeatJobStatus.SUCCEEDED) {
-    return { ok: false, message: "Only invoices accepted by Verifactu can be cancelled in AEAT." };
+    return {
+      ok: false,
+      message: "Solo se pueden anular en AEAT las facturas ya aceptadas por Verifactu.",
+    };
   }
 
   if (invoice.aeatCancellationStatus === AeatCancellationStatus.SUCCEEDED) {
-    return { ok: false, message: "This invoice is already cancelled in Verifactu." };
+    return { ok: false, message: "Esta factura ya está anulada en Verifactu." };
   }
 
   if (invoice.aeatCancellationStatus === AeatCancellationStatus.PENDING) {
-    return { ok: false, message: "Cancellation is already in progress. Use Refresh status." };
+    return {
+      ok: false,
+      message: "La anulación ya está en curso. Usa «Actualizar estado».",
+    };
   }
 
   const needsNewCancelKey =
@@ -206,7 +224,11 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
 
   const account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
   if (!account?.issuerNif || !account.issuerLegalName) {
-    return { ok: false, message: "Set issuer NIF and legal name under Settings → Verifactu." };
+    return {
+      ok: false,
+      message:
+        "Configura el NIF y la razón social del emisor en Ajustes → Verifactu.",
+    };
   }
 
   const { apiKey } = await ensureVerifactuApiKey(userId);
@@ -219,7 +241,11 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
   if (certRes.ok) {
     const cj = (await certRes.json()) as { hasCertificate?: boolean };
     if (!cj.hasCertificate) {
-      return { ok: false, message: "Upload your PFX certificate under Settings → Verifactu first." };
+      return {
+        ok: false,
+        message:
+          "Sube primero tu certificado PFX en Ajustes → Verifactu.",
+      };
     }
   }
 
@@ -227,7 +253,10 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
   try {
     body = buildCancelInvoicePayload(invoice, account);
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Invalid cancellation payload." };
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Datos de anulación no válidos.",
+    };
   }
 
   let cancelKey =
@@ -258,7 +287,7 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
 
   const jobId = postJson.jobId as string | undefined;
   if (!jobId) {
-    return { ok: false, message: "No cancellation jobId returned from Verifactu." };
+    return { ok: false, message: "El API no devolvió jobId de anulación (Verifactu)." };
   }
 
   await prisma.invoice.update({

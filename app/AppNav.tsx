@@ -11,13 +11,13 @@ export async function AppNav() {
   return (
     <nav className="flex gap-6">
       <Link href="/" className={c}>
-        Home
+        Inicio
       </Link>
       <Link href="/invoices" className={c}>
-        Invoices
+        Facturas
       </Link>
       <Link href="/invoices/new" className={c}>
-        New Invoice
+        Nueva factura
       </Link>
       <Link href="/customers" className={c}>
         Clientes
@@ -30,7 +30,7 @@ export async function AppNav() {
       </Link>
       {showAdmin ? (
         <Link href="/admin" className={c}>
-          Admin
+          Administración
         </Link>
       ) : null}
     </nav>

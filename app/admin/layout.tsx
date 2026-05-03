@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </div>
       <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-gray-200 pb-3">
         <Link href="/admin" className={linkClass}>
-          Dashboard
+          Inicio
         </Link>
         <Link href="/admin/tenants" className={linkClass}>
           Tenants

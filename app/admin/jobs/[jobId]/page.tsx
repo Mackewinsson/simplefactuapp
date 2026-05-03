@@ -23,7 +23,7 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
     return (
       <div className="space-y-4">
         <Link href="/admin/jobs" className="text-sm text-blue-600 hover:underline">
-          ← Jobs
+          ← Jobs AEAT
         </Link>
         <p className="text-red-700">{loadErr}</p>
       </div>
@@ -42,13 +42,13 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
   return (
     <div className="space-y-4">
       <Link href="/admin/jobs" className="text-sm text-blue-600 hover:underline">
-        ← Jobs
+        ← Jobs AEAT
       </Link>
-      <h1 className="text-xl font-semibold text-gray-900">Job {j.id}</h1>
+      <h1 className="text-xl font-semibold text-gray-900">Trabajo {j.id}</h1>
 
       <dl className="grid gap-2 text-sm sm:grid-cols-2">
         <div>
-          <dt className="text-gray-500">Tenant</dt>
+          <dt className="text-gray-500">Tenant (API)</dt>
           <dd className="font-mono text-xs">{j.tenant_id}</dd>
         </div>
         <div>
@@ -68,14 +68,14 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
           <dd className="break-all font-mono text-xs">{j.idempotency_key ?? "—"}</dd>
         </div>
         <div>
-          <dt className="text-gray-500">last_error</dt>
+          <dt className="text-gray-500">Último error</dt>
           <dd className="break-all text-red-800">{j.last_error ?? "—"}</dd>
         </div>
       </dl>
 
       {j.payload_json ? (
         <section>
-          <h2 className="mb-2 text-sm font-semibold text-gray-800">Payload (JSON)</h2>
+          <h2 className="mb-2 text-sm font-semibold text-gray-800">Cuerpo enviado (JSON)</h2>
           <pre className="max-h-96 overflow-auto rounded border border-gray-200 bg-gray-50 p-3 text-xs">
             {j.payload_json.length > 20000
               ? `${j.payload_json.slice(0, 20000)}\n… (truncado en UI)`

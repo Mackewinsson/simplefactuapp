@@ -29,14 +29,14 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
     <div>
       <div className="mb-6 flex flex-wrap items-center gap-4">
         <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
-          ← Back to invoices
+          ← Volver a facturas
         </Link>
         <a
           href={`/invoices/${invoice.id}/pdf`}
           className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
           download
         >
-          Download PDF
+          Descargar PDF
         </a>
       </div>
 
@@ -89,11 +89,11 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
           <table className="w-full min-w-[400px] text-left text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 font-medium text-gray-900">Description</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Qty</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Unit price</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Concepto</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Cant.</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Precio u.</th>
                 <th className="px-4 py-3 font-medium text-gray-900 text-right">
-                  Line total
+                  Importe
                 </th>
               </tr>
             </thead>
@@ -120,11 +120,11 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <div className="border-t border-gray-200 px-4 py-3 text-sm">
           <div className="ml-auto flex max-w-xs flex-col gap-1 text-right">
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Subtotal</span>
+              <span className="text-gray-600">Base imponible</span>
               <span>{formatCents(invoice.currency, invoice.subtotalCents)}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Tax</span>
+              <span className="text-gray-600">IVA</span>
               <span>{formatCents(invoice.currency, invoice.taxCents)}</span>
             </div>
             <div className="flex justify-between gap-4 border-t border-gray-200 pt-2 font-medium">
@@ -136,7 +136,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
 
         {invoice.notes ? (
           <div className="border-t border-gray-200 px-4 py-3 text-sm text-gray-600">
-            <span className="font-medium text-gray-700">Notes:</span> {invoice.notes}
+            <span className="font-medium text-gray-700">Notas:</span> {invoice.notes}
           </div>
         ) : null}
       </div>

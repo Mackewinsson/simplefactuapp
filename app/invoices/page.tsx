@@ -4,37 +4,12 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { extractSerie } from "@/lib/simplefactu/invoice-series";
+import { registrationStatusBadge } from "@/lib/simplefactu/aeat-status-ui";
 
 const PAGE_SIZE = 50;
-const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "short" });
+const dateFormat = new Intl.DateTimeFormat("es", { dateStyle: "short" });
 
 export const dynamic = "force-dynamic";
-
-type AeatStatus = string;
-
-function aeatStatusBadge(
-  status: AeatStatus,
-  cancellationStatus: AeatStatus
-): { label: string; className: string } {
-  if (cancellationStatus === "SUCCEEDED") {
-    return {
-      label: "Anulada",
-      className: "line-through text-gray-400 bg-gray-100",
-    };
-  }
-  switch (status) {
-    case "SUCCEEDED":
-      return { label: "Registrada", className: "text-green-800 bg-green-100" };
-    case "PENDING":
-    case "PROCESSING":
-      return { label: "Enviando…", className: "text-amber-800 bg-amber-100" };
-    case "FAILED":
-    case "DEAD":
-      return { label: "Error", className: "text-red-800 bg-red-100" };
-    default:
-      return { label: "No enviada", className: "text-gray-500 bg-gray-100" };
-  }
-}
 
 export default async function InvoicesPage() {
   const { userId } = await auth();
@@ -50,23 +25,23 @@ export default async function InvoicesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Invoices</h1>
+        <h1 className="text-2xl font-semibold">Facturas</h1>
         <Link
           href="/invoices/new"
           className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
         >
-          New invoice
+          Nueva factura
         </Link>
       </div>
 
       {invoices.length === 0 ? (
         <div className="rounded border border-gray-200 bg-white p-8 text-center">
-          <p className="mb-4 text-gray-600">No invoices yet.</p>
+          <p className="mb-4 text-gray-600">Aún no hay facturas.</p>
           <Link
             href="/invoices/new"
             className="inline-block rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
           >
-            Create invoice
+            Crear factura
           </Link>
         </div>
       ) : (
@@ -74,17 +49,17 @@ export default async function InvoicesPage() {
           <table className="w-full min-w-[700px] text-left text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 font-medium text-gray-900">Number</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Número</th>
                 <th className="px-4 py-3 font-medium text-gray-900">Serie</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Customer</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Issue Date</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Cliente</th>
+                <th className="px-4 py-3 font-medium text-gray-900">Fecha</th>
                 <th className="px-4 py-3 font-medium text-gray-900">Total</th>
                 <th className="px-4 py-3 font-medium text-gray-900">AEAT</th>
               </tr>
             </thead>
             <tbody>
               {invoices.map((inv: InvoiceRow) => {
-                const badge = aeatStatusBadge(
+                const badge = registrationStatusBadge(
                   inv.aeatStatus,
                   inv.aeatCancellationStatus
                 );

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { esES } from "@clerk/localizations";
 import { AppNav } from "./AppNav";
 import { HeaderUserArea } from "./HeaderUserArea";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SimpleFactu",
-  description: "Simple invoices",
+  description: "Facturación sencilla con Verifactu (AEAT)",
 };
 
 export default function RootLayout({
@@ -15,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
+    <ClerkProvider localization={esES}>
+      <html lang="es">
         <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
           <header className="border-b border-gray-200 bg-white">
             <div className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-4 py-3">

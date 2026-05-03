@@ -25,10 +25,10 @@ export default async function NewInvoicePage() {
     <div>
       <div className="mb-6">
         <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
-          ← Back to invoices
+          ← Volver a facturas
         </Link>
       </div>
-      <h1 className="mb-6 text-2xl font-semibold">New invoice</h1>
+      <h1 className="mb-6 text-2xl font-semibold">Nueva factura</h1>
       <NewInvoiceForm
         defaultCreatedByFirstName={user?.firstName ?? ""}
         defaultCreatedByLastName={user?.lastName ?? ""}
