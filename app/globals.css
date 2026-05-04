@@ -1,3 +1,109 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =====================================================================
+   Theme tokens
+   ---------------------------------------------------------------------
+   Single source of truth for colors. Each value is an RGB triple (no
+   commas) so it can be consumed by Tailwind utilities like `bg-cta`,
+   `text-fg-muted` or `border-danger-outline` with optional alpha
+   (e.g. `bg-cta/30`).
+
+   To re-skin the app, edit only the variables below.
+   To restyle every button of a given variant, edit the matching
+   `.btn-*` class in the components layer further down.
+   ===================================================================== */
+@layer base {
+  :root {
+    /* Brand / primary actions (e.g. "Crear factura", "Guardar") */
+    --color-primary: 17 24 39;            /* gray-900 */
+    --color-primary-hover: 31 41 55;      /* gray-800 */
+    --color-primary-foreground: 255 255 255;
+
+    /* High-attention call-to-action (e.g. "Enviar a Verifactu") */
+    --color-cta: 234 88 12;               /* orange-600 */
+    --color-cta-hover: 194 65 12;         /* orange-700 */
+    --color-cta-foreground: 255 255 255;
+    --color-cta-ring: 251 146 60;         /* orange-400 */
+
+    /* Surfaces (cards, inputs, secondary buttons) */
+    --color-surface: 255 255 255;
+    --color-surface-hover: 249 250 251;   /* gray-50  */
+    --color-surface-muted: 243 244 246;   /* gray-100 */
+
+    /* Borders / dividers */
+    --color-outline: 209 213 219;         /* gray-300 */
+    --color-outline-soft: 229 231 235;    /* gray-200 */
+
+    /* Foreground / text */
+    --color-fg: 17 24 39;                 /* gray-900 */
+    --color-fg-muted: 75 85 99;           /* gray-600 */
+    --color-fg-subtle: 107 114 128;       /* gray-500 */
+    --color-fg-link: 37 99 235;           /* blue-600  */
+
+    /* Status: danger */
+    --color-danger: 254 242 242;          /* red-50  */
+    --color-danger-hover: 254 226 226;    /* red-100 */
+    --color-danger-outline: 254 202 202;  /* red-200 */
+    --color-danger-foreground: 127 29 29; /* red-900 */
+
+    /* Status: warning */
+    --color-warning: 255 251 235;         /* amber-50  */
+    --color-warning-hover: 254 243 199;   /* amber-100 */
+    --color-warning-outline: 252 211 77;  /* amber-300 */
+    --color-warning-foreground: 120 53 15;/* amber-900 */
+  }
+}
+
+/* =====================================================================
+   Reusable component classes
+   ---------------------------------------------------------------------
+   Compose with: <button className="btn btn-sm btn-cta">…</button>
+   Sizes: btn-sm | btn-md
+   Variants: btn-primary | btn-cta | btn-secondary | btn-danger
+             btn-warning | btn-ghost | btn-link
+   ===================================================================== */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium
+           transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
+
+  .btn-sm { @apply px-3 py-1.5; }
+  .btn-md { @apply px-4 py-2; }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary-hover focus-visible:ring-primary;
+  }
+
+  .btn-cta {
+    @apply bg-cta text-cta-foreground shadow-sm
+           hover:bg-cta-hover focus-visible:ring-cta-ring;
+  }
+
+  .btn-secondary {
+    @apply border border-outline bg-surface text-fg
+           hover:bg-surface-hover focus-visible:ring-outline;
+  }
+
+  .btn-danger {
+    @apply border border-danger-outline bg-danger text-danger-foreground
+           hover:bg-danger-hover focus-visible:ring-danger-outline;
+  }
+
+  .btn-warning {
+    @apply border border-warning-outline bg-warning text-warning-foreground
+           hover:bg-warning-hover focus-visible:ring-warning-outline;
+  }
+
+  .btn-ghost {
+    @apply text-fg hover:bg-surface-hover;
+  }
+
+  .btn-link {
+    @apply text-fg-link hover:underline;
+  }
+}

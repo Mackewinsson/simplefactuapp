@@ -117,7 +117,7 @@ export function VerifactuSendPanel({
                 href={aeatQrText}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-blue-600 hover:underline"
+                className="text-xs text-fg-link hover:underline"
               >
                 Comprobar en AEAT ↗
               </a>
@@ -167,7 +167,7 @@ export function VerifactuSendPanel({
             type="button"
             onClick={() => run(sendInvoiceToVerifactuAction, invoiceId)}
             disabled={pending}
-            className="rounded bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+            className="btn btn-sm btn-cta"
           >
             {pending ? "Procesando…" : "Enviar a Verifactu"}
           </button>
@@ -177,7 +177,7 @@ export function VerifactuSendPanel({
             type="button"
             onClick={() => run(refreshVerifactuJobAction, invoiceId)}
             disabled={pending}
-            className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:opacity-50"
+            className="btn btn-sm btn-secondary"
           >
             {pending ? "…" : "Actualizar estado"}
           </button>
@@ -187,7 +187,7 @@ export function VerifactuSendPanel({
             type="button"
             onClick={onCancelClick}
             disabled={pending}
-            className="rounded border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-900 hover:bg-red-100 disabled:opacity-50"
+            className="btn btn-sm btn-danger"
           >
             {pending ? "…" : "Anular en Verifactu"}
           </button>
