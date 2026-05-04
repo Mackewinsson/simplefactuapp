@@ -364,6 +364,9 @@ export function NewInvoiceForm({
   const [numero, setNumero] = useState("");
   const [showSeriesModal, setShowSeriesModal] = useState(false);
 
+  const [issueDate, setIssueDate] = useState<string>(today());
+  const [fechaOperacion, setFechaOperacion] = useState<string>("");
+
   // Customer state
   const [customerName, setCustomerName] = useState("");
   const [customerNif, setCustomerNif] = useState("");
@@ -386,6 +389,18 @@ export function NewInvoiceForm({
   const sendToAeatRef = useRef<HTMLInputElement>(null);
 
   const composedNumber = serie && numero ? `${serie}/${numero}` : numero;
+
+  // AEAT rule 1146: fechaOperacion may only be later than issueDate when at least
+  // one detail uses ClaveRegimen 14 or 15. Surface it inline so the user does not
+  // have to wait for a server round-trip.
+  const allowsFutureOp = items.some(
+    (i) => i.claveRegimen === "14" || i.claveRegimen === "15"
+  );
+  const fechaOperacionInvalid =
+    Boolean(fechaOperacion) &&
+    Boolean(issueDate) &&
+    fechaOperacion > issueDate &&
+    !allowsFutureOp;
 
   function fillCustomer(c: { name: string; nif: string; email: string; tipoPersona: string } | CustomerRow) {
     setVnifFeedback(null);
@@ -528,7 +543,8 @@ export function NewInvoiceForm({
               <input
                 type="date"
                 name="issueDate"
-                defaultValue={today()}
+                value={issueDate}
+                onChange={(e) => setIssueDate(e.target.value)}
                 className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
               />
             </label>
@@ -541,8 +557,25 @@ export function NewInvoiceForm({
               <input
                 type="date"
                 name="fechaOperacion"
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                value={fechaOperacion}
+                onChange={(e) => setFechaOperacion(e.target.value)}
+                max={allowsFutureOp ? undefined : issueDate || undefined}
+                aria-invalid={fechaOperacionInvalid}
+                aria-describedby="fechaOperacionHint"
+                className={`w-full rounded border px-3 py-2 text-sm ${
+                  fechaOperacionInvalid ? "border-red-400" : "border-gray-300"
+                }`}
               />
+              <p
+                id="fechaOperacionHint"
+                className={`mt-1 text-xs ${
+                  fechaOperacionInvalid ? "text-red-600" : "text-gray-400"
+                }`}
+              >
+                {fechaOperacionInvalid
+                  ? "No puede ser posterior a la fecha de expedición salvo en régimen 14 o 15 (AEAT 1146)."
+                  : "No puede ser posterior a la fecha de expedición."}
+              </p>
             </label>
           </div>
         </section>

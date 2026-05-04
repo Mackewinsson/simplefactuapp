@@ -85,6 +85,25 @@ const schema = z
         path: ["customerCodigoPais"],
       });
     }
+  })
+  .superRefine((data, ctx) => {
+    // AEAT rule 1146: fechaOperacion may only be later than issueDate when at least
+    // one detail uses ClaveRegimen 14 or 15. Both fields use the HTML date input
+    // format (YYYY-MM-DD), so lexicographic comparison is safe and matches the
+    // backend check in middleware/validation.js.
+    const op = (data.fechaOperacion ?? "").trim();
+    const ex = (data.issueDate ?? "").trim();
+    if (!op || !ex || op <= ex) return;
+    const allowsFutureOp = data.items.some(
+      (i) => i.claveRegimen === "14" || i.claveRegimen === "15"
+    );
+    if (allowsFutureOp) return;
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La fecha de operación no puede ser posterior a la de expedición (salvo régimen 14 o 15).",
+      path: ["fechaOperacion"],
+    });
   });
 
 export type CreateInvoiceState = { errors: string[] } | null;
