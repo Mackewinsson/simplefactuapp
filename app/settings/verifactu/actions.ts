@@ -58,9 +58,38 @@ export async function uploadCertificateAction(
   });
 
   const res = await client.postMeCertificate({ pfxBase64, pfxPassphrase: passphrase });
-  const json = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+  const json = (await res.json().catch(() => ({}))) as {
+    message?: string;
+    error?: string;
+    code?: string;
+    docsHint?: string;
+    warnings?: string[];
+  };
 
   if (!res.ok) {
+    // 422 with code=legacy_rc2 means the cert is in the old FNMT format
+    // OpenSSL 3 cannot read. Tell the user how to convert it.
+    if (res.status === 422 && json.code === "legacy_rc2") {
+      return {
+        ok: false,
+        errors: [
+          "Tu certificado usa el formato heredado RC2-40 (típico de FNMT antes de 2023) que ya no se admite.",
+          "Conviértelo abriendo una terminal: `openssl pkcs12 -legacy -in cert.p12 -nodes -out cert.pem` y luego `openssl pkcs12 -export -in cert.pem -out cert-modern.p12`. Sube el `cert-modern.p12`.",
+        ],
+      };
+    }
+    if (res.status === 422 && json.code === "wrong_passphrase") {
+      return { ok: false, errors: ["La contraseña no coincide con el certificado."] };
+    }
+    if (res.status === 422 && json.code === "malformed") {
+      return {
+        ok: false,
+        errors: [
+          "El archivo no parece ser un PFX válido.",
+          json.message || "Comprueba que es un .p12 / .pfx genuino y no un PEM o un certificado vacío.",
+        ],
+      };
+    }
     const msg = json.message || json.error || `HTTP ${res.status}`;
     return { ok: false, errors: [msg] };
   }
@@ -71,7 +100,13 @@ export async function uploadCertificateAction(
   });
 
   revalidatePath("/settings/verifactu");
-  return { ok: true, message: "Certificado subido a Verifactu." };
+
+  const successMsg =
+    json.warnings && json.warnings.length
+      ? `Certificado subido. Aviso: ${json.warnings.join(" ")}`
+      : "Certificado subido a Verifactu.";
+
+  return { ok: true, message: successMsg };
 }
 
 export async function verifyNifAction(
