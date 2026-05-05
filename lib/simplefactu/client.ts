@@ -88,6 +88,29 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       });
     },
 
+    async getMePlan(): Promise<Response> {
+      return fetch(joinUrl(baseUrl, "/me/plan"), { method: "GET", headers });
+    },
+
+    async getMeUsage(months = 12): Promise<Response> {
+      return fetch(joinUrl(baseUrl, `/me/usage?months=${months}`), {
+        method: "GET",
+        headers,
+      });
+    },
+
+    async postMeUpgrade(body: {
+      planId: "pro" | "enterprise";
+      successUrl: string;
+      cancelUrl: string;
+    }): Promise<Response> {
+      return fetch(joinUrl(baseUrl, "/me/upgrade"), {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+    },
+
     parseJson,
   };
 }

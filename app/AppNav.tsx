@@ -28,6 +28,9 @@ export async function AppNav() {
       <Link href="/settings/verifactu" className={c}>
         Verifactu
       </Link>
+      <Link href="/settings/billing" className={c}>
+        Plan
+      </Link>
       {showAdmin ? (
         <Link href="/admin" className={c}>
           Administración
