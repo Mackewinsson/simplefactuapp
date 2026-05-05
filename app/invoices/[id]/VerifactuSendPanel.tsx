@@ -22,6 +22,7 @@ type Props = {
   aeatLastError: string | null;
   aeatCsv: string | null;
   aeatQrText: string | null;
+  aeatQrDataUrl: string | null;
   aeatCancellationStatus: string;
   aeatCancellationJobId: string | null;
   aeatCancellationLastError: string | null;
@@ -35,6 +36,7 @@ export function VerifactuSendPanel({
   aeatLastError,
   aeatCsv,
   aeatQrText,
+  aeatQrDataUrl,
   aeatCancellationStatus,
   aeatCancellationJobId,
   aeatCancellationLastError,
@@ -122,6 +124,31 @@ export function VerifactuSendPanel({
                 Comprobar en AEAT ↗
               </a>
             ) : null}
+          </div>
+        ) : null}
+        {aeatQrDataUrl ? (
+          <div className="mt-3 flex flex-wrap items-start gap-3">
+            {/* QR is mandated by RD 1007/2023 art. 25. The leyenda VERI*FACTU
+                next to it is the consumer-facing trust mark required when
+                the issuer operates under Veri*Factu rules.
+                next/image would offer no optimization here: the source is an
+                inline data: URL already produced server-side. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={aeatQrDataUrl}
+              alt="QR de verificación AEAT (Veri*Factu)"
+              className="h-32 w-32 rounded border border-gray-200 bg-white p-1"
+              width={128}
+              height={128}
+            />
+            <div className="text-xs text-gray-700">
+              <p className="font-semibold">Factura verificable en sede AEAT</p>
+              <p className="font-mono tracking-wide text-gray-900">VERI*FACTU</p>
+              <p className="mt-1 text-gray-500">
+                Escanea o haz clic en «Comprobar en AEAT» para validar este
+                registro en la sede electrónica de la Agencia Tributaria.
+              </p>
+            </div>
           </div>
         ) : null}
         {aeatLastError ? (

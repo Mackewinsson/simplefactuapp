@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
+import { verifactuQrDataUrl } from "@/lib/verifactu/qr-image";
 import { VerifactuSendPanel } from "./VerifactuSendPanel";
 
 type Props = {
@@ -24,6 +25,10 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
   });
 
   if (!invoice) notFound();
+
+  // Render the AEAT verification QR server-side so the panel just paints an
+  // <img>. We only have an aeatQrText after AEAT returns CSV.
+  const aeatQrDataUrl = invoice.aeatQrText ? await verifactuQrDataUrl(invoice.aeatQrText) : null;
 
   return (
     <div>
@@ -78,6 +83,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
             aeatLastError={invoice.aeatLastError}
             aeatCsv={invoice.aeatCsv}
             aeatQrText={invoice.aeatQrText}
+            aeatQrDataUrl={aeatQrDataUrl}
             aeatCancellationStatus={invoice.aeatCancellationStatus}
             aeatCancellationJobId={invoice.aeatCancellationJobId}
             aeatCancellationLastError={invoice.aeatCancellationLastError}
