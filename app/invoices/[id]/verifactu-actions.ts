@@ -10,6 +10,7 @@ import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefact
 import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
 import { syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
+import { adminFetch } from "@/lib/simplefactu/admin-server";
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -306,4 +307,85 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
     jobId,
     kind: "CANCEL_INVOICE",
   });
+}
+
+export type IssueCorrectionResult =
+  | { ok: true; message: string; correctionJobId: string }
+  | { ok: false; message: string };
+
+/**
+ * Server action: issue an R1-R5 corrective invoice from a DEAD invoice.
+ *
+ * Verifies the invoice belongs to the logged-in user, then calls the
+ * simplefactu admin endpoint POST /admin/jobs/:id/issue-correction with
+ * the admin key (which lives only on the BFF). Returns the new job id so
+ * the front can redirect to it or refresh the panel.
+ *
+ * The new corrective invoice is enqueued as a fresh SEND_INVOICE job; the
+ * worker will recompute the chain + huella + AEAT call. The original
+ * DEAD job stays as a historic record annotated with superseded_by_job_id.
+ */
+export async function issueCorrectionAction(
+  invoiceId: string,
+  options: { tipoFactura: "R1" | "R2" | "R3" | "R4" | "R5"; numSerie: string }
+): Promise<IssueCorrectionResult> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+  });
+  if (!invoice) return { ok: false, message: "Factura no encontrada." };
+  if (invoice.aeatStatus !== AeatJobStatus.DEAD) {
+    return {
+      ok: false,
+      message:
+        "Solo se puede emitir una rectificativa desde una factura cuyo envío a AEAT acabó en DEAD.",
+    };
+  }
+  if (!invoice.aeatJobId) {
+    return { ok: false, message: "Esta factura no tiene un job de envío asociado." };
+  }
+  if (!options.numSerie?.trim()) {
+    return { ok: false, message: "Indica un nuevo número de serie para la rectificativa." };
+  }
+
+  const res = await adminFetch(`/admin/jobs/${invoice.aeatJobId}/issue-correction`, {
+    method: "POST",
+    body: JSON.stringify({
+      tipoFactura: options.tipoFactura,
+      numSerie: options.numSerie.trim(),
+    }),
+  });
+  const json = (await res.json().catch(() => ({}))) as {
+    correctionJobId?: string;
+    message?: string;
+  };
+  if (res.status !== 201 || !json.correctionJobId) {
+    return {
+      ok: false,
+      message: json.message || `Error emitiendo rectificativa (HTTP ${res.status})`,
+    };
+  }
+
+  // Reset the local invoice state so the front shows the new send in flight.
+  // The user will need to fill the new invoice details (and the worker will
+  // recompute everything). For now we just point aeatJobId to the new job;
+  // the polling will refresh the rest.
+  await prisma.invoice.update({
+    where: { id: invoice.id },
+    data: {
+      aeatJobId: json.correctionJobId,
+      aeatStatus: AeatJobStatus.PENDING,
+      aeatLastError: null,
+      aeatUpdatedAt: new Date(),
+    },
+  });
+
+  revalidatePath(`/invoices/${invoice.id}`);
+  return {
+    ok: true,
+    message: `Rectificativa ${options.tipoFactura} encolada (job ${json.correctionJobId})`,
+    correctionJobId: json.correctionJobId,
+  };
 }

@@ -78,6 +78,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <div className="border-b border-gray-200 px-4 py-4">
           <VerifactuSendPanel
             invoiceId={invoice.id}
+            invoiceNumber={invoice.number}
             aeatStatus={invoice.aeatStatus}
             aeatJobId={invoice.aeatJobId}
             aeatLastError={invoice.aeatLastError}

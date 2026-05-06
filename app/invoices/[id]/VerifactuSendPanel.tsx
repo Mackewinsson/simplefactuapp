@@ -14,9 +14,11 @@ import {
   registrationStatusBadgeClass,
   cancellationStatusBadgeClass,
 } from "@/lib/simplefactu/aeat-status-ui";
+import { IssueCorrectionButton } from "./IssueCorrectionButton";
 
 type Props = {
   invoiceId: string;
+  invoiceNumber: string;
   aeatStatus: string;
   aeatJobId: string | null;
   aeatLastError: string | null;
@@ -31,6 +33,7 @@ type Props = {
 
 export function VerifactuSendPanel({
   invoiceId,
+  invoiceNumber,
   aeatStatus,
   aeatJobId,
   aeatLastError,
@@ -155,6 +158,11 @@ export function VerifactuSendPanel({
           <div className="text-red-700">
             <span className="font-medium">Error de alta:</span>{" "}
             {humanizeAeatError(aeatLastError)}
+          </div>
+        ) : null}
+        {aeatStatus === "DEAD" ? (
+          <div className="mt-2">
+            <IssueCorrectionButton invoiceId={invoiceId} originalNumSerie={invoiceNumber} />
           </div>
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
