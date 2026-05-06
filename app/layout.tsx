@@ -4,6 +4,7 @@ import { esES } from "@clerk/localizations";
 import { AppNav } from "./AppNav";
 import { HeaderUserArea } from "./HeaderUserArea";
 import { Footer } from "./Footer";
+import { OnboardingBanner } from "./OnboardingBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default function RootLayout({
               </div>
             </div>
           </header>
+          <OnboardingBanner />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
           <Footer />
         </body>
