@@ -37,8 +37,9 @@
     "zod": "^4.3.6"
   },
   "engines": {
-    "node": ">=22.x"
+    "node": "22.x"
   },
+  "packageManager": "pnpm@10.33.4",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@types/node": "^22",
