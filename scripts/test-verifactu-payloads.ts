@@ -90,12 +90,12 @@ assert.ok(formatSimplefactuHttpError(429, { retryAfterSeconds: 30 }).includes("3
 
 // verifactuQrPayload now always builds the URL from invoice data (not from stored aeatQrText/csv)
 const qrUrl = verifactuQrPayload({
-  issuerNif: "Z0706098A",
+  issuerNif: "B12345678",
   number: "2026/F-001",
   issueDate: new Date("2026-05-01"),
   totalCents: 121000,
 });
-assert.ok(qrUrl?.includes("nif=Z0706098A"), "QR URL must contain nif param");
+assert.ok(qrUrl?.includes("nif=B12345678"), "QR URL must contain nif param");
 assert.ok(qrUrl?.includes("numserie="), "QR URL must contain numserie param");
 assert.ok(qrUrl?.includes("importe="), "QR URL must contain importe param");
 assert.equal(verifactuQrPayload({ number: "", issueDate: new Date(), totalCents: 0 }), null);

@@ -15,7 +15,7 @@ Esta guía asume que ya tienes:
 ```bash
 export API_BASE="https://api.tudominio.com/v1"
 export API_KEY="vf_..."
-export NIF="Z0706098A"        # tu NIF emisor
+export NIF="B12345678"        # tu NIF emisor
 export NOMBRE="ACME SL"
 ```
 
