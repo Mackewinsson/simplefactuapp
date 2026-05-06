@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { isBillingEnabled } from "@/lib/billing/feature";
 import { UpgradeButton } from "./UpgradeButton";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +41,30 @@ function pct(used: number, max: number): number {
 export default async function BillingPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
+
+  // Billing feature flag: when off, render a "coming soon" placeholder
+  // rather than the full upgrade UI. Hides the API call entirely so the
+  // page also works for deploys without the simplefactu /me/upgrade path
+  // wired (it would 503 anyway).
+  if (!isBillingEnabled()) {
+    return (
+      <div className="mx-auto max-w-md">
+        <div className="mb-6">
+          <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
+            ← Volver
+          </Link>
+        </div>
+        <h1 className="mb-3 text-2xl font-semibold">Plan y facturación</h1>
+        <div className="rounded border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+          <p className="font-medium">Esta funcionalidad estará disponible próximamente.</p>
+          <p className="mt-1 text-blue-800">
+            De momento puedes usar SimpleFactu sin coste. Te avisaremos por email cuando los planes
+            de pago estén activos.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   let plan: PlanResponse["plan"] | null = null;
   let usage: PlanResponse["usage"] | null = null;
