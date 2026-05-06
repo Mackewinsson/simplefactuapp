@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { logAdminAction } from "@/lib/admin-audit";
 import {
   patchTenant,
+  postCreateTenant,
   postMaintenanceOn,
   postMaintenanceOff,
   postJobRetry,
@@ -12,6 +13,7 @@ import {
   postRevokeApiKey,
   postUploadTenantCertificate,
   deleteTenantCertificate,
+  SimplefactuAdminError,
 } from "@/lib/simplefactu/admin-server";
 import { BFF_KEY_SCOPES } from "@/lib/verifactu/provision";
 
@@ -20,7 +22,72 @@ export type ActionState = {
   error?: string;
   message?: string;
   plainKey?: string;
+  tenantId?: string;
 } | null;
+
+/**
+ * Create a brand-new tenant from the admin UI. Used to onboard external
+ * integrators that talk to the simplefactu API directly (server-to-server)
+ * without going through the Clerk-based auto-provisioning flow.
+ *
+ * Required: id (stable identifier, must be path-traversal-safe).
+ * Optional: name, planId, notificationEmail (used by the API for the welcome
+ * email when EMAILS_ENABLED=true).
+ */
+export async function adminCreateTenantAction(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const { userId } = await requireAdmin();
+  const id = formData.get("id")?.toString()?.trim() ?? "";
+  const name = formData.get("name")?.toString()?.trim() ?? "";
+  const planIdRaw = formData.get("planId")?.toString()?.trim() ?? "free";
+  const notificationEmail = formData.get("notificationEmail")?.toString()?.trim() ?? "";
+
+  if (!id) return { ok: false, error: "Falta el identificador del tenant." };
+  if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
+    return {
+      ok: false,
+      error:
+        "El id solo puede contener letras, números, guiones y guiones bajos (sin espacios ni caracteres especiales).",
+    };
+  }
+  const plans = ["free", "pro", "enterprise"];
+  if (!plans.includes(planIdRaw)) {
+    return { ok: false, error: `planId debe ser uno de: ${plans.join(", ")}` };
+  }
+
+  try {
+    const body: {
+      id: string;
+      name?: string;
+      planId: "free" | "pro" | "enterprise";
+      notificationEmail?: string;
+    } = { id, planId: planIdRaw as "free" | "pro" | "enterprise" };
+    if (name) body.name = name;
+    if (notificationEmail) body.notificationEmail = notificationEmail;
+
+    await postCreateTenant(body);
+    await logAdminAction({
+      userId,
+      action: "tenant.create",
+      target: id,
+      metadata: { name, planId: planIdRaw, hasEmail: Boolean(notificationEmail) },
+    });
+    revalidatePath("/admin/tenants");
+    return {
+      ok: true,
+      message: `Tenant "${id}" creado.`,
+      tenantId: id,
+    };
+  } catch (e: unknown) {
+    if (e instanceof SimplefactuAdminError && e.status === 409) {
+      return { ok: false, error: `Ya existe un tenant con id "${id}".` };
+    }
+    const msg = e instanceof Error ? e.message : "Error";
+    return { ok: false, error: msg };
+  }
+}
 
 export async function adminPatchTenantAction(
   _prev: ActionState,

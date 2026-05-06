@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
 import { listTenants } from "@/lib/simplefactu/admin-server";
+import { CreateTenantForm } from "./CreateTenantForm";
 
 const PAGE_SIZE = 30;
 
@@ -27,7 +28,10 @@ export default async function AdminTenantsPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-gray-900">Tenants (simplefactu)</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold text-gray-900">Tenants (simplefactu)</h1>
+        <CreateTenantForm />
+      </div>
       {err ? (
         <p className="text-sm text-red-700">{err}</p>
       ) : data ? (

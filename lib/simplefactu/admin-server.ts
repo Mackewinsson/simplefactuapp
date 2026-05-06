@@ -123,6 +123,22 @@ export async function getTenant(id: string): Promise<{ success: boolean; tenant:
   return adminJson(`/admin/tenants/${encodeURIComponent(id)}`, { method: "GET" });
 }
 
+/**
+ * Create a new tenant. Returns 409 (raised as SimplefactuAdminError) if the
+ * id is already taken; the action layer translates that to a friendly error.
+ */
+export async function postCreateTenant(body: {
+  id: string;
+  name?: string;
+  planId?: "free" | "pro" | "enterprise";
+  notificationEmail?: string;
+}): Promise<{ success: boolean; tenant: AdminTenant }> {
+  return adminJson("/admin/tenants", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
 export async function patchTenant(
   id: string,
   body: { name?: string; planId?: string; status?: string }
