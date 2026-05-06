@@ -6,7 +6,7 @@ import {
   adminMaintenanceOnAction,
   adminMaintenanceOffAction,
   type ActionState,
-} from "@/app/admin/actions";
+} from "@/app/(chrome)/admin/actions";
 import type { AdminTenant } from "@/lib/simplefactu/admin-server";
 
 function FormMessage({ state }: { state: ActionState }) {

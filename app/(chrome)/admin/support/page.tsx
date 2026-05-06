@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/admin";
-import { RetryJobForm } from "@/app/admin/support/RetryJobForm";
+import { RetryJobForm } from "@/app/(chrome)/admin/support/RetryJobForm";
 
 export default async function AdminSupportPage() {
   await requireAdmin();

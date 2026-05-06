@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { adminRetryJobAction, type ActionState } from "@/app/admin/actions";
+import { adminRetryJobAction, type ActionState } from "@/app/(chrome)/admin/actions";
 
 function Message({ state }: { state: ActionState }) {
   if (!state) return null;

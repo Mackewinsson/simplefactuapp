@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
-import { AppNav } from "./AppNav";
-import { HeaderUserArea } from "./HeaderUserArea";
-import { Footer } from "./Footer";
-import { OnboardingBanner } from "./OnboardingBanner";
-import { ChromeSlot, MainContainer } from "./ChromeSlot";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,6 +8,16 @@ export const metadata: Metadata = {
   description: "Facturación sencilla con Verifactu (AEAT)",
 };
 
+/**
+ * Root layout. Intentionally minimal: it sets up <html>, <body>, the Clerk
+ * provider and global styles, then defers all chrome (header, banner,
+ * footer, container) to nested layouts.
+ *
+ * The transactional app surface lives under the `(chrome)` route group, so
+ * its layout — which calls `auth()` server-side — only runs for the routes
+ * that need it. Public surfaces with their own chrome (`/docs`, `/sign-in`,
+ * `/sign-up`) skip it, which keeps `/docs/[slug]` statically prerenderable.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,26 +27,7 @@ export default function RootLayout({
     <ClerkProvider localization={esES}>
       <html lang="es">
         <body className="flex min-h-screen flex-col bg-gray-50 text-gray-900 antialiased">
-          <ChromeSlot>
-            <header className="border-b border-gray-200 bg-white">
-              <div className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-4 py-3">
-                <div className="flex items-center gap-8">
-                  <span className="text-lg font-semibold text-gray-900">
-                    SimpleFactu
-                  </span>
-                  <AppNav />
-                </div>
-                <div className="flex items-center gap-3">
-                  <HeaderUserArea />
-                </div>
-              </div>
-            </header>
-            <OnboardingBanner />
-          </ChromeSlot>
-          <MainContainer>{children}</MainContainer>
-          <ChromeSlot>
-            <Footer />
-          </ChromeSlot>
+          {children}
         </body>
       </html>
     </ClerkProvider>

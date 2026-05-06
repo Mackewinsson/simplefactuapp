@@ -8,8 +8,8 @@ import {
   listApiKeysForTenant,
   SimplefactuAdminError,
 } from "@/lib/simplefactu/admin-server";
-import { TenantDetailForms } from "@/app/admin/tenants/TenantDetailForms";
-import { TenantKeysAndCert } from "@/app/admin/tenants/TenantKeysAndCert";
+import { TenantDetailForms } from "@/app/(chrome)/admin/tenants/TenantDetailForms";
+import { TenantKeysAndCert } from "@/app/(chrome)/admin/tenants/TenantKeysAndCert";
 
 export default async function AdminTenantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

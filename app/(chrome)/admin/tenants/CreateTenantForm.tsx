@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { adminCreateTenantAction, type ActionState } from "@/app/admin/actions";
+import { adminCreateTenantAction, type ActionState } from "@/app/(chrome)/admin/actions";
 
 /**
  * Inline collapsible form to create a new tenant from /admin/tenants.

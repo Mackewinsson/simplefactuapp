@@ -13,11 +13,11 @@ import {
   getCustomersAction,
   createCustomerAction,
   type CustomerRow,
-} from "@/app/customers/actions";
+} from "@/app/(chrome)/customers/actions";
 import {
   getProductsAction,
   type ProductRow,
-} from "@/app/products/actions";
+} from "@/app/(chrome)/products/actions";
 import { parseDecimalToCents, formatCents } from "@/lib/money";
 import { verifyRecipientNif } from "./verify-recipient-nif";
 

@@ -7,7 +7,7 @@ import {
   adminRevokeApiKeyAction,
   adminUploadCertificateAction,
   type ActionState,
-} from "@/app/admin/actions";
+} from "@/app/(chrome)/admin/actions";
 import type { AdminApiKeyRow } from "@/lib/simplefactu/admin-server";
 
 function Msg({ state }: { state: ActionState }) {
