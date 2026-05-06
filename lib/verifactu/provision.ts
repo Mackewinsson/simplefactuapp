@@ -1,7 +1,26 @@
 import { prisma } from "@/lib/prisma";
+import { clerkClient } from "@clerk/nextjs/server";
 import { encryptSecret, decryptSecret } from "@/lib/verifactu/crypto";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
+
+/**
+ * Best-effort lookup of the user's primary email from Clerk. Returns null on
+ * any failure (network, missing user) so provisioning can proceed without
+ * email — the only consequence is that transactional emails get skipped.
+ */
+async function lookupClerkEmail(userId: string): Promise<string | null> {
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const primary = user.emailAddresses.find(
+      (e) => e.id === user.primaryEmailAddressId
+    );
+    return primary?.emailAddress || user.emailAddresses[0]?.emailAddress || null;
+  } catch {
+    return null;
+  }
+}
 
 /** Scopes for app-provisioned API keys (also used when creating keys from the admin panel). */
 export const BFF_KEY_SCOPES = [
@@ -22,10 +41,17 @@ function tenantIdForUser(userId: string): string {
 /**
  * Provisions a fresh tenant + API key on simplefactu and returns the plain key.
  * Does NOT touch the local DB row — the caller decides whether to insert or rotate.
+ *
+ * @param userId Clerk user id
+ * @param preferredTenantId Optional override (used during key rotation to keep the same tenant)
+ * @param notificationEmail Optional. Stored on the tenant; the simplefactu API
+ *   uses it to send transactional emails (welcome on first creation, first
+ *   invoice, dead-job notice). Pass the user's primary Clerk email when known.
  */
 async function provisionTenantAndKey(
   userId: string,
-  preferredTenantId?: string
+  preferredTenantId?: string,
+  notificationEmail?: string | null
 ): Promise<{ tenantId: string; plainKey: string }> {
   const tenantId = preferredTenantId ?? tenantIdForUser(userId);
 
@@ -35,6 +61,7 @@ async function provisionTenantAndKey(
       id: tenantId,
       name: `App user ${userId}`,
       planId: "free",
+      ...(notificationEmail ? { notificationEmail } : {}),
     }),
   });
 
@@ -94,6 +121,9 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
     // 401 → rotate the key in place. Reuse the existing tenantId so the URL/QR
     // chain on stored invoices keeps working, and preserve issuer fields.
     // certificateUploadedAt is cleared because the new tenant has no certificate.
+    // We don't pass notificationEmail on rotation: the tenant already exists
+    // and the API only sets notification_email at creation. Updating it would
+    // need a dedicated endpoint, deferred until needed.
     const { tenantId, plainKey } = await provisionTenantAndKey(
       userId,
       existing.simplefactuTenantId
@@ -109,8 +139,11 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
     return { tenantId, apiKey: plainKey };
   }
 
-  // No row yet → first-time provisioning.
-  const { tenantId, plainKey } = await provisionTenantAndKey(userId);
+  // No row yet → first-time provisioning. Look up the user's primary email
+  // so the simplefactu API can send a welcome email immediately and so the
+  // worker can later send first-invoice / dead-job emails.
+  const email = await lookupClerkEmail(userId);
+  const { tenantId, plainKey } = await provisionTenantAndKey(userId, undefined, email);
   try {
     await prisma.userVerifactuAccount.create({
       data: {
