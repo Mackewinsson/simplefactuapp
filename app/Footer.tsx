@@ -40,6 +40,15 @@ export function Footer() {
           <Link href="/legal/dpa" className="hover:text-gray-900">
             DPA
           </Link>
+          <Link href="/legal/cookies" className="hover:text-gray-900">
+            Cookies
+          </Link>
+          <Link href="/legal/cancelacion" className="hover:text-gray-900">
+            Cancelación
+          </Link>
+          <Link href="/legal/accesibilidad" className="hover:text-gray-900">
+            Accesibilidad
+          </Link>
         </nav>
       </div>
     </footer>

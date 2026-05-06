@@ -10,6 +10,9 @@ const legalLinks: Array<{ href: string; label: string }> = [
   { href: "/legal/privacidad", label: "Política de privacidad" },
   { href: "/legal/terminos", label: "Términos y condiciones" },
   { href: "/legal/dpa", label: "Encargado de tratamiento (DPA)" },
+  { href: "/legal/cookies", label: "Política de cookies" },
+  { href: "/legal/cancelacion", label: "Cancelación y reembolso" },
+  { href: "/legal/accesibilidad", label: "Accesibilidad" },
 ];
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
