@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
 
 const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`;
 
@@ -6,6 +7,7 @@ export default {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./content/**/*.md",
   ],
   theme: {
     extend: {
@@ -51,5 +53,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 } satisfies Config;

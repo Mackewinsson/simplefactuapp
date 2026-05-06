@@ -6,6 +6,7 @@ node_modules
 .next
 out
 
+
 # Prisma (SQLite dev DB)
 dev.db
 dev.db-journal
