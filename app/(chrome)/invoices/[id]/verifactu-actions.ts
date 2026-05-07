@@ -313,6 +313,27 @@ export type IssueCorrectionResult =
   | { ok: true; message: string; correctionJobId: string }
   | { ok: false; message: string };
 
+export type ImporteRectificacionInput = {
+  baseRectificada: number;
+  cuotaRectificada: number;
+  cuotaRecargoRectificado?: number;
+};
+
+export type IssueCorrectionOptions = {
+  tipoFactura: "R1" | "R2" | "R3" | "R4" | "R5";
+  numSerie: string;
+  /**
+   * Rectification mode (AEAT 1114). Defaults to "I" when omitted (the
+   * backend also defaults to "I", but we send it explicitly so the
+   * decision is auditable in the BFF logs).
+   *   - "I" (por diferencias): importes in <Desglose> are the corrected totals.
+   *   - "S" (sustitución): importes in <Desglose> are the difference; requires
+   *     `importeRectificacion` with the original importes.
+   */
+  tipoRectificativa?: "S" | "I";
+  importeRectificacion?: ImporteRectificacionInput;
+};
+
 /**
  * Server action: issue an R1-R5 corrective invoice from a DEAD invoice.
  *
@@ -327,7 +348,7 @@ export type IssueCorrectionResult =
  */
 export async function issueCorrectionAction(
   invoiceId: string,
-  options: { tipoFactura: "R1" | "R2" | "R3" | "R4" | "R5"; numSerie: string }
+  options: IssueCorrectionOptions
 ): Promise<IssueCorrectionResult> {
   const { userId } = await auth();
   if (!userId) return { ok: false, message: "Debes iniciar sesión." };
@@ -350,11 +371,37 @@ export async function issueCorrectionAction(
     return { ok: false, message: "Indica un nuevo número de serie para la rectificativa." };
   }
 
+  // Mirror the backend cross-field rules (AEAT 1118/1119) here so the user
+  // sees a clean error from the BFF instead of a 400 from the API.
+  const tipoRectificativa = options.tipoRectificativa ?? "I";
+  if (tipoRectificativa !== "S" && tipoRectificativa !== "I") {
+    return { ok: false, message: "tipoRectificativa debe ser 'S' o 'I'." };
+  }
+  const hasImporte =
+    options.importeRectificacion !== undefined && options.importeRectificacion !== null;
+
+  if (tipoRectificativa === "S" && !hasImporte) {
+    return {
+      ok: false,
+      message:
+        "Modo sustitución (S) requiere informar baseRectificada y cuotaRectificada (AEAT 1118).",
+    };
+  }
+  if (tipoRectificativa === "I" && hasImporte) {
+    return {
+      ok: false,
+      message:
+        "Modo por diferencias (I) no admite importeRectificacion (AEAT 1119).",
+    };
+  }
+
   const res = await adminFetch(`/admin/jobs/${invoice.aeatJobId}/issue-correction`, {
     method: "POST",
     body: JSON.stringify({
       tipoFactura: options.tipoFactura,
       numSerie: options.numSerie.trim(),
+      tipoRectificativa,
+      ...(hasImporte ? { importeRectificacion: options.importeRectificacion } : {}),
     }),
   });
   const json = (await res.json().catch(() => ({}))) as {
@@ -385,7 +432,7 @@ export async function issueCorrectionAction(
   revalidatePath(`/invoices/${invoice.id}`);
   return {
     ok: true,
-    message: `Rectificativa ${options.tipoFactura} encolada (job ${json.correctionJobId})`,
+    message: `Rectificativa ${options.tipoFactura} (modo ${tipoRectificativa}) encolada (job ${json.correctionJobId})`,
     correctionJobId: json.correctionJobId,
   };
 }

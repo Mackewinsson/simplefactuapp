@@ -151,10 +151,28 @@ export function buildSendInvoicePayload(
   const cuotaTotal = formatImporte(invoice.taxCents / 100);
   const total = formatImporte(invoice.totalCents / 100);
 
-  const descripcion =
-    (invoice.notes || "").trim() ||
-    (invoice.items[0]?.description || "Operación sujeta").trim() ||
-    "Operación sujeta";
+  // Build a meaningful DescripcionOperacion (AEAT XSD requires a real
+  // description, max 500 chars). Order of preference:
+  //   1. invoice.notes (the user's explicit "concepto" in the form).
+  //   2. The concatenated descriptions of all line items (joined by ", ").
+  // If neither is present we throw — perpetuating the legacy default
+  // "Operación sujeta" was a regulatory smell because it was a constant
+  // string unrelated to the actual operation (RD 1007/2023 art. 7.1).
+  const itemDescriptions = invoice.items
+    .map((it) => (it.description || "").trim())
+    .filter(Boolean)
+    .join(", ");
+
+  const descripcion = ((invoice.notes || "").trim() || itemDescriptions)
+    .slice(0, 500)
+    .trim();
+
+  if (!descripcion) {
+    throw new Error(
+      "La factura necesita una descripción de la operación (AEAT). " +
+        "Rellena el campo de notas o asegúrate de que al menos una línea tenga descripción."
+    );
+  }
 
   const detalles = invoice.items.length > 0
     ? buildDetalles(invoice.items)

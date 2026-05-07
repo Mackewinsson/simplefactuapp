@@ -80,12 +80,28 @@ assert.equal(send.numSerie, "2026/F-001");
 assert.equal(send.tipoFactura, "F1");
 assert.equal((send.detalles as { base: number }[])[0].base, 100);
 assert.equal((send.detalles as { cuota: number }[])[0].cuota, 21);
+// notes is null → falls back to item descriptions ("Service")
+assert.equal(send.descripcion, "Service");
+
+// notes wins over item description when present
+const sendWithNotes = buildSendInvoicePayload(
+  { ...invoiceBase, notes: "Servicios de consultoría enero 2026" },
+  accountBase
+);
+assert.equal(sendWithNotes.descripcion, "Servicios de consultoría enero 2026");
+
+// notes blank + items without description → throws (no more silent "Operación sujeta")
+const itemNoDesc: InvoiceItem = { ...item, description: "" };
+assert.throws(
+  () => buildSendInvoicePayload({ ...invoiceBase, notes: null, items: [itemNoDesc] }, accountBase),
+  /descripción de la operación/
+);
 
 const cancel = buildCancelInvoicePayload(invoiceBase, accountBase);
 assert.equal((cancel.facturaAnulada as { fechaExpedicionFacturaAnulada: string }).fechaExpedicionFacturaAnulada, "15-03-2026");
 assert.equal((cancel.facturaAnulada as { numSerieFacturaAnulada: string }).numSerieFacturaAnulada, "2026/F-001");
 
-assert.ok(formatSimplefactuHttpError(402, { message: "cap" }).includes("Plan limit"));
+assert.ok(formatSimplefactuHttpError(402, { message: "cap" }).includes("Límite del plan"));
 assert.ok(formatSimplefactuHttpError(429, { retryAfterSeconds: 30 }).includes("30"));
 
 // verifactuQrPayload now always builds the URL from invoice data (not from stored aeatQrText/csv)

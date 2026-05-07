@@ -728,6 +728,11 @@ export function NewInvoiceForm({
               placeholder="Descripción de los bienes/servicios facturados (máx. 500 caracteres)"
               className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
             />
+            <span className="mt-1 block text-xs text-gray-500">
+              Si lo dejas en blanco, usaremos las descripciones de las líneas como
+              <code className="mx-1 rounded bg-gray-100 px-1 py-0.5 text-[11px]">DescripcionOperacion</code>
+              para AEAT. Es obligatorio que haya algún texto entre este campo y las líneas.
+            </span>
           </label>
         </section>
 
