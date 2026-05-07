@@ -41,28 +41,38 @@ export async function OnboardingBanner() {
     issuerProfileDone = Boolean(account?.issuerNif?.trim() && account?.issuerLegalName?.trim());
     firstInvoiceDone = invoiceCount > 0;
 
-    if (account?.certificateUploadedAt) {
-      // Cross-check the API: the local timestamp can be stale if the user
-      // rotated their API key (which wipes certificateUploadedAt) but the
-      // remote cert is still there.
-      try {
-        const { apiKey } = await ensureVerifactuApiKey(userId);
-        const client = createSimplefactuClient({
-          baseUrl: getSimplefactuBaseUrl(),
-          apiKey,
-        });
-        const res = await client.getMeCertificate();
-        if (res.ok) {
-          const j = (await res.json()) as { hasCertificate?: boolean };
-          certificateDone = Boolean(j.hasCertificate);
-        } else {
-          // If the API doesn't say no, trust the local flag (better UX
-          // than flickering back the banner during a transient API blip).
-          certificateDone = true;
+    // Always probe the API; it is the source of truth for the certificate.
+    // The local certificateUploadedAt flag can be stale (e.g. wiped on key
+    // rotation while the certificate row in the API tenant remains valid),
+    // so we use it only as a fallback when the API is unreachable.
+    try {
+      const { apiKey } = await ensureVerifactuApiKey(userId);
+      const client = createSimplefactuClient({
+        baseUrl: getSimplefactuBaseUrl(),
+        apiKey,
+      });
+      const res = await client.getMeCertificate();
+      if (res.ok) {
+        const j = (await res.json()) as { hasCertificate?: boolean; updatedAt?: string };
+        certificateDone = Boolean(j.hasCertificate);
+
+        // Self-heal: backfill certificateUploadedAt from the API's updatedAt
+        // when the API confirms a certificate but Prisma lost the timestamp.
+        // Idempotent: the next render finds the flag set and skips the write.
+        if (certificateDone && j.updatedAt && !account?.certificateUploadedAt) {
+          const parsed = new Date(j.updatedAt);
+          if (!Number.isNaN(parsed.getTime())) {
+            await prisma.userVerifactuAccount.update({
+              where: { userId },
+              data: { certificateUploadedAt: parsed },
+            });
+          }
         }
-      } catch {
-        certificateDone = true;
+      } else {
+        certificateDone = Boolean(account?.certificateUploadedAt);
       }
+    } catch {
+      certificateDone = Boolean(account?.certificateUploadedAt);
     }
   } catch {
     // DB or auth blip: be quiet, don't spam the UI.

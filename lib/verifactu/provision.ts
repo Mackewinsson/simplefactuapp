@@ -120,7 +120,8 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
 
     // 401 → rotate the key in place. Reuse the existing tenantId so the URL/QR
     // chain on stored invoices keeps working, and preserve issuer fields.
-    // certificateUploadedAt is cleared because the new tenant has no certificate.
+    // certificateUploadedAt is preserved on purpose: we reuse the same tenantId,
+    // so the certificate row in tenant_certificates on the API is still valid.
     // We don't pass notificationEmail on rotation: the tenant already exists
     // and the API only sets notification_email at creation. Updating it would
     // need a dedicated endpoint, deferred until needed.
@@ -133,7 +134,6 @@ export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: s
       data: {
         simplefactuTenantId: tenantId,
         apiKeyEncrypted: encryptSecret(plainKey),
-        certificateUploadedAt: null,
       },
     });
     return { tenantId, apiKey: plainKey };

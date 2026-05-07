@@ -31,6 +31,19 @@ export default async function VerifactuSettingsPage() {
       const j = (await res.json()) as { hasCertificate?: boolean; updatedAt?: string };
       remoteHasCertificate = Boolean(j.hasCertificate);
       remoteUpdatedAt = j.updatedAt ?? null;
+
+      // Self-heal: if the API confirms a certificate but the local timestamp
+      // is missing (e.g. wiped by an earlier key rotation), backfill it from
+      // the API's updatedAt so the "Última subida" line stops showing "—".
+      if (remoteHasCertificate && remoteUpdatedAt && !account?.certificateUploadedAt) {
+        const parsed = new Date(remoteUpdatedAt);
+        if (!Number.isNaN(parsed.getTime())) {
+          account = await prisma.userVerifactuAccount.update({
+            where: { userId },
+            data: { certificateUploadedAt: parsed },
+          });
+        }
+      }
     }
   } catch {
     remoteHasCertificate = null;
