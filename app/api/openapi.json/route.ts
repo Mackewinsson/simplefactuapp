@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { filterPublicOpenApi } from "@/lib/docs/filter-openapi";
 
 /**
  * Server-side proxy that forwards the OpenAPI document published by the
@@ -57,8 +58,23 @@ export async function GET() {
     );
   }
 
-  const body = await res.text();
-  return new NextResponse(body, {
+  let parsed: unknown;
+  try {
+    parsed = await res.json();
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "upstream_invalid_json",
+        upstream,
+        message: err instanceof Error ? err.message : String(err),
+      },
+      { status: 502 }
+    );
+  }
+
+  const filtered = filterPublicOpenApi(parsed);
+
+  return new NextResponse(JSON.stringify(filtered), {
     status: 200,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
