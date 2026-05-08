@@ -170,8 +170,12 @@ export async function postMaintenanceOff(tenantId: string): Promise<{ success: b
   });
 }
 
-export async function postJobRetry(jobId: string): Promise<{ success: boolean; message?: string }> {
-  return adminJson(`/admin/jobs/${encodeURIComponent(jobId)}/retry`, {
+export async function postJobRetry(
+  jobId: string,
+  force = false
+): Promise<{ success: boolean; message?: string }> {
+  const qs = force ? "?force=true" : "";
+  return adminJson(`/admin/jobs/${encodeURIComponent(jobId)}/retry${qs}`, {
     method: "POST",
     body: JSON.stringify({}),
   });

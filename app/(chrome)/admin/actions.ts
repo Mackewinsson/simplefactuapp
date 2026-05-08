@@ -155,12 +155,14 @@ export async function adminMaintenanceOffAction(_prev: ActionState, formData: Fo
 export async function adminRetryJobAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const { userId } = await requireAdmin();
   const jobId = formData.get("jobId")?.toString()?.trim() ?? "";
+  const force = formData.get("force") === "true";
   if (!jobId) return { ok: false, error: "Job ID requerido" };
   try {
-    const r = await postJobRetry(jobId);
-    await logAdminAction({ userId, action: "job.retry", target: jobId });
+    const r = await postJobRetry(jobId, force);
+    await logAdminAction({ userId, action: force ? "job.retry.force" : "job.retry", target: jobId });
     revalidatePath("/admin/jobs");
     revalidatePath("/admin/support");
+    revalidatePath(`/admin/jobs/${encodeURIComponent(jobId)}`);
     return { ok: true, message: r.message ?? "Job encolado de nuevo." };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";

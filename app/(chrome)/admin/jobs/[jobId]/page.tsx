@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getAdminJob, SimplefactuAdminError } from "@/lib/simplefactu/admin-server";
+import { RetryJobButton } from "./RetryJobButton";
 
 export default async function AdminJobDetailPage({ params }: { params: Promise<{ jobId: string }> }) {
   await requireAdmin();
@@ -83,6 +84,8 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
           </pre>
         </section>
       ) : null}
+
+      <RetryJobButton jobId={j.id} status={j.status} />
 
       {data.result ? (
         <section>
