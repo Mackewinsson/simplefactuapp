@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { adminRetryJobAction, type ActionState } from "@/app/admin/actions";
+import { adminRetryJobAction, type ActionState } from "@/app/(chrome)/admin/actions";
 
 export function RetryJobButton({ jobId, status }: { jobId: string; status: string }) {
   const [state, action, pending] = useActionState(adminRetryJobAction, null);
