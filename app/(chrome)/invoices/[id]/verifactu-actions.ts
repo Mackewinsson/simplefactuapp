@@ -16,7 +16,7 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export type SendVerifactuResult = { ok: boolean; message: string };
+export type SendVerifactuResult = { ok: boolean; message: string; terminal?: boolean };
 
 async function pollUntilTerminal(
   client: ReturnType<typeof createSimplefactuClient>,
@@ -189,7 +189,7 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
     kind,
   });
   revalidatePath(`/invoices/${invoiceId}`);
-  return { ok: r.ok, message: r.message };
+  return { ok: r.ok, message: r.message, terminal: r.terminal };
 }
 
 export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {

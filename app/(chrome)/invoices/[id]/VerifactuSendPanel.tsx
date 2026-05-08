@@ -48,6 +48,7 @@ export function VerifactuSendPanel({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
+  const [polling, setPolling] = useState(false);
   const autoSendFired = useRef(false);
 
   const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
@@ -63,8 +64,39 @@ export function VerifactuSendPanel({
 
   const sendPending = aeatStatus === "PENDING";
   const cancelPending = aeatCancellationStatus === "PENDING";
+  const pollActive = sendPending || cancelPending;
   const canSend = canSendNow;
-  const canRefresh = sendPending || cancelPending;
+  const canRefresh = pollActive;
+
+  // Auto-poll every 3 s while a job is PENDING. Stops when terminal or after
+  // 60 attempts (~3 min), at which point the manual button remains as fallback.
+  useEffect(() => {
+    if (!pollActive) {
+      setPolling(false);
+      return;
+    }
+    setPolling(true);
+    let attempts = 0;
+    let stopped = false;
+    const id = setInterval(async () => {
+      if (stopped) return;
+      attempts++;
+      const r = await refreshVerifactuJobAction(invoiceId);
+      if (stopped) return;
+      if (r.terminal || attempts >= 60) {
+        stopped = true;
+        clearInterval(id);
+        setPolling(false);
+      }
+      router.refresh();
+    }, 3000);
+    return () => {
+      stopped = true;
+      clearInterval(id);
+      setPolling(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pollActive, invoiceId]);
   const canCancelAeat =
     aeatStatus === "SUCCEEDED" &&
     aeatCancellationStatus !== "SUCCEEDED" &&
@@ -191,9 +223,14 @@ export function VerifactuSendPanel({
           {message}
         </p>
       ) : null}
-      {canRefresh ? (
+      {polling ? (
+        <p className="mt-2 flex items-center gap-1.5 text-sm text-amber-700">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+          Actualizando automáticamente…
+        </p>
+      ) : canRefresh ? (
         <p className="mt-2 text-sm text-amber-800">
-          Trabajo en curso. Usa «Actualizar estado» para refrescar sin salir de la página.
+          Trabajo en curso. Usa «Actualizar estado» para refrescar.
         </p>
       ) : null}
       <div className="mt-3 flex flex-wrap gap-2">
