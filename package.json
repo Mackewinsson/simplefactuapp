@@ -14,7 +14,7 @@
     "test:money": "tsx scripts/test-money.ts",
     "test:payloads": "tsx scripts/test-verifactu-payloads.ts",
     "test": "npm run test:money && npm run test:payloads",
-    "prepare": "husky"
+    "prepare": "node -e \"if(!process.env.CI && !process.env.DOCKER_BUILD){require('child_process').execSync('husky',{stdio:'inherit'})}\" || true"
   },
   "lint-staged": {
     "*.{ts,tsx}": "next lint --fix --file"
