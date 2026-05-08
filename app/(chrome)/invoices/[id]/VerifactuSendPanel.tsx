@@ -49,6 +49,7 @@ export function VerifactuSendPanel({
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [polling, setPolling] = useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const autoSendFired = useRef(false);
 
   const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
@@ -97,6 +98,16 @@ export function VerifactuSendPanel({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollActive, invoiceId]);
+
+  useEffect(() => {
+    if (!cancelModalOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && !pending) setCancelModalOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [cancelModalOpen, pending]);
+
   const canCancelAeat =
     aeatStatus === "SUCCEEDED" &&
     aeatCancellationStatus !== "SUCCEEDED" &&
@@ -114,15 +125,14 @@ export function VerifactuSendPanel({
     });
   }
 
-  function onCancelClick() {
-    if (
-      !window.confirm(
-        "¿Anular esta factura en Verifactu (AEAT)? Se enviará un registro de anulación a la Agencia Tributaria."
-      )
-    ) {
-      return;
-    }
-    run(cancelInvoiceVerifactuAction, invoiceId);
+  function confirmCancelVerifactu() {
+    setMessage(null);
+    startTransition(async () => {
+      const r = await cancelInvoiceVerifactuAction(invoiceId);
+      setMessage(r.message);
+      setCancelModalOpen(false);
+      router.refresh();
+    });
   }
 
   return (
@@ -257,14 +267,69 @@ export function VerifactuSendPanel({
         {canCancelAeat ? (
           <button
             type="button"
-            onClick={onCancelClick}
+            onClick={() => setCancelModalOpen(true)}
             disabled={pending}
             className="btn btn-sm btn-danger"
           >
-            {pending ? "…" : "Anular en Verifactu"}
+            Anular en Verifactu
           </button>
         ) : null}
       </div>
+
+      {cancelModalOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-16"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !pending) setCancelModalOpen(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="verifactu-cancel-title"
+            className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-5 shadow-xl"
+          >
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <h3 id="verifactu-cancel-title" className="text-base font-semibold text-gray-900">
+                ¿Anular esta factura en Verifactu?
+              </h3>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => setCancelModalOpen(false)}
+                className="shrink-0 text-gray-400 hover:text-gray-700 disabled:opacity-40"
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-sm text-gray-700">
+              Se enviará un registro de <strong>anulación</strong> a la Agencia Tributaria para la factura{" "}
+              <span className="font-mono">{invoiceNumber}</span>. Esta acción no se puede deshacer desde
+              SimpleFactu.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => setCancelModalOpen(false)}
+                className="btn btn-sm btn-secondary"
+              >
+                No, mantener
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={confirmCancelVerifactu}
+                className="btn btn-sm btn-danger"
+              >
+                {pending ? "Enviando…" : "Sí, anular en AEAT"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
