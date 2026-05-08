@@ -13,7 +13,11 @@
     "postinstall": "prisma generate",
     "test:money": "tsx scripts/test-money.ts",
     "test:payloads": "tsx scripts/test-verifactu-payloads.ts",
-    "test": "npm run test:money && npm run test:payloads"
+    "test": "npm run test:money && npm run test:payloads",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "next lint --fix --file"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -49,6 +53,8 @@
     "dotenv": "^17.2.4",
     "eslint": "^9",
     "eslint-config-next": "^15.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.2",
     "postcss": "^8",
     "prisma": "^6.19.2",
     "tailwindcss": "^3.4.0",
