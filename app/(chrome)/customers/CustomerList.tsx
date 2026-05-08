@@ -62,7 +62,36 @@ export function CustomerList({ customers }: Props) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+      <div className="space-y-2 md:hidden">
+        {customers.map((c) => (
+          <article key={c.id} className="rounded border border-gray-200 bg-white p-3">
+            <p className="font-medium text-gray-900">{c.name}</p>
+            <p className="mt-1 text-sm text-gray-600">NIF: {c.nif ?? "—"}</p>
+            <p className="text-sm text-gray-600">Email: {c.email ?? "—"}</p>
+            <p className="text-sm text-gray-600">Tipo: {c.tipoPersona ?? "—"}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => startEdit(c)}
+                disabled={pending}
+                className="rounded border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={() => onDelete(c.id)}
+                disabled={pending}
+                className="rounded border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-800 hover:bg-red-100"
+              >
+                Eliminar
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded border border-gray-200 bg-white md:block">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">

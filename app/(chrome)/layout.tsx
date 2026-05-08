@@ -19,14 +19,14 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-4 py-3">
-          <div className="flex items-center gap-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+          <div className="flex min-w-0 items-center gap-3 lg:gap-8">
             <span className="text-lg font-semibold text-gray-900">
               SimpleFactu
             </span>
             <AppNav />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <HeaderUserArea />
           </div>
         </div>

@@ -92,7 +92,22 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
           />
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="space-y-2 p-4 md:hidden">
+          {invoice.items.map((item) => (
+            <article key={item.id} className="rounded border border-gray-200 bg-gray-50 p-3">
+              <p className="font-medium text-gray-900">{item.description}</p>
+              <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-600">
+                <span>Cant.: {item.quantity}</span>
+                <span>Precio u.: {formatCents(invoice.currency, item.unitPriceCents)}</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-gray-900">
+                Importe: {formatCents(invoice.currency, item.lineTotalCents)}
+              </p>
+            </article>
+          ))}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[400px] text-left text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">

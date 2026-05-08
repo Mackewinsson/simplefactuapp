@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import "./globals.css";
@@ -6,6 +6,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "SimpleFactu",
   description: "Facturación sencilla con Verifactu (AEAT)",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 /**

@@ -357,7 +357,61 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog }: Props)
       </div>
 
       {items.length > 0 && (
-        <div className="overflow-x-auto rounded border border-gray-200">
+        <div className="space-y-2 md:hidden">
+          {items.map((row, i) => {
+            const line = calcLine(row);
+            return (
+              <article key={i} className="rounded border border-gray-200 bg-white p-3">
+                <p className="font-medium text-gray-900">{row.description || "—"}</p>
+                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-600">
+                  <span>Cant.: {row.quantity}</span>
+                  <span>Precio: {formatCents(currency, parseDecimalToCents(row.unitPrice))}</span>
+                  <span>Base: {formatCents(currency, line.base)}</span>
+                  <span>IVA: {formatCents(currency, line.cuota)}</span>
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  {row.claveRegimen} · {row.calificacion} · {row.tipoImpositivo}%
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingIdx(i)}
+                    className="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
+                  >
+                    Editar
+                  </button>
+                  {items.length > 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(i)}
+                      className="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50"
+                    >
+                      Eliminar
+                    </button>
+                  ) : null}
+                </div>
+              </article>
+            );
+          })}
+          <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm">
+            <div className="flex justify-between text-gray-600">
+              <span>Base imponible</span>
+              <span>{formatCents(currency, totals.base)}</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>IVA</span>
+              <span>{formatCents(currency, totals.cuota)}</span>
+            </div>
+            <div className="mt-1 flex justify-between border-t border-gray-200 pt-1 font-medium text-gray-900">
+              <span>Total</span>
+              <span>{formatCents(currency, totals.base + totals.cuota)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {items.length > 0 && (
+        <div className="hidden overflow-x-auto rounded border border-gray-200 md:block">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">

@@ -33,7 +33,10 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 md:grid-cols-[14rem_1fr]">
-        <aside className="md:sticky md:top-8 md:h-fit">
+        <article className="order-1 rounded border border-gray-200 bg-white p-6 md:order-2 md:p-8">
+          {children}
+        </article>
+        <aside className="order-2 md:order-1 md:sticky md:top-8 md:h-fit">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
             Guías
           </h2>
@@ -55,9 +58,6 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
             </Link>
           </nav>
         </aside>
-        <article className="rounded border border-gray-200 bg-white p-6 md:p-8">
-          {children}
-        </article>
       </div>
     </div>
   );

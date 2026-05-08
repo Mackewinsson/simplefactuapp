@@ -101,11 +101,11 @@ export default async function InvoicesPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold">Facturas</h1>
         <Link
           href="/invoices/new"
-          className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="w-full rounded bg-gray-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-gray-800 sm:w-auto"
         >
           Nueva factura
         </Link>
@@ -116,23 +116,23 @@ export default async function InvoicesPage({
         method="get"
         className="mb-4 flex flex-wrap items-end gap-3 rounded border border-gray-200 bg-white p-3 text-sm"
       >
-        <label className="block">
+        <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Buscar</span>
           <input
             name="q"
             type="search"
             defaultValue={q ?? ""}
             placeholder="número, cliente, NIF…"
-            className="mt-1 block w-52 rounded border border-gray-300 px-2 py-1 text-sm"
+            className="mt-1 block w-full min-w-0 rounded border border-gray-300 px-2 py-1 text-sm sm:w-52"
           />
         </label>
 
-        <label className="block">
+        <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Estado AEAT</span>
           <select
             name="status"
             defaultValue={status ?? ""}
-            className="mt-1 block rounded border border-gray-300 px-2 py-1 text-sm"
+            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
           >
             {AEAT_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>
@@ -142,38 +142,38 @@ export default async function InvoicesPage({
           </select>
         </label>
 
-        <label className="block">
+        <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Serie</span>
           <input
             name="serie"
             type="text"
             defaultValue={serie ?? ""}
             placeholder="2026"
-            className="mt-1 block w-24 rounded border border-gray-300 px-2 py-1 text-sm"
+            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-24"
           />
         </label>
 
-        <label className="block">
+        <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Desde</span>
           <input
             name="from"
             type="date"
             defaultValue={from ?? ""}
-            className="mt-1 block rounded border border-gray-300 px-2 py-1 text-sm"
+            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
           />
         </label>
 
-        <label className="block">
+        <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Hasta</span>
           <input
             name="to"
             type="date"
             defaultValue={to ?? ""}
-            className="mt-1 block rounded border border-gray-300 px-2 py-1 text-sm"
+            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
           />
         </label>
 
-        <div className="flex gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           <button
             type="submit"
             className="rounded bg-gray-900 px-3 py-1.5 text-sm text-white hover:bg-gray-800"
@@ -207,7 +207,35 @@ export default async function InvoicesPage({
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+          <div className="space-y-3 md:hidden">
+            {invoices.map((inv: InvoiceRow) => {
+              const badge = registrationStatusBadge(inv.aeatStatus, inv.aeatCancellationStatus);
+              return (
+                <article key={inv.id} className="rounded border border-gray-200 bg-white p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <Link href={`/invoices/${inv.id}`} className="font-medium text-blue-600 hover:underline">
+                      {inv.number}
+                    </Link>
+                    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-700">{inv.customerName}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+                    <span>{dateFormat.format(inv.issueDate)}</span>
+                    <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-600">
+                      {extractSerie(inv.number)}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm font-medium text-gray-900">
+                    {formatCents(inv.currency, inv.totalCents)}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="hidden overflow-x-auto rounded border border-gray-200 bg-white md:block">
             <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
@@ -263,11 +291,11 @@ export default async function InvoicesPage({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+            <div className="mt-4 flex flex-col gap-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
               <span>
                 {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} de {total}
               </span>
-              <div className="flex gap-1">
+              <div className="flex flex-wrap gap-1">
                 {page > 1 && (
                   <Link
                     href={pageHref(page - 1)}
