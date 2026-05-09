@@ -14,6 +14,7 @@ import {
   registrationStatusBadgeClass,
   cancellationStatusBadgeClass,
 } from "@/lib/simplefactu/aeat-status-ui";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { IssueCorrectionButton } from "./IssueCorrectionButton";
 
 type Props = {
@@ -306,8 +307,8 @@ export function VerifactuSendPanel({
             </div>
             <p className="text-sm text-gray-700">
               Se enviará un registro de <strong>anulación</strong> a la Agencia Tributaria para la factura{" "}
-              <span className="font-mono">{invoiceNumber}</span>. Esta acción no se puede deshacer desde
-              SimpleFactu.
+              <span className="font-mono">{invoiceNumber}</span>. Esta acción no se puede deshacer desde{" "}
+              {APP_DISPLAY_NAME}.
             </p>
             <div className="mt-5 flex flex-wrap justify-end gap-2">
               <button

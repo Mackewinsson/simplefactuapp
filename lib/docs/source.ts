@@ -1,6 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import {
+  APP_DISPLAY_NAME,
+  APP_DOCS_INDEX_DESCRIPTION,
+  APP_DOCS_LABEL,
+} from "@/lib/branding";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
@@ -38,10 +43,11 @@ export type DocMeta = {
 /** Slug used for the index file. Empty string maps to /docs. */
 export const ROOT_SLUG = "index";
 
-function readMeta(): { title: string; pages: string[] } {
+function readMeta(): { pages: string[] } {
   const file = path.join(DOCS_DIR, "meta.json");
-  if (!fs.existsSync(file)) return { title: "Docs", pages: [] };
-  return JSON.parse(fs.readFileSync(file, "utf8"));
+  if (!fs.existsSync(file)) return { pages: [] };
+  const raw = JSON.parse(fs.readFileSync(file, "utf8")) as { pages?: string[] };
+  return { pages: Array.isArray(raw.pages) ? raw.pages : [] };
 }
 
 function fileForSlug(slug: string): string | null {
@@ -62,13 +68,28 @@ export async function getDocPage(slug: string | undefined): Promise<DocPage | nu
 
   const processed = await remark().use(remarkGfm).use(remarkHtml).process(content);
 
+  const html = String(processed).replaceAll("{{APP_DISPLAY_NAME}}", APP_DISPLAY_NAME);
+
+  const title =
+    realSlug === ROOT_SLUG
+      ? APP_DOCS_LABEL
+      : typeof data.title === "string"
+        ? data.title
+        : realSlug;
+  const description =
+    realSlug === ROOT_SLUG
+      ? APP_DOCS_INDEX_DESCRIPTION
+      : typeof data.description === "string"
+        ? data.description
+        : undefined;
+
   return {
     slug: realSlug,
     frontmatter: {
-      title: typeof data.title === "string" ? data.title : realSlug,
-      description: typeof data.description === "string" ? data.description : undefined,
+      title,
+      description,
     },
-    html: String(processed),
+    html,
   };
 }
 
@@ -80,10 +101,22 @@ export function listDocs(): DocMeta[] {
     const file = fileForSlug(slug);
     if (!file) continue;
     const { data } = matter(fs.readFileSync(file, "utf8"));
+    const title =
+      slug === ROOT_SLUG
+        ? APP_DOCS_LABEL
+        : typeof data.title === "string"
+          ? data.title
+          : slug;
+    const description =
+      slug === ROOT_SLUG
+        ? APP_DOCS_INDEX_DESCRIPTION
+        : typeof data.description === "string"
+          ? data.description
+          : undefined;
     items.push({
       slug,
-      title: typeof data.title === "string" ? data.title : slug,
-      description: typeof data.description === "string" ? data.description : undefined,
+      title,
+      description,
     });
   }
   return items;

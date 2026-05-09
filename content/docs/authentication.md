@@ -13,7 +13,7 @@ x-api-key: vf_xxxxxxxxxxxxxxxxxxxxxxxx
 
 (También aceptamos `Authorization: Bearer vf_...` si te resulta más cómodo).
 
-Las API keys se emiten desde el panel admin de SimpleFactu. Si eres
+Las API keys se emiten desde el panel admin de {{APP_DISPLAY_NAME}}. Si eres
 integrador externo, contáctanos y te emitimos una; te llegará por canal
 seguro y solo se muestra **una vez**.
 

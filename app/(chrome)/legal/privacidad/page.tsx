@@ -12,7 +12,9 @@
  *   - Datos de pago (a través de Stripe; no almacenamos tarjetas).
  */
 
-export const metadata = { title: "Política de privacidad — SimpleFactu" };
+import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+
+export const metadata = { title: appDocumentTitle("Política de privacidad") };
 
 export default function PrivacyPolicyPage() {
   return (
@@ -157,7 +159,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>9. Cookies</h2>
       <p>
-        SimpleFactu utiliza únicamente cookies técnicas necesarias para mantener la
+        {APP_DISPLAY_NAME} utiliza únicamente cookies técnicas necesarias para mantener la
         sesión (Clerk) y procesar el pago (Stripe). No utiliza cookies de analítica ni
         publicitarias. Por ello no requiere banner de consentimiento conforme al art.
         22.2 LSSI.

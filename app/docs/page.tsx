@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { APP_DOCS_LABEL } from "@/lib/branding";
 import { getDocPage } from "@/lib/docs/source";
 import { DocBody } from "./DocBody";
 
@@ -12,9 +13,9 @@ export default async function DocsIndexPage() {
 
 export async function generateMetadata() {
   const page = await getDocPage(undefined);
-  if (!page) return { title: "SimpleFactu Docs" };
+  if (!page) return { title: APP_DOCS_LABEL };
   return {
-    title: `${page.frontmatter.title} — SimpleFactu Docs`,
+    title: APP_DOCS_LABEL,
     description: page.frontmatter.description,
   };
 }

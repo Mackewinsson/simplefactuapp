@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { AppNav } from "../AppNav";
 import { HeaderUserArea } from "../HeaderUserArea";
 import { Footer } from "../Footer";
@@ -22,7 +23,7 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex min-w-0 items-center gap-3 lg:gap-8">
             <span className="text-lg font-semibold text-gray-900">
-              SimpleFactu
+              {APP_DISPLAY_NAME}
             </span>
             <AppNav />
           </div>

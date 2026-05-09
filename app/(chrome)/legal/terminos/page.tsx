@@ -6,7 +6,9 @@
  * eliminar/añadir cláusulas según la legislación aplicable.
  */
 
-export const metadata = { title: "Términos y condiciones — SimpleFactu" };
+import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+
+export const metadata = { title: appDocumentTitle("Términos y condiciones") };
 
 export default function TermsPage() {
   return (
@@ -17,7 +19,7 @@ export default function TermsPage() {
       <h2>1. Definiciones</h2>
       <ul>
         <li>
-          <strong>Servicio:</strong> SimpleFactu, plataforma web de emisión de facturas
+          <strong>Servicio:</strong> {APP_DISPLAY_NAME}, plataforma web de emisión de facturas
           conforme al sistema Veri*Factu de AEAT.
         </li>
         <li>

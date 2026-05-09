@@ -10,7 +10,9 @@
  * información y de comercio electrónico (LSSI-CE), art. 10.
  */
 
-export const metadata = { title: "Aviso legal — SimpleFactu" };
+import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+
+export const metadata = { title: appDocumentTitle("Aviso legal") };
 
 export default function AvisoLegalPage() {
   return (
@@ -42,7 +44,7 @@ export default function AvisoLegalPage() {
 
       <h2>2. Objeto del sitio</h2>
       <p>
-        SimpleFactu es una herramienta web para emitir facturas conforme al sistema
+        {APP_DISPLAY_NAME} es una herramienta web para emitir facturas conforme al sistema
         Veri*Factu de la Agencia Estatal de Administración Tributaria (AEAT) regulado
         por el Real Decreto 1007/2023 y la Orden HAC/1177/2024. El servicio actúa como
         intermediario técnico entre el sistema de facturación del usuario y los servicios
@@ -51,7 +53,7 @@ export default function AvisoLegalPage() {
 
       <h2>3. Condiciones de acceso</h2>
       <p>
-        El acceso a SimpleFactu es libre y gratuito. La utilización de las funcionalidades
+        El acceso a {APP_DISPLAY_NAME} es libre y gratuito. La utilización de las funcionalidades
         de envío a AEAT requiere registro y la aceptación de los{" "}
         <a href="/legal/terminos">Términos y condiciones</a>. El usuario se compromete a
         utilizar la plataforma conforme a la legislación vigente, la moral, las buenas

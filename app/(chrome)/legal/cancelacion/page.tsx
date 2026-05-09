@@ -7,7 +7,9 @@
  * aplica el desistimiento (servicios ya consumidos).
  */
 
-export const metadata = { title: "Cancelación y reembolso — SimpleFactu" };
+import { appDocumentTitle } from "@/lib/branding";
+
+export const metadata = { title: appDocumentTitle("Cancelación y reembolso") };
 
 export default function CancellationPolicyPage() {
   return (

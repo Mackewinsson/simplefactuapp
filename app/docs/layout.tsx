@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { APP_DOCS_LABEL } from "@/lib/branding";
 import { listDocs, ROOT_SLUG } from "@/lib/docs/source";
 
 /**
@@ -19,7 +20,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3">
           <div className="flex items-center gap-3">
             <Link href="/docs" className="text-base font-semibold text-gray-900">
-              SimpleFactu Docs
+              {APP_DOCS_LABEL}
             </Link>
           </div>
           <nav className="flex items-center gap-4 text-sm">

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { docsBrowserPageTitle } from "@/lib/branding";
 import { getDocPage, listDocSlugs } from "@/lib/docs/source";
 import { DocBody } from "../DocBody";
 
@@ -28,7 +29,7 @@ export async function generateMetadata({
   const page = await getDocPage(slug);
   if (!page) return { title: "Not found" };
   return {
-    title: `${page.frontmatter.title} — SimpleFactu Docs`,
+    title: docsBrowserPageTitle(page.frontmatter.title),
     description: page.frontmatter.description,
   };
 }

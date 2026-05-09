@@ -1,3 +1,4 @@
+import { docsBrowserPageTitle } from "@/lib/branding";
 import { ApiReferenceClient } from "./ApiReferenceClient";
 
 /**
@@ -12,7 +13,8 @@ import { ApiReferenceClient } from "./ApiReferenceClient";
  *   - the API base URL stays server-side (no NEXT_PUBLIC_* leak),
  *   - the spec is cached at the edge for an hour.
  */
-export const metadata = { title: "API Reference — SimpleFactu Docs" };
+
+export const metadata = { title: docsBrowserPageTitle("API Reference") };
 
 export default function ApiReferencePage() {
   return <ApiReferenceClient specUrl="/api/openapi.json" />;

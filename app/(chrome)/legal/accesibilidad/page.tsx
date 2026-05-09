@@ -7,7 +7,9 @@
  * es buena práctica y suma puntos en RFP de sector público.
  */
 
-export const metadata = { title: "Declaración de accesibilidad — SimpleFactu" };
+import { appDocumentTitle } from "@/lib/branding";
+
+export const metadata = { title: appDocumentTitle("Declaración de accesibilidad") };
 
 export default function AccessibilityStatementPage() {
   return (

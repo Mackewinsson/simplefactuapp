@@ -1,13 +1,11 @@
 ---
-title: SimpleFactu Docs
-description: Documentación de la API SimpleFactu para integraciones con Veri*Factu (AEAT).
 ---
 
-Bienvenido a la documentación de **SimpleFactu**. Esta API te permite emitir
+Bienvenido a la documentación de **{{APP_DISPLAY_NAME}}**. Esta API te permite emitir
 facturas conforme al sistema **Veri\*Factu** de la Agencia Tributaria
 (RD 1007/2023, OM HAC/1177/2024) sin construir tú la integración SOAP con AEAT.
 
-## ¿Qué hace SimpleFactu?
+## ¿Qué hace {{APP_DISPLAY_NAME}}?
 
 - Recibe la factura en JSON.
 - Valida los datos según las reglas normativas (NIF, encadenamiento de huellas,

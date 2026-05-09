@@ -1,4 +1,6 @@
-# SimpleFactu
+# simplefactuapp
+
+Nombre del producto en la interfaz: edita `APP_DISPLAY_NAME` en [`lib/branding.ts`](lib/branding.ts).
 
 Minimal invoice list + create + PDF download. Next.js App Router, TypeScript, Prisma, Postgres (Neon), Clerk auth.
 

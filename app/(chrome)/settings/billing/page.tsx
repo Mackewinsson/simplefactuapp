@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { isBillingEnabled } from "@/lib/billing/feature";
@@ -58,7 +59,7 @@ export default async function BillingPage() {
         <div className="rounded border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
           <p className="font-medium">Esta funcionalidad estará disponible próximamente.</p>
           <p className="mt-1 text-blue-800">
-            De momento puedes usar SimpleFactu sin coste. Te avisaremos por email cuando los planes
+            De momento puedes usar {APP_DISPLAY_NAME} sin coste. Te avisaremos por email cuando los planes
             de pago estén activos.
           </p>
         </div>

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { appDocumentTitle } from "@/lib/branding";
 
 export const metadata: Metadata = {
-  title: "Información legal — SimpleFactu",
+  title: appDocumentTitle("Información legal"),
 };
 
 const legalLinks: Array<{ href: string; label: string }> = [
