@@ -136,11 +136,11 @@ export function VerifactuSettingsForm({
       </section>
 
       <section className="rounded border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-gray-900">Verificar NIF (VNIF AEAT)</h2>
+        <h2 className="text-lg font-medium text-gray-900">Comprobar nombre con Hacienda</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Comprobación opcional contra AEAT. Requiere el scope <code className="text-xs">nif:read</code>{" "}
-          en la API key (las cuentas nuevas ya lo incluyen; en cuentas antiguas puede hacer falta
-          borrar datos de Verifactu y reprovisionar).
+          Comprueba si el nombre o la razón social coinciden con el que tiene registrado Hacienda para un
+          NIF o CIF español. Es opcional. Si falla la consulta, revisa también en Ajustes que la integración
+          Verifactu esté bien conectada.
         </p>
         {vnifState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-red-700">
@@ -163,7 +163,7 @@ export function VerifactuSettingsForm({
           </label>
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-gray-700">
-              Nombre (debe coincidir con AEAT)
+              Nombre o razón social (como en la documentación)
             </span>
             <input
               name="verifyNombre"
@@ -171,7 +171,7 @@ export function VerifactuSettingsForm({
               placeholder="Razón social o nombre completo"
             />
           </label>
-          <SubmitButton label="Verificar con AEAT" />
+          <SubmitButton label="Comprobar con Hacienda" />
         </form>
       </section>
     </div>

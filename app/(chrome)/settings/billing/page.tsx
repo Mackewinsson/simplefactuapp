@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { isBillingEnabled } from "@/lib/billing/feature";
 import { UpgradeButton } from "./UpgradeButton";
 
@@ -88,7 +89,7 @@ export default async function BillingPage() {
       fetchError = `HTTP ${res.status}`;
     }
   } catch (e) {
-    fetchError = e instanceof Error ? e.message : "Error desconocido";
+    fetchError = formatVerifactuActionError(e);
   }
 
   const requestsPct = plan && usage ? pct(usage.requests, plan.maxRequestsPerMonth) : 0;

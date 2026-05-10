@@ -5,7 +5,13 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
-import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
+import { formatSimplefactuHttpError, formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import {
+  NIF_VERIFY_MATCH_USER,
+  NIF_VERIFY_NEED_BOTH_USER,
+  NIF_VERIFY_NOT_MATCH_USER,
+  NIF_VERIFY_PERMISSION_USER,
+} from "@/lib/invoices/nif-verify-user-messages";
 
 export type VerifactuSettingsState = { ok: true; message: string } | { ok: false; errors: string[] };
 
@@ -22,7 +28,12 @@ export async function saveIssuerProfileAction(
     return { ok: false, errors: ["El NIF y la razón social del emisor son obligatorios."] };
   }
 
-  await ensureVerifactuApiKey(userId);
+  try {
+    await ensureVerifactuApiKey(userId);
+  } catch (e) {
+    return { ok: false, errors: [formatVerifactuActionError(e)] };
+  }
+
   await prisma.userVerifactuAccount.update({
     where: { userId },
     data: { issuerNif, issuerLegalName },
@@ -51,13 +62,18 @@ export async function uploadCertificateAction(
   const buf = Buffer.from(await file.arrayBuffer());
   const pfxBase64 = buf.toString("base64");
 
-  const { apiKey } = await ensureVerifactuApiKey(userId);
-  const client = createSimplefactuClient({
-    baseUrl: getSimplefactuBaseUrl(),
-    apiKey,
-  });
+  let res: Response;
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
+    res = await client.postMeCertificate({ pfxBase64, pfxPassphrase: passphrase });
+  } catch (e) {
+    return { ok: false, errors: [formatVerifactuActionError(e)] };
+  }
 
-  const res = await client.postMeCertificate({ pfxBase64, pfxPassphrase: passphrase });
   const json = (await res.json().catch(() => ({}))) as {
     message?: string;
     error?: string;
@@ -121,37 +137,35 @@ export async function verifyNifAction(
   if (!nif || !nombre) {
     return {
       ok: false,
-      errors: ["El NIF y el nombre (razón social) son obligatorios para VNIF."],
+      errors: [NIF_VERIFY_NEED_BOTH_USER],
     };
   }
 
-  const { apiKey } = await ensureVerifactuApiKey(userId);
-  const client = createSimplefactuClient({
-    baseUrl: getSimplefactuBaseUrl(),
-    apiKey,
-  });
-
-  const res = await client.postVerifyNif({ nif, nombre });
-  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  let res: Response;
+  let json: Record<string, unknown>;
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
+    res = await client.postVerifyNif({ nif, nombre });
+    json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  } catch (e) {
+    return { ok: false, errors: [formatVerifactuActionError(e)] };
+  }
 
   if (!res.ok) {
     const msg =
-      res.status === 403
-        ? "La API key no tiene nif:read. Borra la fila UserVerifactuAccount o revoca la clave e inicia sesión de nuevo para reprovisionar."
-        : formatSimplefactuHttpError(res.status, json);
+      res.status === 403 ? NIF_VERIFY_PERMISSION_USER : formatSimplefactuHttpError(res.status, json);
     return { ok: false, errors: [msg] };
   }
 
   const success = json.success === true;
-  const resultado = json.resultado != null ? String(json.resultado) : "";
-  const summary = success
-    ? `VNIF: identificado (${resultado || "OK"})`
-    : typeof json.message === "string"
-      ? json.message
-      : resultado
-        ? `VNIF: ${resultado}`
-        : "Consulta VNIF finalizada.";
 
   revalidatePath("/settings/verifactu");
-  return { ok: true, message: summary };
+  if (success) {
+    return { ok: true, message: NIF_VERIFY_MATCH_USER };
+  }
+  return { ok: false, errors: [NIF_VERIFY_NOT_MATCH_USER] };
 }

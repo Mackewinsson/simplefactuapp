@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { z } from "@/lib/zod-es";
 import { prisma } from "@/lib/prisma";
 
 const customerSchema = z.object({

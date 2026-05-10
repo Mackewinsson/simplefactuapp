@@ -1,6 +1,7 @@
 import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { SimplefactuClient } from "@/lib/simplefactu/client";
+import { formatSimplefactuNetworkError } from "@/lib/simplefactu/api-errors";
 
 type AeatError = {
   code?: string | null;
@@ -38,6 +39,14 @@ function buildErrorMessage(job: JobJson): string {
 /**
  * Fetches job status from simplefactu and persists terminal state to the invoice.
  */
+export type SyncJobStatusResult = {
+  ok: boolean;
+  message: string;
+  terminal: boolean;
+  /** Fallo de red antes de respuesta HTTP; no actualizar estado terminal en BD. */
+  networkFailure?: boolean;
+};
+
 export async function syncJobStatusToInvoice(
   client: SimplefactuClient,
   params: {
@@ -46,7 +55,7 @@ export async function syncJobStatusToInvoice(
     jobId: string;
     kind: "SEND_INVOICE" | "CANCEL_INVOICE";
   }
-): Promise<{ ok: boolean; message: string; terminal: boolean }> {
+): Promise<SyncJobStatusResult> {
   const { invoiceId, userId, jobId, kind } = params;
 
   const invoice = await prisma.invoice.findFirst({
@@ -56,7 +65,18 @@ export async function syncJobStatusToInvoice(
     return { ok: false, message: "Factura no encontrada.", terminal: true };
   }
 
-  const jr = await client.getJob(jobId);
+  let jr: Response;
+  try {
+    jr = await client.getJob(jobId);
+  } catch (e) {
+    return {
+      ok: false,
+      message: formatSimplefactuNetworkError(e),
+      terminal: false,
+      networkFailure: true,
+    };
+  }
+
   const job = (await jr.json().catch(() => ({}))) as JobJson;
 
   if (!jr.ok) {

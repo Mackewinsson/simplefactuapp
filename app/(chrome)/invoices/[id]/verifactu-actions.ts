@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { buildSendInvoicePayload } from "@/lib/simplefactu/build-send-invoice-payload";
 import { buildCancelInvoicePayload } from "@/lib/simplefactu/build-cancel-invoice-payload";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
-import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
+import { formatSimplefactuHttpError, formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
@@ -37,6 +37,13 @@ async function pollUntilTerminal(
       jobId: params.jobId,
       kind: params.kind,
     });
+    if (r.networkFailure) {
+      revalidatePath(`/invoices/${params.invoiceId}`);
+      return {
+        ok: false,
+        message: `${r.message} Cuando el API responda, usa «Actualizar estado» en la factura.`,
+      };
+    }
     if (r.terminal) {
       revalidatePath(`/invoices/${params.invoiceId}`);
       return { ok: r.ok, message: r.message };
@@ -73,80 +80,84 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
     };
   }
 
-  const { apiKey } = await ensureVerifactuApiKey(userId);
-  const client = createSimplefactuClient({
-    baseUrl: getSimplefactuBaseUrl(),
-    apiKey,
-  });
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
 
-  const certRes = await client.getMeCertificate();
-  if (certRes.ok) {
-    const cj = (await certRes.json()) as { hasCertificate?: boolean };
-    if (!cj.hasCertificate) {
+    const certRes = await client.getMeCertificate();
+    if (certRes.ok) {
+      const cj = (await certRes.json()) as { hasCertificate?: boolean };
+      if (!cj.hasCertificate) {
+        return {
+          ok: false,
+          message:
+            "Sube primero tu certificado PFX en Ajustes → Verifactu.",
+        };
+      }
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = buildSendInvoicePayload(invoice, account);
+    } catch (e) {
       return {
         ok: false,
-        message:
-          "Sube primero tu certificado PFX en Ajustes → Verifactu.",
+        message: e instanceof Error ? e.message : "Factura no válida para Verifactu.",
       };
     }
-  }
 
-  let body: Record<string, unknown>;
-  try {
-    body = buildSendInvoicePayload(invoice, account);
-  } catch (e) {
-    return {
-      ok: false,
-      message: e instanceof Error ? e.message : "Factura no válida para Verifactu.",
-    };
-  }
+    const idempotencyKey = invoice.aeatIdempotencyKey || invoice.id;
+    if (!invoice.aeatIdempotencyKey) {
+      await prisma.invoice.update({
+        where: { id: invoice.id },
+        data: { aeatIdempotencyKey: idempotencyKey },
+      });
+    }
 
-  const idempotencyKey = invoice.aeatIdempotencyKey || invoice.id;
-  if (!invoice.aeatIdempotencyKey) {
-    await prisma.invoice.update({
-      where: { id: invoice.id },
-      data: { aeatIdempotencyKey: idempotencyKey },
-    });
-  }
+    const post = await client.postSendInvoice(body, idempotencyKey);
+    const postJson = (await post.json().catch(() => ({}))) as Record<string, unknown>;
 
-  const post = await client.postSendInvoice(body, idempotencyKey);
-  const postJson = (await post.json().catch(() => ({}))) as Record<string, unknown>;
+    if (post.status !== 202) {
+      const msg = formatSimplefactuHttpError(post.status, postJson);
+      await prisma.invoice.update({
+        where: { id: invoice.id },
+        data: {
+          aeatStatus: AeatJobStatus.NOT_SENT,
+          aeatLastError: msg.slice(0, 2000),
+          aeatUpdatedAt: new Date(),
+        },
+      });
+      revalidatePath(`/invoices/${invoice.id}`);
+      return { ok: false, message: msg };
+    }
 
-  if (post.status !== 202) {
-    const msg = formatSimplefactuHttpError(post.status, postJson);
+    const jobId = postJson.jobId as string | undefined;
+    if (!jobId) {
+      return { ok: false, message: "El API no devolvió jobId (Verifactu)." };
+    }
+
     await prisma.invoice.update({
       where: { id: invoice.id },
       data: {
-        aeatStatus: AeatJobStatus.NOT_SENT,
-        aeatLastError: msg.slice(0, 2000),
+        aeatJobId: jobId,
+        aeatStatus: AeatJobStatus.PENDING,
+        aeatLastError: null,
         aeatUpdatedAt: new Date(),
       },
     });
-    revalidatePath(`/invoices/${invoice.id}`);
-    return { ok: false, message: msg };
+
+    return pollUntilTerminal(client, {
+      invoiceId: invoice.id,
+      userId,
+      jobId,
+      kind: "SEND_INVOICE",
+    });
+  } catch (e) {
+    return { ok: false, message: formatVerifactuActionError(e) };
   }
-
-  const jobId = postJson.jobId as string | undefined;
-  if (!jobId) {
-    return { ok: false, message: "El API no devolvió jobId (Verifactu)." };
-  }
-
-  await prisma.invoice.update({
-    where: { id: invoice.id },
-    data: {
-      aeatJobId: jobId,
-      aeatStatus: AeatJobStatus.PENDING,
-      aeatLastError: null,
-      aeatUpdatedAt: new Date(),
-    },
-  });
-
-  return pollUntilTerminal(client, {
-    invoiceId: invoice.id,
-    userId,
-    jobId,
-    kind: "SEND_INVOICE",
-  });
 }
 
 export async function refreshVerifactuJobAction(invoiceId: string): Promise<SendVerifactuResult> {
@@ -176,20 +187,24 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
     return { ok: false, message: "No hay ningún trabajo Verifactu pendiente de actualizar." };
   }
 
-  const { apiKey } = await ensureVerifactuApiKey(userId);
-  const client = createSimplefactuClient({
-    baseUrl: getSimplefactuBaseUrl(),
-    apiKey,
-  });
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
 
-  const r = await syncJobStatusToInvoice(client, {
-    invoiceId,
-    userId,
-    jobId,
-    kind,
-  });
-  revalidatePath(`/invoices/${invoiceId}`);
-  return { ok: r.ok, message: r.message, terminal: r.terminal };
+    const r = await syncJobStatusToInvoice(client, {
+      invoiceId,
+      userId,
+      jobId,
+      kind,
+    });
+    revalidatePath(`/invoices/${invoiceId}`);
+    return { ok: r.ok, message: r.message, terminal: r.terminal };
+  } catch (e) {
+    return { ok: false, message: formatVerifactuActionError(e) };
+  }
 }
 
 export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
@@ -232,81 +247,85 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
     };
   }
 
-  const { apiKey } = await ensureVerifactuApiKey(userId);
-  const client = createSimplefactuClient({
-    baseUrl: getSimplefactuBaseUrl(),
-    apiKey,
-  });
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
 
-  const certRes = await client.getMeCertificate();
-  if (certRes.ok) {
-    const cj = (await certRes.json()) as { hasCertificate?: boolean };
-    if (!cj.hasCertificate) {
+    const certRes = await client.getMeCertificate();
+    if (certRes.ok) {
+      const cj = (await certRes.json()) as { hasCertificate?: boolean };
+      if (!cj.hasCertificate) {
+        return {
+          ok: false,
+          message:
+            "Sube primero tu certificado PFX en Ajustes → Verifactu.",
+        };
+      }
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = buildCancelInvoicePayload(invoice, account);
+    } catch (e) {
       return {
         ok: false,
-        message:
-          "Sube primero tu certificado PFX en Ajustes → Verifactu.",
+        message: e instanceof Error ? e.message : "Datos de anulación no válidos.",
       };
     }
-  }
 
-  let body: Record<string, unknown>;
-  try {
-    body = buildCancelInvoicePayload(invoice, account);
-  } catch (e) {
-    return {
-      ok: false,
-      message: e instanceof Error ? e.message : "Datos de anulación no válidos.",
-    };
-  }
+    let cancelKey =
+      invoice.aeatCancellationIdempotencyKey || `cancel-inv-${invoice.id}`;
+    if (needsNewCancelKey) {
+      cancelKey = `cancel-inv-${invoice.id}-${Date.now()}`;
+    }
+    await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { aeatCancellationIdempotencyKey: cancelKey },
+    });
 
-  let cancelKey =
-    invoice.aeatCancellationIdempotencyKey || `cancel-inv-${invoice.id}`;
-  if (needsNewCancelKey) {
-    cancelKey = `cancel-inv-${invoice.id}-${Date.now()}`;
-  }
-  await prisma.invoice.update({
-    where: { id: invoice.id },
-    data: { aeatCancellationIdempotencyKey: cancelKey },
-  });
+    const post = await client.postCancelInvoice(body, cancelKey);
+    const postJson = (await post.json().catch(() => ({}))) as Record<string, unknown>;
 
-  const post = await client.postCancelInvoice(body, cancelKey);
-  const postJson = (await post.json().catch(() => ({}))) as Record<string, unknown>;
+    if (post.status !== 202) {
+      const msg = formatSimplefactuHttpError(post.status, postJson);
+      await prisma.invoice.update({
+        where: { id: invoice.id },
+        data: {
+          aeatCancellationLastError: msg.slice(0, 2000),
+          aeatUpdatedAt: new Date(),
+        },
+      });
+      revalidatePath(`/invoices/${invoice.id}`);
+      return { ok: false, message: msg };
+    }
 
-  if (post.status !== 202) {
-    const msg = formatSimplefactuHttpError(post.status, postJson);
+    const jobId = postJson.jobId as string | undefined;
+    if (!jobId) {
+      return { ok: false, message: "El API no devolvió jobId de anulación (Verifactu)." };
+    }
+
     await prisma.invoice.update({
       where: { id: invoice.id },
       data: {
-        aeatCancellationLastError: msg.slice(0, 2000),
+        aeatCancellationJobId: jobId,
+        aeatCancellationStatus: AeatCancellationStatus.PENDING,
+        aeatCancellationLastError: null,
         aeatUpdatedAt: new Date(),
       },
     });
-    revalidatePath(`/invoices/${invoice.id}`);
-    return { ok: false, message: msg };
+
+    return pollUntilTerminal(client, {
+      invoiceId: invoice.id,
+      userId,
+      jobId,
+      kind: "CANCEL_INVOICE",
+    });
+  } catch (e) {
+    return { ok: false, message: formatVerifactuActionError(e) };
   }
-
-  const jobId = postJson.jobId as string | undefined;
-  if (!jobId) {
-    return { ok: false, message: "El API no devolvió jobId de anulación (Verifactu)." };
-  }
-
-  await prisma.invoice.update({
-    where: { id: invoice.id },
-    data: {
-      aeatCancellationJobId: jobId,
-      aeatCancellationStatus: AeatCancellationStatus.PENDING,
-      aeatCancellationLastError: null,
-      aeatUpdatedAt: new Date(),
-    },
-  });
-
-  return pollUntilTerminal(client, {
-    invoiceId: invoice.id,
-    userId,
-    jobId,
-    kind: "CANCEL_INVOICE",
-  });
 }
 
 export type IssueCorrectionResult =
@@ -395,15 +414,20 @@ export async function issueCorrectionAction(
     };
   }
 
-  const res = await adminFetch(`/admin/jobs/${invoice.aeatJobId}/issue-correction`, {
-    method: "POST",
-    body: JSON.stringify({
-      tipoFactura: options.tipoFactura,
-      numSerie: options.numSerie.trim(),
-      tipoRectificativa,
-      ...(hasImporte ? { importeRectificacion: options.importeRectificacion } : {}),
-    }),
-  });
+  let res: Response;
+  try {
+    res = await adminFetch(`/admin/jobs/${invoice.aeatJobId}/issue-correction`, {
+      method: "POST",
+      body: JSON.stringify({
+        tipoFactura: options.tipoFactura,
+        numSerie: options.numSerie.trim(),
+        tipoRectificativa,
+        ...(hasImporte ? { importeRectificacion: options.importeRectificacion } : {}),
+      }),
+    });
+  } catch (e) {
+    return { ok: false, message: formatVerifactuActionError(e) };
+  }
   const json = (await res.json().catch(() => ({}))) as {
     correctionJobId?: string;
     message?: string;

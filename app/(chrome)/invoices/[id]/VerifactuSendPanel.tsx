@@ -15,6 +15,7 @@ import {
   cancellationStatusBadgeClass,
 } from "@/lib/simplefactu/aeat-status-ui";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { IssueCorrectionButton } from "./IssueCorrectionButton";
 
 type Props = {
@@ -83,12 +84,19 @@ export function VerifactuSendPanel({
     const id = setInterval(async () => {
       if (stopped) return;
       attempts++;
-      const r = await refreshVerifactuJobAction(invoiceId);
-      if (stopped) return;
-      if (r.terminal || attempts >= 60) {
+      try {
+        const r = await refreshVerifactuJobAction(invoiceId);
+        if (stopped) return;
+        if (r.terminal || attempts >= 60) {
+          stopped = true;
+          clearInterval(id);
+          setPolling(false);
+        }
+      } catch (e) {
         stopped = true;
         clearInterval(id);
         setPolling(false);
+        setMessage(formatVerifactuActionError(e));
       }
       router.refresh();
     }, 3000);
@@ -120,8 +128,12 @@ export function VerifactuSendPanel({
   ) {
     setMessage(null);
     startTransition(async () => {
-      const r = await action(id);
-      setMessage(r.message);
+      try {
+        const r = await action(id);
+        setMessage(r.message);
+      } catch (e) {
+        setMessage(formatVerifactuActionError(e));
+      }
       router.refresh();
     });
   }
@@ -129,8 +141,12 @@ export function VerifactuSendPanel({
   function confirmCancelVerifactu() {
     setMessage(null);
     startTransition(async () => {
-      const r = await cancelInvoiceVerifactuAction(invoiceId);
-      setMessage(r.message);
+      try {
+        const r = await cancelInvoiceVerifactuAction(invoiceId);
+        setMessage(r.message);
+      } catch (e) {
+        setMessage(formatVerifactuActionError(e));
+      }
       setCancelModalOpen(false);
       router.refresh();
     });

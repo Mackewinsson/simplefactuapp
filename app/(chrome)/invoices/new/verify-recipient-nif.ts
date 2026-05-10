@@ -4,6 +4,12 @@ import { auth } from "@clerk/nextjs/server";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
+import {
+  NIF_VERIFY_NEED_BOTH_USER,
+  NIF_VERIFY_NOT_MATCH_USER,
+  NIF_VERIFY_PERMISSION_USER,
+  NIF_VERIFY_SERVICE_USER,
+} from "@/lib/invoices/nif-verify-user-messages";
 
 export type VerifyRecipientNifResult =
   | { kind: "identified"; nif: string; nombre: string; resultado: string }
@@ -34,7 +40,7 @@ export async function verifyRecipientNif(
   if (!n || !nom) {
     return {
       kind: "error",
-      error: "Indica NIF/CIF y razón social o nombre para verificar.",
+      error: NIF_VERIFY_NEED_BOTH_USER,
     };
   }
 
@@ -51,7 +57,7 @@ export async function verifyRecipientNif(
     if (!res.ok) {
       const errMsg =
         res.status === 403
-          ? "La API key no tiene permiso nif:read. Revisa Ajustes → Verifactu o vuelve a provisionar la cuenta."
+          ? NIF_VERIFY_PERMISSION_USER
           : formatSimplefactuHttpError(res.status, json);
       return { kind: "error", error: errMsg };
     }
@@ -70,12 +76,7 @@ export async function verifyRecipientNif(
       };
     }
 
-    const message =
-      typeof json.message === "string"
-        ? json.message
-        : resultado
-          ? `Resultado: ${resultado}`
-          : "No identificado ante AEAT.";
+    const message = NIF_VERIFY_NOT_MATCH_USER;
 
     return {
       kind: "not_identified",
@@ -84,10 +85,10 @@ export async function verifyRecipientNif(
       nif: outNif,
       nombre: outNombre,
     };
-  } catch (e) {
+  } catch {
     return {
       kind: "error",
-      error: e instanceof Error ? e.message : "Error al contactar Verifactu.",
+      error: NIF_VERIFY_SERVICE_USER,
     };
   }
 }

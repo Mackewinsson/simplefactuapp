@@ -23,6 +23,7 @@ import {
   validateCreateInvoiceClientPayload,
 } from "@/lib/invoices/create-invoice-validation";
 import { verifyRecipientNif } from "./verify-recipient-nif";
+import { NIF_VERIFY_SUCCESS_UPDATED_USER } from "@/lib/invoices/nif-verify-user-messages";
 import { focusFirstInvoiceError } from "./focus-first-invoice-error";
 import { SeriesModal } from "./components/SeriesModal";
 import { CustomerFormModal } from "./components/CustomerFormModal";
@@ -187,7 +188,7 @@ export function NewInvoiceForm({
         setFormFieldErrors((p) => stripFormFieldErrors(p, "customerNif", "customerName"));
         setVnifFeedback({
           variant: "ok",
-          text: `VNIF AEAT: ${r.resultado}. NIF y nombre actualizados con los datos devueltos.`,
+          text: NIF_VERIFY_SUCCESS_UPDATED_USER,
         });
       } else if (r.kind === "not_identified") {
         setVnifFeedback({
@@ -420,9 +421,10 @@ export function NewInvoiceForm({
           </div>
 
           <p className="text-xs text-gray-500">
-            La verificación VNIF (calidad de datos identificativos AEAT) solo aplica a{" "}
-            <strong>NIF/CIF españoles</strong>. No sustituye identificadores extranjeros u otros (ID_OTRO
-            en Verifactu).
+            El botón «Comprobar con Hacienda» consulta si el <strong>nombre o razón social</strong> que has
+            escrito <strong>coincide con el que tiene registrado Hacienda</strong> para ese NIF o CIF. Solo
+            aplica a <strong>identificadores españoles</strong>; no sirve para NIF-IVA intracomunitario ni
+            otros tipos de identificación extranjeros.
           </p>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -487,7 +489,7 @@ export function NewInvoiceForm({
                   }
                   className="shrink-0 self-start rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-50"
                 >
-                  {vnifPending ? "Verificando…" : "Verificar con AEAT (VNIF)"}
+                  {vnifPending ? "Comprobando…" : "Comprobar con Hacienda"}
                 </button>
               </div>
               {formFieldErrors?.customerNif ? (

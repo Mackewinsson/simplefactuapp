@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 
 /**
  * Build absolute URLs for Stripe Checkout success/cancel callbacks. Stripe
@@ -67,7 +68,6 @@ export async function startUpgradeAction(
     }
     return { ok: true, checkoutUrl: body.checkoutUrl };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Error desconocido";
-    return { ok: false, message: msg };
+    return { ok: false, message: formatVerifactuActionError(e) };
   }
 }

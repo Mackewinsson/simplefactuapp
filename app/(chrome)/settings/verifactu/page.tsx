@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { VerifactuSettingsForm } from "./VerifactuSettingsForm";
 
@@ -13,9 +14,14 @@ export default async function VerifactuSettingsPage() {
   if (!userId) redirect("/sign-in");
 
   let account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
+  let provisionError: string | null = null;
   if (!account) {
-    await ensureVerifactuApiKey(userId);
-    account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
+    try {
+      await ensureVerifactuApiKey(userId);
+      account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
+    } catch (e) {
+      provisionError = formatVerifactuActionError(e);
+    }
   }
 
   let remoteHasCertificate: boolean | null = null;
@@ -49,6 +55,28 @@ export default async function VerifactuSettingsPage() {
     remoteHasCertificate = null;
   }
 
+  if (!account) {
+    return (
+      <div>
+        <div className="mb-6">
+          <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
+            ← Volver
+          </Link>
+        </div>
+        <h1 className="mb-2 text-2xl font-semibold">Verifactu (AEAT)</h1>
+        <div className="rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+          <p className="font-medium">No se pudo preparar tu cuenta de Verifactu</p>
+          <p className="mt-2 text-amber-900">{provisionError ?? "Intenta de nuevo cuando el API esté disponible."}</p>
+          <p className="mt-3 text-amber-800">
+            Comprueba que el servicio simplefactu está en marcha y que{" "}
+            <code className="rounded bg-amber-100/80 px-1">SIMPLEFACTU_API_BASE_URL</code> es correcta.
+            Luego recarga esta página.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-6">
@@ -59,12 +87,12 @@ export default async function VerifactuSettingsPage() {
       <h1 className="mb-2 text-2xl font-semibold">Verifactu (AEAT)</h1>
       <p className="mb-8 text-sm text-gray-600">
         Tenant en el API:{" "}
-        <code className="rounded bg-gray-100 px-1">{account?.simplefactuTenantId}</code>
+        <code className="rounded bg-gray-100 px-1">{account.simplefactuTenantId}</code>
       </p>
       <VerifactuSettingsForm
-        initialIssuerNif={account?.issuerNif ?? ""}
-        initialIssuerLegalName={account?.issuerLegalName ?? ""}
-        certUploadedAt={account?.certificateUploadedAt ?? null}
+        initialIssuerNif={account.issuerNif ?? ""}
+        initialIssuerLegalName={account.issuerLegalName ?? ""}
+        certUploadedAt={account.certificateUploadedAt ?? null}
         remoteHasCertificate={remoteHasCertificate}
         remoteUpdatedAt={remoteUpdatedAt}
       />
