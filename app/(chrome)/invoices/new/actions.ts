@@ -2,111 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { parseDecimalToCents } from "@/lib/money";
+import {
+  createInvoiceFormSchema,
+  zodErrorToValidationParts,
+} from "@/lib/invoices/create-invoice-validation";
+import type { CreateInvoiceState } from "./invoice-form-state";
 
 const CURRENCY_DEFAULT = "EUR";
-
-const itemSchema = z.object({
-  description: z.string().min(1, "La descripción es obligatoria"),
-  quantity: z.coerce.number().int().min(1, "La cantidad debe ser al menos 1"),
-  unitPrice: z.string(),
-  discountCents: z.coerce.number().int().min(0).default(0),
-  discountConcept: z.string().max(250).optional().nullable(),
-  claveRegimen: z.string().default("01"),
-  calificacion: z.string().default("S1"),
-  tipoImpositivo: z.string().default("21.0"),
-});
-
-const AEAT_ID_TYPES = ["02", "03", "04", "05", "06"] as const;
-
-const schema = z
-  .object({
-    number: z.string().min(1, "El número es obligatorio"),
-    issueDate: z.string().min(1, "La fecha de expedición es obligatoria"),
-    dueDate: z.string().optional(),
-    fechaOperacion: z.string().optional(),
-    customerName: z.string().min(1, "El nombre del cliente es obligatorio"),
-    customerNif: z.string().optional(),
-    customerEmail: z
-      .string()
-      .optional()
-      .refine((v) => !v || v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Email no válido"),
-    customerTipoPersona: z.enum(["F", "J"]).optional(),
-    customerIdScheme: z.enum(["NIF", "ID_OTRO"]).default("NIF"),
-    customerIdType: z.string().optional(),
-    customerCodigoPais: z.string().optional(),
-    customerForeignId: z.string().optional(),
-    notes: z.string().optional(),
-    createdByFirstName: z.string().optional(),
-    createdByLastName: z.string().optional(),
-    sendToAeat: z.enum(["0", "1"]).default("0"),
-    items: z.array(itemSchema).min(1, "Añade al menos una línea"),
-  })
-  .refine(
-    (data) => data.items.every((i) => parseDecimalToCents(i.unitPrice) >= 0),
-    { message: "El precio unitario debe ser ≥ 0", path: ["items"] }
-  )
-  .superRefine((data, ctx) => {
-    if (data.customerIdScheme === "NIF") {
-      const nif = (data.customerNif ?? "").trim();
-      if (!nif) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "El NIF/CIF del cliente es obligatorio.",
-          path: ["customerNif"],
-        });
-      }
-      return;
-    }
-    const idType = (data.customerIdType ?? "").trim();
-    const id = (data.customerForeignId ?? "").trim();
-    const pais = (data.customerCodigoPais ?? "").trim().toUpperCase();
-    if (!idType || !AEAT_ID_TYPES.includes(idType as (typeof AEAT_ID_TYPES)[number])) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Tipo de identificación (IDType AEAT) obligatorio: 02–06.",
-        path: ["customerIdType"],
-      });
-    }
-    if (!id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Identificador del destinatario obligatorio.",
-        path: ["customerForeignId"],
-      });
-    }
-    if (idType !== "02" && !/^[A-Z]{2}$/.test(pais)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Código país ISO-2 obligatorio (salvo IDType 02 NIF-IVA).",
-        path: ["customerCodigoPais"],
-      });
-    }
-  })
-  .superRefine((data, ctx) => {
-    // AEAT rule 1146: fechaOperacion may only be later than issueDate when at least
-    // one detail uses ClaveRegimen 14 or 15. Both fields use the HTML date input
-    // format (YYYY-MM-DD), so lexicographic comparison is safe and matches the
-    // backend check in middleware/validation.js.
-    const op = (data.fechaOperacion ?? "").trim();
-    const ex = (data.issueDate ?? "").trim();
-    if (!op || !ex || op <= ex) return;
-    const allowsFutureOp = data.items.some(
-      (i) => i.claveRegimen === "14" || i.claveRegimen === "15"
-    );
-    if (allowsFutureOp) return;
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message:
-        "La fecha de operación no puede ser posterior a la de expedición (salvo régimen 14 o 15).",
-      path: ["fechaOperacion"],
-    });
-  });
-
-export type CreateInvoiceState = { errors: string[] } | null;
 
 export async function createInvoiceAction(
   _prev: CreateInvoiceState,
@@ -143,16 +48,10 @@ export async function createInvoiceAction(
     })(),
   };
 
-  const parsed = schema.safeParse(raw);
+  const parsed = createInvoiceFormSchema.safeParse(raw);
   if (!parsed.success) {
-    const errors = parsed.error.flatten();
-    const messages: string[] = [];
-    if (errors.formErrors.length) messages.push(...errors.formErrors);
-    Object.values(errors.fieldErrors).forEach((arr) => {
-      if (Array.isArray(arr)) messages.push(...arr);
-      else if (arr) messages.push(arr);
-    });
-    return { errors: messages };
+    const { errors, itemFieldErrors, formFieldErrors } = zodErrorToValidationParts(parsed.error);
+    return { errors, itemFieldErrors, formFieldErrors };
   }
 
   const {
@@ -194,7 +93,6 @@ export async function createInvoiceAction(
       claveRegimen: i.claveRegimen,
       calificacion: i.calificacion,
       tipoImpositivo: i.tipoImpositivo,
-      // stored for aggregation below
       _taxCents: itemTaxCents,
     };
   });

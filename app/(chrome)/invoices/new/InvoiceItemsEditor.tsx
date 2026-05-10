@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { parseDecimalToCents, formatCents } from "@/lib/money";
+import type { InvoiceItemFieldErrorsMap } from "./invoice-form-state";
 
 export type InvoiceItemRow = {
   description: string;
@@ -73,18 +74,29 @@ type ItemModalProps = {
   initial: InvoiceItemRow;
   onSave: (item: InvoiceItemRow) => void;
   onClose: () => void;
+  fieldErrors?: { description?: string; unitPrice?: string };
 };
 
-function ItemModal({ initial, onSave, onClose }: ItemModalProps) {
+function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
   const [item, setItem] = useState<InvoiceItemRow>(initial);
   const [hasDiscount, setHasDiscount] = useState(initial.discountCents > 0);
   const [discountInput, setDiscountInput] = useState(
     initial.discountCents > 0 ? (initial.discountCents / 100).toFixed(2) : ""
   );
   const [discountConceptInput, setDiscountConceptInput] = useState(initial.discountConcept || "");
+  const [saveAttempted, setSaveAttempted] = useState(false);
 
   const line = calcLine(item);
   const currency = "EUR";
+
+  const descriptionError =
+    fieldErrors?.description ??
+    (saveAttempted && !item.description.trim() ? "La descripción es obligatoria" : undefined);
+  const unitPriceError =
+    fieldErrors?.unitPrice ??
+    (saveAttempted && !String(item.unitPrice ?? "").trim()
+      ? "Indica el importe unitario"
+      : undefined);
 
   function set<K extends keyof InvoiceItemRow>(k: K, v: InvoiceItemRow[K]) {
     setItem((prev) => ({ ...prev, [k]: v }));
@@ -96,8 +108,9 @@ function ItemModal({ initial, onSave, onClose }: ItemModalProps) {
   }
 
   function handleSave() {
+    setSaveAttempted(true);
     if (!item.description.trim()) return;
-    if (!item.unitPrice) return;
+    if (!String(item.unitPrice ?? "").trim()) return;
     onSave({
       ...item,
       discountCents: hasDiscount ? item.discountCents : 0,
@@ -128,13 +141,29 @@ function ItemModal({ initial, onSave, onClose }: ItemModalProps) {
               Descripción <span className="text-red-500">*</span>
             </span>
             <textarea
+              id="invoice-item-modal-description"
               value={item.description}
-              onChange={(e) => set("description", e.target.value)}
+              onChange={(e) => {
+                set("description", e.target.value);
+                if (saveAttempted) setSaveAttempted(false);
+              }}
               rows={2}
               maxLength={500}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              aria-invalid={descriptionError ? true : undefined}
+              aria-describedby={descriptionError ? "invoice-item-modal-error-description" : undefined}
+              className={`w-full rounded border px-3 py-2 text-sm ${
+                descriptionError ? "border-red-500 ring-1 ring-red-200" : "border-gray-300"
+              }`}
               placeholder="Descripción del producto o servicio"
             />
+            {descriptionError ? (
+              <span
+                id="invoice-item-modal-error-description"
+                className="mt-1 block text-sm text-red-600"
+              >
+                {descriptionError}
+              </span>
+            ) : null}
           </label>
 
           <div className="grid grid-cols-2 gap-3">
@@ -153,13 +182,29 @@ function ItemModal({ initial, onSave, onClose }: ItemModalProps) {
                 Importe unitario (€) <span className="text-red-500">*</span>
               </span>
               <input
+                id="invoice-item-modal-unitPrice"
                 type="text"
                 inputMode="decimal"
                 value={item.unitPrice}
-                onChange={(e) => set("unitPrice", e.target.value)}
+                onChange={(e) => {
+                  set("unitPrice", e.target.value);
+                  if (saveAttempted) setSaveAttempted(false);
+                }}
                 placeholder="0.00"
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                aria-invalid={unitPriceError ? true : undefined}
+                aria-describedby={unitPriceError ? "invoice-item-modal-error-unitPrice" : undefined}
+                className={`w-full rounded border px-3 py-2 text-sm ${
+                  unitPriceError ? "border-red-500 ring-1 ring-red-200" : "border-gray-300"
+                }`}
               />
+              {unitPriceError ? (
+                <span
+                  id="invoice-item-modal-error-unitPrice"
+                  className="mt-1 block text-sm text-red-600"
+                >
+                  {unitPriceError}
+                </span>
+              ) : null}
             </label>
           </div>
 
@@ -285,8 +330,7 @@ function ItemModal({ initial, onSave, onClose }: ItemModalProps) {
           <button
             type="button"
             onClick={handleSave}
-            disabled={!item.description.trim() || !item.unitPrice}
-            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-60"
+            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
           >
             Guardar línea
           </button>
@@ -300,9 +344,10 @@ type Props = {
   items: InvoiceItemRow[];
   onChange: (items: InvoiceItemRow[]) => void;
   onAddFromCatalog?: () => void;
+  itemFieldErrors?: InvoiceItemFieldErrorsMap;
 };
 
-export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog }: Props) {
+export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFieldErrors }: Props) {
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const currency = "EUR";
@@ -360,12 +405,36 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog }: Props)
         <div className="space-y-2 md:hidden">
           {items.map((row, i) => {
             const line = calcLine(row);
+            const descErr = itemFieldErrors?.[i]?.description;
+            const priceErr = itemFieldErrors?.[i]?.unitPrice;
             return (
-              <article key={i} className="rounded border border-gray-200 bg-white p-3">
-                <p className="font-medium text-gray-900">{row.description || "—"}</p>
+              <article
+                key={i}
+                id={`invoice-line-${i}-m`}
+                className="rounded border border-gray-200 bg-white p-3"
+              >
+                <div
+                  className={
+                    descErr
+                      ? "rounded-md border border-red-500 bg-red-50/40 px-2 py-1.5 -mx-0.5"
+                      : undefined
+                  }
+                >
+                  <p className="font-medium text-gray-900">{row.description || "—"}</p>
+                  {descErr ? <p className="mt-1 text-sm text-red-600">{descErr}</p> : null}
+                </div>
                 <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-600">
                   <span>Cant.: {row.quantity}</span>
-                  <span>Precio: {formatCents(currency, parseDecimalToCents(row.unitPrice))}</span>
+                  <span
+                    className={
+                      priceErr ? "rounded border border-red-500 bg-red-50/40 px-1 py-0.5 -mx-1" : undefined
+                    }
+                  >
+                    Precio: {formatCents(currency, parseDecimalToCents(row.unitPrice))}
+                    {priceErr ? (
+                      <span className="mt-0.5 block text-xs text-red-600">{priceErr}</span>
+                    ) : null}
+                  </span>
                   <span>Base: {formatCents(currency, line.base)}</span>
                   <span>IVA: {formatCents(currency, line.cuota)}</span>
                 </div>
@@ -426,18 +495,48 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog }: Props)
             <tbody>
               {items.map((row, i) => {
                 const line = calcLine(row);
+                const descErr = itemFieldErrors?.[i]?.description;
+                const priceErr = itemFieldErrors?.[i]?.unitPrice;
                 return (
-                  <tr key={i} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50">
+                  <tr
+                    key={i}
+                    id={`invoice-line-${i}-d`}
+                    className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50"
+                  >
                     <td className="px-3 py-2">
-                      <span className="line-clamp-1">{row.description || "—"}</span>
-                      {row.claveRegimen !== "01" || row.calificacion !== "S1" ? (
-                        <span className="block text-xs text-gray-400">
-                          {row.claveRegimen} · {row.calificacion} · {row.tipoImpositivo}%
-                        </span>
-                      ) : null}
+                      <div
+                        className={
+                          descErr
+                            ? "rounded-md border border-red-500 bg-red-50/40 px-2 py-1 -mx-1"
+                            : undefined
+                        }
+                      >
+                        <span className="line-clamp-1">{row.description || "—"}</span>
+                        {descErr ? (
+                          <span className="mt-1 block text-sm text-red-600">{descErr}</span>
+                        ) : null}
+                        {row.claveRegimen !== "01" || row.calificacion !== "S1" ? (
+                          <span className="block text-xs text-gray-400">
+                            {row.claveRegimen} · {row.calificacion} · {row.tipoImpositivo}%
+                          </span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-3 py-2 text-right">{row.quantity}</td>
-                    <td className="px-3 py-2 text-right">{formatCents(currency, parseDecimalToCents(row.unitPrice))}</td>
+                    <td className="px-3 py-2 text-right">
+                      <div
+                        className={
+                          priceErr
+                            ? "inline-block rounded border border-red-500 bg-red-50/40 px-2 py-1 text-right"
+                            : undefined
+                        }
+                      >
+                        {formatCents(currency, parseDecimalToCents(row.unitPrice))}
+                        {priceErr ? (
+                          <span className="mt-1 block text-xs text-red-600">{priceErr}</span>
+                        ) : null}
+                      </div>
+                    </td>
                     <td className="px-3 py-2 text-right">{formatCents(currency, line.base)}</td>
                     <td className="px-3 py-2 text-right">{formatCents(currency, line.cuota)}</td>
                     <td className="px-3 py-2">
@@ -484,6 +583,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog }: Props)
 
       {isAdding && (
         <ItemModal
+          key="add-line"
           initial={DEFAULT_ITEM}
           onSave={addItem}
           onClose={() => setIsAdding(false)}
@@ -491,9 +591,11 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog }: Props)
       )}
       {editingIdx !== null && (
         <ItemModal
+          key={`edit-line-${editingIdx}`}
           initial={items[editingIdx]}
           onSave={(item) => saveItem(editingIdx, item)}
           onClose={() => setEditingIdx(null)}
+          fieldErrors={itemFieldErrors?.[editingIdx]}
         />
       )}
     </div>
