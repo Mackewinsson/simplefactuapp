@@ -77,7 +77,7 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">Email</span>
+            <span className="mb-1 block text-sm font-medium text-gray-700">Correo</span>
             <input
               type="email"
               value={email}

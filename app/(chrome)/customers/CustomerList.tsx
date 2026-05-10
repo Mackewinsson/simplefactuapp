@@ -67,7 +67,7 @@ export function CustomerList({ customers }: Props) {
           <article key={c.id} className="rounded border border-gray-200 bg-white p-3">
             <p className="font-medium text-gray-900">{c.name}</p>
             <p className="mt-1 text-sm text-gray-600">NIF: {c.nif ?? "—"}</p>
-            <p className="text-sm text-gray-600">Email: {c.email ?? "—"}</p>
+            <p className="text-sm text-gray-600">Correo: {c.email ?? "—"}</p>
             <p className="text-sm text-gray-600">Tipo: {c.tipoPersona ?? "—"}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -97,7 +97,7 @@ export function CustomerList({ customers }: Props) {
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="px-3 py-2 font-medium text-gray-900">Nombre</th>
               <th className="px-3 py-2 font-medium text-gray-900">NIF</th>
-              <th className="px-3 py-2 font-medium text-gray-900">Email</th>
+              <th className="px-3 py-2 font-medium text-gray-900">Correo</th>
               <th className="px-3 py-2 font-medium text-gray-900">Tipo</th>
               <th className="px-3 py-2 w-32"></th>
             </tr>
@@ -166,7 +166,7 @@ export function CustomerList({ customers }: Props) {
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Email</span>
+                <span className="mb-1 block text-xs font-medium text-gray-700">Correo</span>
                 <input
                   type="email"
                   value={form.email}

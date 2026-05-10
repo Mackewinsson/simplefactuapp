@@ -26,6 +26,13 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
 
   if (!invoice) notFound();
 
+  const dateOpts: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  };
+  const fmt = (d: Date) => d.toLocaleDateString("es-ES", dateOpts);
+
   // Render the AEAT verification QR server-side so the panel just paints an
   // <img>. We only have an aeatQrText after AEAT returns CSV.
   const aeatQrDataUrl = invoice.aeatQrText ? await verifactuQrDataUrl(invoice.aeatQrText) : null;
@@ -50,26 +57,26 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
           <h1 className="text-xl font-semibold">{invoice.number}</h1>
           <dl className="mt-2 grid gap-1 text-sm text-gray-700 sm:grid-cols-2">
             <div>
-              <span className="font-medium">Customer:</span> {invoice.customerName}
+              <span className="font-medium">Cliente:</span> {invoice.customerName}
             </div>
             {invoice.customerEmail ? (
               <div>
-                <span className="font-medium">Email:</span> {invoice.customerEmail}
+                <span className="font-medium">Correo:</span> {invoice.customerEmail}
               </div>
             ) : null}
             <div>
-              <span className="font-medium">Issue date:</span>{" "}
-              {invoice.issueDate.toLocaleDateString()}
+              <span className="font-medium">Fecha de expedición:</span>{" "}
+              {fmt(invoice.issueDate)}
             </div>
             {invoice.dueDate ? (
               <div>
-                <span className="font-medium">Due date:</span>{" "}
-                {invoice.dueDate.toLocaleDateString()}
+                <span className="font-medium">Fecha de vencimiento:</span>{" "}
+                {fmt(invoice.dueDate)}
               </div>
             ) : null}
             {invoice.customerNif ? (
               <div>
-                <span className="font-medium">Customer NIF:</span> {invoice.customerNif}
+                <span className="font-medium">NIF / CIF:</span> {invoice.customerNif}
               </div>
             ) : null}
           </dl>

@@ -29,7 +29,7 @@ export const createInvoiceFormSchema = z
     customerEmail: z
       .string()
       .optional()
-      .refine((v) => !v || v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Email no válido"),
+      .refine((v) => !v || v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "El correo no es válido"),
     customerTipoPersona: z.enum(["F", "J"]).optional(),
     customerIdScheme: z.enum(["NIF", "ID_OTRO"]).default("NIF"),
     customerIdType: z.string().optional(),

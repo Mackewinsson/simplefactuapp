@@ -325,7 +325,7 @@ export function VerifactuSendPanel({
                 onClick={confirmCancelVerifactu}
                 className="btn btn-sm btn-danger"
               >
-                {pending ? "Enviando…" : "Sí, anular en AEAT"}
+                {pending ? "Enviando…" : "Sí, anular en Veri*Factu"}
               </button>
             </div>
           </div>

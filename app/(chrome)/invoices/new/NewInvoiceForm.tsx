@@ -324,7 +324,9 @@ export function NewInvoiceForm({
                 </p>
               ) : null}
               {composedNumber ? (
-                <p className="mt-1 text-xs text-gray-400">NumSerie: {composedNumber}</p>
+                <p className="mt-1 text-xs text-gray-400">
+                  Número completo (serie + correlativo): {composedNumber}
+                </p>
               ) : null}
             </div>
 
@@ -508,7 +510,7 @@ export function NewInvoiceForm({
               </div>
             ) : null}
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Email</span>
+              <span className="mb-1 block text-sm font-medium text-gray-700">Correo</span>
               <input
                 id="invoice-field-customerEmail"
                 type="email"

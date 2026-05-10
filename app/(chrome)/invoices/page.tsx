@@ -128,7 +128,7 @@ export default async function InvoicesPage({
         </label>
 
         <label className="block w-full sm:w-auto">
-          <span className="text-gray-600">Estado AEAT</span>
+          <span className="text-gray-600">Estado Veri*Factu</span>
           <select
             name="status"
             defaultValue={status ?? ""}
@@ -244,7 +244,7 @@ export default async function InvoicesPage({
                   <th className="px-4 py-3 font-medium text-gray-900">Cliente</th>
                   <th className="px-4 py-3 font-medium text-gray-900">Fecha</th>
                   <th className="px-4 py-3 font-medium text-gray-900">Total</th>
-                  <th className="px-4 py-3 font-medium text-gray-900">AEAT</th>
+                  <th className="px-4 py-3 font-medium text-gray-900">Veri*Factu</th>
                 </tr>
               </thead>
               <tbody>

@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 const customerSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
   nif: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  email: z.string().email("Correo no válido").optional().or(z.literal("")),
   tipoPersona: z.enum(["F", "J"]).optional(),
 });
 
