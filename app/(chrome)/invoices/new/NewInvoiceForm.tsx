@@ -669,7 +669,7 @@ export function NewInvoiceForm({
             }}
           />
           <SubmitButton
-            label="Validar y enviar a AEAT"
+            label="Validar y enviar a Veri*Factu"
             onClick={() => {
               if (sendToAeatRef.current) sendToAeatRef.current.value = "1";
             }}
