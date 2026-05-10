@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { APP_DISPLAY_NAME } from "@/lib/branding";
+import { BrandWordmark } from "../BrandWordmark";
 import { AppNav } from "../AppNav";
 import { HeaderUserArea } from "../HeaderUserArea";
 import { Footer } from "../Footer";
@@ -22,9 +22,7 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex min-w-0 items-center gap-3 lg:gap-8">
-            <span className="text-lg font-semibold text-gray-900">
-              {APP_DISPLAY_NAME}
-            </span>
+            <BrandWordmark href="/" />
             <AppNav />
           </div>
           <div className="flex shrink-0 items-center gap-3">

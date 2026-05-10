@@ -5,7 +5,7 @@
  * Markdown under `content/docs/` may use the placeholder `{{APP_DISPLAY_NAME}}`;
  * it is replaced when rendering (see `lib/docs/source.ts`).
  */
-export const APP_DISPLAY_NAME = "simple*factu";
+export const APP_DISPLAY_NAME = "Simple*Factu";
 
 /** Docs site label (nav + browser titles under /docs). */
 export const APP_DOCS_LABEL = `${APP_DISPLAY_NAME} Docs`;
