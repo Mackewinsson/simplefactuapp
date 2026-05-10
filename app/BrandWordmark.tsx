@@ -9,7 +9,7 @@ type Props = {
 
 /**
  * Logo wordmark for the chrome header: correct casing via {@link APP_DISPLAY_NAME},
- * legible asterisk spacing, faint brand pill aligned with deployed UI reference.
+ * legible asterisk spacing, plain text on the header surface.
  */
 export function BrandWordmark({ href = "/", className }: Props) {
   const idx = APP_DISPLAY_NAME.indexOf("*");
@@ -21,9 +21,8 @@ export function BrandWordmark({ href = "/", className }: Props) {
       href={href}
       aria-label={APP_DISPLAY_NAME}
       className={[
-        "inline-flex shrink-0 items-center rounded-md px-2.5 py-1.5",
-        "bg-sky-50 ring-1 ring-sky-100/90 transition-colors",
-        "hover:bg-sky-100/90 hover:ring-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2",
+        "inline-flex shrink-0 items-center transition-opacity",
+        "hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:rounded-sm",
         className ?? "",
       ]
         .filter(Boolean)
