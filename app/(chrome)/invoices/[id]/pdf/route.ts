@@ -1,8 +1,9 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import QRCode from "qrcode";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { verifactuQrPayload } from "@/lib/pdf/verifactu-qr-content";
@@ -65,6 +66,13 @@ export async function GET(
     prisma.userVerifactuAccount.findUnique({ where: { userId }, select: { issuerNif: true } }),
   ]);
   if (!invoice) notFound();
+
+  if (invoice.aeatStatus === AeatJobStatus.NOT_SENT) {
+    return new NextResponse(
+      "El PDF se habilita cuando la factura se ha enviado a Verifactu al menos una vez.",
+      { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } }
+    );
+  }
 
   /* ── Setup ──────────────────────────────────────────── */
   const doc = await PDFDocument.create();

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { verifactuQrDataUrl } from "@/lib/verifactu/qr-image";
@@ -43,13 +44,15 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
           ← Volver a facturas
         </Link>
-        <a
-          href={`/invoices/${invoice.id}/pdf`}
-          className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          download
-        >
-          Descargar PDF
-        </a>
+        {invoice.aeatStatus !== AeatJobStatus.NOT_SENT ? (
+          <a
+            href={`/invoices/${invoice.id}/pdf`}
+            className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            download
+          >
+            Descargar PDF
+          </a>
+        ) : null}
       </div>
 
       <div className="rounded border border-gray-200 bg-white">
