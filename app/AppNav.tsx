@@ -10,15 +10,14 @@ export async function AppNav() {
   const links: Array<{ href: string; label: string }> = [
     { href: "/", label: "Inicio" },
     { href: "/invoices", label: "Facturas" },
-    { href: "/invoices/new", label: "Nueva factura" },
     { href: "/customers", label: "Clientes" },
     { href: "/products", label: "Productos" },
     { href: "/settings/verifactu", label: "Verifactu" },
-    { href: "/docs", label: "Documentación" },
+    { href: "/docs", label: "Docs" },
   ];
 
   if (showBilling) links.push({ href: "/settings/billing", label: "Plan" });
-  if (showAdmin) links.push({ href: "/admin", label: "Administración" });
+  if (showAdmin) links.push({ href: "/admin", label: "Admin" });
 
   return (
     <ResponsiveAppNav links={links} />

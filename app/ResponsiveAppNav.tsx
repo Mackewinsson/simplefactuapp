@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+
+function isNavLinkActive(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 type NavLink = {
   href: string;
@@ -12,9 +18,8 @@ type Props = {
   links: NavLink[];
 };
 
-const navLinkClass = "text-gray-600 hover:text-gray-900";
-
 export function ResponsiveAppNav({ links }: Props) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -30,12 +35,24 @@ export function ResponsiveAppNav({ links }: Props) {
 
   return (
     <>
-      <nav className="hidden lg:flex lg:gap-6">
-        {links.map((link) => (
-          <Link key={link.href} href={link.href} className={navLinkClass}>
-            {link.label}
-          </Link>
-        ))}
+      <nav className="hidden items-center lg:flex lg:gap-6">
+        {links.map((link) => {
+          const active = isNavLinkActive(pathname, link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={active ? "page" : undefined}
+              className={
+                active
+                  ? "border-b-2 border-gray-900 py-2 text-sm font-semibold leading-none text-gray-900"
+                  : "border-b-2 border-transparent py-2 text-sm leading-none text-gray-600 hover:text-gray-900"
+              }
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
 
       <button
@@ -69,16 +86,24 @@ export function ResponsiveAppNav({ links }: Props) {
                 ✕
               </button>
             </div>
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link) => {
+              const active = isNavLinkActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={
+                    active
+                      ? "rounded border-l-4 border-gray-900 bg-gray-50 py-2 pl-2 pr-3 text-sm font-semibold text-gray-900"
+                      : "rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  }
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       ) : null}

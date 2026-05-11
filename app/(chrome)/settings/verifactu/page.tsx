@@ -68,9 +68,8 @@ export default async function VerifactuSettingsPage() {
           <p className="font-medium">No se pudo preparar tu cuenta de Verifactu</p>
           <p className="mt-2 text-amber-900">{provisionError ?? "Intenta de nuevo cuando el API esté disponible."}</p>
           <p className="mt-3 text-amber-800">
-            Comprueba que el servicio simplefactu está en marcha y que{" "}
-            <code className="rounded bg-amber-100/80 px-1">SIMPLEFACTU_API_BASE_URL</code> es correcta.
-            Luego recarga esta página.
+            Comprueba que el servicio de registro Verifactu está disponible y vuelve a cargar esta página. Si el
+            problema continúa, contacta con soporte.
           </p>
         </div>
       </div>
@@ -84,11 +83,7 @@ export default async function VerifactuSettingsPage() {
           ← Volver
         </Link>
       </div>
-      <h1 className="mb-2 text-2xl font-semibold">Verifactu (AEAT)</h1>
-      <p className="mb-8 text-sm text-gray-600">
-        Tenant en el API:{" "}
-        <code className="rounded bg-gray-100 px-1">{account.simplefactuTenantId}</code>
-      </p>
+      <h1 className="mb-8 text-2xl font-semibold">Verifactu (AEAT)</h1>
       <VerifactuSettingsForm
         initialIssuerNif={account.issuerNif ?? ""}
         initialIssuerLegalName={account.issuerLegalName ?? ""}

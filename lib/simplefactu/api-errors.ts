@@ -22,15 +22,15 @@ function errnoCodeFromUnknown(e: unknown): string | undefined {
 export function formatSimplefactuNetworkError(err: unknown): string {
   const code = errnoCodeFromUnknown(err);
   if (code === "ECONNREFUSED") {
-    return "No se pudo conectar con el API de Verifactu (conexión rechazada). Comprueba que el servicio simplefactu está en marcha y que SIMPLEFACTU_API_BASE_URL apunta al host y puerto correctos (en local, el API suele ir en un puerto y Next en otro; ver AGENTS.md).";
+    return "No se pudo conectar con el servicio de registro Verifactu (conexión rechazada). Comprueba que el servicio está en marcha y que la URL configurada para el entorno apunta al host y puerto correctos (en desarrollo local, la app y el servicio de registro suelen usar puertos distintos).";
   }
   if (code === "ENOTFOUND") {
-    return "No se pudo resolver el host del API de Verifactu. Revisa SIMPLEFACTU_API_BASE_URL.";
+    return "No se pudo resolver el host del servicio de registro Verifactu. Revisa la URL configurada en el entorno.";
   }
   if (code === "ETIMEDOUT" || code === "ECONNRESET") {
-    return "La conexión con el API de Verifactu se cortó o expiró. Inténtalo de nuevo.";
+    return "La conexión con el servicio de registro Verifactu se cortó o expiró. Inténtalo de nuevo.";
   }
-  return "No se pudo contactar con el API de Verifactu. Revisa la red e inténtalo de nuevo.";
+  return "No se pudo contactar con el servicio de registro Verifactu. Revisa la red e inténtalo de nuevo.";
 }
 
 function isLikelyNetworkFetchFailure(e: unknown): boolean {
@@ -65,7 +65,7 @@ export function formatSimplefactuHttpError(
   if (status === 402) {
     return msg && typeof msg === "string"
       ? `Límite del plan: ${msg}`
-      : "Se superó el límite del plan en el API Verifactu. Mejora el plan del tenant o inténtalo el mes siguiente.";
+      : "Se superó el límite del plan en Verifactu. Mejora tu plan o inténtalo el mes siguiente.";
   }
 
   if (status === 429) {
@@ -73,7 +73,7 @@ export function formatSimplefactuHttpError(
     const base =
       msg && typeof msg === "string"
         ? msg
-        : "Demasiadas peticiones al API Verifactu.";
+        : "Demasiadas peticiones al servicio de registro Verifactu.";
     if (retry != null && typeof retry === "number") {
       return `${base} Reintenta tras ${retry} s.`;
     }

@@ -22,13 +22,11 @@ type Props = {
   invoiceId: string;
   invoiceNumber: string;
   aeatStatus: string;
-  aeatJobId: string | null;
   aeatLastError: string | null;
   aeatCsv: string | null;
   aeatQrText: string | null;
   aeatQrDataUrl: string | null;
   aeatCancellationStatus: string;
-  aeatCancellationJobId: string | null;
   aeatCancellationLastError: string | null;
   autoSend?: boolean;
 };
@@ -37,13 +35,11 @@ export function VerifactuSendPanel({
   invoiceId,
   invoiceNumber,
   aeatStatus,
-  aeatJobId,
   aeatLastError,
   aeatCsv,
   aeatQrText,
   aeatQrDataUrl,
   aeatCancellationStatus,
-  aeatCancellationJobId,
   aeatCancellationLastError,
   autoSend,
 }: Props) {
@@ -164,12 +160,6 @@ export function VerifactuSendPanel({
             {registrationStatusDetailLabel(aeatStatus)}
           </span>
         </div>
-        {aeatJobId ? (
-          <div>
-            <span className="font-medium">Trabajo (job) de alta:</span>{" "}
-            <code className="text-xs">{aeatJobId}</code>
-          </div>
-        ) : null}
         {aeatCsv ? (
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium">CSV:</span>
@@ -232,12 +222,6 @@ export function VerifactuSendPanel({
             {cancellationStatusDetailLabel(aeatCancellationStatus)}
           </span>
         </div>
-        {aeatCancellationJobId ? (
-          <div>
-            <span className="font-medium">Trabajo (job) de anulación:</span>{" "}
-            <code className="text-xs">{aeatCancellationJobId}</code>
-          </div>
-        ) : null}
         {aeatCancellationLastError ? (
           <div className="text-red-700">
             <span className="font-medium">Error de anulación:</span>{" "}
