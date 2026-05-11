@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { extractSerie } from "@/lib/simplefactu/invoice-series";
 import { registrationStatusBadge } from "@/lib/simplefactu/aeat-status-ui";
+import { InvoiceViewTabs, type InvoiceVista } from "./InvoiceViewTabs";
 
 const PAGE_SIZE = 50;
 const dateFormat = new Intl.DateTimeFormat("es", { dateStyle: "short" });
@@ -21,6 +22,28 @@ const AEAT_STATUSES: { value: string; label: string }[] = [
   { value: "DEAD", label: "Muerta" },
 ];
 
+/** Estados mostrados en la vista Verifactu (excluye «no enviada»). */
+const AEAT_STATUSES_VERIFACTU = AEAT_STATUSES.filter((s) => s.value !== "NOT_SENT");
+
+function buildListHref(params: {
+  vista: InvoiceVista;
+  q?: string;
+  from?: string;
+  to?: string;
+  serie?: string;
+  status?: string;
+}): string {
+  const qs = new URLSearchParams();
+  if (params.vista === "sin-enviar") qs.set("vista", "sin-enviar");
+  if (params.q) qs.set("q", params.q);
+  if (params.from) qs.set("from", params.from);
+  if (params.to) qs.set("to", params.to);
+  if (params.serie) qs.set("serie", params.serie);
+  if (params.vista === "verifactu" && params.status) qs.set("status", params.status);
+  const s = qs.toString();
+  return `/invoices${s ? `?${s}` : ""}`;
+}
+
 export default async function InvoicesPage({
   searchParams,
 }: {
@@ -31,6 +54,7 @@ export default async function InvoicesPage({
     to?: string;
     serie?: string;
     page?: string;
+    vista?: string;
   }>;
 }) {
   const { userId } = await auth();
@@ -45,12 +69,28 @@ export default async function InvoicesPage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  const validStatus = status && Object.values(AeatJobStatus).includes(status as AeatJobStatus)
-    ? (status as AeatJobStatus)
-    : undefined;
+  const vista: InvoiceVista = sp.vista === "sin-enviar" ? "sin-enviar" : "verifactu";
+
+  const validStatusRaw =
+    status && Object.values(AeatJobStatus).includes(status as AeatJobStatus)
+      ? (status as AeatJobStatus)
+      : undefined;
+
+  const validStatusVerifactu =
+    vista === "verifactu" && validStatusRaw && validStatusRaw !== AeatJobStatus.NOT_SENT
+      ? validStatusRaw
+      : undefined;
+
+  const aeatWhere =
+    vista === "sin-enviar"
+      ? { aeatStatus: AeatJobStatus.NOT_SENT }
+      : validStatusVerifactu
+        ? { aeatStatus: validStatusVerifactu }
+        : { aeatStatus: { not: AeatJobStatus.NOT_SENT } };
 
   const where = {
     userId,
+    ...aeatWhere,
     ...(q && {
       OR: [
         { number: { contains: q, mode: "insensitive" as const } },
@@ -58,7 +98,6 @@ export default async function InvoicesPage({
         { customerNif: { contains: q, mode: "insensitive" as const } },
       ],
     }),
-    ...(validStatus && { aeatStatus: validStatus }),
     ...(from && to
       ? { issueDate: { gte: new Date(from), lte: new Date(to) } }
       : from
@@ -69,7 +108,7 @@ export default async function InvoicesPage({
     ...(serie && { number: { startsWith: serie } }),
   };
 
-  const [invoices, total] = await prisma.$transaction([
+  const [invoices, total, sinEnviarCount, verifactuCount] = await prisma.$transaction([
     prisma.invoice.findMany({
       where,
       take: PAGE_SIZE,
@@ -77,15 +116,41 @@ export default async function InvoicesPage({
       orderBy: { createdAt: "desc" },
     }),
     prisma.invoice.count({ where }),
+    prisma.invoice.count({
+      where: { userId, aeatStatus: AeatJobStatus.NOT_SENT },
+    }),
+    prisma.invoice.count({
+      where: { userId, aeatStatus: { not: AeatJobStatus.NOT_SENT } },
+    }),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   type InvoiceRow = (typeof invoices)[number];
 
-  // Build query string preserving current filters but allowing page override
+  const statusForVerifactuHref =
+    vista === "verifactu" && validStatusVerifactu ? String(validStatusVerifactu) : undefined;
+
+  const hrefVerifactu = buildListHref({
+    vista: "verifactu",
+    q,
+    from,
+    to,
+    serie,
+    status: statusForVerifactuHref,
+  });
+
+  const hrefSinEnviar = buildListHref({
+    vista: "sin-enviar",
+    q,
+    from,
+    to,
+    serie,
+  });
+
   const baseQs = new URLSearchParams();
+  if (vista === "sin-enviar") baseQs.set("vista", "sin-enviar");
   if (q) baseQs.set("q", q);
-  if (status) baseQs.set("status", status);
+  if (vista === "verifactu" && validStatusVerifactu) baseQs.set("status", String(validStatusVerifactu));
   if (from) baseQs.set("from", from);
   if (to) baseQs.set("to", to);
   if (serie) baseQs.set("serie", serie);
@@ -97,7 +162,18 @@ export default async function InvoicesPage({
     return `/invoices${s ? `?${s}` : ""}`;
   }
 
-  const hasFilters = !!(q || validStatus || from || to || serie);
+  const hasFilters = !!(
+    q ||
+    (vista === "verifactu" && validStatusVerifactu) ||
+    from ||
+    to ||
+    serie
+  );
+
+  const statusSelectDefault =
+    vista === "verifactu" && validStatusRaw === AeatJobStatus.NOT_SENT
+      ? ""
+      : (status ?? "");
 
   return (
     <div>
@@ -111,11 +187,21 @@ export default async function InvoicesPage({
         </Link>
       </div>
 
+      <InvoiceViewTabs
+        current={vista}
+        sinEnviarCount={sinEnviarCount}
+        verifactuCount={verifactuCount}
+        hrefVerifactu={hrefVerifactu}
+        hrefSinEnviar={hrefSinEnviar}
+      />
+
       {/* Filters */}
       <form
         method="get"
         className="mb-4 flex flex-wrap items-end gap-3 rounded border border-gray-200 bg-white p-3 text-sm"
       >
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="vista" value={vista} />
         <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Buscar</span>
           <input
@@ -127,20 +213,22 @@ export default async function InvoicesPage({
           />
         </label>
 
-        <label className="block w-full sm:w-auto">
-          <span className="text-gray-600">Estado Veri*Factu</span>
-          <select
-            name="status"
-            defaultValue={status ?? ""}
-            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
-          >
-            {AEAT_STATUSES.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        {vista === "verifactu" ? (
+          <label className="block w-full sm:w-auto">
+            <span className="text-gray-600">Estado Veri*Factu</span>
+            <select
+              name="status"
+              defaultValue={statusSelectDefault}
+              className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+            >
+              {AEAT_STATUSES_VERIFACTU.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
 
         <label className="block w-full sm:w-auto">
           <span className="text-gray-600">Serie</span>
@@ -193,16 +281,53 @@ export default async function InvoicesPage({
 
       {invoices.length === 0 ? (
         <div className="rounded border border-gray-200 bg-white p-8 text-center">
-          <p className="mb-4 text-gray-600">
-            {hasFilters ? "No hay facturas con esos filtros." : "Aún no hay facturas."}
-          </p>
-          {!hasFilters && (
-            <Link
-              href="/invoices/new"
-              className="inline-block rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-            >
-              Crear factura
-            </Link>
+          {vista === "sin-enviar" ? (
+            <>
+              <p className="mb-2 text-gray-800">
+                {hasFilters ? "No hay facturas por enviar con esos filtros." : "No tienes facturas pendientes de envío."}
+              </p>
+              <p className="mb-4 text-sm text-gray-600">
+                Las facturas nuevas aparecen aquí hasta que las envíes a Verifactu desde el detalle.
+              </p>
+              <Link
+                href="/invoices/new"
+                className="inline-block rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                Nueva factura
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="mb-2 text-gray-800">
+                {hasFilters
+                  ? "No hay facturas en Verifactu con esos filtros."
+                  : "Aún no hay envíos a Verifactu."}
+              </p>
+              {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
+                <p className="mb-4 text-sm text-gray-600">
+                  Tienes facturas listas para enviar. Abre una, revisa los datos y pulsa «Enviar a Verifactu».
+                </p>
+              ) : !hasFilters ? (
+                <p className="mb-4 text-sm text-gray-600">
+                  Cuando envíes una factura a Verifactu, el estado aparecerá aquí.
+                </p>
+              ) : null}
+              {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
+                <Link
+                  href={hrefSinEnviar}
+                  className="inline-block rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
+                >
+                  Ver facturas por enviar ({sinEnviarCount})
+                </Link>
+              ) : !hasFilters && sinEnviarCount === 0 && verifactuCount === 0 ? (
+                <Link
+                  href="/invoices/new"
+                  className="inline-block rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                >
+                  Crear factura
+                </Link>
+              ) : null}
+            </>
           )}
         </div>
       ) : (
@@ -289,12 +414,11 @@ export default async function InvoicesPage({
             </table>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-4 flex flex-col gap-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-              <span>
-                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} de {total}
-              </span>
+          <div className="mt-4 flex flex-col gap-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} de {total}
+            </span>
+            {totalPages > 1 ? (
               <div className="flex flex-wrap gap-1">
                 {page > 1 && (
                   <Link
@@ -328,8 +452,8 @@ export default async function InvoicesPage({
                   </Link>
                 )}
               </div>
-            </div>
-          )}
+            ) : null}
+          </div>
         </>
       )}
     </div>
