@@ -61,6 +61,7 @@ async function provisionTenantAndKey(
       id: tenantId,
       name: `App user ${userId}`,
       planId: "free",
+      source: "FRONTEND",
       ...(notificationEmail ? { notificationEmail } : {}),
     }),
   });

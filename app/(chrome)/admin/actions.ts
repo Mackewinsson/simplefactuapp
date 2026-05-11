@@ -31,8 +31,8 @@ export type ActionState = {
  * without going through the Clerk-based auto-provisioning flow.
  *
  * Required: id (stable identifier, must be path-traversal-safe).
- * Optional: name, planId, notificationEmail (used by the API for the welcome
- * email when EMAILS_ENABLED=true).
+ * Optional: name, planId, notificationEmail (reference only — source is forced
+ * to API so no tenant-facing Resend welcome / worker emails are sent).
  */
 export async function adminCreateTenantAction(
   _prev: ActionState,
@@ -63,7 +63,12 @@ export async function adminCreateTenantAction(
       name?: string;
       planId: "free" | "pro" | "enterprise";
       notificationEmail?: string;
-    } = { id, planId: planIdRaw as "free" | "pro" | "enterprise" };
+      source: "API";
+    } = {
+      id,
+      planId: planIdRaw as "free" | "pro" | "enterprise",
+      source: "API",
+    };
     if (name) body.name = name;
     if (notificationEmail) body.notificationEmail = notificationEmail;
 

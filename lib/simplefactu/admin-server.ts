@@ -132,6 +132,8 @@ export async function postCreateTenant(body: {
   name?: string;
   planId?: "free" | "pro" | "enterprise";
   notificationEmail?: string;
+  /** B2B / admin-created tenants default to API — no tenant-facing Resend rollups */
+  source?: "FRONTEND" | "API";
 }): Promise<{ success: boolean; tenant: AdminTenant }> {
   return adminJson("/admin/tenants", {
     method: "POST",

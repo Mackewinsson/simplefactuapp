@@ -101,8 +101,10 @@ export function CreateTenantForm() {
             className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
           />
           <span className="mt-1 block text-xs text-gray-500">
-            Opcional. Se usa para los emails transaccionales (welcome, primera factura,
-            DEAD job).
+            Opcional (referencia interna del integrador). Estos tenants se crean con origen{" "}
+            <code className="rounded bg-gray-100 px-0.5">API</code>: la API{" "}
+            <strong className="font-medium">no</strong> envía correos automáticos Resend al
+            titular como en usuarios web.
           </span>
         </label>
         <div className="md:col-span-2">
