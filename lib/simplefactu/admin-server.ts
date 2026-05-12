@@ -307,6 +307,7 @@ export async function postRevokeApiKey(keyId: string): Promise<{ success: boolea
   });
 }
 
+/** JSON body only. The API also accepts multipart on the same route; use raw `fetch`/`FormData` if you need file upload without base64. */
 export async function postUploadTenantCertificate(params: {
   tenantId: string;
   pfxBase64: string;

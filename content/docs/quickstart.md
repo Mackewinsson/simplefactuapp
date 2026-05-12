@@ -7,8 +7,9 @@ Esta guía asume que ya tienes:
 
 - Una **API key** emitida por nosotros (formato `vf_...`). Si no la tienes,
   contáctanos y te la enviamos.
-- Tu **certificado digital AEAT** subido al sistema (también te ayudamos
-  desde soporte si lo necesitas).
+- Tu **certificado digital AEAT** subido al sistema (vía app en Ajustes o vía API
+  `POST /me/certificate` con JSON **o** `multipart/form-data`; ver [Autenticación](/docs/authentication)).
+  Si lo necesitas, soporte te ayuda con la primera subida.
 
 ## 1. Variables base
 

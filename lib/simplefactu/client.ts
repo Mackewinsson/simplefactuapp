@@ -63,6 +63,7 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       return fetch(joinUrl(baseUrl, "/me/certificate"), { method: "GET", headers });
     },
 
+    /** JSON upload only. The API also accepts `multipart/form-data` (`pfx`/`pfxFile` + `pfxPassphrase`) — use `fetch`/`curl` directly if you need that. */
     async postMeCertificate(body: { pfxBase64: string; pfxPassphrase: string }): Promise<Response> {
       return fetch(joinUrl(baseUrl, "/me/certificate"), {
         method: "POST",

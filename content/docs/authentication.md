@@ -36,6 +36,12 @@ Si haces una llamada sin el scope correcto recibes `403 Forbidden`.
 Tus envíos a AEAT viajan con tu propio certificado PKCS#12. Lo subes una vez
 y queda cifrado con AES-256-GCM en nuestra base de datos.
 
+El endpoint `POST /me/certificate` admite **dos formas** (misma URL y mismos permisos):
+
+### Opción A — JSON (integraciones server-to-server)
+
+Cuerpo `application/json` con `pfxBase64` (sin saltos de línea) y `pfxPassphrase`:
+
 ```bash
 PFX_B64=$(base64 -i mi-cert.p12 | tr -d '\n')
 curl -X POST "$API_BASE/me/certificate" \
@@ -44,14 +50,28 @@ curl -X POST "$API_BASE/me/certificate" \
   -d "{\"pfxBase64\":\"$PFX_B64\",\"pfxPassphrase\":\"PASS\"}"
 ```
 
-Verificamos el PFX inmediatamente; si es del formato heredado RC2-40
-(FNMT antiguo) recibirás `422` con instrucciones para convertirlo:
+### Opción B — Multipart (más cómodo con curl o Postman)
+
+`multipart/form-data`: archivo en el campo **`pfx`** o **`pfxFile`**, y texto **`pfxPassphrase`**. La ruta al fichero va con `@` en curl:
+
+```bash
+curl -X POST "$API_BASE/me/certificate" \
+  -H "x-api-key: $API_KEY" \
+  -F "pfx=@/ruta/a/mi-cert.p12" \
+  -F "pfxPassphrase=PASS"
+```
+
+### Formato antiguo FNMT (RC2-40)
+
+El servidor intenta **convertir automáticamente** muchos `.p12` heredados a un PKCS#12 compatible. Si lo consigue, la respuesta incluye `certificate.normalizedFromLegacy: true`. Si aun así falla la validación, puedes convertir en local:
 
 ```bash
 openssl pkcs12 -legacy -in cert-viejo.p12 -nodes -out cert.pem
 openssl pkcs12 -export -in cert.pem -out cert-modern.p12
 rm cert.pem      # contiene la clave privada en claro
 ```
+
+La especificación detallada (esquemas, códigos 413/422) está en **[API Reference](/docs/api-reference)** (OpenAPI).
 
 ## Idempotencia
 

@@ -19,9 +19,9 @@ facturas conforme al sistema **Veri\*Factu** de la Agencia Tributaria
 1. **[Quickstart](/docs/quickstart)**: emite tu primera factura con `curl`
    en menos de 5 minutos.
 2. **[Autenticación](/docs/authentication)**: cómo obtener tu API key y
-   subir el certificado digital.
-3. **[API Reference](/docs/api-reference)**: especificación completa de
-   todos los endpoints, generada automáticamente desde el OpenAPI.
+   subir el certificado digital (JSON o multipart en `POST /me/certificate`).
+3. **[API Reference](/docs/api-reference)**: especificación OpenAPI/Swagger
+   de todos los endpoints (incluye `POST /me/certificate` con JSON y multipart).
 
 ## Modelos de integración
 
