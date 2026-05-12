@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
+import { getSimplefactuBaseUrlForDocs } from "@/lib/simplefactu/client";
 import { filterPublicOpenApi } from "@/lib/docs/filter-openapi";
 import { rewriteOpenApiServers } from "@/lib/docs/rewrite-openapi-servers";
 
@@ -17,7 +17,7 @@ export const revalidate = 3600;
 export async function GET() {
   let baseUrl: string;
   try {
-    baseUrl = getSimplefactuBaseUrl();
+    baseUrl = getSimplefactuBaseUrlForDocs();
   } catch (err) {
     return NextResponse.json(
       {

@@ -1,4 +1,6 @@
 import { docsBrowserPageTitle } from "@/lib/branding";
+import { getSimplefactuBaseUrlForDocs } from "@/lib/simplefactu/client";
+import { buildOpenApiServerList } from "@/lib/docs/rewrite-openapi-servers";
 import { ApiReferenceClient } from "./ApiReferenceClient";
 
 /**
@@ -12,10 +14,15 @@ import { ApiReferenceClient } from "./ApiReferenceClient";
  *   - the browser hits the same origin → no CORS to configure on the API,
  *   - the API base URL stays server-side (no NEXT_PUBLIC_* leak),
  *   - the spec is cached at the edge for an hour.
+ *
+ * Scalar also receives explicit `servers` + `baseServerURL` from the same
+ * base URL resolution so the Try-it bar never sticks to localhost from the
+ * upstream spec.
  */
 
 export const metadata = { title: docsBrowserPageTitle("API Reference") };
 
 export default function ApiReferencePage() {
-  return <ApiReferenceClient specUrl="/api/openapi.json" />;
+  const scalarServers = buildOpenApiServerList(getSimplefactuBaseUrlForDocs());
+  return <ApiReferenceClient specUrl="/api/openapi.json" scalarServers={scalarServers} />;
 }

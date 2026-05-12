@@ -34,6 +34,23 @@ export function getSimplefactuBaseUrl(): string {
   return u.replace(/\/$/, "");
 }
 
+/**
+ * Base URL for OpenAPI proxy + Scalar "Try it" servers. Prefer the server-only
+ * env; fall back to `NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL` so QA/prod docs work
+ * when only the public var is set in the dashboard.
+ */
+export function getSimplefactuBaseUrlForDocs(): string {
+  const a = process.env.SIMPLEFACTU_API_BASE_URL?.trim();
+  const b = process.env.NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL?.trim();
+  const u = a || b;
+  if (!u) {
+    throw new Error(
+      "Define SIMPLEFACTU_API_BASE_URL o NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL (p. ej. https://api.qa.simplefactu.com/v1)"
+    );
+  }
+  return u.replace(/\/$/, "");
+}
+
 export function createSimplefactuClient(config: SimplefactuClientConfig) {
   const { baseUrl, apiKey } = config;
   const headers = {
