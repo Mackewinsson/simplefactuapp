@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { filterPublicOpenApi } from "@/lib/docs/filter-openapi";
+import { rewriteOpenApiServers } from "@/lib/docs/rewrite-openapi-servers";
 
 /**
  * Server-side proxy that forwards the OpenAPI document published by the
@@ -72,7 +73,8 @@ export async function GET() {
     );
   }
 
-  const filtered = filterPublicOpenApi(parsed);
+  const withServers = rewriteOpenApiServers(parsed, baseUrl);
+  const filtered = filterPublicOpenApi(withServers);
 
   return new NextResponse(JSON.stringify(filtered), {
     status: 200,
