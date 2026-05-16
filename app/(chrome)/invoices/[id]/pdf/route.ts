@@ -220,7 +220,8 @@ export async function GET(
   /* ── 4b. Verifactu (AEAT) ───────────────────────────── */
   const hasAeatSubmission = !!(invoice.aeatCsv?.trim() || invoice.aeatStatus === "SUCCEEDED");
   const qrPayload = hasAeatSubmission
-    ? verifactuQrPayload({ ...invoice, issuerNif: account?.issuerNif ?? null })
+    ? (invoice.aeatQrText?.trim() ||
+       verifactuQrPayload({ ...invoice, issuerNif: account?.issuerNif ?? null }))
     : null;
   if (invoice.aeatCsv || qrPayload) {
     text("VERIFACTU (AEAT)", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
