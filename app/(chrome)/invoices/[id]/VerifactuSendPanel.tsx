@@ -5,6 +5,7 @@ import { useState, useTransition, useEffect, useRef } from "react";
 import {
   sendInvoiceToVerifactuAction,
   refreshVerifactuJobAction,
+  resyncVerifactuQrAction,
   cancelInvoiceVerifactuAction,
 } from "./verifactu-actions";
 import { humanizeAeatError } from "@/lib/simplefactu/aeat-error-messages";
@@ -24,6 +25,7 @@ type Props = {
   aeatStatus: string;
   aeatLastError: string | null;
   aeatCsv: string | null;
+  aeatJobId: string | null;
   aeatQrText: string | null;
   aeatQrDataUrl: string | null;
   aeatCancellationStatus: string;
@@ -37,6 +39,7 @@ export function VerifactuSendPanel({
   aeatStatus,
   aeatLastError,
   aeatCsv,
+  aeatJobId,
   aeatQrText,
   aeatQrDataUrl,
   aeatCancellationStatus,
@@ -66,6 +69,8 @@ export function VerifactuSendPanel({
   const pollActive = sendPending || cancelPending;
   const canSend = canSendNow;
   const canRefresh = pollActive;
+  const canResyncQr =
+    aeatStatus === "SUCCEEDED" && !!aeatJobId && !!(aeatCsv?.trim() || aeatQrText?.trim());
 
   // Auto-poll every 3 s while a job is PENDING. Stops when terminal or after
   // 60 attempts (~3 min), at which point the manual button remains as fallback.
@@ -263,6 +268,17 @@ export function VerifactuSendPanel({
             className="btn btn-sm btn-secondary"
           >
             {pending ? "…" : "Actualizar estado"}
+          </button>
+        ) : null}
+        {canResyncQr ? (
+          <button
+            type="button"
+            onClick={() => run(resyncVerifactuQrAction, invoiceId)}
+            disabled={pending}
+            className="btn btn-sm btn-secondary"
+            title="Vuelve a leer la URL de verificación desde la API (entorno AEAT actual)"
+          >
+            {pending ? "…" : "Actualizar enlace QR"}
           </button>
         ) : null}
         {canCancelAeat ? (

@@ -159,3 +159,81 @@ export async function syncJobStatusToInvoice(
     terminal: false,
   };
 }
+
+/**
+ * Re-fetches a succeeded SEND_INVOICE job and updates stored QR URL from the API
+ * (authoritative AEAT environment). Use after API QR-base fixes for legacy rows.
+ */
+export async function resyncVerifactuQrFromJob(
+  client: SimplefactuClient,
+  params: { invoiceId: string; userId: string; jobId: string }
+): Promise<SyncJobStatusResult> {
+  const { invoiceId, userId, jobId } = params;
+
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+  });
+  if (!invoice) {
+    return { ok: false, message: "Factura no encontrada.", terminal: true };
+  }
+  if (invoice.aeatStatus !== AeatJobStatus.SUCCEEDED) {
+    return {
+      ok: false,
+      message: "Solo se puede actualizar el enlace QR en facturas aceptadas por Verifactu.",
+      terminal: true,
+    };
+  }
+
+  let jr: Response;
+  try {
+    jr = await client.getJob(jobId);
+  } catch (e) {
+    return {
+      ok: false,
+      message: formatSimplefactuNetworkError(e),
+      terminal: false,
+      networkFailure: true,
+    };
+  }
+
+  const job = (await jr.json().catch(() => ({}))) as JobJson;
+  if (!jr.ok) {
+    return {
+      ok: false,
+      message: `No se pudo cargar el trabajo (${jr.status}).`,
+      terminal: false,
+    };
+  }
+  if (job.status !== "SUCCEEDED") {
+    return {
+      ok: false,
+      message: "El trabajo Verifactu ya no está en estado Aceptado.",
+      terminal: true,
+    };
+  }
+
+  const qrText = job.result?.qrInfo?.qrText?.trim() ?? null;
+  if (!qrText) {
+    return {
+      ok: false,
+      message: "La API no devolvió URL de verificación para este envío.",
+      terminal: true,
+    };
+  }
+
+  const csvFromJob = job.result?.qrInfo?.csv?.trim();
+  await prisma.invoice.update({
+    where: { id: invoiceId },
+    data: {
+      aeatQrText: qrText,
+      ...(csvFromJob ? { aeatCsv: csvFromJob } : {}),
+      aeatUpdatedAt: new Date(),
+    },
+  });
+
+  return {
+    ok: true,
+    message: "Enlace y QR de verificación actualizados desde la API.",
+    terminal: true,
+  };
+}

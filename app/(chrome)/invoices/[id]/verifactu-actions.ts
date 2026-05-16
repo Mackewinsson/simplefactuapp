@@ -8,7 +8,7 @@ import { buildSendInvoicePayload } from "@/lib/simplefactu/build-send-invoice-pa
 import { buildCancelInvoicePayload } from "@/lib/simplefactu/build-cancel-invoice-payload";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { formatSimplefactuHttpError, formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
-import { syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
+import { resyncVerifactuQrFromJob, syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
 
@@ -155,6 +155,39 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
       jobId,
       kind: "SEND_INVOICE",
     });
+  } catch (e) {
+    return { ok: false, message: formatVerifactuActionError(e) };
+  }
+}
+
+export async function resyncVerifactuQrAction(invoiceId: string): Promise<SendVerifactuResult> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+  });
+  if (!invoice) return { ok: false, message: "Factura no encontrada." };
+  if (invoice.aeatStatus !== AeatJobStatus.SUCCEEDED || !invoice.aeatJobId) {
+    return {
+      ok: false,
+      message: "Solo hay enlace QR que actualizar en facturas ya aceptadas por Verifactu.",
+    };
+  }
+
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
+    const r = await resyncVerifactuQrFromJob(client, {
+      invoiceId,
+      userId,
+      jobId: invoice.aeatJobId,
+    });
+    revalidatePath(`/invoices/${invoiceId}`);
+    return { ok: r.ok, message: r.message, terminal: r.terminal };
   } catch (e) {
     return { ok: false, message: formatVerifactuActionError(e) };
   }
