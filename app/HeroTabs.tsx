@@ -13,18 +13,20 @@ const CONTENT: Record<
     bullets: string[];
     cta: { label: string; href: string };
     ctaSecondary: { label: string; href: string };
+    note?: string;
   }
 > = {
   autonomos: {
-    headline: "Cumple con Veri\u00b7Factu sin pensar en AEAT.",
-    sub: "Factura, env\u00eda a Hacienda y guarda el CSV. T\u00fa emites; nosotros nos encargamos de huellas, encadenamiento y firma SOAP.",
+    headline: "Cumple Veri\u00b7Factu. Sin coste.",
+    sub: "Factura, env\u00eda a Hacienda y guarda el CSV en segundos. Huellas, encadenamiento y firma SOAP gestionados por nosotros \u2014 en el plan gratuito.",
     bullets: [
       "Alta en minutos con tu certificado FNMT",
       "Facturas v\u00e1lidas con PDF descargable y QR tributario",
-      "Hist\u00f3rico inalterable y CSV oficial por cada factura",
+      "Plan gratuito \u2014 sin tarjeta ni permanencia",
     ],
-    cta: { label: "Crear cuenta gratis", href: "/sign-up" },
+    cta: { label: "Crear cuenta \u2014 es gratis", href: "/sign-up" },
     ctaSecondary: { label: "Ver documentaci\u00f3n", href: "/docs" },
+    note: "Sin tarjeta \u00b7 Sin permanencia \u00b7 Gratis",
   },
   empresas: {
     headline: "API Veri\u00b7Factu lista para integrar.",
@@ -103,7 +105,7 @@ export function HeroTabs() {
             onClick={() => setMode(m)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
             className={[
-              "rounded-md px-4 py-1.5 text-sm font-medium transition-all",
+              "inline-flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-all",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cta-ring focus-visible:ring-offset-1",
               mode === m
                 ? "bg-surface shadow-sm text-fg"
@@ -111,6 +113,11 @@ export function HeroTabs() {
             ].join(" ")}
           >
             {LABELS[m]}
+            {m === "autonomos" && (
+              <span className="rounded-full bg-fg px-1.5 py-0.5 text-[10px] font-semibold leading-none text-surface">
+                Gratis
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -152,6 +159,9 @@ export function HeroTabs() {
             {content.ctaSecondary.label}
           </Link>
         </div>
+        {content.note && (
+          <p className="mt-4 text-xs text-fg-subtle">{content.note}</p>
+        )}
       </div>
     </div>
   );
