@@ -101,7 +101,8 @@ El API **no** lee variables de Vercel. El front llama al API por HTTP con secret
 | `VERIFACTU_ENCRYPTION_KEY` | clave dev propia | clave QA (distinta de prod) | clave prod nueva |
 | Clerk | `pk_test_` / `sk_test_` | test | `pk_live_` / `sk_live_` |
 | `DATABASE_URL` | Neon dev / local | Neon QA | Neon prod |
-| `VERIFACTU_VERIFY_QR_BASE` | opcional (deprecated) | AEAT preprod | AEAT prod |
+
+QR de verificación AEAT: lo devuelve el API en `qrInfo.qrText` → Prisma `invoice.aeatQrText` (PDF y panel). Base URL en el VPS: `AEAT_QR_BASE_URL` / `AEAT_URL` ([API AGENTS.md](../simplefactu/AGENTS.md)).
 
 Si `SIMPLEFACTU_ADMIN_KEY` ≠ `ADMIN_KEY` del VPS → `401 Invalid x-admin-key` en `POST /admin/tenants` y provisión.
 
@@ -125,7 +126,6 @@ Si `SIMPLEFACTU_ADMIN_KEY` ≠ `ADMIN_KEY` del VPS → `401 Invalid x-admin-key`
 | `VERIFACTU_SI_NOMBRE_RAZON`, `VERIFACTU_SI_NIF` | No | `build-send-invoice-payload.ts` — override emisor SIF |
 | `VERIFACTU_SI_NOMBRE`, `VERIFACTU_SI_ID`, `VERIFACTU_SI_VERSION` | No | Bloque `sistemaInformatico` en envío |
 | `VERIFACTU_SI_SOLO_VERI`, `VERIFACTU_SI_MULTI_OT`, `VERIFACTU_SI_IND_MULTI_OT` | No | Flags SIF (`S`/`N`) |
-| `VERIFACTU_VERIFY_QR_BASE` | No | **Deprecated** — PDF y «Comprobar» usan `invoice.aeatQrText` del API |
 | **Admin panel (Clerk)** | | |
 | `ADMIN_CLERK_USER_IDS` | No | `middleware.ts` + `lib/auth/admin.ts` — allowlist opcional `/admin` |
 | **App / UI** | | |

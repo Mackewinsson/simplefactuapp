@@ -6,7 +6,6 @@ import type { Invoice, InvoiceItem, UserVerifactuAccount } from "@prisma/client"
 import { buildSendInvoicePayload } from "../lib/simplefactu/build-send-invoice-payload";
 import { buildCancelInvoicePayload } from "../lib/simplefactu/build-cancel-invoice-payload";
 import { formatSimplefactuHttpError } from "../lib/simplefactu/api-errors";
-import { verifactuQrPayload } from "../lib/pdf/verifactu-qr-content";
 
 process.env.VERIFACTU_SI_ID = process.env.VERIFACTU_SI_ID || "01";
 
@@ -103,17 +102,5 @@ assert.equal((cancel.facturaAnulada as { numSerieFacturaAnulada: string }).numSe
 
 assert.ok(formatSimplefactuHttpError(402, { message: "cap" }).includes("Límite del plan"));
 assert.ok(formatSimplefactuHttpError(429, { retryAfterSeconds: 30 }).includes("30"));
-
-// verifactuQrPayload now always builds the URL from invoice data (not from stored aeatQrText/csv)
-const qrUrl = verifactuQrPayload({
-  issuerNif: "B12345678",
-  number: "2026/F-001",
-  issueDate: new Date("2026-05-01"),
-  totalCents: 121000,
-});
-assert.ok(qrUrl?.includes("nif=B12345678"), "QR URL must contain nif param");
-assert.ok(qrUrl?.includes("numserie="), "QR URL must contain numserie param");
-assert.ok(qrUrl?.includes("importe="), "QR URL must contain importe param");
-assert.equal(verifactuQrPayload({ number: "", issueDate: new Date(), totalCents: 0 }), null);
 
 console.log("test-verifactu-payloads: OK");
