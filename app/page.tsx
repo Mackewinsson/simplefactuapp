@@ -105,19 +105,14 @@ export default async function PublicHomePage() {
         <div className="border-t border-outline-soft" />
 
         {/* ── Contacto / lead form ──────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-          <div className="grid gap-10 sm:grid-cols-2 sm:gap-16">
-            <div>
-              <h2 className="text-xl font-semibold text-fg">
-                ¿Tienes preguntas?
-              </h2>
-              <p className="mt-2 text-sm text-fg-muted">
-                Cuéntanos tu caso y te respondemos en menos de 24&nbsp;h.
-                Sin compromisos.
-              </p>
-            </div>
-            <LeadForm />
+        <section className="mx-auto w-full max-w-lg px-4 py-14 sm:px-6 sm:py-20">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-semibold text-fg">¿Tienes preguntas?</h2>
+            <p className="mt-2 text-sm text-fg-muted">
+              Cuéntanos tu caso y te respondemos en menos de 24&nbsp;h. Sin compromisos.
+            </p>
           </div>
+          <LeadForm />
         </section>
       </main>
 
