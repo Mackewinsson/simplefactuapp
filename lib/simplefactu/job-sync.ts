@@ -1,7 +1,14 @@
 import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
+import { clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import type { SimplefactuClient } from "@/lib/simplefactu/client";
 import { formatSimplefactuNetworkError } from "@/lib/simplefactu/api-errors";
+import {
+  sendCancellationAcceptedEmail,
+  sendCancellationFailedEmail,
+  sendInvoiceAcceptedEmail,
+  sendInvoiceFailedEmail,
+} from "@/lib/email/invoice-notifications";
 
 type AeatError = {
   code?: string | null;
@@ -103,6 +110,9 @@ export async function syncJobStatusToInvoice(
           aeatUpdatedAt: new Date(),
         },
       });
+      void notifyByEmail(userId, (email) =>
+        sendInvoiceAcceptedEmail({ to: email, invoiceNumber: invoice.number, csv })
+      );
       return {
         ok: true,
         message: csv ? `Aceptada (CSV: ${csv})` : "Aceptada por Verifactu.",
@@ -119,6 +129,12 @@ export async function syncJobStatusToInvoice(
           aeatUpdatedAt: new Date(),
         },
       });
+      // Only notify on DEAD (permanent failure) to avoid noise on transient retries.
+      if (st === "DEAD") {
+        void notifyByEmail(userId, (email) =>
+          sendInvoiceFailedEmail({ to: email, invoiceNumber: invoice.number, errorMessage: err })
+        );
+      }
       return { ok: false, message: err, terminal: true };
     }
     return {
@@ -138,6 +154,9 @@ export async function syncJobStatusToInvoice(
         aeatUpdatedAt: new Date(),
       },
     });
+    void notifyByEmail(userId, (email) =>
+      sendCancellationAcceptedEmail({ to: email, invoiceNumber: invoice.number })
+    );
     return { ok: true, message: "Anulación aceptada por Verifactu.", terminal: true };
   }
   if (st === "FAILED" || st === "DEAD") {
@@ -150,6 +169,11 @@ export async function syncJobStatusToInvoice(
         aeatUpdatedAt: new Date(),
       },
     });
+    if (st === "DEAD") {
+        void notifyByEmail(userId, (email) =>
+          sendCancellationFailedEmail({ to: email, invoiceNumber: invoice.number, errorMessage: err })
+        );
+    }
     return { ok: false, message: err, terminal: true };
   }
 
@@ -158,6 +182,27 @@ export async function syncJobStatusToInvoice(
     message: "La anulación sigue en curso.",
     terminal: false,
   };
+}
+
+/**
+ * Resolves the user's primary email from Clerk and calls the provided send
+ * function with it. Fire-and-forget: errors are silenced so email failures
+ * never break the invoice flow.
+ */
+async function notifyByEmail(
+  userId: string,
+  send: (userEmail: string) => Promise<unknown>
+): Promise<void> {
+  try {
+    const clerk = await clerkClient();
+    const user = await clerk.users.getUser(userId);
+    const email = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
+      ?.emailAddress ?? user.emailAddresses[0]?.emailAddress;
+    if (!email) return;
+    await send(email);
+  } catch {
+    // Best-effort: never let email errors surface to the user.
+  }
 }
 
 /**
