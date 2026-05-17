@@ -118,7 +118,7 @@ export async function GET(
   };
 
   /* ── 1. Header ──────────────────────────────────────── */
-  // Top-left: created-by name (from invoice) or env company name
+  // Left: issuer name; Right: invoice reference block — both at FONT_LG for balance
   const createdByName = [invoice.createdByFirstName, invoice.createdByLastName]
     .filter(Boolean)
     .join(" ")
@@ -129,10 +129,10 @@ export async function GET(
   }
 
   const invLabel = `Factura ${invoice.number}`;
-  textR(invLabel, RIGHT, { size: FONT_MD, font: bold });
-  y -= LH + 2;
+  textR(invLabel, RIGHT, { size: FONT_LG, font: bold });
+  y -= LH + 6;
 
-  textR(`Fecha expedición: ${fmtDate(invoice.issueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
+  textR(`Fecha: ${fmtDate(invoice.issueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
   y -= LH_SM;
 
   if (invoice.dueDate) {
@@ -147,6 +147,10 @@ export async function GET(
   y -= LH;
   text(invoice.customerName, MARGIN, { size: FONT_MD, font: bold });
   y -= LH;
+  if (invoice.customerNif) {
+    text(`NIF/CIF: ${invoice.customerNif}`, MARGIN, { size: FONT_SM, color: GRAY });
+    y -= LH_SM;
+  }
   if (invoice.customerEmail) {
     text(invoice.customerEmail, MARGIN, { size: FONT_SM, color: GRAY });
     y -= LH_SM;
@@ -220,23 +224,29 @@ export async function GET(
   const hasAeatSubmission = !!(invoice.aeatCsv?.trim() || invoice.aeatStatus === "SUCCEEDED");
   const qrPayload = hasAeatSubmission ? invoice.aeatQrText?.trim() || null : null;
   if (invoice.aeatCsv || qrPayload) {
+    const dim = VERIFACTU_QR_PDF_PT; // 108pt
+    const qrX = RIGHT - dim;
+    const sectionTopY = y;
+
+    // Left column: label + CSV + verification note
     text("VERIFACTU (AEAT)", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
     y -= LH;
+
     if (invoice.aeatCsv) {
       text(`CSV: ${invoice.aeatCsv}`, MARGIN, { size: FONT_SM, color: GRAY });
       y -= LH_SM;
     }
-    if (invoice.aeatQrText) {
-      const qrLine =
-        invoice.aeatQrText.length > 95
-          ? invoice.aeatQrText.slice(0, 92) + "..."
-          : invoice.aeatQrText;
-      text(`URL de verificación: ${qrLine}`, MARGIN, { size: FONT_SM, color: GRAY });
+
+    // Short verification note instead of the full URL (URL is encoded in the QR)
+    if (qrPayload) {
+      text("Escanea el código QR para verificar", MARGIN, { size: FONT_SM, color: GRAY });
+      y -= LH_SM;
+      text("en la sede electrónica de la AEAT.", MARGIN, { size: FONT_SM, color: GRAY });
       y -= LH_SM;
     }
+
+    // Right column: QR image
     if (qrPayload) {
-      text("QR tributario:", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
-      y -= LH_SM;
       try {
         const pngBuffer = await QRCode.toBuffer(qrPayload, {
           type: "png",
@@ -245,21 +255,21 @@ export async function GET(
           errorCorrectionLevel: "M",
         });
         const qrImage = await doc.embedPng(pngBuffer);
-        const dim = VERIFACTU_QR_PDF_PT;
         page.drawImage(qrImage, {
-          x: MARGIN,
-          y: y - dim,
+          x: qrX,
+          y: sectionTopY - dim,
           width: dim,
           height: dim,
         });
-        y -= dim + 4;
-        text("VERI*FACTU", MARGIN, { size: FONT_SM, color: GRAY });
-        y -= LH_SM;
+        // Ensure y advances past the QR bottom
+        const qrBottom = sectionTopY - dim;
+        if (y > qrBottom) y = qrBottom;
       } catch {
-        text("(No se pudo generar el código QR)", MARGIN, { size: FONT_SM, color: GRAY });
+        text("(QR no disponible)", MARGIN, { size: FONT_SM, color: GRAY });
         y -= LH_SM;
       }
     }
+
     y -= GAP_SM;
   }
 
