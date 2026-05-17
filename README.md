@@ -21,16 +21,27 @@ Open [http://localhost:3000](http://localhost:3000). Optional: `pnpm prisma db s
 
 - **In:** List invoices, create invoice, view detail, download PDF. Clerk auth (e.g. Google OAuth); invoices scoped per user. No sending, no edit/delete.
 
+## Environment variables
+
+Secrets live in **Vercel** (Preview vs Production), not in this git repo. The API backend uses a separate `.env` on each VPS — see [simplefactu AGENTS.md §4](../simplefactu/AGENTS.md#4-configuración-del-entorno).
+
+| Store | Template | Runtime |
+| ----- | -------- | ------- |
+| Local | [`.env.example`](.env.example) → `.env.local` | `pnpm dev` |
+| QA | [`.env.qa.example`](.env.qa.example) | Vercel Preview (`develop`, `qa.simplefactu.com`) |
+| Prod | [`.env.prod.example`](.env.prod.example) | Vercel Production (`main`, `simplefactu.com`) |
+| Bitwarden (recommended) | Copia de cada plantilla rellena | Backup offline |
+
+**Critical pairing (per environment):** `SIMPLEFACTU_ADMIN_KEY` (Vercel) must equal `ADMIN_KEY` on the matching API VPS. `SIMPLEFACTU_API_BASE_URL` must point to that VPS (`https://api.qa.simplefactu.com/v1` or `https://api.simplefactu.com/v1`).
+
+Full catalog with file references: **[AGENTS.md — Variables de entorno](AGENTS.md#variables-de-entorno)**.
+
 ## Deploy checklist
 
-1. **Environment variables** (in your host’s env/config):
-   - `DATABASE_URL` — production Postgres URL. For Neon: run `npx neonctl@latest init` (or use [Neon Console](https://console.neon.tech)) and set this to the Neon connection string. If missing, the app fails on first DB access.
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` — from [Clerk API keys](https://dashboard.clerk.com/last-active?path=api-keys).
-   - `CLERK_SECRET_KEY` — from same page (server-only; never expose).
-   - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
-   - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
-   - `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/invoices`
-   - `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/invoices`
+1. **Environment variables** in Vercel (see checklist above and AGENTS.md). Minimum:
+   - `DATABASE_URL` — Neon Postgres for this app’s Prisma schema
+   - Clerk keys (`NEXT_PUBLIC_*` + `CLERK_SECRET_KEY`) — test keys on Preview, live on Production
+   - `SIMPLEFACTU_API_BASE_URL`, `SIMPLEFACTU_ADMIN_KEY`, `VERIFACTU_ENCRYPTION_KEY`
 
 2. **Clerk production**: In Clerk Dashboard, set the production app URL and allow the production domain. Ensure redirect URLs match your host (e.g. `https://yourdomain.com/sign-in`, `https://yourdomain.com/invoices`).
 

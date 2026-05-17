@@ -23,5 +23,8 @@ prisma/dev.db-journal
 *.log
 *.tsbuildinfo
 .env
+.env.*
 .env*.local
+!.env.example
+!.env.*.example
 .vercel
