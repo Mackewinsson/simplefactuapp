@@ -12,24 +12,24 @@ export default async function PublicHomePage() {
     <div className="flex min-h-screen flex-col bg-surface">
       {/* ── Public header ─────────────────────────────── */}
       <header className="border-b border-outline-soft bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <BrandWordmark />
           <nav className="flex items-center gap-1">
             <Link
               href="/docs"
-              className="rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg"
+              className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
             >
               Docs
             </Link>
             <Link
               href="/sign-in"
-              className="rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg"
+              className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
             >
               Iniciar sesión
             </Link>
             <Link
               href="/sign-up"
-              className="btn btn-sm btn-primary ml-2"
+              className="btn btn-sm btn-primary sm:ml-2"
             >
               Crear cuenta
             </Link>
@@ -39,11 +39,11 @@ export default async function PublicHomePage() {
 
       <main className="flex flex-1 flex-col">
         {/* ── Hero ──────────────────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">
+        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-24">
           {/* Compliance pill */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-outline-soft bg-surface-muted px-3 py-1 text-xs font-medium text-fg-subtle">
-            <span className="h-1.5 w-1.5 rounded-full bg-fg-subtle" />
-            Compatible con Veri·Factu — RD&nbsp;1007/2023 · OM&nbsp;HAC/1177/2024
+          <div className="mb-8 inline-flex flex-wrap items-center gap-2 rounded-full border border-outline-soft bg-surface-muted px-3 py-1 text-xs font-medium text-fg-subtle">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-fg-subtle" />
+            <span>Compatible con Veri·Factu — RD&nbsp;1007/2023&nbsp;·&nbsp;OM&nbsp;HAC/1177/2024</span>
           </div>
 
           <HeroTabs />
@@ -53,7 +53,7 @@ export default async function PublicHomePage() {
         <div className="border-t border-outline-soft" />
 
         {/* ── Cómo funciona ─────────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-6 py-16">
+        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
           <p className="mb-10 text-xs font-medium uppercase tracking-widest text-fg-subtle">
             Cómo funciona
           </p>
@@ -80,7 +80,7 @@ export default async function PublicHomePage() {
         <div className="border-t border-outline-soft" />
 
         {/* ── Confianza técnica ─────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-6 py-12">
+        <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
           <ul className="flex flex-wrap gap-x-8 gap-y-3">
             {[
               "Huellas SHA-256 por registro",
@@ -104,7 +104,7 @@ export default async function PublicHomePage() {
 
       {/* ── Minimal public footer ─────────────────────── */}
       <footer className="border-t border-outline-soft bg-surface">
-        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-6 py-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <span>
             Simple·Factu &mdash; Servicio compatible con Veri·Factu (AEAT)
           </span>

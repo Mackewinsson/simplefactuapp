@@ -45,8 +45,8 @@ export function ResponsiveAppNav({ links }: Props) {
               aria-current={active ? "page" : undefined}
               className={
                 active
-                  ? "border-b-2 border-gray-900 py-2 text-sm font-semibold leading-none text-gray-900"
-                  : "border-b-2 border-transparent py-2 text-sm leading-none text-gray-600 hover:text-gray-900"
+                  ? "border-b-2 border-fg py-2 text-sm font-semibold leading-none text-fg"
+                  : "border-b-2 border-transparent py-2 text-sm leading-none text-fg-muted hover:text-fg"
               }
             >
               {link.label}
@@ -57,7 +57,7 @@ export function ResponsiveAppNav({ links }: Props) {
 
       <button
         type="button"
-        className="inline-flex items-center rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 lg:hidden"
+        className="inline-flex items-center rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-muted lg:hidden"
         aria-expanded={isOpen}
         aria-controls="mobile-app-nav"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -72,14 +72,14 @@ export function ResponsiveAppNav({ links }: Props) {
         >
           <nav
             id="mobile-app-nav"
-            className="ml-auto flex h-full w-72 max-w-[85vw] flex-col gap-1 overflow-y-auto bg-white p-4 shadow-xl"
+            className="ml-auto flex h-full w-72 max-w-[85vw] flex-col gap-1 overflow-y-auto bg-surface p-4 shadow-xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900">Navegación</span>
+              <span className="text-sm font-semibold text-fg">Navegación</span>
               <button
                 type="button"
-                className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                className="rounded p-1 text-fg-subtle hover:bg-surface-muted hover:text-fg-muted"
                 onClick={() => setIsOpen(false)}
                 aria-label="Cerrar menú"
               >
@@ -95,8 +95,8 @@ export function ResponsiveAppNav({ links }: Props) {
                   aria-current={active ? "page" : undefined}
                   className={
                     active
-                      ? "rounded border-l-4 border-gray-900 bg-gray-50 py-2 pl-2 pr-3 text-sm font-semibold text-gray-900"
-                      : "rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      ? "rounded border-l-4 border-fg bg-surface-muted py-2 pl-2 pr-3 text-sm font-semibold text-fg"
+                      : "rounded px-3 py-2 text-sm text-fg-muted hover:bg-surface-muted hover:text-fg"
                   }
                   onClick={() => setIsOpen(false)}
                 >

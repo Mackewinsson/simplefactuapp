@@ -122,7 +122,7 @@ export function HeroTabs() {
         aria-labelledby={`tab-${mode}`}
         className="mt-8"
       >
-        <h1 className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg sm:text-4xl lg:text-5xl">
           {content.headline}
         </h1>
         <p className="mt-4 max-w-xl text-base text-fg-muted sm:text-lg">
@@ -138,16 +138,16 @@ export function HeroTabs() {
           ))}
         </ul>
 
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link
             href={content.cta.href}
-            className="btn btn-md btn-primary"
+            className="btn btn-md btn-primary w-full justify-center sm:w-auto"
           >
             {content.cta.label}
           </Link>
           <Link
             href={content.ctaSecondary.href}
-            className="btn btn-md btn-secondary"
+            className="btn btn-md btn-secondary w-full justify-center sm:w-auto"
           >
             {content.ctaSecondary.label}
           </Link>

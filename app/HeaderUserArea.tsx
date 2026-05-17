@@ -15,7 +15,7 @@ export function HeaderUserArea() {
         <SignInButton mode="modal">
           <button
             type="button"
-            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            className="text-sm font-medium text-fg-muted hover:text-fg"
           >
             Iniciar sesión
           </button>
@@ -23,7 +23,7 @@ export function HeaderUserArea() {
         <SignUpButton mode="modal">
           <button
             type="button"
-            className="ml-3 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-50"
+            className="btn btn-sm btn-secondary ml-3"
           >
             Registrarse
           </button>
