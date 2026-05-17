@@ -34,7 +34,7 @@ export function BrandWordmark({ href = "/", className }: Props) {
         ) : (
           <span className="flex items-baseline text-lg font-semibold tracking-tight text-slate-900 normal-case">
             <span>{before}</span>
-            <span className="-mx-px translate-y-[-0.04em] px-0.5 text-base font-medium text-sky-800/90">
+            <span className="-mx-px translate-y-[-0.04em] px-0.5 text-base font-medium text-fg-muted">
               *
             </span>
             <span>{after}</span>

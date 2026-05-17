@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: APP_DISPLAY_NAME,
-  description: "Facturación sencilla con Verifactu (AEAT)",
+  description: "Cumple Veri\u00b7Factu sin tocar AEAT \u2014 facturaci\u00f3n y API para aut\u00f3nomos y empresas. Huellas, encadenamiento y env\u00edo SOAP gestionados por nosotros.",
 };
 
 export const viewport: Viewport = {
@@ -31,8 +33,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={esES}>
-      <html lang="es">
-        <body className="flex min-h-screen flex-col bg-gray-50 text-gray-900 antialiased">
+      <html lang="es" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+        <body className="flex min-h-screen flex-col bg-surface font-sans text-fg antialiased">
           {children}
         </body>
       </html>
