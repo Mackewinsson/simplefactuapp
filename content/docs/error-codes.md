@@ -26,20 +26,19 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 {
   "error": "ChainContinuityError",
   "expectedHuella": "910204E9...",
-  "receivedHuella": "AABBCC...",
-  "chainKey": "B12345678|2026|20260429-163224-DA0BDFF3"
+  "receivedHuella": "AABBCC..."
 }
 ```
 
 **Causa:** la huella que pasaste en `encadenamiento.registroAnterior.huella` no coincide con la última huella que tenemos registrada para esa cadena.
 
-**Solución:** consulta `GET /admin/tenants/:id/chains` para ver la `last_huella` actual de tu cadena y úsala en el siguiente envío.
+**Solución:** la respuesta incluye `expectedHuella` — es exactamente la huella que debes usar en el siguiente envío. Cópiala y úsala en `encadenamiento.registroAnterior.huella`.
 
 ### `ChainStateError — Chain already exists`
 
-**Causa:** enviaste `primerRegistro: true` pero ya hay facturas en esa cadena.
+**Causa:** enviaste `primerRegistro: true` pero la cadena ya tiene facturas registradas.
 
-**Solución:** cambia a `primerRegistro: false` y pasa la huella de la última factura de la cadena.
+**Solución:** cambia a `primerRegistro: false` y usa la huella de la última factura aceptada por AEAT en `encadenamiento.registroAnterior.huella`. Si no la tienes guardada, escríbenos con el `requestId` y te la facilitamos.
 
 ### `Idempotency conflict`
 

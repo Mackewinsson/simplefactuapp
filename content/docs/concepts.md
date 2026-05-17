@@ -52,8 +52,7 @@ Factura 2  →  (huella₁ + datos₂)  →  huella₂
 Factura 3  →  (huella₂ + datos₃)  →  huella₃
 ```
 
-La cadena se identifica por `{NIF emisor} | {serie} | {número de instalación}`.
-Nosotros llevamos el rastro por ti — solo tienes que pasarnos la huella de la factura anterior en el campo `encadenamiento.registroAnterior`.
+Nosotros llevamos el rastro por ti. Lo único que tienes que hacer es pasarnos la huella de la factura anterior en el campo `encadenamiento.registroAnterior` de cada envío (excepto en el primero, donde usas `primerRegistro: true`).
 
 ## Primer registro (`primerRegistro: true`)
 
@@ -77,25 +76,8 @@ Con el CSV y la URL de verificación, cualquiera puede comprobar en la web de la
 
 ## Sistema informático (`sistemaInformatico`)
 
-AEAT exige identificar qué software emitió la factura. El bloque `sistemaInformatico` en cada envío describe tu programa:
+AEAT exige identificar qué software emitió la factura. Cada envío incluye un bloque que describe tu programa (nombre, NIF, versión).
 
-- `nif` / `nombreRazon`: el NIF y nombre del fabricante del software (tú, o nosotros si delegas).
-- `nombreSistemaInformatico` / `idSistemaInformatico`: nombre e identificador del programa.
-- `version`: versión del software.
-- Los flags `tipoUsoPosibleSoloVerifactu`, `tipoUsoPosibleMultiOT`, `indicadorMultiplesOT` declaran si el sistema puede emitir facturas no-Veri·Factu o gestionar varios obligados tributarios.
-
-En la práctica: copia el bloque de ejemplo del Quickstart y ajusta `nombre`/`nif` con los tuyos.
-
-## Flujo completo resumido
-
-```
-Tu sistema           Simple·Factu               AEAT
-
-POST /send-invoice ──►  valida JSON
-                         calcula huella?  ──────►  envía SOAP (mTLS)
-                         ◄── 202 PENDING           ◄── acepta + CSV
-
-GET /jobs/:id  ──────►  ◄── SUCCEEDED + CSV + QR
-```
+En la práctica: copia el bloque de ejemplo del [Quickstart](/docs/quickstart#paso-3--enviar-la-factura) y ajusta `nombreRazon`, `nif` y `version` con los tuyos. No necesitas cambiar nada más para empezar.
 
 Con esto claro, el [Quickstart](/docs/quickstart) debería tener mucho más sentido.

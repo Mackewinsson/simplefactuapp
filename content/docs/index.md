@@ -36,7 +36,7 @@ Cuando el job llega a `SUCCEEDED` tienes el **CSV** (código de verificación de
 | **Autónomo o pyme** que usa la app web | Registro en simplefactu.com — el certificado y la API key se gestionan desde Ajustes |
 | **ERP o integrador** (server-to-server) | Te emitimos una API key; llamas a `/v1/send-invoice` directamente desde tu backend |
 
-Esta documentación cubre principalmente el segundo caso (integración directa vía API).
+Los conceptos (huella, encadenamiento, CSV) son los mismos en ambos casos — solo cambia quién llama a la API.
 
 ## Soporte
 
