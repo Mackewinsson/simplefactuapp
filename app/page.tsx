@@ -42,8 +42,8 @@ export default async function PublicHomePage() {
         {/* ── Hero ──────────────────────────────────────── */}
         <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-24">
           {/* Compliance pill */}
-          <div className="mb-8 inline-flex flex-wrap items-center gap-2 rounded-full border border-outline-soft bg-surface-muted px-3 py-1 text-xs font-medium text-fg-subtle">
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-fg-subtle" />
+          <div className="mb-8 flex w-fit max-w-full items-start gap-2 rounded-xl border border-outline-soft bg-surface-muted px-3 py-1.5 text-xs font-medium text-fg-subtle">
+            <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-fg-subtle" />
             <span>Compatible con Veri·Factu — RD&nbsp;1007/2023&nbsp;·&nbsp;OM&nbsp;HAC/1177/2024</span>
           </div>
 
