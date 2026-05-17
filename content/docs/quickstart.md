@@ -1,73 +1,113 @@
 ---
 title: Quickstart
-description: Emite tu primera factura en 5 minutos con un curl.
+description: Envía tu primera factura a AEAT con curl en menos de 5 minutos.
 ---
 
-Esta guía asume que ya tienes:
+Esta guía te lleva paso a paso desde cero hasta recibir un CSV de AEAT.
+Si algunos términos (huella, encadenamiento, primer registro) te suenan a chino, lee antes los [Conceptos clave](/docs/concepts) — son 3 minutos y lo harán todo mucho más claro.
 
-- Una **API key** emitida por nosotros (formato `vf_...`). Si no la tienes,
-  contáctanos y te la enviamos.
-- Tu **certificado digital AEAT** subido al sistema (vía app en Ajustes o vía API
-  `POST /me/certificate` con JSON **o** `multipart/form-data`; ver [Autenticación](/docs/authentication)).
-  Si lo necesitas, soporte te ayuda con la primera subida.
+## Antes de empezar
 
-## 1. Variables base
+Necesitas dos cosas:
+
+- **API key** — contáctanos y te la enviamos. Tiene el formato `vf_...`.
+- **Certificado digital AEAT** subido al sistema. Puedes hacerlo desde la app en *Ajustes → Veri·Factu*, o vía API (ver [Autenticación](/docs/authentication)). Si aún no lo tienes configurado, escríbenos y te ayudamos.
+
+## Paso 1 — Variables de entorno
+
+Abre la terminal y define estas variables. Las usaremos en todos los pasos siguientes.
 
 ```bash
-export API_BASE="https://api.tudominio.com/v1"
-export API_KEY="vf_..."
-export NIF="B12345678"        # tu NIF emisor
-export NOMBRE="ACME SL"
+export API_BASE="https://api.simplefactu.com/v1"   # o tu dominio propio
+export API_KEY="vf_..."                             # tu API key
+export NIF="B12345678"                              # tu NIF como emisor
+export NOMBRE="ACME SL"                             # tu nombre o razón social
 ```
 
-## 2. Componer la huella
+## Paso 2 — Calcular la huella
 
-Veri\*Factu obliga a enviar una huella SHA-256 de la cadena canónica. El
-servidor la valida; si te equivocas, devuelve `409 ChainContinuityError`.
+**¿Qué es esto?** La huella es un hash SHA-256 de los datos principales de la factura.
+AEAT la comprueba para verificar que nadie ha modificado los datos en tránsito.
+Para la **primera factura** de una serie no hay huella anterior — eso se indica con `primerRegistro: true`.
+
+> Si quieres entender por qué existe y cómo funciona la cadena, lee [Conceptos clave → Huella](/docs/concepts#huella-fingerprint-sha-256).
+
+El script calcula la huella a partir del importe y otros datos, y también genera el timestamp con zona horaria que AEAT requiere:
 
 ```bash
 read HUELLA TIMESTAMP < <(node -e "
   const c = require('crypto');
+
+  // Formato AEAT: eliminar el segundo decimal si es cero
+  // 210.00 → 210.0  |  21.15 → 21.15
   const fmt = v => Number(v).toFixed(2).replace(/\.00$/, '.0');
-  const ts = new Date().toISOString().replace('Z', '+00:00').replace(/\.\d{3}/, '');
+
+  // Timestamp ISO 8601 con zona horaria, sin milisegundos
+  const ts = new Date().toISOString()
+    .replace('Z', '+00:00')
+    .replace(/\.\d{3}/, '');
+
+  // Cadena canónica: campos separados por & en orden fijo
   const cadena = [
     'IDEmisorFactura=$NIF',
     'NumSerieFactura=2026/F-001',
-    'FechaExpedicionFactura=$(date +%d-%m-%Y)',
+    'FechaExpedicionFactura=\$(date +%d-%m-%Y)',
     'TipoFactura=F1',
-    'CuotaTotal=' + fmt(21),
-    'ImporteTotal=' + fmt(121),
-    'Huella=',
+    'CuotaTotal=' + fmt(21),       // IVA total
+    'ImporteTotal=' + fmt(121),    // total con IVA
+    'Huella=',                     // vacío porque es primerRegistro
     'FechaHoraHusoGenRegistro=' + ts,
   ].join('&');
+
   const h = c.createHash('sha256').update(cadena, 'utf8').digest('hex').toUpperCase();
   process.stdout.write(h + ' ' + ts);
 ")
 ```
 
-## 3. Enviar la factura
+Comprueba que tienes los valores:
 
 ```bash
-curl -X POST "$API_BASE/send-invoice" \
+echo "Huella:    $HUELLA"
+echo "Timestamp: $TIMESTAMP"
+```
+
+## Paso 3 — Enviar la factura
+
+Ahora enviamos la factura. Fíjate en los campos comentados — son los más importantes para entender el cuerpo:
+
+```bash
+curl -s -X POST "$API_BASE/send-invoice" \
   -H "Content-Type: application/json" \
   -H "x-api-key: $API_KEY" \
   -H "x-idempotency-key: $(uuidgen)" \
   -d "{
     \"nif\": \"$NIF\",
     \"nombre\": \"$NOMBRE\",
+
     \"numSerie\": \"2026/F-001\",
     \"fecha\": \"$(date +%d-%m-%Y)\",
     \"tipoFactura\": \"F1\",
     \"descripcion\": \"Servicios de consultoría\",
+
     \"destNombre\": \"FNMT-RCM\",
     \"destNif\": \"Q2826004J\",
+
     \"cuotaTotal\": 21.00,
     \"total\": 121.00,
+
     \"primerRegistro\": true,
     \"huella\": \"$HUELLA\",
     \"tipoHuella\": \"01\",
     \"fechaHoraHusoGenRegistro\": \"$TIMESTAMP\",
-    \"detalles\": [{\"clave\":\"01\",\"calif\":\"S1\",\"tipo\":21,\"base\":100.00,\"cuota\":21.00}],
+
+    \"detalles\": [{
+      \"clave\": \"01\",
+      \"calif\": \"S1\",
+      \"tipo\": 21,
+      \"base\": 100.00,
+      \"cuota\": 21.00
+    }],
+
     \"sistemaInformatico\": {
       \"nombreRazon\": \"$NOMBRE\",
       \"nif\": \"$NIF\",
@@ -81,7 +121,24 @@ curl -X POST "$API_BASE/send-invoice" \
   }"
 ```
 
-Respuesta (modo asíncrono, default):
+**Campos clave del body:**
+
+| Campo | Qué es |
+|-------|--------|
+| `nif` / `nombre` | Tu NIF y nombre como emisor de la factura |
+| `numSerie` | Número de factura — debe ser único por serie |
+| `tipoFactura` | `F1` = factura normal; `R1`–`R5` = rectificativas |
+| `descripcion` | Texto libre que describe la operación (obligatorio por ley) |
+| `destNif` / `destNombre` | NIF y nombre de tu cliente |
+| `cuotaTotal` | Suma del IVA de todos los detalles |
+| `total` | Base + IVA total |
+| `primerRegistro` | `true` solo en la primera factura de la serie; `false` en todas las demás |
+| `huella` | La que calculaste en el paso anterior |
+| `detalles` | Desglose del IVA — `clave 01` = régimen general; `calif S1` = operación sujeta y no exenta |
+| `sistemaInformatico` | Identifica el software que emite la factura (requerido por AEAT) |
+| `x-idempotency-key` | UUID único por intento — protege contra envíos duplicados si la red falla |
+
+La respuesta inmediata es `202 Accepted` con un job en cola:
 
 ```json
 {
@@ -91,14 +148,20 @@ Respuesta (modo asíncrono, default):
 }
 ```
 
-## 4. Consultar el resultado
+Esto es normal — el envío a AEAT es asíncrono para no bloquearte si AEAT tarda o tiene problemas.
+
+## Paso 4 — Consultar el resultado
+
+Guarda el `jobId` y consúltalo hasta que cambie a `SUCCEEDED` o `FAILED`:
 
 ```bash
-curl "$API_BASE/jobs/3e033807-17a0-4e1e-b1ba-7711d690fb3f" \
+JOB_ID="3e033807-17a0-4e1e-b1ba-7711d690fb3f"  # sustituye por el tuyo
+
+curl -s "$API_BASE/jobs/$JOB_ID" \
   -H "x-api-key: $API_KEY"
 ```
 
-Cuando `status` sea `SUCCEEDED`:
+Cuando llega a `SUCCEEDED`:
 
 ```json
 {
@@ -107,17 +170,42 @@ Cuando `status` sea `SUCCEEDED`:
   "result": {
     "qrInfo": {
       "csv": "A-XXXXXXXXXXX",
-      "verificationUrl": "https://www2.agenciatributaria.gob.es/wlpl/TIKE-CONT/ValidarQR?...",
+      "verificationUrl": "https://www2.agenciatributaria.gob.es/...",
       "qrText": "https://www2.agenciatributaria.gob.es/..."
     }
   }
 }
 ```
 
-Pinta `qrInfo.qrText` como QR en tu factura impresa y ya cumples con el
-art. 25 del RD 1007/2023.
+`csv` es el código de verificación oficial de AEAT para esa factura.
+`qrText` es la URL que debes codificar como QR e imprimir en el PDF (obligatorio por el art. 25 del RD 1007/2023).
 
-## Siguiente paso
+En producción, haz polling cada 2–5 segundos con backoff. Típicamente el job se resuelve en menos de 3 segundos.
 
-- [Manejo de errores AEAT](/docs/error-codes)
-- [API Reference completa](/docs/api-reference)
+## Paso 5 — Segunda factura y siguientes
+
+A partir de la segunda factura, `primerRegistro` es `false` y debes pasar la huella de la factura anterior:
+
+```bash
+# La huella de la factura anterior la guardas cuando recibes SUCCEEDED
+HUELLA_ANTERIOR="910204E9..."   # huella de la factura 2026/F-001
+
+# En el body:
+# "primerRegistro": false,
+# "encadenamiento": {
+#   "registroAnterior": {
+#     "idEmisorFactura": "$NIF",
+#     "numSerieFactura": "2026/F-001",
+#     "fechaExpedicionFactura": "DD-MM-YYYY",
+#     "huella": "$HUELLA_ANTERIOR"
+#   }
+# }
+```
+
+La cadena canónica para calcular la nueva huella también cambia: el campo `Huella=` ya no va vacío, sino que lleva `$HUELLA_ANTERIOR`.
+
+## ¿Qué sigue?
+
+- [Manejo de errores](/docs/error-codes) — los errores más frecuentes de AEAT y cómo resolverlos
+- [Autenticación](/docs/authentication) — cómo rotar la API key y subir el certificado vía API
+- [API Reference](/docs/api-reference) — todos los campos y endpoints con esquemas completos

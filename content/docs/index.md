@@ -1,38 +1,43 @@
 ---
 ---
 
-Bienvenido a la documentación de **{{APP_DISPLAY_NAME}}**. Esta API te permite emitir
-facturas conforme al sistema **Veri\*Factu** de la Agencia Tributaria
-(RD 1007/2023, OM HAC/1177/2024) sin construir tú la integración SOAP con AEAT.
+{{APP_DISPLAY_NAME}} es el intermediario entre **tu sistema de facturación y Hacienda (AEAT)**.
+Tú envías un JSON con los datos de la factura; nosotros construimos el XML, lo firmamos con tu certificado y lo enviamos a AEAT por SOAP.
 
-## ¿Qué hace {{APP_DISPLAY_NAME}}?
+## Cómo funciona en 30 segundos
 
-- Recibe la factura en JSON.
-- Valida los datos según las reglas normativas (NIF, encadenamiento de huellas,
-  formato de importes, fechas).
-- Construye el XML SOAP, lo firma con tu certificado digital y lo envía a AEAT.
-- Devuelve el CSV (Código Seguro de Verificación) y la URL del QR.
-- Mantiene la cadena de huellas para que sigas cumpliendo en envíos sucesivos.
+```
+Tu sistema   →   POST /send-invoice (JSON)
+                      │
+              {{APP_DISPLAY_NAME}} valida, firma y envía
+                      │
+                    AEAT ← XML SOAP con mTLS
+                      │
+              ← CSV + URL de verificación + QR
+                      │
+              ← 202 PENDING (jobId)
+                      │
+Tu sistema   →   GET /jobs/:jobId  ←  SUCCEEDED + resultado
+```
 
-## Empezar en 3 pasos
+Cuando el job llega a `SUCCEEDED` tienes el **CSV** (código de verificación de AEAT) y el **QR** que debes imprimir en la factura. Todo lo demás — huellas, encadenamiento, firma SOAP, reintentos — lo gestionamos nosotros.
 
-1. **[Quickstart](/docs/quickstart)**: emite tu primera factura con `curl`
-   en menos de 5 minutos.
-2. **[Autenticación](/docs/authentication)**: cómo obtener tu API key y
-   subir el certificado digital (JSON o multipart en `POST /me/certificate`).
-3. **[API Reference](/docs/api-reference)**: especificación OpenAPI/Swagger
-   de todos los endpoints (incluye `POST /me/certificate` con JSON y multipart).
+## Por dónde empezar
 
-## Modelos de integración
+1. **[Conceptos clave](/docs/concepts)** — qué es una huella, el encadenamiento, el CSV y el primer registro. Lee esto si es tu primera vez con Veri·Factu.
+2. **[Quickstart](/docs/quickstart)** — emite tu primera factura con `curl` en menos de 5 minutos.
+3. **[Autenticación](/docs/authentication)** — cómo obtener tu API key y subir tu certificado digital.
+4. **[API Reference](/docs/api-reference)** — especificación OpenAPI interactiva de todos los endpoints.
 
-| Modelo | Quién | Cómo |
-|--------|-------|------|
-| **App web (Clerk)** | Autónomos / pymes que usan la app | Registro normal en simplefactu.com; el BFF gestiona la API key automáticamente |
-| **API directa (server-to-server)** | ERPs e integradores | Te emitimos una API key desde el panel admin; tú llamas a `/v1/send-invoice` directamente |
+## ¿Cómo accedo?
 
-Esta documentación cubre principalmente el segundo modelo.
+| Perfil | Cómo usar {{APP_DISPLAY_NAME}} |
+|--------|-------------------------------|
+| **Autónomo o pyme** que usa la app web | Registro en simplefactu.com — el certificado y la API key se gestionan desde Ajustes |
+| **ERP o integrador** (server-to-server) | Te emitimos una API key; llamas a `/v1/send-invoice` directamente desde tu backend |
+
+Esta documentación cubre principalmente el segundo caso (integración directa vía API).
 
 ## Soporte
 
-- ¿Bug? Email a soporte con el `requestId` que devolvemos en cada respuesta.
-- ¿Falta una funcionalidad? Escríbenos y dinos qué priorizarías.
+Cada respuesta de la API incluye un `requestId`. Si algo falla, mándanoslo por email y podremos ver la traza completa del envío.
