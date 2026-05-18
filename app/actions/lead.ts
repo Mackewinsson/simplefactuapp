@@ -7,6 +7,7 @@ const schema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(100),
   email: z.string().email("Email no válido"),
   type: z.enum(["autonomo", "empresa"]),
+  message: z.string().max(2000).optional(),
 });
 
 export async function submitLead(

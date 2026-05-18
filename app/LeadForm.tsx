@@ -27,7 +27,7 @@ export function LeadForm() {
         <legend className="mb-2 block text-xs font-medium uppercase tracking-wide text-fg-subtle">
           Perfil
         </legend>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex rounded-lg border border-outline-soft bg-surface-muted p-1">
           {(["autonomo", "empresa"] as const).map((val) => {
             const label = val === "autonomo" ? "Autónomo" : "Empresa / API";
             const active = type === val;
@@ -35,10 +35,10 @@ export function LeadForm() {
               <label
                 key={val}
                 className={[
-                  "flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all",
+                  "flex flex-1 cursor-pointer items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all select-none",
                   active
-                    ? "border-fg bg-surface text-fg shadow-sm"
-                    : "border-outline-soft bg-surface-muted text-fg-muted hover:border-outline hover:text-fg",
+                    ? "bg-fg text-white shadow-sm"
+                    : "text-fg-muted hover:text-fg",
                 ].join(" ")}
               >
                 <input
@@ -85,6 +85,20 @@ export function LeadForm() {
           autoComplete="email"
           placeholder={type === "empresa" ? "tu@empresa.com" : "tu@email.com"}
           className="w-full rounded-lg border border-outline-soft bg-surface px-3.5 py-2.5 text-sm text-fg placeholder:text-fg-subtle transition-colors focus:border-fg focus:outline-none focus:ring-1 focus:ring-fg"
+        />
+      </div>
+
+      {/* Mensaje */}
+      <div>
+        <label htmlFor="lf-message" className="mb-1.5 block text-sm font-medium text-fg">
+          Mensaje
+        </label>
+        <textarea
+          id="lf-message"
+          name="message"
+          rows={4}
+          placeholder="Cuéntanos tu caso, duda o necesidad…"
+          className="w-full resize-none rounded-lg border border-outline-soft bg-surface px-3.5 py-2.5 text-sm text-fg placeholder:text-fg-subtle transition-colors focus:border-fg focus:outline-none focus:ring-1 focus:ring-fg"
         />
       </div>
 
