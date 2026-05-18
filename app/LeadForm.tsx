@@ -102,6 +102,28 @@ export function LeadForm() {
         />
       </div>
 
+      {/* Consentimiento RGPD */}
+      <label className="flex cursor-pointer items-start gap-3">
+        <input
+          type="checkbox"
+          name="consent"
+          required
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-outline accent-fg"
+        />
+        <span className="text-sm text-fg-muted">
+          He leído y acepto la{" "}
+          <a
+            href="/legal/privacidad"
+            target="_blank"
+            rel="noopener"
+            className="underline underline-offset-2 hover:text-fg"
+          >
+            Política de Privacidad
+          </a>
+          . Mis datos se usarán exclusivamente para responder a mi consulta.
+        </span>
+      </label>
+
       {/* Error */}
       {state?.error && (
         <p role="alert" className="rounded-lg bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
