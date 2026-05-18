@@ -1,5 +1,5 @@
 import { docsBrowserPageTitle } from "@/lib/branding";
-import { getSimplefactuBaseUrlForDocs } from "@/lib/simplefactu/client";
+import { getSimplefactuDocsApiBaseUrl } from "@/lib/simplefactu/client";
 import { buildOpenApiServerList } from "@/lib/docs/rewrite-openapi-servers";
 import { ApiReferenceClient } from "./ApiReferenceClient";
 
@@ -23,6 +23,6 @@ import { ApiReferenceClient } from "./ApiReferenceClient";
 export const metadata = { title: docsBrowserPageTitle("API Reference") };
 
 export default function ApiReferencePage() {
-  const scalarServers = buildOpenApiServerList(getSimplefactuBaseUrlForDocs());
+  const scalarServers = buildOpenApiServerList(getSimplefactuDocsApiBaseUrl());
   return <ApiReferenceClient specUrl="/api/openapi.json" scalarServers={scalarServers} />;
 }

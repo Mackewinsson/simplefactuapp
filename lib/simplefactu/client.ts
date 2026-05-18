@@ -51,6 +51,20 @@ export function getSimplefactuBaseUrlForDocs(): string {
   return u.replace(/\/$/, "");
 }
 
+/**
+ * Base URL used exclusively for the OpenAPI spec proxy and Scalar playground.
+ * Always points to the QA API so "Try it" requests never hit production data.
+ *
+ * Set SIMPLEFACTU_DOCS_API_BASE_URL=https://api.qa.simplefactu.com/v1
+ * in the production Vercel environment. In QA and local it falls back to
+ * the normal SIMPLEFACTU_API_BASE_URL.
+ */
+export function getSimplefactuDocsApiBaseUrl(): string {
+  const docsUrl = process.env.SIMPLEFACTU_DOCS_API_BASE_URL?.trim();
+  if (docsUrl) return docsUrl.replace(/\/$/, "");
+  return getSimplefactuBaseUrlForDocs();
+}
+
 export function createSimplefactuClient(config: SimplefactuClientConfig) {
   const { baseUrl, apiKey } = config;
   const headers = {
