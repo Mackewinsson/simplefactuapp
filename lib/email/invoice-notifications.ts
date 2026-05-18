@@ -1,5 +1,58 @@
 import { getFromEmail, getResend } from "./client";
 
+/* ── Lead notification ──────────────────────────────── */
+
+type LeadNotificationParams = {
+  name: string;
+  email: string;
+  type: string;
+  message?: string | null;
+};
+
+export async function sendLeadNotificationEmail(params: LeadNotificationParams): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const notifyTo = process.env.LEAD_NOTIFY_EMAIL;
+  if (!notifyTo) return;
+
+  const typeLabel = params.type === "autonomo" ? "Autónomo" : "Empresa / API";
+  const messageBlock = params.message
+    ? `<p style="margin:16px 0 0;font-size:14px;color:#3f3f46;white-space:pre-wrap;">${params.message}</p>`
+    : "";
+
+  const html = baseHtml(`Nuevo lead: ${params.name}`, `
+    <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#18181b;">
+      Nuevo lead en la landing
+    </h1>
+    <table style="border-collapse:collapse;width:100%;margin-top:12px;">
+      <tr>
+        <td style="padding:6px 0;font-size:13px;color:#71717a;width:80px;">Nombre</td>
+        <td style="padding:6px 0;font-size:14px;color:#18181b;font-weight:500;">${params.name}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:13px;color:#71717a;">Email</td>
+        <td style="padding:6px 0;font-size:14px;color:#18181b;">
+          <a href="mailto:${params.email}" style="color:#18181b;">${params.email}</a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:13px;color:#71717a;">Perfil</td>
+        <td style="padding:6px 0;font-size:14px;color:#18181b;">${typeLabel}</td>
+      </tr>
+    </table>
+    ${messageBlock}
+  `);
+
+  await resend.emails.send({
+    from: getFromEmail(),
+    to: notifyTo,
+    reply_to: params.email,
+    subject: `Nuevo lead: ${params.name} (${typeLabel})`,
+    html,
+  });
+}
+
 type InvoiceEmailParams = {
   to: string;
   invoiceNumber: string;

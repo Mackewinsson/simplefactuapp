@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { sendLeadNotificationEmail } from "@/lib/email/invoice-notifications";
 
 const schema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(100),
@@ -24,6 +25,7 @@ export async function submitLead(
     await prisma.lead.create({
       data: { ...parsed.data, source: "landing" },
     });
+    void sendLeadNotificationEmail(parsed.data);
     return { ok: true };
   } catch {
     return { ok: false, error: "No hemos podido guardar tu mensaje. Inténtalo de nuevo." };
