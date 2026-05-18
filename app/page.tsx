@@ -80,32 +80,8 @@ export default async function PublicHomePage() {
         {/* ── Divider ───────────────────────────────────── */}
         <div className="border-t border-outline-soft" />
 
-        {/* ── Confianza técnica ─────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
-          <ul className="flex flex-wrap gap-x-8 gap-y-3">
-            {[
-              "Huellas SHA-256 por registro",
-              "Encadenamiento por instalación",
-              "Registro append-only en base de datos",
-              "TLS mutuo (mTLS) con AEAT",
-              "Jobs asincrónos con reintentos y backoff",
-              "Watchdog contra jobs atascados",
-            ].map((item) => (
-              <li
-                key={item}
-                className="flex items-center gap-2 text-xs text-fg-subtle"
-              >
-                <span aria-hidden className="text-fg-subtle/50">—</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-        {/* ── Divider ───────────────────────────────────── */}
-        <div className="border-t border-outline-soft" />
-
         {/* ── Contacto / lead form ──────────────────────── */}
-        <section className="mx-auto w-full max-w-lg px-4 py-14 sm:px-6 sm:py-20">
+        <section id="contacto" className="mx-auto w-full max-w-lg px-4 py-14 sm:px-6 sm:py-20">
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-semibold text-fg">¿Tienes preguntas?</h2>
             <p className="mt-2 text-sm text-fg-muted">

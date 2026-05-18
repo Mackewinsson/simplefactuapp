@@ -33,6 +33,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin/audit" className={linkClass}>
           Auditoría
         </Link>
+        <Link href="/admin/leads" className={linkClass}>
+          Leads
+        </Link>
         <Link href="/invoices" className={`${linkClass} ml-auto`}>
           Volver a la app
         </Link>

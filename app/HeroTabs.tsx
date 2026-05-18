@@ -11,33 +11,48 @@ const CONTENT: Record<
     headline: string;
     sub: string;
     bullets: string[];
+    trust: string[];
     cta: { label: string; href: string };
     ctaSecondary: { label: string; href: string };
+    ctaTertiary?: { label: string; href: string };
     note?: string;
   }
 > = {
   autonomos: {
-    headline: "Cumple Veri\u00b7Factu. Sin coste.",
-    sub: "Factura, env\u00eda a Hacienda y guarda el CSV en segundos. Huellas, encadenamiento y firma SOAP gestionados por nosotros \u2014 en el plan gratuito.",
+    headline: "Cumple Veri·Factu. Sin coste.",
+    sub: "Factura, envía a Hacienda y guarda el CSV en segundos. Huellas, encadenamiento y firma SOAP gestionados por nosotros — en el plan gratuito.",
     bullets: [
       "Alta en minutos con tu certificado FNMT",
-      "Facturas v\u00e1lidas con PDF descargable y QR tributario",
-      "Plan gratuito \u2014 sin tarjeta ni permanencia",
+      "Facturas válidas con PDF descargable y QR tributario",
+      "Plan gratuito — sin tarjeta ni permanencia",
     ],
-    cta: { label: "Crear cuenta \u2014 es gratis", href: "/sign-up" },
-    ctaSecondary: { label: "Ver documentaci\u00f3n", href: "/docs" },
-    note: "Sin tarjeta \u00b7 Sin permanencia \u00b7 Gratis",
+    trust: [
+      "Tus facturas no se pierden aunque Hacienda esté caída — reintentos automáticos",
+      "Cada envío queda firmado y registrado. No hay forma de borrarlo.",
+      "Conexión directa y cifrada con la AEAT — tu certificado nunca sale de nuestros servidores",
+      "Recibes un email cuando AEAT acepta o rechaza cada factura",
+    ],
+    cta: { label: "Crear cuenta — es gratis", href: "/sign-up" },
+    ctaSecondary: { label: "Ver documentación", href: "/docs" },
+    note: "Sin tarjeta · Sin permanencia · Gratis",
   },
   empresas: {
-    headline: "API Veri\u00b7Factu lista para integrar.",
-    sub: "REST con idempotencia, jobs as\u00edncronos y firma mTLS por tenant. Tu sistema sigue emitiendo; nosotros hablamos con AEAT.",
+    headline: "API Veri·Factu lista para integrar.",
+    sub: "REST con idempotencia, jobs asíncronos y firma mTLS por tenant. Tu sistema sigue emitiendo; nosotros hablamos con AEAT.",
     bullets: [
       "POST /send-invoice, polling de jobs y webhooks salientes",
       "Multi-tenant con certificado por empresa",
-      "OpenAPI completo, panel admin y m\u00e9tricas por tenant",
+      "OpenAPI completo, panel admin y métricas por tenant",
+    ],
+    trust: [
+      "Backoff exponencial y watchdog — ningún job se queda atascado",
+      "Encadenamiento SHA-256 por instalación según RD 1007/2023",
+      "Registro append-only: trazabilidad completa para auditoría",
+      "mTLS con AEAT — idempotencia garantizada por clave única de envío",
     ],
     cta: { label: "Ver API Reference", href: "/docs/api-reference" },
     ctaSecondary: { label: "Crear cuenta", href: "/sign-up" },
+    ctaTertiary: { label: "Solicitar acceso", href: "#contacto" },
   },
 };
 
@@ -158,10 +173,28 @@ export function HeroTabs() {
           >
             {content.ctaSecondary.label}
           </Link>
+          {content.ctaTertiary && (
+            <a
+              href={content.ctaTertiary.href}
+              className="btn btn-md btn-ghost w-full justify-center sm:w-auto"
+            >
+              {content.ctaTertiary.label}
+            </a>
+          )}
         </div>
         {content.note && (
           <p className="mt-4 text-xs text-fg-subtle">{content.note}</p>
         )}
+
+        {/* Garantías técnicas — adaptadas al perfil */}
+        <ul className="mt-10 space-y-2.5 border-t border-outline-soft pt-8">
+          {content.trust.map((item) => (
+            <li key={item} className="flex items-start gap-2.5 text-sm text-fg-subtle">
+              <span aria-hidden className="mt-0.5 shrink-0 text-fg-subtle/50">—</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
