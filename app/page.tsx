@@ -123,21 +123,14 @@ export default async function PublicHomePage() {
             Simple·Factu &mdash; Servicio compatible con Veri·Factu (AEAT)
           </span>
           <nav className="flex flex-wrap gap-x-4 gap-y-1">
-            <Link href="/docs" className="hover:text-fg">
-              Docs
-            </Link>
-            <Link href="/docs/api-reference" className="hover:text-fg">
-              API Reference
-            </Link>
-            <Link href="/legal/aviso-legal" className="hover:text-fg">
-              Aviso legal
-            </Link>
-            <Link href="/legal/privacidad" className="hover:text-fg">
-              Privacidad
-            </Link>
-            <Link href="/legal/terminos" className="hover:text-fg">
-              Términos
-            </Link>
+            <Link href="/docs" className="hover:text-fg">Docs</Link>
+            <Link href="/docs/api-reference" className="hover:text-fg">API Reference</Link>
+            <Link href="/legal/aviso-legal" className="hover:text-fg">Aviso legal</Link>
+            <Link href="/legal/privacidad" className="hover:text-fg">Privacidad</Link>
+            <Link href="/legal/terminos" className="hover:text-fg">Términos</Link>
+            <Link href="/legal/cookies" className="hover:text-fg">Cookies</Link>
+            <Link href="/legal/dpa" className="hover:text-fg">DPA</Link>
+            <Link href="/legal/cancelacion" className="hover:text-fg">Cancelación</Link>
           </nav>
         </div>
       </footer>
