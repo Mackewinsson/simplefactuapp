@@ -25,7 +25,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
           </div>
           <nav className="flex items-center gap-4 text-sm">
             <Link href="/docs/api-reference" className="text-fg-muted hover:text-fg">
-              API Reference
+              Referencia API
             </Link>
             <Link href="/invoices" className="text-fg-muted hover:text-fg">
               Volver a la app
@@ -55,7 +55,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
               href="/docs/api-reference"
               className="block rounded px-2 py-1.5 text-fg-muted hover:bg-surface-hover hover:text-fg"
             >
-              API Reference
+              Referencia API
             </Link>
           </nav>
         </aside>

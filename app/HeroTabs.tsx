@@ -50,7 +50,7 @@ const CONTENT: Record<
       "Registro append-only: trazabilidad completa para auditoría",
       "mTLS con AEAT — idempotencia garantizada por clave única de envío",
     ],
-    cta: { label: "Ver API Reference", href: "/docs/api-reference" },
+    cta: { label: "Ver referencia API", href: "/docs/api-reference" },
     ctaSecondary: { label: "Crear cuenta", href: "/sign-up" },
     ctaTertiary: { label: "Solicitar acceso", href: "#contacto" },
   },

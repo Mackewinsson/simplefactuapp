@@ -8,7 +8,7 @@
 export const APP_DISPLAY_NAME = "Simple*Factu";
 
 /** Docs site label (nav + browser titles under /docs). */
-export const APP_DOCS_LABEL = `${APP_DISPLAY_NAME} Docs`;
+export const APP_DOCS_LABEL = `Documentación ${APP_DISPLAY_NAME}`;
 
 /** Default meta description for the docs index (overrides index.md when applied in loader). */
 export const APP_DOCS_INDEX_DESCRIPTION =

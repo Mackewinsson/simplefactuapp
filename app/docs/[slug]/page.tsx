@@ -27,7 +27,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const page = await getDocPage(slug);
-  if (!page) return { title: "Not found" };
+  if (!page) return { title: "No encontrado" };
   return {
     title: docsBrowserPageTitle(page.frontmatter.title),
     description: page.frontmatter.description,

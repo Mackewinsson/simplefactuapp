@@ -25,9 +25,9 @@ Cuando el job llega a `SUCCEEDED` tienes el **CSV** (código de verificación de
 ## Por dónde empezar
 
 1. **[Conceptos clave](/docs/concepts)** — qué es una huella, el encadenamiento, el CSV y el primer registro. Lee esto si es tu primera vez con Veri·Factu.
-2. **[Quickstart](/docs/quickstart)** — emite tu primera factura con `curl` en menos de 5 minutos.
+2. **[Inicio rápido](/docs/quickstart)** — emite tu primera factura con `curl` en menos de 5 minutos.
 3. **[Autenticación](/docs/authentication)** — cómo obtener tu API key y subir tu certificado digital.
-4. **[API Reference](/docs/api-reference)** — especificación OpenAPI interactiva de todos los endpoints.
+4. **[Referencia API](/docs/api-reference)** — especificación OpenAPI interactiva de todos los endpoints.
 
 ## ¿Cómo accedo?
 

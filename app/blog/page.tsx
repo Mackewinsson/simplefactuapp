@@ -109,7 +109,7 @@ export default function BlogPage() {
               Inicio
             </Link>
             <Link href="/docs" className="hover:text-fg">
-              Docs
+              Documentación
             </Link>
             <Link href="/legal/privacidad" className="hover:text-fg">
               Privacidad

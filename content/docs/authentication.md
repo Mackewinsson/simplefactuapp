@@ -15,7 +15,7 @@ También aceptamos `Authorization: Bearer vf_...` si prefieres el formato Bearer
 
 Las API keys se emiten desde el panel admin. Si eres integrador externo, contáctanos y te la enviamos por canal seguro.
 
-> **Importante:** la clave solo se muestra una vez al crearla. Guárdala de inmediato en un gestor de secretos (variable de entorno, secret store). Si la pierdes, crea una nueva y revoca la anterior con `POST /admin/api-keys/:id/revoke`.
+> **Importante:** la clave solo se muestra una vez al crearla. Guárdala de inmediato en un gestor de secretos (variable de entorno o almacén de secretos). Si la pierdes, crea una nueva y revoca la anterior con `POST /admin/api-keys/:id/revoke`.
 
 ## Scopes
 
@@ -29,7 +29,7 @@ Los scopes son los permisos de la clave. Cuando te emitamos la API key te asigna
 | `tenant:certificates:read` | Consultar si tienes certificado subido |
 | `tenant:certificates:write` | Subir o borrar tu certificado |
 
-Si haces una llamada sin el scope correcto recibes `403 Forbidden`. Para un BFF completo (app web que gestiona facturas y sube certificados), la clave necesita todos los scopes anteriores.
+Si haces una llamada sin el scope correcto recibes `403 Prohibido`. Para un BFF completo (app web que gestiona facturas y sube certificados), la clave necesita todos los scopes anteriores.
 
 ## Certificado digital AEAT
 
@@ -106,4 +106,4 @@ Si envías la misma clave con un cuerpo distinto (factura diferente) recibes `40
 
 ## Rate limits
 
-Cada cuenta tiene límites por endpoint. Si los superas, recibes `429 Too Many Requests` con la cabecera `Retry-After` indicando cuántos segundos esperar antes del próximo intento.
+Cada cuenta tiene límites por endpoint. Si los superas, recibes `429 Demasiadas solicitudes` con la cabecera `Retry-After` indicando cuántos segundos esperar antes del próximo intento.

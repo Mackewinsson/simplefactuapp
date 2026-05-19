@@ -13,7 +13,7 @@ export async function AppNav() {
     { href: "/customers", label: "Clientes" },
     { href: "/products", label: "Productos" },
     { href: "/settings/verifactu", label: "Verifactu" },
-    { href: "/docs", label: "Docs" },
+    { href: "/docs", label: "Documentación" },
   ];
 
   if (showBilling) links.push({ href: "/settings/billing", label: "Plan" });

@@ -9,14 +9,14 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 
 | Código | Cuándo | Qué hacer |
 |--------|--------|-----------|
-| `400 Bad Request` | Validación fallida (campo faltante, formato incorrecto) | Lee el campo `details` en la respuesta — indica qué campo falla y por qué |
-| `401 Unauthorized` | API key ausente o inválida | Comprueba el header `x-api-key` y que la clave no esté revocada |
-| `402 Payment Required` | Límite de plan alcanzado | Revisa tu plan en `/me/plan`; escríbenos para ampliar |
-| `403 Forbidden` | Scope insuficiente o tenant suspendido | Comprueba que tu API key tiene el scope necesario para ese endpoint |
-| `409 Conflict` | Conflicto de encadenamiento o idempotencia | Lee la sección de errores 409 más abajo |
-| `429 Too Many Requests` | Rate limit superado | Espera `Retry-After` segundos e inténtalo de nuevo |
-| `502 Bad Gateway` | AEAT devolvió un error o no respondió | El job se reintentará automáticamente con backoff; espera o consulta el estado |
-| `504 Gateway Timeout` | Timeout antes de recibir respuesta | La petición puede que haya llegado; usa la misma `x-idempotency-key` para reintentar sin duplicar |
+| `400 Solicitud incorrecta` | Validación fallida (campo faltante, formato incorrecto) | Lee el campo `details` en la respuesta — indica qué campo falla y por qué |
+| `401 No autorizado` | API key ausente o inválida | Comprueba el header `x-api-key` y que la clave no esté revocada |
+| `402 Pago requerido` | Límite de plan alcanzado | Revisa tu plan en `/me/plan`; escríbenos para ampliar |
+| `403 Prohibido` | Scope insuficiente o tenant suspendido | Comprueba que tu API key tiene el scope necesario para ese endpoint |
+| `409 Conflicto` | Conflicto de encadenamiento o idempotencia | Lee la sección de errores 409 más abajo |
+| `429 Demasiadas solicitudes` | Límite de tasa superado | Espera `Retry-After` segundos e inténtalo de nuevo |
+| `502 Puerta de enlace incorrecta` | AEAT devolvió un error o no respondió | El job se reintentará automáticamente con backoff; espera o consulta el estado |
+| `504 Tiempo de espera agotado` | Timeout antes de recibir respuesta | La petición puede que haya llegado; usa la misma `x-idempotency-key` para reintentar sin duplicar |
 
 ## Errores 409 — los más comunes en integración
 
@@ -34,7 +34,7 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 
 **Solución:** la respuesta incluye `expectedHuella` — es exactamente la huella que debes usar en el siguiente envío. Cópiala y úsala en `encadenamiento.registroAnterior.huella`.
 
-### `ChainStateError — Chain already exists`
+### `ChainStateError` — la cadena ya existe
 
 **Causa:** enviaste `primerRegistro: true` pero la cadena ya tiene facturas registradas.
 

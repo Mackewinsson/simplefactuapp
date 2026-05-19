@@ -1,5 +1,5 @@
 ---
-title: Quickstart
+title: Inicio rápido
 description: Envía tu primera factura a AEAT con curl en menos de 5 minutos.
 ---
 
@@ -30,7 +30,7 @@ export NOMBRE="ACME SL"                             # tu nombre o razón social
 AEAT la comprueba para verificar que nadie ha modificado los datos en tránsito.
 Para la **primera factura** de una serie no hay huella anterior — eso se indica con `primerRegistro: true`.
 
-> Si quieres entender por qué existe y cómo funciona la cadena, lee [Conceptos clave → Huella](/docs/concepts#huella-fingerprint-sha-256).
+> Si quieres entender por qué existe y cómo funciona la cadena, lee [Conceptos clave → Huella](/docs/concepts#huella-sha-256).
 
 El script calcula la huella a partir del importe y otros datos, y también genera el timestamp con zona horaria que AEAT requiere:
 
@@ -121,7 +121,7 @@ curl -s -X POST "$API_BASE/send-invoice" \
   }"
 ```
 
-**Campos clave del body:**
+**Campos clave del cuerpo de la petición:**
 
 | Campo | Qué es |
 |-------|--------|
@@ -138,7 +138,7 @@ curl -s -X POST "$API_BASE/send-invoice" \
 | `sistemaInformatico` | Identifica el software que emite la factura (requerido por AEAT) |
 | `x-idempotency-key` | UUID único por intento — protege contra envíos duplicados si la red falla |
 
-La respuesta inmediata es `202 Accepted` con un job en cola:
+La respuesta inmediata es `202 Aceptado` con un job en cola:
 
 ```json
 {
@@ -208,4 +208,4 @@ La cadena canónica para calcular la nueva huella también cambia: el campo `Hue
 
 - [Manejo de errores](/docs/error-codes) — los errores más frecuentes de AEAT y cómo resolverlos
 - [Autenticación](/docs/authentication) — cómo rotar la API key y subir el certificado vía API
-- [API Reference](/docs/api-reference) — todos los campos y endpoints con esquemas completos
+- [Referencia API](/docs/api-reference) — todos los campos y endpoints con esquemas completos

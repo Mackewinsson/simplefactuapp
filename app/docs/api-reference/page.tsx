@@ -20,7 +20,7 @@ import { ApiReferenceClient } from "./ApiReferenceClient";
  * upstream spec.
  */
 
-export const metadata = { title: docsBrowserPageTitle("API Reference") };
+export const metadata = { title: docsBrowserPageTitle("Referencia API") };
 
 export default function ApiReferencePage() {
   const scalarServers = buildOpenApiServerList(getSimplefactuDocsApiBaseUrl());

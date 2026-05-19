@@ -171,7 +171,7 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 
 - **`/invoices`:** gestión de facturas; envío Veri\*Factu y seguimiento de job en detalle.
 - **`/invoices/new`:** alta; verificación NIF destinatario contra el API cuando procede.
-- **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la API Reference (OpenAPI).
+- **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la [referencia API](/docs/api-reference) (OpenAPI).
 - **`/admin`:** operación — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
 
 ---
