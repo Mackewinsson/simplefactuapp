@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { articles } from "@/lib/blog/articles";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://simplefactu.com";
@@ -12,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/docs/authentication`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${base}/docs/error-codes`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/docs/api-reference`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/legal/aviso-legal`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/legal/privacidad`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/legal/terminos`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
@@ -21,5 +23,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/legal/declaracion-responsable`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
   ];
 
-  return staticRoutes;
+  const blogRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
+    url: `${base}/blog/${article.slug}`,
+    lastModified: new Date(article.date),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...blogRoutes];
 }

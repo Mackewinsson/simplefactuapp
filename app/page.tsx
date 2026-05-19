@@ -4,6 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { BrandWordmark } from "./BrandWordmark";
 import { HeroTabs } from "./HeroTabs";
 import { LeadForm } from "./LeadForm";
+import { BlogCarousel } from "./BlogCarousel";
+import { articles } from "@/lib/blog/articles";
 
 export default async function PublicHomePage() {
   const { userId } = await auth();
@@ -16,6 +18,12 @@ export default async function PublicHomePage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <BrandWordmark />
           <nav className="flex items-center gap-1">
+            <Link
+              href="/blog"
+              className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
+            >
+              Blog
+            </Link>
             <Link
               href="/docs"
               className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
@@ -80,6 +88,44 @@ export default async function PublicHomePage() {
         {/* ── Divider ───────────────────────────────────── */}
         <div className="border-t border-outline-soft" />
 
+        {/* ── Blog / Artículos ──────────────────────────── */}
+        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-fg-subtle">
+                Blog
+              </p>
+              <h2 className="text-xl font-semibold text-fg sm:text-2xl">
+                Guías sobre Veri*Factu
+              </h2>
+            </div>
+            <Link
+              href="/blog"
+              className="shrink-0 text-sm text-fg-muted hover:text-fg"
+            >
+              Ver todos →
+            </Link>
+          </div>
+          <BlogCarousel
+            articles={[...articles]
+              .sort(
+                (a, b) =>
+                  new Date(b.date).getTime() - new Date(a.date).getTime()
+              )
+              .map(({ slug, title, excerpt, date, readingMinutes, tags }) => ({
+                slug,
+                title,
+                excerpt,
+                date,
+                readingMinutes,
+                tags,
+              }))}
+          />
+        </section>
+
+        {/* ── Divider ───────────────────────────────────── */}
+        <div className="border-t border-outline-soft" />
+
         {/* ── Contacto / lead form ──────────────────────── */}
         <section id="contacto" className="mx-auto w-full max-w-lg px-4 py-14 sm:px-6 sm:py-20">
           <div className="mb-8 text-center">
@@ -99,6 +145,7 @@ export default async function PublicHomePage() {
             Simple·Factu &mdash; Servicio compatible con Veri·Factu (AEAT)
           </span>
           <nav className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/blog" className="hover:text-fg">Blog</Link>
             <Link href="/docs" className="hover:text-fg">Docs</Link>
             <Link href="/docs/api-reference" className="hover:text-fg">API Reference</Link>
             <Link href="/legal/aviso-legal" className="hover:text-fg">Aviso legal</Link>
