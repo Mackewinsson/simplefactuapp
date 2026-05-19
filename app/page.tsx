@@ -107,6 +107,7 @@ export default async function PublicHomePage() {
             <Link href="/legal/cookies" className="hover:text-fg">Cookies</Link>
             <Link href="/legal/dpa" className="hover:text-fg">DPA</Link>
             <Link href="/legal/cancelacion" className="hover:text-fg">Cancelación</Link>
+            <Link href="/legal/declaracion-responsable" className="hover:text-fg">Declaración Veri*Factu</Link>
           </nav>
         </div>
       </footer>

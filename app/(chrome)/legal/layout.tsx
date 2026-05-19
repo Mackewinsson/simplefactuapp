@@ -14,6 +14,10 @@ const legalLinks: Array<{ href: string; label: string }> = [
   { href: "/legal/cookies", label: "Política de cookies" },
   { href: "/legal/cancelacion", label: "Cancelación y reembolso" },
   { href: "/legal/accesibilidad", label: "Accesibilidad" },
+  {
+    href: "/legal/declaracion-responsable",
+    label: "Declaración responsable Veri*Factu",
+  },
 ];
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
