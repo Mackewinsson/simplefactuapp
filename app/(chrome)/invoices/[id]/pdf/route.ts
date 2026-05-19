@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import QRCode from "qrcode";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { AeatJobStatus } from "@prisma/client";
+import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 
@@ -28,6 +28,7 @@ const GRAY = rgb(0.45, 0.45, 0.45);
 const RULE_COLOR = rgb(0.8, 0.8, 0.8);
 const ROW_RULE = rgb(0.92, 0.92, 0.92);
 const BLACK = rgb(0, 0, 0);
+const RED = rgb(0.8, 0.1, 0.1);
 
 /* ── Column right edges ──────────────────────────────── */
 const RIGHT = MARGIN + CONTENT_W;
@@ -128,8 +129,17 @@ export async function GET(
     text(topLeftLabel, MARGIN, { size: FONT_LG, font: bold });
   }
 
-  const invLabel = `Factura ${invoice.number}`;
-  textR(invLabel, RIGHT, { size: FONT_LG, font: bold });
+  const isCancelled =
+    invoice.aeatCancellationStatus === AeatCancellationStatus.SUCCEEDED;
+
+  const invLabel = isCancelled
+    ? `Factura ${invoice.number} — ANULADA`
+    : `Factura ${invoice.number}`;
+  textR(invLabel, RIGHT, {
+    size: FONT_LG,
+    font: bold,
+    color: isCancelled ? RED : BLACK,
+  });
   y -= LH + 6;
 
   textR(`Fecha: ${fmtDate(invoice.issueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
@@ -141,6 +151,29 @@ export async function GET(
   }
 
   y -= GAP_MD;
+
+  /* ── 1b. Cancelled banner ───────────────────────────── */
+  if (isCancelled) {
+    // Draw filled red banner
+    page.drawRectangle({
+      x: MARGIN,
+      y: y - 20,
+      width: CONTENT_W,
+      height: 22,
+      color: rgb(0.95, 0.22, 0.22),
+      opacity: 0.12,
+    });
+    const bannerText = "FACTURA ANULADA — Anulación registrada en Veri*Factu (AEAT)";
+    const bannerX = MARGIN + CONTENT_W / 2 - tw(bannerText, FONT_SM, bold) / 2;
+    page.drawText(bannerText, {
+      x: bannerX,
+      y: y - 14,
+      size: FONT_SM,
+      font: bold,
+      color: RED,
+    });
+    y -= 34;
+  }
 
   /* ── 2. Bill To ─────────────────────────────────────── */
   text("DATOS DEL CLIENTE", MARGIN, { size: FONT_SM, font: bold, color: GRAY });
@@ -284,9 +317,23 @@ export async function GET(
     }
   }
 
+  /* ── Watermark (cancelled) ──────────────────────────── */
+  if (isCancelled) {
+    page.drawText("ANULADA", {
+      x: 90,
+      y: PAGE_H / 2 - 60,
+      size: 110,
+      font: bold,
+      color: rgb(0.85, 0.1, 0.1),
+      opacity: 0.07,
+      rotate: degrees(45),
+    });
+  }
+
   /* ── Serialize ──────────────────────────────────────── */
   const pdfBytes = await doc.save();
-  const filename = `factura-${safeFilename(invoice.number)}.pdf`;
+  const suffix = isCancelled ? "-anulada" : "";
+  const filename = `factura-${safeFilename(invoice.number)}${suffix}.pdf`;
   const body = Buffer.from(pdfBytes);
 
   return new Response(body, {
