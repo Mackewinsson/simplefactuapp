@@ -7,19 +7,6 @@ const isProtectedRoute = createRouteMatcher([
   "/admin(.*)",
 ]);
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
-
-function adminAllowlistIds(): Set<string> {
-  const raw = process.env.ADMIN_CLERK_USER_IDS?.trim();
-  if (!raw) return new Set();
-  return new Set(
-    raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
-  );
-}
-
 export default clerkMiddleware(async (authFn, req) => {
   try {
     if (isProtectedRoute(req)) await authFn.protect();
@@ -31,13 +18,9 @@ export default clerkMiddleware(async (authFn, req) => {
     }
   }
 
-  const allow = adminAllowlistIds();
-  if (isAdminRoute(req) && allow.size > 0) {
-    const { userId } = await authFn();
-    if (!userId || !allow.has(userId)) {
-      return NextResponse.redirect(new URL("/invoices", req.url));
-    }
-  }
+  // Admin authorization is enforced in app/(chrome)/admin/layout.tsx via requireAdmin().
+  // Do not duplicate allowlist checks here: they omitted publicMetadata.role and made
+  // /admin look like a no-op (redirect to /invoices without feedback).
 
   return NextResponse.next();
 });

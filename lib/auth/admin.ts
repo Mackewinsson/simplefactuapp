@@ -16,11 +16,26 @@ function hasAdminRoleInMetadata(metadata: Record<string, unknown> | undefined): 
   return metadata?.role === "admin";
 }
 
+/** Clerk session token claim when Dashboard → Sessions includes public_metadata. */
+function hasAdminRoleInSessionClaims(
+  sessionClaims: Record<string, unknown> | null | undefined
+): boolean {
+  const metadata = sessionClaims?.metadata;
+  if (!metadata || typeof metadata !== "object") return false;
+  return hasAdminRoleInMetadata(metadata as Record<string, unknown>);
+}
+
 /**
  * True if this Clerk user may access /admin (allowlist or publicMetadata.role === "admin").
  */
 export async function isUserAdmin(userId: string): Promise<boolean> {
   if (adminAllowlist().has(userId)) return true;
+
+  const { sessionClaims } = await auth();
+  if (hasAdminRoleInSessionClaims(sessionClaims as Record<string, unknown>)) {
+    return true;
+  }
+
   const api = await clerkClient();
   const user = await api.users.getUser(userId);
   return hasAdminRoleInMetadata(user.publicMetadata as Record<string, unknown>);
@@ -35,7 +50,7 @@ export async function requireAdmin(): Promise<{ userId: string }> {
     redirect("/sign-in");
   }
   if (!(await isUserAdmin(userId))) {
-    redirect("/invoices");
+    redirect("/admin-access-denied");
   }
   return { userId };
 }
