@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { verifactuQrDataUrl } from "@/lib/verifactu/qr-image";
 import { VerifactuSendPanel } from "./VerifactuSendPanel";
+import { VerifactuSuccessBanner } from "./VerifactuSuccessBanner";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -86,6 +87,15 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         </div>
 
         <div className="border-b border-outline-soft px-4 py-4">
+          {invoice.aeatStatus === AeatJobStatus.SUCCEEDED && invoice.aeatCsv ? (
+            <VerifactuSuccessBanner
+              invoiceNumber={invoice.number}
+              aeatCsv={invoice.aeatCsv}
+              aeatQrText={invoice.aeatQrText}
+              aeatQrDataUrl={aeatQrDataUrl}
+              pdfHref={`/invoices/${invoice.id}/pdf`}
+            />
+          ) : null}
           <VerifactuSendPanel
             invoiceId={invoice.id}
             invoiceNumber={invoice.number}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import {
@@ -110,7 +111,15 @@ export function VerifactuSettingsForm({
           </ul>
         ) : null}
         {certState?.ok ? (
-          <p className="mt-3 text-sm text-success-emphasis">{certState.message}</p>
+          <div className="mt-3 text-sm text-success-emphasis">
+            <p>{certState.message}</p>
+            <Link
+              href="/invoices/new"
+              className="mt-2 inline-block font-medium text-fg-link underline hover:text-fg"
+            >
+              Crear tu primera factura →
+            </Link>
+          </div>
         ) : null}
         <form action={certAction} className="mt-4 space-y-4">
           <label className="block">

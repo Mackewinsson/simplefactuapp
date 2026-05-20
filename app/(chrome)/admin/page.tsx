@@ -1,12 +1,15 @@
 import { requireAdmin } from "@/lib/auth/admin";
 import { getDiagnostics } from "@/lib/simplefactu/admin-server";
+import { probeApiReady } from "@/lib/simplefactu/public-health";
 import Link from "next/link";
+import { AdminOpsAlerts } from "./AdminOpsAlerts";
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
 
   let diag: Awaited<ReturnType<typeof getDiagnostics>> | null = null;
   let err: string | null = null;
+  const ready = await probeApiReady();
   try {
     diag = await getDiagnostics();
   } catch (e: unknown) {
@@ -72,6 +75,7 @@ export default async function AdminDashboardPage() {
               <span className="font-medium">{diag.jobs?.pendingFailedLastHour ?? 0}</span>
             </p>
           </section>
+          <AdminOpsAlerts diag={diag} ready={ready} />
         </div>
       ) : null}
 

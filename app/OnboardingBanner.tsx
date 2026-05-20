@@ -31,15 +31,22 @@ export async function OnboardingBanner() {
   let issuerProfileDone = false;
   let certificateDone = false;
   let firstInvoiceDone = false;
+  let pendingInvoice: { id: string; aeatStatus: string } | null = null;
 
   try {
-    const [account, invoiceCount] = await Promise.all([
+    const [account, invoiceCount, pendingRow] = await Promise.all([
       prisma.userVerifactuAccount.findUnique({ where: { userId } }),
       prisma.invoice.count({ where: { userId, aeatStatus: "SUCCEEDED" } }),
+      prisma.invoice.findFirst({
+        where: { userId, aeatStatus: { not: "SUCCEEDED" } },
+        orderBy: { createdAt: "desc" },
+        select: { id: true, aeatStatus: true },
+      }),
     ]);
 
     issuerProfileDone = Boolean(account?.issuerNif?.trim() && account?.issuerLegalName?.trim());
     firstInvoiceDone = invoiceCount > 0;
+    pendingInvoice = pendingRow;
 
     // Always probe the API; it is the source of truth for the certificate.
     // The local certificateUploadedAt flag can be stale (e.g. wiped on key
@@ -79,6 +86,17 @@ export async function OnboardingBanner() {
     return null;
   }
 
+  let invoiceStepHref = "/invoices/new";
+  let invoiceStepCta = "Crear factura";
+  if (!firstInvoiceDone && pendingInvoice) {
+    invoiceStepHref =
+      pendingInvoice.aeatStatus === "NOT_SENT"
+        ? `/invoices/${pendingInvoice.id}?send=1`
+        : `/invoices/${pendingInvoice.id}`;
+    invoiceStepCta =
+      pendingInvoice.aeatStatus === "NOT_SENT" ? "Enviar borrador" : "Ver factura";
+  }
+
   const steps = [
     {
       id: "issuer",
@@ -98,8 +116,8 @@ export async function OnboardingBanner() {
       id: "invoice",
       label: "Primera factura enviada",
       done: firstInvoiceDone,
-      href: "/invoices/new",
-      cta: "Crear factura",
+      href: invoiceStepHref,
+      cta: invoiceStepCta,
     },
   ];
 

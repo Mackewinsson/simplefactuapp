@@ -66,6 +66,11 @@ async function provisionTenantAndKey(
     }),
   });
 
+  if (tenantRes.status === 401) {
+    throw new Error(
+      "simplefactu rechazó la clave de administración (401). SIMPLEFACTU_ADMIN_KEY debe coincidir con ADMIN_KEY del API en el mismo entorno."
+    );
+  }
   if (tenantRes.status !== 201 && tenantRes.status !== 409) {
     const t = await tenantRes.text();
     throw new Error(`simplefactu POST /admin/tenants falló: ${tenantRes.status} ${t}`);
@@ -80,6 +85,11 @@ async function provisionTenantAndKey(
     }),
   });
 
+  if (keyRes.status === 401) {
+    throw new Error(
+      "simplefactu rechazó la clave de administración (401). SIMPLEFACTU_ADMIN_KEY debe coincidir con ADMIN_KEY del API en el mismo entorno."
+    );
+  }
   if (keyRes.status !== 201) {
     const t = await keyRes.text();
     throw new Error(`simplefactu POST /admin/api-keys falló: ${keyRes.status} ${t}`);

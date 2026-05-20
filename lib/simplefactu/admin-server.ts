@@ -62,7 +62,8 @@ export async function adminJson<T>(path: string, init: RequestInit = {}): Promis
         ? String((body as { message?: string }).message)
         : res.statusText;
     if (res.status === 401) {
-      msg = "simplefactu rechazó la admin key (401).";
+      msg =
+        "simplefactu rechazó la clave de administración (401). SIMPLEFACTU_ADMIN_KEY debe coincidir con ADMIN_KEY del API en el mismo entorno.";
     }
     throw new SimplefactuAdminError(msg || `HTTP ${res.status}`, res.status, body);
   }
@@ -70,6 +71,13 @@ export async function adminJson<T>(path: string, init: RequestInit = {}): Promis
 }
 
 // --- Typed helpers ---
+
+export type AdminDiagnosticsAlerts = {
+  emailsEnabled?: boolean;
+  resendConfigured?: boolean;
+  deadJobNotify?: { slack?: boolean; discord?: boolean; email?: boolean };
+  anyDeadJobNotify?: boolean;
+};
 
 export type AdminDiagnostics = {
   success: boolean;
@@ -81,6 +89,7 @@ export type AdminDiagnostics = {
     byStatus?: Record<string, number>;
     pendingFailedLastHour?: number;
   };
+  alerts?: AdminDiagnosticsAlerts;
   timestamp?: string;
 };
 

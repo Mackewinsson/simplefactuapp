@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
-import { getAdminMetrics, getRateLimitConfig } from "@/lib/simplefactu/admin-server";
+import { getAdminMetrics, getDiagnostics, getRateLimitConfig } from "@/lib/simplefactu/admin-server";
+import { probeApiReady } from "@/lib/simplefactu/public-health";
+import { AdminOpsAlerts } from "../AdminOpsAlerts";
 
 function defaultDateRange(): { from: string; to: string } {
   const to = new Date();
@@ -20,6 +22,16 @@ export default async function AdminSystemPage({
   const tenantId = sp.tenantId?.trim() ?? "";
   const from = sp.from?.trim() || defaults.from;
   const to = sp.to?.trim() || defaults.to;
+
+  const ready = await probeApiReady();
+
+  let diag: Awaited<ReturnType<typeof getDiagnostics>> | null = null;
+  let diagErr: string | null = null;
+  try {
+    diag = await getDiagnostics();
+  } catch (e: unknown) {
+    diagErr = e instanceof Error ? e.message : "Error";
+  }
 
   let rate: Awaited<ReturnType<typeof getRateLimitConfig>> | null = null;
   let rateErr: string | null = null;
@@ -47,6 +59,14 @@ export default async function AdminSystemPage({
         </Link>
         <h1 className="mt-2 text-xl font-semibold text-fg">Sistema (simplefactu)</h1>
       </div>
+
+      {diagErr ? (
+        <p className="rounded border border-danger-outline bg-danger px-3 py-2 text-sm text-danger-foreground">
+          Diagnóstico API: {diagErr}
+        </p>
+      ) : (
+        <AdminOpsAlerts diag={diag} ready={ready} />
+      )}
 
       <section className="rounded-lg border border-outline-soft bg-surface p-4">
         <h2 className="mb-2 text-sm font-semibold text-fg">

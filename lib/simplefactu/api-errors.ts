@@ -50,9 +50,27 @@ function isLikelyNetworkFetchFailure(e: unknown): boolean {
  * Cualquier fallo al hablar con simplefactu (red, timeout, errores lanzados desde provision/admin).
  * Para usar en server actions: evita 500 y muestra mensaje en la UI.
  */
+const ADMIN_KEY_MISMATCH_HINT =
+  "Comprueba que SIMPLEFACTU_ADMIN_KEY (Vercel) coincide con ADMIN_KEY del API en el mismo entorno (QA con QA, producción con producción).";
+
+function expandAdminKeyMessage(msg: string): string {
+  const lower = msg.toLowerCase();
+  if (
+    lower.includes("admin key") ||
+    lower.includes("x-admin-key") ||
+    lower.includes("simplefactu_admin_key") ||
+    (lower.includes("401") && lower.includes("admin"))
+  ) {
+    return `${msg} ${ADMIN_KEY_MISMATCH_HINT}`;
+  }
+  return msg;
+}
+
 export function formatVerifactuActionError(e: unknown): string {
   if (isLikelyNetworkFetchFailure(e)) return formatSimplefactuNetworkError(e);
-  if (e instanceof Error && e.message.trim()) return e.message.trim().slice(0, 500);
+  if (e instanceof Error && e.message.trim()) {
+    return expandAdminKeyMessage(e.message.trim().slice(0, 500));
+  }
   return formatSimplefactuNetworkError(e);
 }
 

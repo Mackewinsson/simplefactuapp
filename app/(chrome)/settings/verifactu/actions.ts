@@ -100,8 +100,18 @@ export async function uploadCertificateAction(
       return {
         ok: false,
         errors: [
-          "El formato de tu certificado no pudo convertirse automáticamente.",
-          "Conviértelo manualmente: `openssl pkcs12 -legacy -in cert.p12 -nodes -out cert.pem` y luego `openssl pkcs12 -export -in cert.pem -out cert-modern.p12`.",
+          "Tu certificado usa un formato antiguo (RC2) que el servidor no pudo reempaquetar.",
+          "Conviértelo en tu Mac o Linux: openssl pkcs12 -legacy -in cert.p12 -passin pass:TU_PASS -nodes -out /tmp/cert.pem && openssl pkcs12 -export -in /tmp/cert.pem -out cert-modern.p12 -passout pass:TU_PASS && rm /tmp/cert.pem",
+          "Vuelve a subir cert-modern.p12 desde este formulario.",
+        ],
+      };
+    }
+    if (res.status === 500 && /certificate|pfx|pkcs12/i.test(String(json.message ?? json.error ?? ""))) {
+      return {
+        ok: false,
+        errors: [
+          String(json.message || json.error || "Error al procesar el certificado."),
+          "Si el archivo es antiguo (FNMT), prueba la conversión RC2 descrita arriba o contacta soporte.",
         ],
       };
     }
