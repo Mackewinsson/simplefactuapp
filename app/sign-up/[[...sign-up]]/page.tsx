@@ -15,17 +15,17 @@ export default function SignUpPage() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 py-8">
       <SignUp />
-      <p className="text-center text-xs leading-relaxed text-gray-600">
+      <p className="text-center text-xs leading-relaxed text-fg-muted">
         Al crear una cuenta aceptas los{" "}
-        <Link href="/legal/terminos" className="underline hover:text-gray-900">
+        <Link href="/legal/terminos" className="underline hover:text-fg">
           Términos y condiciones
         </Link>
         , la{" "}
-        <Link href="/legal/privacidad" className="underline hover:text-gray-900">
+        <Link href="/legal/privacidad" className="underline hover:text-fg">
           Política de privacidad
         </Link>{" "}
         y el{" "}
-        <Link href="/legal/dpa" className="underline hover:text-gray-900">
+        <Link href="/legal/dpa" className="underline hover:text-fg">
           Contrato de encargado de tratamiento (DPA)
         </Link>
         .

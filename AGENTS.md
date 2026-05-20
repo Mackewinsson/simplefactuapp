@@ -42,6 +42,12 @@ Documentación de contrato HTTP del API: [INTEGRATION.md](https://github.com/Mac
 
 ---
 
+## Tema / colores
+
+**Un solo fichero:** [`app/theme.css`](app/theme.css) — variables CSS (`--color-*`). Tailwind las expone en [`tailwind.config.ts`](tailwind.config.ts) (`bg-primary`, `text-accent`, `border-outline`, …). Clases reutilizables en [`app/globals.css`](app/globals.css) (`.btn-*`, `.panel`, `.input`, `.link-accent`).
+
+No uses `gray-*`, `blue-*`, etc. en componentes nuevos; usa tokens semánticos.
+
 ## Mapa del código
 
 ```

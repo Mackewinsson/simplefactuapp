@@ -15,7 +15,7 @@ export default function AccessibilityStatementPage() {
   return (
     <>
       <h1>Declaración de accesibilidad</h1>
-      <p className="text-sm text-gray-500">Última actualización: ((FECHA_REVISION))</p>
+      <p className="text-sm text-fg-subtle">Última actualización: ((FECHA_REVISION))</p>
 
       <p>
         <em>Documento pendiente de revisión.</em>

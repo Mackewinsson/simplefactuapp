@@ -6,7 +6,7 @@ export default function CookiesPolicyPage() {
   return (
     <>
       <h1>Política de cookies</h1>
-      <p className="text-sm text-gray-500">Última actualización: 19 de mayo de 2026</p>
+      <p className="text-sm text-fg-subtle">Última actualización: 19 de mayo de 2026</p>
 
       <h2>1. ¿Qué es una cookie?</h2>
       <p>

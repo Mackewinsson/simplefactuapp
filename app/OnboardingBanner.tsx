@@ -113,7 +113,7 @@ export async function OnboardingBanner() {
     <div
       role="status"
       aria-label={`Configuración: ${completed} de ${steps.length} pasos completados`}
-      className="border-b border-amber-200 bg-amber-50 text-amber-900"
+      className="border-b border-warning-outline bg-warning text-warning-foreground"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 flex-col gap-2">
@@ -123,19 +123,19 @@ export async function OnboardingBanner() {
               {completed} / {steps.length} pasos
             </span>
             {next ? (
-              <span className="text-xs text-amber-700">
+              <span className="text-xs text-warning-muted">
                 Siguiente: <strong>{next.label}</strong>
               </span>
             ) : null}
           </div>
           <div
-            className="h-1 w-full overflow-hidden rounded bg-amber-200"
+            className="h-1 w-full overflow-hidden rounded bg-warning-outline"
             role="progressbar"
             aria-valuenow={pct}
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            <div className="h-full bg-amber-500" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-warning-strong" style={{ width: `${pct}%` }} />
           </div>
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
             {steps.map((s) => (
@@ -149,7 +149,7 @@ export async function OnboardingBanner() {
         {next ? (
           <Link
             href={next.href}
-            className="self-start rounded border border-amber-400 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100 md:self-center"
+            className="self-start rounded border border-warning-outline bg-surface px-3 py-1.5 text-xs font-medium text-warning-foreground hover:bg-warning-hover md:self-center"
           >
             {next.cta}
           </Link>

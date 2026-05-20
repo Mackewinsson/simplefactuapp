@@ -29,8 +29,8 @@ export function RetryJobButton({ jobId, status }: { jobId: string; status: strin
       <button
         type="submit"
         disabled={pending}
-        className={`w-fit rounded px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 ${
-          isDead ? "bg-red-700 hover:bg-red-800" : "bg-amber-600 hover:bg-amber-700"
+        className={`w-fit rounded px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50 ${
+          isDead ? "bg-danger-emphasis-hover hover:bg-danger-emphasis-hover" : "bg-warning-emphasis hover:bg-warning-emphasis-hover"
         }`}
       >
         {pending
@@ -40,10 +40,10 @@ export function RetryJobButton({ jobId, status }: { jobId: string; status: strin
             : "Reintentar job"}
       </button>
       {state?.ok === true && (
-        <p className="text-sm text-green-800">{state.message}</p>
+        <p className="text-sm text-success-foreground">{state.message}</p>
       )}
       {state?.ok === false && (
-        <p className="text-sm text-red-700">{state.error}</p>
+        <p className="text-sm text-danger-foreground">{state.error}</p>
       )}
     </form>
   );

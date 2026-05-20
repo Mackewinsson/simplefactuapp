@@ -12,16 +12,16 @@ export default async function AdminAuditPage() {
 
   return (
     <div className="space-y-4">
-      <Link href="/admin" className="text-sm text-blue-600 hover:underline">
+      <Link href="/admin" className="text-sm text-accent hover:underline">
         ← Inicio
       </Link>
-      <h1 className="text-xl font-semibold text-gray-900">Auditoría admin</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-xl font-semibold text-fg">Auditoría admin</h1>
+      <p className="text-sm text-fg-muted">
         Últimas {rows.length} acciones registradas desde el panel (Postgres).
       </p>
-      <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded border border-outline-soft bg-surface">
         <table className="min-w-full text-left text-xs">
-          <thead className="border-b border-gray-200 bg-gray-50">
+          <thead className="border-b border-outline-soft bg-surface-hover">
             <tr>
               <th className="px-2 py-2">Fecha</th>
               <th className="px-2 py-2">Usuario</th>
@@ -32,7 +32,7 @@ export default async function AdminAuditPage() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-b border-gray-100">
+              <tr key={r.id} className="border-b border-outline-soft">
                 <td className="whitespace-nowrap px-2 py-2">{r.createdAt.toISOString()}</td>
                 <td className="max-w-[120px] truncate px-2 py-2 font-mono" title={r.userId}>
                   {r.userId}

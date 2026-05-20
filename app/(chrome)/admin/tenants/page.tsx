@@ -29,19 +29,19 @@ export default async function AdminTenantsPage({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold text-gray-900">Tenants (simplefactu)</h1>
+        <h1 className="text-xl font-semibold text-fg">Tenants (simplefactu)</h1>
         <CreateTenantForm />
       </div>
       {err ? (
-        <p className="text-sm text-red-700">{err}</p>
+        <p className="text-sm text-danger-foreground">{err}</p>
       ) : data ? (
         <>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-fg-muted">
             Total: {total} — página {page} de {totalPages}
           </p>
-          <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+          <div className="overflow-x-auto rounded border border-outline-soft bg-surface">
             <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+              <thead className="border-b border-outline-soft bg-surface-hover text-xs uppercase text-fg-subtle">
                 <tr>
                   <th className="px-3 py-2">ID</th>
                   <th className="px-3 py-2">Nombre</th>
@@ -52,13 +52,13 @@ export default async function AdminTenantsPage({
               </thead>
               <tbody>
                 {data.tenants.map((t) => (
-                  <tr key={t.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr key={t.id} className="border-b border-outline-soft hover:bg-surface-hover">
                     <td className="px-3 py-2 font-mono text-xs">{t.id}</td>
                     <td className="px-3 py-2">{t.name ?? "—"}</td>
                     <td className="px-3 py-2">{t.plan_id}</td>
                     <td className="px-3 py-2">{t.status}</td>
                     <td className="px-3 py-2">
-                      <Link href={`/admin/tenants/${encodeURIComponent(t.id)}`} className="text-blue-600 hover:underline">
+                      <Link href={`/admin/tenants/${encodeURIComponent(t.id)}`} className="text-accent hover:underline">
                         Ver
                       </Link>
                     </td>
@@ -69,12 +69,12 @@ export default async function AdminTenantsPage({
           </div>
           <div className="flex gap-4 text-sm">
             {page > 1 ? (
-              <Link href={`/admin/tenants?page=${page - 1}`} className="text-blue-600 hover:underline">
+              <Link href={`/admin/tenants?page=${page - 1}`} className="text-accent hover:underline">
                 Anterior
               </Link>
             ) : null}
             {page < totalPages ? (
-              <Link href={`/admin/tenants?page=${page + 1}`} className="text-blue-600 hover:underline">
+              <Link href={`/admin/tenants?page=${page + 1}`} className="text-accent hover:underline">
                 Siguiente
               </Link>
             ) : null}

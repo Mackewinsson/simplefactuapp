@@ -33,7 +33,7 @@ export function UpgradeButton({ planId, label, variant = "primary" }: Props) {
   const baseClasses =
     variant === "primary"
       ? "btn btn-cta"
-      : "rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50";
+      : "rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-hover";
 
   return (
     <div className="space-y-1">
@@ -47,7 +47,7 @@ export function UpgradeButton({ planId, label, variant = "primary" }: Props) {
         {pending ? "Redirigiendo..." : label}
       </button>
       {error ? (
-        <p role="alert" className="text-xs text-red-700">
+        <p role="alert" className="text-xs text-danger-foreground">
           {error}
         </p>
       ) : null}

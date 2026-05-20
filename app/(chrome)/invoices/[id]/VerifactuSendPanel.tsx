@@ -154,9 +154,9 @@ export function VerifactuSendPanel({
   }
 
   return (
-    <div className="rounded border border-gray-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-gray-900">Verifactu (AEAT)</h2>
-      <dl className="mt-2 grid gap-1 text-sm text-gray-700">
+    <div className="rounded border border-outline-soft bg-surface p-4">
+      <h2 className="text-sm font-semibold text-fg">Verifactu (AEAT)</h2>
+      <dl className="mt-2 grid gap-1 text-sm text-fg-muted">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium">Estado del alta:</span>
           <span
@@ -168,7 +168,7 @@ export function VerifactuSendPanel({
         {aeatCsv ? (
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium">CSV:</span>
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">
+            <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs font-mono">
               {aeatCsv}
             </code>
             {aeatQrText ? (
@@ -194,14 +194,14 @@ export function VerifactuSendPanel({
             <img
               src={aeatQrDataUrl}
               alt="QR de verificación AEAT (Veri*Factu)"
-              className="h-32 w-32 rounded border border-gray-200 bg-white p-1"
+              className="h-32 w-32 rounded border border-outline-soft bg-surface p-1"
               width={128}
               height={128}
             />
-            <div className="text-xs text-gray-700">
+            <div className="text-xs text-fg-muted">
               <p className="font-semibold">Factura verificable en sede AEAT</p>
-              <p className="font-mono tracking-wide text-gray-900">VERI*FACTU</p>
-              <p className="mt-1 text-gray-500">
+              <p className="font-mono tracking-wide text-fg">VERI*FACTU</p>
+              <p className="mt-1 text-fg-subtle">
                 Escanea o haz clic en «Comprobar en AEAT» para validar este
                 registro en la sede electrónica de la Agencia Tributaria.
               </p>
@@ -209,7 +209,7 @@ export function VerifactuSendPanel({
           </div>
         ) : null}
         {aeatLastError ? (
-          <div className="text-red-700">
+          <div className="text-danger-foreground">
             <span className="font-medium">Error de alta:</span>{" "}
             {humanizeAeatError(aeatLastError)}
           </div>
@@ -228,24 +228,24 @@ export function VerifactuSendPanel({
           </span>
         </div>
         {aeatCancellationLastError ? (
-          <div className="text-red-700">
+          <div className="text-danger-foreground">
             <span className="font-medium">Error de anulación:</span>{" "}
             {humanizeAeatError(aeatCancellationLastError)}
           </div>
         ) : null}
       </dl>
       {message ? (
-        <p className="mt-2 text-sm text-gray-800" role="status">
+        <p className="mt-2 text-sm text-fg" role="status">
           {message}
         </p>
       ) : null}
       {polling ? (
-        <p className="mt-2 flex items-center gap-1.5 text-sm text-amber-700">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+        <p className="mt-2 flex items-center gap-1.5 text-sm text-warning-muted">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-warning-pulse" />
           Actualizando automáticamente…
         </p>
       ) : canRefresh ? (
-        <p className="mt-2 text-sm text-amber-800">
+        <p className="mt-2 text-sm text-warning-deep">
           Trabajo en curso. Usa «Actualizar estado» para refrescar.
         </p>
       ) : null}
@@ -305,23 +305,23 @@ export function VerifactuSendPanel({
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-cancel-title"
-            className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
           >
             <div className="mb-3 flex items-start justify-between gap-3">
-              <h3 id="verifactu-cancel-title" className="text-base font-semibold text-gray-900">
+              <h3 id="verifactu-cancel-title" className="text-base font-semibold text-fg">
                 ¿Anular esta factura en Verifactu?
               </h3>
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => setCancelModalOpen(false)}
-                className="shrink-0 text-gray-400 hover:text-gray-700 disabled:opacity-40"
+                className="shrink-0 text-fg-subtle hover:text-fg-muted disabled:opacity-40"
                 aria-label="Cerrar"
               >
                 ✕
               </button>
             </div>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-fg-muted">
               Se enviará un registro de <strong>anulación</strong> a la Agencia Tributaria para la factura{" "}
               <span className="font-mono">{invoiceNumber}</span>. Esta acción no se puede deshacer desde{" "}
               {APP_DISPLAY_NAME}.

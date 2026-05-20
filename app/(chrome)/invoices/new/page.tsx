@@ -24,7 +24,7 @@ export default async function NewInvoicePage() {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
+        <Link href="/invoices" className="text-fg-muted hover:text-fg">
           ← Volver a facturas
         </Link>
       </div>

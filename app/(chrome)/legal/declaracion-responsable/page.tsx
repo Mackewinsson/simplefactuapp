@@ -14,7 +14,7 @@ export default function DeclaracionResponsablePage() {
   return (
     <>
       <h1>Declaración responsable del fabricante</h1>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-fg-subtle">
         En cumplimiento del artículo 15 de la Orden HAC/1177/2024, de 17 de
         octubre, y del Real Decreto 1007/2023, de 5 de diciembre.
       </p>

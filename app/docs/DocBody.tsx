@@ -12,13 +12,13 @@ export function DocBody({ page }: { page: DocPage }) {
   return (
     <>
       <header className="not-prose mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">{page.frontmatter.title}</h1>
+        <h1 className="text-2xl font-semibold text-fg">{page.frontmatter.title}</h1>
         {page.frontmatter.description ? (
-          <p className="mt-1 text-sm text-gray-600">{page.frontmatter.description}</p>
+          <p className="mt-1 text-sm text-fg-muted">{page.frontmatter.description}</p>
         ) : null}
       </header>
       <div
-        className="prose prose-sm max-w-none prose-headings:scroll-mt-24 prose-pre:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100"
+        className="prose prose-sm max-w-none prose-headings:scroll-mt-24 prose-a:text-accent prose-pre:rounded prose-pre:bg-code prose-pre:text-code-foreground"
         dangerouslySetInnerHTML={{ __html: page.html }}
       />
     </>

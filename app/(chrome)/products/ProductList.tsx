@@ -60,9 +60,9 @@ export function ProductList({ products }: Props) {
 
   if (products.length === 0) {
     return (
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-fg-muted">
         No hay productos en catálogo. Añade líneas en{" "}
-        <Link href="/invoices/new" className="text-blue-600 hover:underline">
+        <Link href="/invoices/new" className="text-accent hover:underline">
           Nueva factura
         </Link>{" "}
         y guárdalos desde el flujo de productos, o crea uno aquí más adelante.
@@ -74,20 +74,20 @@ export function ProductList({ products }: Props) {
     <>
       <div className="space-y-2 md:hidden">
         {products.map((p) => (
-          <article key={p.id} className="rounded border border-gray-200 bg-white p-3">
-            <p className="font-medium text-gray-900">{p.description}</p>
-            <p className="mt-1 text-sm text-gray-600">
+          <article key={p.id} className="rounded border border-outline-soft bg-surface p-3">
+            <p className="font-medium text-fg">{p.description}</p>
+            <p className="mt-1 text-sm text-fg-muted">
               Precio: {formatCents("EUR", p.unitPriceCents)}
             </p>
-            <p className="text-sm text-gray-600">IVA: {p.tipoImpositivo}</p>
-            <p className="text-sm text-gray-600">Clave: {p.claveRegimen}</p>
-            <p className="text-sm text-gray-600">Calif.: {p.calificacion}</p>
+            <p className="text-sm text-fg-muted">IVA: {p.tipoImpositivo}</p>
+            <p className="text-sm text-fg-muted">Clave: {p.claveRegimen}</p>
+            <p className="text-sm text-fg-muted">Calif.: {p.calificacion}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => startEdit(p)}
                 disabled={pending}
-                className="rounded border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50"
+                className="rounded border border-outline bg-surface px-2 py-1 text-xs hover:bg-surface-hover"
               >
                 Editar
               </button>
@@ -95,7 +95,7 @@ export function ProductList({ products }: Props) {
                 type="button"
                 onClick={() => onDelete(p.id)}
                 disabled={pending}
-                className="rounded border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-800 hover:bg-red-100"
+                className="rounded border border-danger-outline bg-danger px-2 py-1 text-xs text-danger-foreground hover:bg-danger-hover"
               >
                 Eliminar
               </button>
@@ -104,33 +104,33 @@ export function ProductList({ products }: Props) {
         ))}
       </div>
 
-      <div className="hidden overflow-x-auto rounded border border-gray-200 bg-white md:block">
+      <div className="hidden overflow-x-auto rounded border border-outline-soft bg-surface md:block">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-3 py-2 font-medium text-gray-900">Descripción</th>
-              <th className="px-3 py-2 font-medium text-gray-900">Precio</th>
-              <th className="px-3 py-2 font-medium text-gray-900">IVA %</th>
-              <th className="px-3 py-2 font-medium text-gray-900">Clave</th>
-              <th className="px-3 py-2 font-medium text-gray-900">Calif.</th>
+            <tr className="border-b border-outline-soft bg-surface-hover">
+              <th className="px-3 py-2 font-medium text-fg">Descripción</th>
+              <th className="px-3 py-2 font-medium text-fg">Precio</th>
+              <th className="px-3 py-2 font-medium text-fg">IVA %</th>
+              <th className="px-3 py-2 font-medium text-fg">Clave</th>
+              <th className="px-3 py-2 font-medium text-fg">Calif.</th>
               <th className="px-3 py-2 w-32"></th>
             </tr>
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id} className="border-b border-gray-100 last:border-0">
+              <tr key={p.id} className="border-b border-outline-soft last:border-0">
                 <td className="px-3 py-2 font-medium">{p.description}</td>
                 <td className="px-3 py-2">{formatCents("EUR", p.unitPriceCents)}</td>
-                <td className="px-3 py-2 text-gray-600">{p.tipoImpositivo}</td>
-                <td className="px-3 py-2 text-gray-600">{p.claveRegimen}</td>
-                <td className="px-3 py-2 text-gray-600">{p.calificacion}</td>
+                <td className="px-3 py-2 text-fg-muted">{p.tipoImpositivo}</td>
+                <td className="px-3 py-2 text-fg-muted">{p.claveRegimen}</td>
+                <td className="px-3 py-2 text-fg-muted">{p.calificacion}</td>
                 <td className="px-3 py-2">
                   <div className="flex flex-wrap gap-1">
                     <button
                       type="button"
                       onClick={() => startEdit(p)}
                       disabled={pending}
-                      className="rounded border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50"
+                      className="rounded border border-outline bg-surface px-2 py-1 text-xs hover:bg-surface-hover"
                     >
                       Editar
                     </button>
@@ -138,7 +138,7 @@ export function ProductList({ products }: Props) {
                       type="button"
                       onClick={() => onDelete(p.id)}
                       disabled={pending}
-                      className="rounded border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-800 hover:bg-red-100"
+                      className="rounded border border-danger-outline bg-danger px-2 py-1 text-xs text-danger-foreground hover:bg-danger-hover"
                     >
                       Eliminar
                     </button>
@@ -157,36 +157,36 @@ export function ProductList({ products }: Props) {
         >
           <form
             onSubmit={onSaveEdit}
-            className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="mb-3 text-base font-semibold">Editar producto</h2>
-            {error ? <p className="mb-2 text-sm text-red-700">{error}</p> : null}
+            {error ? <p className="mb-2 text-sm text-danger-foreground">{error}</p> : null}
             <div className="space-y-3">
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Descripción</span>
+                <span className="mb-1 block text-xs font-medium text-fg-muted">Descripción</span>
                 <input
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded border border-outline px-3 py-2 text-sm"
                   required
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Precio (€)</span>
+                <span className="mb-1 block text-xs font-medium text-fg-muted">Precio (€)</span>
                 <input
                   value={form.unitPrice}
                   onChange={(e) => setForm((f) => ({ ...f, unitPrice: e.target.value }))}
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded border border-outline px-3 py-2 text-sm"
                   required
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Tipo impositivo</span>
+                <span className="mb-1 block text-xs font-medium text-fg-muted">Tipo impositivo</span>
                 <select
                   value={form.tipoImpositivo}
                   onChange={(e) => setForm((f) => ({ ...f, tipoImpositivo: e.target.value }))}
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded border border-outline px-3 py-2 text-sm"
                 >
                   {TIPO_OPTIONS.map((t) => (
                     <option key={t} value={t}>
@@ -196,20 +196,20 @@ export function ProductList({ products }: Props) {
                 </select>
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Clave régimen</span>
+                <span className="mb-1 block text-xs font-medium text-fg-muted">Clave régimen</span>
                 <input
                   value={form.claveRegimen}
                   onChange={(e) => setForm((f) => ({ ...f, claveRegimen: e.target.value }))}
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded border border-outline px-3 py-2 text-sm"
                   maxLength={2}
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Calificación</span>
+                <span className="mb-1 block text-xs font-medium text-fg-muted">Calificación</span>
                 <input
                   value={form.calificacion}
                   onChange={(e) => setForm((f) => ({ ...f, calificacion: e.target.value }))}
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded border border-outline px-3 py-2 text-sm"
                   maxLength={2}
                 />
               </label>
@@ -218,14 +218,14 @@ export function ProductList({ products }: Props) {
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="rounded border border-gray-300 px-3 py-1.5 text-sm"
+                className="rounded border border-outline px-3 py-1.5 text-sm"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={pending}
-                className="rounded bg-gray-900 px-3 py-1.5 text-sm text-white disabled:opacity-60"
+                className="rounded bg-primary px-3 py-1.5 text-sm text-primary-foreground disabled:opacity-60"
               >
                 Guardar
               </button>

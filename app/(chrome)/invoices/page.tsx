@@ -181,7 +181,7 @@ export default async function InvoicesPage({
         <h1 className="text-2xl font-semibold">Facturas</h1>
         <Link
           href="/invoices/new"
-          className="w-full rounded bg-gray-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-gray-800 sm:w-auto"
+          className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
         >
           Nueva factura
         </Link>
@@ -198,28 +198,28 @@ export default async function InvoicesPage({
       {/* Filters */}
       <form
         method="get"
-        className="mb-4 flex flex-wrap items-end gap-3 rounded border border-gray-200 bg-white p-3 text-sm"
+        className="mb-4 flex flex-wrap items-end gap-3 rounded border border-outline-soft bg-surface p-3 text-sm"
       >
         <input type="hidden" name="page" value="1" />
         <input type="hidden" name="vista" value={vista} />
         <label className="block w-full sm:w-auto">
-          <span className="text-gray-600">Buscar</span>
+          <span className="text-fg-muted">Buscar</span>
           <input
             name="q"
             type="search"
             defaultValue={q ?? ""}
             placeholder="número, cliente, NIF…"
-            className="mt-1 block w-full min-w-0 rounded border border-gray-300 px-2 py-1 text-sm sm:w-52"
+            className="mt-1 block w-full min-w-0 rounded border border-outline px-2 py-1 text-sm sm:w-52"
           />
         </label>
 
         {vista === "verifactu" ? (
           <label className="block w-full sm:w-auto">
-            <span className="text-gray-600">Estado Veri*Factu</span>
+            <span className="text-fg-muted">Estado Veri*Factu</span>
             <select
               name="status"
               defaultValue={statusSelectDefault}
-              className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+              className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-auto"
             >
               {AEAT_STATUSES_VERIFACTU.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -231,47 +231,47 @@ export default async function InvoicesPage({
         ) : null}
 
         <label className="block w-full sm:w-auto">
-          <span className="text-gray-600">Serie</span>
+          <span className="text-fg-muted">Serie</span>
           <input
             name="serie"
             type="text"
             defaultValue={serie ?? ""}
             placeholder="2026"
-            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-24"
+            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-24"
           />
         </label>
 
         <label className="block w-full sm:w-auto">
-          <span className="text-gray-600">Desde</span>
+          <span className="text-fg-muted">Desde</span>
           <input
             name="from"
             type="date"
             defaultValue={from ?? ""}
-            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-auto"
           />
         </label>
 
         <label className="block w-full sm:w-auto">
-          <span className="text-gray-600">Hasta</span>
+          <span className="text-fg-muted">Hasta</span>
           <input
             name="to"
             type="date"
             defaultValue={to ?? ""}
-            className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm sm:w-auto"
+            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-auto"
           />
         </label>
 
         <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           <button
             type="submit"
-            className="rounded bg-gray-900 px-3 py-1.5 text-sm text-white hover:bg-gray-800"
+            className="rounded bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary-hover"
           >
             Filtrar
           </button>
           {hasFilters && (
             <Link
               href="/invoices"
-              className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              className="rounded border border-outline px-3 py-1.5 text-sm text-fg-muted hover:bg-surface-hover"
             >
               Limpiar
             </Link>
@@ -280,49 +280,49 @@ export default async function InvoicesPage({
       </form>
 
       {invoices.length === 0 ? (
-        <div className="rounded border border-gray-200 bg-white p-8 text-center">
+        <div className="rounded border border-outline-soft bg-surface p-8 text-center">
           {vista === "sin-enviar" ? (
             <>
-              <p className="mb-2 text-gray-800">
+              <p className="mb-2 text-fg">
                 {hasFilters ? "No hay facturas por enviar con esos filtros." : "No tienes facturas pendientes de envío."}
               </p>
-              <p className="mb-4 text-sm text-gray-600">
+              <p className="mb-4 text-sm text-fg-muted">
                 Las facturas nuevas aparecen aquí hasta que las envíes a Verifactu desde el detalle.
               </p>
               <Link
                 href="/invoices/new"
-                className="inline-block rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                className="inline-block rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
               >
                 Nueva factura
               </Link>
             </>
           ) : (
             <>
-              <p className="mb-2 text-gray-800">
+              <p className="mb-2 text-fg">
                 {hasFilters
                   ? "No hay facturas en Verifactu con esos filtros."
                   : "Aún no hay envíos a Verifactu."}
               </p>
               {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
-                <p className="mb-4 text-sm text-gray-600">
+                <p className="mb-4 text-sm text-fg-muted">
                   Tienes facturas listas para enviar. Abre una, revisa los datos y pulsa «Enviar a Verifactu».
                 </p>
               ) : !hasFilters ? (
-                <p className="mb-4 text-sm text-gray-600">
+                <p className="mb-4 text-sm text-fg-muted">
                   Cuando envíes una factura a Verifactu, el estado aparecerá aquí.
                 </p>
               ) : null}
               {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
                 <Link
                   href={hrefSinEnviar}
-                  className="inline-block rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
+                  className="inline-block rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-hover"
                 >
                   Ver facturas por enviar ({sinEnviarCount})
                 </Link>
               ) : !hasFilters && sinEnviarCount === 0 && verifactuCount === 0 ? (
                 <Link
                   href="/invoices/new"
-                  className="inline-block rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                  className="inline-block rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
                 >
                   Crear factura
                 </Link>
@@ -336,23 +336,23 @@ export default async function InvoicesPage({
             {invoices.map((inv: InvoiceRow) => {
               const badge = registrationStatusBadge(inv.aeatStatus, inv.aeatCancellationStatus);
               return (
-                <article key={inv.id} className="rounded border border-gray-200 bg-white p-3">
+                <article key={inv.id} className="rounded border border-outline-soft bg-surface p-3">
                   <div className="flex items-start justify-between gap-3">
-                    <Link href={`/invoices/${inv.id}`} className="font-medium text-blue-600 hover:underline">
+                    <Link href={`/invoices/${inv.id}`} className="font-medium text-accent hover:underline">
                       {inv.number}
                     </Link>
                     <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}>
                       {badge.label}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-700">{inv.customerName}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+                  <p className="mt-2 text-sm text-fg-muted">{inv.customerName}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-muted">
                     <span>{dateFormat.format(inv.issueDate)}</span>
-                    <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-600">
+                    <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-fg-muted">
                       {extractSerie(inv.number)}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm font-medium text-gray-900">
+                  <p className="mt-1 text-sm font-medium text-fg">
                     {formatCents(inv.currency, inv.totalCents)}
                   </p>
                 </article>
@@ -360,16 +360,16 @@ export default async function InvoicesPage({
             })}
           </div>
 
-          <div className="hidden overflow-x-auto rounded border border-gray-200 bg-white md:block">
+          <div className="hidden overflow-x-auto rounded border border-outline-soft bg-surface md:block">
             <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-4 py-3 font-medium text-gray-900">Número</th>
-                  <th className="px-4 py-3 font-medium text-gray-900">Serie</th>
-                  <th className="px-4 py-3 font-medium text-gray-900">Cliente</th>
-                  <th className="px-4 py-3 font-medium text-gray-900">Fecha</th>
-                  <th className="px-4 py-3 font-medium text-gray-900">Total</th>
-                  <th className="px-4 py-3 font-medium text-gray-900">Veri*Factu</th>
+                <tr className="border-b border-outline-soft bg-surface-hover">
+                  <th className="px-4 py-3 font-medium text-fg">Número</th>
+                  <th className="px-4 py-3 font-medium text-fg">Serie</th>
+                  <th className="px-4 py-3 font-medium text-fg">Cliente</th>
+                  <th className="px-4 py-3 font-medium text-fg">Fecha</th>
+                  <th className="px-4 py-3 font-medium text-fg">Total</th>
+                  <th className="px-4 py-3 font-medium text-fg">Veri*Factu</th>
                 </tr>
               </thead>
               <tbody>
@@ -378,26 +378,26 @@ export default async function InvoicesPage({
                   return (
                     <tr
                       key={inv.id}
-                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                      className="border-b border-outline-soft last:border-0 hover:bg-surface-hover"
                     >
                       <td className="px-4 py-3">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="font-medium text-blue-600 hover:underline"
+                          className="font-medium text-accent hover:underline"
                         >
                           {inv.number}
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-600">
+                        <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-fg-muted">
                           {extractSerie(inv.number)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-gray-700">{inv.customerName}</td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-fg-muted">{inv.customerName}</td>
+                      <td className="px-4 py-3 text-fg-muted">
                         {dateFormat.format(inv.issueDate)}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-fg-muted">
                         {formatCents(inv.currency, inv.totalCents)}
                       </td>
                       <td className="px-4 py-3">
@@ -414,7 +414,7 @@ export default async function InvoicesPage({
             </table>
           </div>
 
-          <div className="mt-4 flex flex-col gap-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-2 text-sm text-fg-muted sm:flex-row sm:items-center sm:justify-between">
             <span>
               {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} de {total}
             </span>
@@ -423,7 +423,7 @@ export default async function InvoicesPage({
                 {page > 1 && (
                   <Link
                     href={pageHref(page - 1)}
-                    className="rounded border border-gray-300 px-2 py-1 hover:bg-gray-50"
+                    className="rounded border border-outline px-2 py-1 hover:bg-surface-hover"
                   >
                     ← Anterior
                   </Link>
@@ -436,8 +436,8 @@ export default async function InvoicesPage({
                       href={pageHref(p)}
                       className={`rounded border px-2 py-1 ${
                         p === page
-                          ? "border-gray-900 bg-gray-900 text-white"
-                          : "border-gray-300 hover:bg-gray-50"
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-outline hover:bg-surface-hover"
                       }`}
                     >
                       {p}
@@ -446,7 +446,7 @@ export default async function InvoicesPage({
                 {page < totalPages && (
                   <Link
                     href={pageHref(page + 1)}
-                    className="rounded border border-gray-300 px-2 py-1 hover:bg-gray-50"
+                    className="rounded border border-outline px-2 py-1 hover:bg-surface-hover"
                   >
                     Siguiente →
                   </Link>

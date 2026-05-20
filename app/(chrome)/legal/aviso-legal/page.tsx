@@ -6,7 +6,7 @@ export default function AvisoLegalPage() {
   return (
     <>
       <h1>Aviso legal</h1>
-      <p className="text-sm text-gray-500">Última actualización: 19 de mayo de 2026</p>
+      <p className="text-sm text-fg-subtle">Última actualización: 19 de mayo de 2026</p>
 
       <h2>1. Identificación del titular</h2>
       <ul>

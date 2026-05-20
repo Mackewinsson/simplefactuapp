@@ -52,8 +52,8 @@ export default async function AdminTenantDetailPage({ params }: { params: Promis
   if (!tenantRes?.tenant) {
     return (
       <div>
-        <p className="text-red-700">{err ?? "Tenant no encontrado"}</p>
-        <Link href="/admin/tenants" className="text-sm text-blue-600 hover:underline">
+        <p className="text-danger-foreground">{err ?? "Tenant no encontrado"}</p>
+        <Link href="/admin/tenants" className="text-sm text-accent hover:underline">
           Volver
         </Link>
       </div>
@@ -65,40 +65,40 @@ export default async function AdminTenantDetailPage({ params }: { params: Promis
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/admin/tenants" className="text-sm text-blue-600 hover:underline">
+        <Link href="/admin/tenants" className="text-sm text-accent hover:underline">
           ← Tenants
         </Link>
-        <h1 className="mt-2 text-xl font-semibold text-gray-900">Tenant: {t.id}</h1>
+        <h1 className="mt-2 text-xl font-semibold text-fg">Tenant: {t.id}</h1>
       </div>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 className="mb-2 text-sm font-semibold text-gray-800">Certificado (resumen)</h2>
+      <section className="rounded-lg border border-outline-soft bg-surface p-4">
+        <h2 className="mb-2 text-sm font-semibold text-fg">Certificado (resumen)</h2>
         {cert ? (
-          <dl className="text-sm text-gray-600">
+          <dl className="text-sm text-fg-muted">
             <div>
-              <dt className="inline text-gray-500">Tiene certificado:</dt>{" "}
+              <dt className="inline text-fg-subtle">Tiene certificado:</dt>{" "}
               <dd className="inline">{cert.hasCertificate ? "Sí" : "No"}</dd>
             </div>
             {cert.updatedAt ? (
               <div>
-                <dt className="inline text-gray-500">Actualizado:</dt>{" "}
+                <dt className="inline text-fg-subtle">Actualizado:</dt>{" "}
                 <dd className="inline">{cert.updatedAt}</dd>
               </div>
             ) : null}
           </dl>
         ) : (
-          <p className="text-sm text-gray-500">No se pudo cargar el estado del certificado.</p>
+          <p className="text-sm text-fg-subtle">No se pudo cargar el estado del certificado.</p>
         )}
       </section>
 
       <TenantDetailForms tenant={t} />
 
-      <section className="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-gray-800">Encadenamiento (chain_registry)</h2>
+      <section className="rounded-lg border border-outline-soft bg-surface p-4">
+        <h2 className="mb-3 text-sm font-semibold text-fg">Encadenamiento (chain_registry)</h2>
         {chains?.chains?.length ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50">
+              <thead className="border-b border-outline-soft bg-surface-hover">
                 <tr>
                   <th className="px-2 py-2">chain_key</th>
                   <th className="px-2 py-2">last_huella</th>
@@ -107,7 +107,7 @@ export default async function AdminTenantDetailPage({ params }: { params: Promis
               </thead>
               <tbody>
                 {chains.chains.map((c) => (
-                  <tr key={c.id} className="border-b border-gray-100">
+                  <tr key={c.id} className="border-b border-outline-soft">
                     <td className="px-2 py-2 font-mono">{c.chainKey}</td>
                     <td className="max-w-[200px] truncate px-2 py-2 font-mono" title={c.lastHuella}>
                       {c.lastHuella}
@@ -119,13 +119,13 @@ export default async function AdminTenantDetailPage({ params }: { params: Promis
             </table>
           </div>
         ) : (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-fg-subtle">
             {chains ? "Sin filas en chain_registry para este tenant." : "No se pudo cargar la cadena."}
           </p>
         )}
       </section>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-4">
+      <section className="rounded-lg border border-outline-soft bg-surface p-4">
         <TenantKeysAndCert
           tenantId={tenantId}
           initialKeys={keys}

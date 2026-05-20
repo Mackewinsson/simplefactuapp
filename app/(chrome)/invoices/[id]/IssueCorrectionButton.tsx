@@ -106,7 +106,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded border border-amber-400 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100"
+        className="rounded border border-warning-outline bg-warning px-3 py-1.5 text-xs font-medium text-warning-foreground hover:bg-warning-hover"
       >
         Emitir factura rectificativa
       </button>
@@ -116,9 +116,9 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
   const modoHelp = MODOS.find((m) => m.value === modo)?.help ?? "";
 
   return (
-    <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+    <div className="rounded border border-warning-outline bg-warning p-3 text-sm text-warning-foreground">
       <p className="font-medium">Emitir rectificativa para {originalNumSerie}</p>
-      <p className="mt-1 text-xs text-amber-800">
+      <p className="mt-1 text-xs text-warning-deep">
         AEAT no permite editar facturas registradas. Lo correcto es emitir una factura nueva
         con tipo R1-R5 que apunte a la original. El worker la enviará a AEAT con la
         cadena recalculada.
@@ -130,7 +130,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
             value={tipo}
             onChange={(e) => setTipo(e.target.value as typeof tipo)}
             disabled={pending}
-            className="mt-1 w-full rounded border border-amber-300 bg-white p-1.5 text-sm"
+            className="mt-1 w-full rounded border border-warning-outline bg-surface p-1.5 text-sm"
           >
             {TIPOS.map((t) => (
               <option key={t.value} value={t.value}>
@@ -146,7 +146,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
             value={numSerie}
             onChange={(e) => setNumSerie(e.target.value)}
             disabled={pending}
-            className="mt-1 w-full rounded border border-amber-300 bg-white p-1.5 font-mono text-sm"
+            className="mt-1 w-full rounded border border-warning-outline bg-surface p-1.5 font-mono text-sm"
           />
         </label>
         <label className="text-xs sm:col-span-2">
@@ -155,7 +155,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
             value={modo}
             onChange={(e) => setModo(e.target.value as ModoRectificacion)}
             disabled={pending}
-            className="mt-1 w-full rounded border border-amber-300 bg-white p-1.5 text-sm"
+            className="mt-1 w-full rounded border border-warning-outline bg-surface p-1.5 text-sm"
           >
             {MODOS.map((m) => (
               <option key={m.value} value={m.value}>
@@ -163,12 +163,12 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
               </option>
             ))}
           </select>
-          <span className="mt-1 block text-[11px] text-amber-700">{modoHelp}</span>
+          <span className="mt-1 block text-[11px] text-warning-muted">{modoHelp}</span>
         </label>
       </div>
       {modo === "S" ? (
-        <div className="mt-3 grid gap-2 rounded border border-amber-300 bg-white/60 p-2 sm:grid-cols-3">
-          <p className="text-[11px] font-medium text-amber-900 sm:col-span-3">
+        <div className="mt-3 grid gap-2 rounded border border-warning-outline bg-surface/60 p-2 sm:grid-cols-3">
+          <p className="text-[11px] font-medium text-warning-foreground sm:col-span-3">
             Importe rectificación (importes ORIGINALES de la factura rectificada)
           </p>
           <label className="text-xs">
@@ -179,7 +179,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
               value={baseRectificada}
               onChange={(e) => setBaseRectificada(e.target.value)}
               disabled={pending}
-              className="mt-1 w-full rounded border border-amber-300 bg-white p-1.5 font-mono text-sm"
+              className="mt-1 w-full rounded border border-warning-outline bg-surface p-1.5 font-mono text-sm"
               placeholder="100.00"
             />
           </label>
@@ -191,13 +191,13 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
               value={cuotaRectificada}
               onChange={(e) => setCuotaRectificada(e.target.value)}
               disabled={pending}
-              className="mt-1 w-full rounded border border-amber-300 bg-white p-1.5 font-mono text-sm"
+              className="mt-1 w-full rounded border border-warning-outline bg-surface p-1.5 font-mono text-sm"
               placeholder="21.00"
             />
           </label>
           <label className="text-xs">
             <span className="block font-medium">
-              Cuota recargo <span className="font-normal text-amber-700">(opcional)</span>
+              Cuota recargo <span className="font-normal text-warning-muted">(opcional)</span>
             </span>
             <input
               type="number"
@@ -205,19 +205,19 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
               value={cuotaRecargoRectificado}
               onChange={(e) => setCuotaRecargoRectificado(e.target.value)}
               disabled={pending}
-              className="mt-1 w-full rounded border border-amber-300 bg-white p-1.5 font-mono text-sm"
+              className="mt-1 w-full rounded border border-warning-outline bg-surface p-1.5 font-mono text-sm"
               placeholder="5.20"
             />
           </label>
         </div>
       ) : null}
       {error ? (
-        <p role="alert" className="mt-2 text-xs text-red-700">
+        <p role="alert" className="mt-2 text-xs text-danger-foreground">
           {error}
         </p>
       ) : null}
       {info ? (
-        <p role="status" className="mt-2 text-xs text-green-800">
+        <p role="status" className="mt-2 text-xs text-success-foreground">
           {info}
         </p>
       ) : null}
@@ -230,7 +230,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
             !numSerie.trim() ||
             (modo === "S" && (baseRectificada.trim() === "" || cuotaRectificada.trim() === ""))
           }
-          className="rounded bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+          className="rounded bg-warning-emphasis px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-warning-emphasis-hover disabled:opacity-50"
         >
           {pending ? "Enviando..." : "Emitir rectificativa"}
         </button>
@@ -238,7 +238,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
           type="button"
           onClick={() => setOpen(false)}
           disabled={pending}
-          className="rounded border border-amber-400 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100"
+          className="rounded border border-warning-outline bg-surface px-3 py-1.5 text-xs font-medium text-warning-foreground hover:bg-warning-hover"
         >
           Cancelar
         </button>

@@ -1,69 +1,10 @@
+@import "./theme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* =====================================================================
-   Theme tokens
-   ---------------------------------------------------------------------
-   Single source of truth for colors. Each value is an RGB triple (no
-   commas) so it can be consumed by Tailwind utilities like `bg-cta`,
-   `text-fg-muted` or `border-danger-outline` with optional alpha
-   (e.g. `bg-cta/30`).
-
-   To re-skin the app, edit only the variables below.
-   To restyle every button of a given variant, edit the matching
-   `.btn-*` class in the components layer further down.
-   ===================================================================== */
-@layer base {
-  :root {
-    /* Brand / primary actions (e.g. "Crear factura", "Guardar") */
-    --color-primary: 24 24 27;            /* zinc-900 */
-    --color-primary-hover: 39 39 42;      /* zinc-800 */
-    --color-primary-foreground: 255 255 255;
-
-    /* High-attention call-to-action (e.g. "Enviar a Verifactu") */
-    --color-cta: 30 41 59;               /* slate-800 */
-    --color-cta-hover: 15 23 42;         /* slate-900 */
-    --color-cta-foreground: 255 255 255;
-    --color-cta-ring: 148 163 184;       /* slate-400 */
-
-    /* Surfaces (cards, inputs, secondary buttons) */
-    --color-surface: 255 255 255;
-    --color-surface-hover: 250 250 250;   /* zinc-50  */
-    --color-surface-muted: 244 244 245;   /* zinc-100 */
-
-    /* Borders / dividers */
-    --color-outline: 212 212 216;         /* zinc-300 */
-    --color-outline-soft: 228 228 231;    /* zinc-200 */
-
-    /* Foreground / text */
-    --color-fg: 24 24 27;                 /* zinc-900 */
-    --color-fg-muted: 82 82 91;           /* zinc-600 */
-    --color-fg-subtle: 113 113 122;       /* zinc-500 */
-    --color-fg-link: 30 41 59;            /* slate-800 */
-
-    /* Status: danger */
-    --color-danger: 254 242 242;          /* red-50  */
-    --color-danger-hover: 254 226 226;    /* red-100 */
-    --color-danger-outline: 254 202 202;  /* red-200 */
-    --color-danger-foreground: 127 29 29; /* red-900 */
-
-    /* Status: warning */
-    --color-warning: 255 251 235;         /* amber-50  */
-    --color-warning-hover: 254 243 199;   /* amber-100 */
-    --color-warning-outline: 252 211 77;  /* amber-300 */
-    --color-warning-foreground: 120 53 15;/* amber-900 */
-  }
-}
-
-/* =====================================================================
-   Reusable component classes
-   ---------------------------------------------------------------------
-   Compose with: <button className="btn btn-sm btn-cta">…</button>
-   Sizes: btn-sm | btn-md
-   Variants: btn-primary | btn-cta | btn-secondary | btn-danger
-             btn-warning | btn-ghost | btn-link
-   ===================================================================== */
+/* Reusable component classes — usan tokens de theme.css vía Tailwind */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium
@@ -72,21 +13,24 @@
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
   }
 
-  .btn-sm { @apply px-3 py-1.5; }
-  .btn-md { @apply px-4 py-2; }
+  .btn-sm {
+    @apply px-3 py-1.5;
+  }
+
+  .btn-md {
+    @apply px-4 py-2;
+  }
 
   .btn-primary {
     @apply bg-primary text-primary-foreground hover:bg-primary-hover focus-visible:ring-primary;
   }
 
   .btn-cta {
-    @apply bg-cta text-cta-foreground shadow-sm
-           hover:bg-cta-hover focus-visible:ring-cta-ring;
+    @apply bg-cta text-cta-foreground shadow-sm hover:bg-cta-hover focus-visible:ring-cta-ring;
   }
 
   .btn-secondary {
-    @apply border border-outline bg-surface text-fg
-           hover:bg-surface-hover focus-visible:ring-outline;
+    @apply border border-outline bg-surface text-fg hover:bg-surface-hover focus-visible:ring-outline;
   }
 
   .btn-danger {
@@ -99,11 +43,43 @@
            hover:bg-warning-hover focus-visible:ring-warning-outline;
   }
 
+  .btn-accent {
+    @apply bg-accent text-accent-foreground hover:bg-accent-hover focus-visible:ring-accent-outline;
+  }
+
   .btn-ghost {
     @apply text-fg hover:bg-surface-hover;
   }
 
   .btn-link {
     @apply text-fg-link hover:underline;
+  }
+
+  /* Tablas y paneles admin */
+  .panel {
+    @apply overflow-x-auto rounded border border-outline-soft bg-surface;
+  }
+
+  .panel-table thead {
+    @apply border-b border-outline-soft bg-surface-muted text-xs uppercase text-fg-subtle;
+  }
+
+  .panel-table tbody tr {
+    @apply border-b border-outline-soft hover:bg-surface-hover;
+  }
+
+  /* Campos de formulario */
+  .input {
+    @apply w-full rounded border border-outline bg-surface px-3 py-2 text-sm text-fg
+           focus:border-outline focus:outline-none focus:ring-1 focus:ring-outline;
+  }
+
+  .label {
+    @apply text-sm text-fg-muted;
+  }
+
+  /* Enlace inline tipo “ver detalle” */
+  .link-accent {
+    @apply text-accent hover:underline;
   }
 }

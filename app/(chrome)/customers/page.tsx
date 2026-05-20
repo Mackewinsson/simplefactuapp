@@ -17,7 +17,7 @@ export default async function CustomersPage() {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
+        <Link href="/invoices" className="text-fg-muted hover:text-fg">
           ← Volver a facturas
         </Link>
       </div>
@@ -25,12 +25,12 @@ export default async function CustomersPage() {
         <h1 className="text-2xl font-semibold">Clientes</h1>
         <Link
           href="/invoices/new"
-          className="rounded bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
         >
           Nueva factura (alta cliente)
         </Link>
       </div>
-      <p className="mb-4 text-sm text-gray-600">
+      <p className="mb-4 text-sm text-fg-muted">
         Los clientes se pueden crear al emitir una factura o editarlos aquí.
       </p>
       <CustomerList customers={customers} />

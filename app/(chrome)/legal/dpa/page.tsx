@@ -6,7 +6,7 @@ export default function DpaPage() {
   return (
     <>
       <h1>Contrato de encargado de tratamiento (DPA)</h1>
-      <p className="text-sm text-gray-500">Última actualización: 19 de mayo de 2026</p>
+      <p className="text-sm text-fg-subtle">Última actualización: 19 de mayo de 2026</p>
 
       <p>
         Este documento se suscribe electrónicamente al aceptar los{" "}

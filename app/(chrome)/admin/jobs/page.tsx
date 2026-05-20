@@ -46,25 +46,25 @@ export default async function AdminJobsPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-gray-900">Jobs AEAT</h1>
+      <h1 className="text-xl font-semibold text-fg">Jobs AEAT</h1>
 
-      <form className="flex flex-wrap items-end gap-3 rounded border border-gray-200 bg-white p-3 text-sm" method="get">
+      <form className="flex flex-wrap items-end gap-3 rounded border border-outline-soft bg-surface p-3 text-sm" method="get">
         <label className="block">
-          <span className="text-gray-600">Tenant ID</span>
+          <span className="text-fg-muted">Tenant ID</span>
           <input
             name="tenant_id"
             type="text"
             defaultValue={tenantId ?? ""}
             placeholder="sf_user_..."
-            className="mt-1 block w-56 rounded border border-gray-300 px-2 py-1 font-mono text-xs"
+            className="mt-1 block w-56 rounded border border-outline px-2 py-1 font-mono text-xs"
           />
         </label>
         <label className="block">
-          <span className="text-gray-600">Estado</span>
+          <span className="text-fg-muted">Estado</span>
           <select
             name="status"
             defaultValue={status ?? ""}
-            className="mt-1 block rounded border border-gray-300 px-2 py-1"
+            className="mt-1 block rounded border border-outline px-2 py-1"
           >
             {STATUSES.map((s) => (
               <option key={s || "all"} value={s}>
@@ -74,21 +74,21 @@ export default async function AdminJobsPage({
           </select>
         </label>
         <input type="hidden" name="page" value="1" />
-        <button type="submit" className="rounded bg-gray-800 px-3 py-1 text-white hover:bg-gray-700">
+        <button type="submit" className="rounded bg-primary-hover px-3 py-1 text-primary-foreground hover:bg-primary-hover">
           Filtrar
         </button>
       </form>
 
-      {err ? <p className="text-sm text-red-700">{err}</p> : null}
+      {err ? <p className="text-sm text-danger-foreground">{err}</p> : null}
 
       {data ? (
         <>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-fg-muted">
             Total: {total} — página {page} de {totalPages}
           </p>
-          <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+          <div className="overflow-x-auto rounded border border-outline-soft bg-surface">
             <table className="min-w-full text-left text-xs">
-              <thead className="border-b border-gray-200 bg-gray-50 text-[10px] uppercase text-gray-500">
+              <thead className="border-b border-outline-soft bg-surface-hover text-[10px] uppercase text-fg-subtle">
                 <tr>
                   <th className="px-2 py-2">ID</th>
                   <th className="px-2 py-2">Tenant</th>
@@ -101,7 +101,7 @@ export default async function AdminJobsPage({
               </thead>
               <tbody>
                 {data.jobs.map((j) => (
-                  <tr key={j.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr key={j.id} className="border-b border-outline-soft hover:bg-surface-hover">
                     <td className="px-2 py-2 font-mono">{j.id.slice(0, 8)}…</td>
                     <td className="max-w-[140px] truncate px-2 py-2 font-mono" title={j.tenant_id}>
                       {j.tenant_id}
@@ -113,7 +113,7 @@ export default async function AdminJobsPage({
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap">{j.updated_at}</td>
                     <td className="px-2 py-2">
-                      <Link href={`/admin/jobs/${encodeURIComponent(j.id)}`} className="text-blue-600 hover:underline">
+                      <Link href={`/admin/jobs/${encodeURIComponent(j.id)}`} className="text-accent hover:underline">
                         Detalle
                       </Link>
                     </td>
@@ -124,12 +124,12 @@ export default async function AdminJobsPage({
           </div>
           <div className="flex gap-4 text-sm">
             {page > 1 ? (
-              <Link href={hrefForPage(page - 1)} className="text-blue-600 hover:underline">
+              <Link href={hrefForPage(page - 1)} className="text-accent hover:underline">
                 Anterior
               </Link>
             ) : null}
             {page < totalPages ? (
-              <Link href={hrefForPage(page + 1)} className="text-blue-600 hover:underline">
+              <Link href={hrefForPage(page + 1)} className="text-accent hover:underline">
                 Siguiente
               </Link>
             ) : null}

@@ -32,8 +32,8 @@ import { SelectProductModal } from "./components/SelectProductModal";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const inputErrorRing = "border-red-500 ring-1 ring-red-200";
-const inputNormal = "border-gray-300";
+const inputErrorRing = "border-danger-emphasis ring-1 ring-danger-ring";
+const inputNormal = "border-outline";
 
 type NewInvoiceFormProps = {
   defaultCreatedByFirstName: string;
@@ -254,7 +254,7 @@ export function NewInvoiceForm({
         {!suppressServerBanner && bannerErrorsFiltered.length > 0 ? (
           <div
             id="invoice-form-banner"
-            className="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            className="rounded border border-danger-outline bg-danger px-4 py-3 text-sm text-danger-foreground"
             role="alert"
           >
             <ul className="list-inside list-disc space-y-0.5">
@@ -267,42 +267,42 @@ export function NewInvoiceForm({
 
         {/* ── Identificación de la factura ─────────────────────────────── */}
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Identificación
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <span className="mb-1 block text-sm font-medium text-gray-700">Serie</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Serie</span>
               <div className="flex gap-2">
                 <input
                   type="text"
                   readOnly
                   value={serie}
                   placeholder="Sin serie"
-                  className="flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                  className="flex-1 rounded border border-outline-soft bg-surface-hover px-3 py-2 text-sm text-fg-muted"
                 />
                 <button
                   type="button"
                   onClick={() => setShowSeriesModal(true)}
-                  className="rounded border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="rounded border border-outline bg-surface px-3 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
                 >
                   Cambiar
                 </button>
               </div>
               {isNewSeries ? (
-                <p className="mt-1 text-xs text-amber-700">
+                <p className="mt-1 text-xs text-warning-muted">
                   Nueva serie — iniciará una cadena AEAT nueva con primerRegistro.
                 </p>
               ) : serie && !isNewSeries && existingSeries.includes(serie) ? (
-                <p className="mt-1 text-xs text-green-700">
+                <p className="mt-1 text-xs text-success-emphasis">
                   Continúa la serie «{serie}» — se encadenará con facturas anteriores.
                 </p>
               ) : null}
             </div>
 
             <div>
-              <span className="mb-1 block text-sm font-medium text-gray-700">
-                Número <span className="text-red-500">*</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">
+                Número <span className="text-danger-emphasis">*</span>
               </span>
               <input
                 id="invoice-field-number"
@@ -320,20 +320,20 @@ export function NewInvoiceForm({
                 }`}
               />
               {formFieldErrors?.number ? (
-                <p id="invoice-error-number" className="mt-1 text-sm text-red-600">
+                <p id="invoice-error-number" className="mt-1 text-sm text-danger-emphasis">
                   {formFieldErrors.number}
                 </p>
               ) : null}
               {composedNumber ? (
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-fg-subtle">
                   Número completo (serie + correlativo): {composedNumber}
                 </p>
               ) : null}
             </div>
 
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">
-                Fecha de expedición <span className="text-red-500">*</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">
+                Fecha de expedición <span className="text-danger-emphasis">*</span>
               </span>
               <input
                 id="invoice-field-issueDate"
@@ -353,16 +353,16 @@ export function NewInvoiceForm({
                 }`}
               />
               {formFieldErrors?.issueDate ? (
-                <p id="invoice-error-issueDate" className="mt-1 text-sm text-red-600">
+                <p id="invoice-error-issueDate" className="mt-1 text-sm text-danger-emphasis">
                   {formFieldErrors.issueDate}
                 </p>
               ) : null}
             </label>
 
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">
+              <span className="mb-1 block text-sm font-medium text-fg-muted">
                 Fecha de operación{" "}
-                <span className="font-normal text-gray-400">(si difiere)</span>
+                <span className="font-normal text-fg-subtle">(si difiere)</span>
               </span>
               <input
                 id="invoice-field-fechaOperacion"
@@ -385,11 +385,11 @@ export function NewInvoiceForm({
                 }`}
               />
               {formFieldErrors?.fechaOperacion ? (
-                <p id="invoice-error-fechaOperacion" className="mt-1 text-sm text-red-600">
+                <p id="invoice-error-fechaOperacion" className="mt-1 text-sm text-danger-emphasis">
                   {formFieldErrors.fechaOperacion}
                 </p>
               ) : null}
-              <p id="fechaOperacionHint" className="mt-1 text-xs text-gray-400">
+              <p id="fechaOperacionHint" className="mt-1 text-xs text-fg-subtle">
                 No puede ser posterior a la fecha de expedición (salvo régimen 14 o 15).
               </p>
             </label>
@@ -399,28 +399,28 @@ export function NewInvoiceForm({
         {/* ── Datos del destinatario ───────────────────────────────────── */}
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">
               Destinatario
             </h2>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setShowSelectCustomerModal(true)}
-                className="text-sm text-gray-500 hover:text-gray-800 hover:underline"
+                className="text-sm text-fg-subtle hover:text-fg hover:underline"
               >
                 Seleccionar cliente
               </button>
               <button
                 type="button"
                 onClick={() => setShowNewCustomerModal(true)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-accent hover:underline"
               >
                 + Nuevo destinatario
               </button>
             </div>
           </div>
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-fg-subtle">
             El botón «Comprobar con Hacienda» consulta si el <strong>nombre o razón social</strong> que has
             escrito <strong>coincide con el que tiene registrado Hacienda</strong> para ese NIF o CIF. Solo
             aplica a <strong>identificadores españoles</strong>; no sirve para NIF-IVA intracomunitario ni
@@ -429,8 +429,8 @@ export function NewInvoiceForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block sm:col-span-2">
-              <span className="mb-1 block text-sm font-medium text-gray-700">
-                Razón social / Nombre <span className="text-red-500">*</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">
+                Razón social / Nombre <span className="text-danger-emphasis">*</span>
               </span>
               <input
                 id="invoice-field-customerName"
@@ -450,7 +450,7 @@ export function NewInvoiceForm({
                 }`}
               />
               {formFieldErrors?.customerName ? (
-                <p id="invoice-error-customerName" className="mt-1 text-sm text-red-600">
+                <p id="invoice-error-customerName" className="mt-1 text-sm text-danger-emphasis">
                   {formFieldErrors.customerName}
                 </p>
               ) : null}
@@ -458,9 +458,9 @@ export function NewInvoiceForm({
             <div className="sm:col-span-2">
               <label
                 htmlFor="invoice-field-customerNif"
-                className="mb-1 block text-sm font-medium text-gray-700"
+                className="mb-1 block text-sm font-medium text-fg-muted"
               >
-                NIF / CIF <span className="text-red-500">*</span>
+                NIF / CIF <span className="text-danger-emphasis">*</span>
               </label>
               <div className="flex gap-2">
                 <input
@@ -487,13 +487,13 @@ export function NewInvoiceForm({
                   disabled={
                     vnifPending || !customerNif.trim() || !customerName.trim()
                   }
-                  className="shrink-0 self-start rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-50"
+                  className="shrink-0 self-start rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-hover disabled:pointer-events-none disabled:opacity-50"
                 >
                   {vnifPending ? "Comprobando…" : "Comprobar con Hacienda"}
                 </button>
               </div>
               {formFieldErrors?.customerNif ? (
-                <p id="invoice-error-customerNif" className="mt-1 text-sm text-red-600">
+                <p id="invoice-error-customerNif" className="mt-1 text-sm text-danger-emphasis">
                   {formFieldErrors.customerNif}
                 </p>
               ) : null}
@@ -502,17 +502,17 @@ export function NewInvoiceForm({
               <div
                 className={`sm:col-span-2 rounded border px-3 py-2 text-sm ${
                   vnifFeedback.variant === "ok"
-                    ? "border-green-200 bg-green-50 text-green-900"
+                    ? "border-success-outline bg-success text-success-deep"
                     : vnifFeedback.variant === "warn"
-                      ? "border-amber-200 bg-amber-50 text-amber-900"
-                      : "border-red-200 bg-red-50 text-red-800"
+                      ? "border-warning-outline bg-warning text-warning-foreground"
+                      : "border-danger-outline bg-danger text-danger-foreground"
                 }`}
               >
                 {vnifFeedback.text}
               </div>
             ) : null}
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Correo</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Correo</span>
               <input
                 id="invoice-field-customerEmail"
                 type="email"
@@ -530,17 +530,17 @@ export function NewInvoiceForm({
                 }`}
               />
               {formFieldErrors?.customerEmail ? (
-                <p id="invoice-error-customerEmail" className="mt-1 text-sm text-red-600">
+                <p id="invoice-error-customerEmail" className="mt-1 text-sm text-danger-emphasis">
                   {formFieldErrors.customerEmail}
                 </p>
               ) : null}
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Tipo de persona</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Tipo de persona</span>
               <select
                 value={customerTipoPersona}
                 onChange={(e) => setCustomerTipoPersona(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
               >
                 <option value="J">J – Persona jurídica</option>
                 <option value="F">F – Persona física</option>
@@ -551,26 +551,26 @@ export function NewInvoiceForm({
 
         {/* ── Emisor ───────────────────────────────────────────────────── */}
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Emisor
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Nombre</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Nombre</span>
               <input
                 type="text"
                 name="createdByFirstName"
                 defaultValue={defaultCreatedByFirstName}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Apellidos</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Apellidos</span>
               <input
                 type="text"
                 name="createdByLastName"
                 defaultValue={defaultCreatedByLastName}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
               />
             </label>
           </div>
@@ -582,18 +582,18 @@ export function NewInvoiceForm({
             <button
               type="button"
               onClick={() => setShowOperationDescription(true)}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="text-sm font-medium text-accent hover:underline"
             >
               + Añadir descripción de la operación (opcional)
             </button>
           ) : !showOperationDescription && operationNotes.trim() ? (
             <div className="flex flex-wrap items-center gap-3">
               <input type="hidden" name="notes" value={operationNotes} />
-              <p className="text-sm text-gray-700">Descripción de la operación añadida.</p>
+              <p className="text-sm text-fg-muted">Descripción de la operación añadida.</p>
               <button
                 type="button"
                 onClick={() => setShowOperationDescription(true)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-accent hover:underline"
               >
                 Editar
               </button>
@@ -601,13 +601,13 @@ export function NewInvoiceForm({
           ) : (
             <>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">
                   Descripción de la operación
                 </h2>
                 <button
                   type="button"
                   onClick={() => setShowOperationDescription(false)}
-                  className="text-sm text-gray-500 hover:text-gray-800 hover:underline"
+                  className="text-sm text-fg-subtle hover:text-fg hover:underline"
                 >
                   Ocultar
                 </button>
@@ -620,11 +620,11 @@ export function NewInvoiceForm({
                   rows={2}
                   maxLength={500}
                   placeholder="Descripción de los bienes/servicios facturados (máx. 500 caracteres)"
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded border border-outline px-3 py-2 text-sm"
                 />
-                <span className="mt-1 block text-xs text-gray-500">
+                <span className="mt-1 block text-xs text-fg-subtle">
                   Si lo dejas en blanco, usaremos las descripciones de las líneas como
-                  <code className="mx-1 rounded bg-gray-100 px-1 py-0.5 text-[11px]">
+                  <code className="mx-1 rounded bg-surface-muted px-1 py-0.5 text-[11px]">
                     DescripcionOperacion
                   </code>
                   para AEAT. Es obligatorio que haya algún texto entre este campo y las líneas.
@@ -636,7 +636,7 @@ export function NewInvoiceForm({
 
         {/* ── Líneas ───────────────────────────────────────────────────── */}
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Productos / Servicios
           </h2>
           <InvoiceItemsEditor
@@ -648,16 +648,16 @@ export function NewInvoiceForm({
         </section>
 
         {/* ── Totales ──────────────────────────────────────────────────── */}
-        <div className="ml-auto max-w-xs rounded border border-gray-200 bg-gray-50 p-4 text-sm">
-          <div className="flex justify-between gap-4 text-gray-600">
+        <div className="ml-auto max-w-xs rounded border border-outline-soft bg-surface-hover p-4 text-sm">
+          <div className="flex justify-between gap-4 text-fg-muted">
             <span>Base imponible</span>
             <span>{formatCents("EUR", totals.base)}</span>
           </div>
-          <div className="flex justify-between gap-4 text-gray-600">
+          <div className="flex justify-between gap-4 text-fg-muted">
             <span>Cuota IVA</span>
             <span>{formatCents("EUR", totals.cuota)}</span>
           </div>
-          <div className="mt-2 flex justify-between gap-4 border-t border-gray-200 pt-2 font-semibold">
+          <div className="mt-2 flex justify-between gap-4 border-t border-outline-soft pt-2 font-semibold">
             <span>Importe total</span>
             <span>{formatCents("EUR", totalCents)}</span>
           </div>
@@ -680,7 +680,7 @@ export function NewInvoiceForm({
           />
           <Link
             href="/invoices"
-            className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
           >
             Cancelar
           </Link>
@@ -738,8 +738,8 @@ function SubmitButton({ label, secondary, onClick }: SubmitButtonProps) {
       onClick={onClick}
       className={`rounded px-4 py-2 text-sm font-medium disabled:opacity-70 disabled:pointer-events-none ${
         secondary
-          ? "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-          : "bg-gray-900 text-white hover:bg-gray-800"
+          ? "border border-outline bg-surface text-fg-muted hover:bg-surface-hover"
+          : "bg-primary text-primary-foreground hover:bg-primary-hover"
       }`}
     >
       {pending ? "Guardando…" : label}

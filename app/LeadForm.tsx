@@ -37,7 +37,7 @@ export function LeadForm() {
                 className={[
                   "flex flex-1 cursor-pointer items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all select-none",
                   active
-                    ? "bg-fg text-white shadow-sm"
+                    ? "bg-fg text-surface shadow-sm"
                     : "text-fg-muted hover:text-fg",
                 ].join(" ")}
               >
@@ -126,7 +126,7 @@ export function LeadForm() {
 
       {/* Error */}
       {state?.error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+        <p role="alert" className="rounded-lg bg-danger px-3.5 py-2.5 text-sm text-danger-foreground">
           {state.error}
         </p>
       )}

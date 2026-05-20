@@ -12,10 +12,10 @@ import type { AdminTenant } from "@/lib/simplefactu/admin-server";
 function FormMessage({ state }: { state: ActionState }) {
   if (!state) return null;
   if (state.ok && state.message) {
-    return <p className="text-sm text-green-800">{state.message}</p>;
+    return <p className="text-sm text-success-foreground">{state.message}</p>;
   }
   if (!state.ok && state.error) {
-    return <p className="text-sm text-red-700">{state.error}</p>;
+    return <p className="text-sm text-danger-foreground">{state.error}</p>;
   }
   return null;
 }
@@ -28,24 +28,24 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-gray-800">Editar tenant</h2>
+        <h2 className="mb-3 text-sm font-semibold text-fg">Editar tenant</h2>
         <form action={patchAction} className="max-w-md space-y-3">
           <input type="hidden" name="tenantId" value={tenant.id} />
           <label className="block text-sm">
-            <span className="text-gray-600">Nombre</span>
+            <span className="text-fg-muted">Nombre</span>
             <input
               name="name"
               type="text"
               defaultValue={tenant.name ?? ""}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
             />
           </label>
           <label className="block text-sm">
-            <span className="text-gray-600">Plan</span>
+            <span className="text-fg-muted">Plan</span>
             <select
               name="planId"
               defaultValue={tenant.plan_id}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
             >
               <option value="free">free</option>
               <option value="pro">pro</option>
@@ -53,11 +53,11 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="text-gray-600">Estado</span>
+            <span className="text-fg-muted">Estado</span>
             <select
               name="status"
               defaultValue={tenant.status}
-              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
             >
               <option value="ACTIVE">ACTIVE</option>
               <option value="SUSPENDED">SUSPENDED</option>
@@ -67,7 +67,7 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
           <button
             type="submit"
             disabled={patchPending}
-            className="rounded bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+            className="rounded bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
             {patchPending ? "Guardando…" : "Guardar cambios"}
           </button>
@@ -76,8 +76,8 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-gray-800">Mantenimiento (tenant)</h2>
-        <p className="mb-3 text-xs text-gray-500">
+        <h2 className="mb-3 text-sm font-semibold text-fg">Mantenimiento (tenant)</h2>
+        <p className="mb-3 text-xs text-fg-subtle">
           Bloquea operaciones de escritura para este tenant según la API simplefactu.
         </p>
         <div className="flex flex-wrap gap-3">
@@ -86,7 +86,7 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
             <button
               type="submit"
               disabled={onPending}
-              className="rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 hover:bg-amber-100 disabled:opacity-50"
+              className="rounded border border-warning-outline bg-warning px-3 py-2 text-sm text-warning-foreground hover:bg-warning-hover disabled:opacity-50"
             >
               {onPending ? "…" : "Maintenance ON"}
             </button>
@@ -96,7 +96,7 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
             <button
               type="submit"
               disabled={offPending}
-              className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded border border-outline bg-surface px-3 py-2 text-sm text-fg hover:bg-surface-hover disabled:opacity-50"
             >
               {offPending ? "…" : "Maintenance OFF"}
             </button>

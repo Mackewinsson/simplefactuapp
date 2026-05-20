@@ -30,13 +30,13 @@ export default async function AdminUsersPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-gray-900">Usuarios (Clerk)</h1>
-      <p className="text-sm text-gray-600">
+      <h1 className="text-xl font-semibold text-fg">Usuarios (Clerk)</h1>
+      <p className="text-sm text-fg-muted">
         Total Clerk: {totalCount ?? "—"} — página {page + 1} de {totalPages}
       </p>
-      <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded border border-outline-soft bg-surface">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+          <thead className="border-b border-outline-soft bg-surface-hover text-xs uppercase text-fg-subtle">
             <tr>
               <th className="px-3 py-2">ID de usuario</th>
               <th className="px-3 py-2">Correo</th>
@@ -51,7 +51,7 @@ export default async function AdminUsersPage({
                 [u.firstName, u.lastName].filter(Boolean).join(" ") || u.username || "—";
               const acc = byUserId.get(u.id);
               return (
-                <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr key={u.id} className="border-b border-outline-soft hover:bg-surface-hover">
                   <td className="px-3 py-2 font-mono text-xs">{u.id}</td>
                   <td className="px-3 py-2">{email}</td>
                   <td className="px-3 py-2">{name}</td>
@@ -59,12 +59,12 @@ export default async function AdminUsersPage({
                     {acc ? (
                       <Link
                         href={`/admin/tenants/${encodeURIComponent(acc.simplefactuTenantId)}`}
-                        className="font-mono text-xs text-blue-600 hover:underline"
+                        className="font-mono text-xs text-accent hover:underline"
                       >
                         {acc.simplefactuTenantId}
                       </Link>
                     ) : (
-                      <span className="text-gray-400">Sin cuenta Verifactu</span>
+                      <span className="text-fg-subtle">Sin cuenta Verifactu</span>
                     )}
                   </td>
                 </tr>
@@ -75,12 +75,12 @@ export default async function AdminUsersPage({
       </div>
       <div className="flex gap-4 text-sm">
         {page > 0 ? (
-          <Link href={`/admin/users?page=${page - 1}`} className="text-blue-600 hover:underline">
+          <Link href={`/admin/users?page=${page - 1}`} className="text-accent hover:underline">
             Anterior
           </Link>
         ) : null}
         {page + 1 < totalPages ? (
-          <Link href={`/admin/users?page=${page + 1}`} className="text-blue-600 hover:underline">
+          <Link href={`/admin/users?page=${page + 1}`} className="text-accent hover:underline">
             Siguiente
           </Link>
         ) : null}

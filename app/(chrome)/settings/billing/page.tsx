@@ -52,14 +52,14 @@ export default async function BillingPage() {
     return (
       <div className="mx-auto max-w-md">
         <div className="mb-6">
-          <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
+          <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg">
             ← Volver
           </Link>
         </div>
         <h1 className="mb-3 text-2xl font-semibold">Plan y facturación</h1>
-        <div className="rounded border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        <div className="rounded border border-info-outline bg-accent-muted p-4 text-sm text-accent-foreground-muted">
           <p className="font-medium">Esta funcionalidad estará disponible próximamente.</p>
-          <p className="mt-1 text-blue-800">
+          <p className="mt-1 text-info-deep">
             De momento puedes usar {APP_DISPLAY_NAME} sin coste. Te avisaremos por email cuando los planes
             de pago estén activos.
           </p>
@@ -102,13 +102,13 @@ export default async function BillingPage() {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
+        <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg">
           ← Volver
         </Link>
       </div>
 
       <h1 className="mb-2 text-2xl font-semibold">Plan y facturación</h1>
-      <p className="mb-8 text-sm text-gray-600">
+      <p className="mb-8 text-sm text-fg-muted">
         Suscripción gestionada por Stripe. La factura mensual llega por email al medio
         registrado en Stripe.
       </p>
@@ -116,7 +116,7 @@ export default async function BillingPage() {
       {fetchError ? (
         <div
           role="alert"
-          className="mb-6 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+          className="mb-6 rounded border border-danger-outline bg-danger p-3 text-sm text-danger-foreground"
         >
           No se pudo recuperar tu plan ({fetchError}). Recarga la página o avisa a soporte.
         </div>
@@ -125,7 +125,7 @@ export default async function BillingPage() {
       {suspended ? (
         <div
           role="alert"
-          className="mb-6 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+          className="mb-6 rounded border border-warning-outline bg-warning p-3 text-sm text-warning-foreground"
         >
           <p className="font-medium">Tu cuenta está suspendida.</p>
           <p>
@@ -136,7 +136,7 @@ export default async function BillingPage() {
       ) : nearLimit ? (
         <div
           role="alert"
-          className="mb-6 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+          className="mb-6 rounded border border-warning-outline bg-warning p-3 text-sm text-warning-foreground"
         >
           <p className="font-medium">Cerca del límite mensual.</p>
           <p>
@@ -148,16 +148,16 @@ export default async function BillingPage() {
       ) : null}
 
       {plan && usage ? (
-        <section className="mb-8 rounded border border-gray-200 bg-white p-4">
+        <section className="mb-8 rounded border border-outline-soft bg-surface p-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-lg font-semibold">
               Plan actual: <span className="font-mono">{plan.name}</span>
             </h2>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-fg-muted">
               {plan.priceCents > 0 ? `${formatEuros(plan.priceCents)} / mes` : "Gratuito"}
             </span>
           </div>
-          <p className="mt-1 text-xs text-gray-500">Mes {usage.month}</p>
+          <p className="mt-1 text-xs text-fg-subtle">Mes {usage.month}</p>
 
           <dl className="mt-4 space-y-3">
             <UsageBar
@@ -176,9 +176,9 @@ export default async function BillingPage() {
         </section>
       ) : null}
 
-      <section className="rounded border border-gray-200 bg-white p-4">
+      <section className="rounded border border-outline-soft bg-surface p-4">
         <h2 className="text-lg font-semibold">Mejorar plan</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-fg-muted">
           Pagas mensualmente, sin permanencia. Puedes cancelar desde el portal de Stripe en
           cualquier momento.
         </p>
@@ -191,7 +191,7 @@ export default async function BillingPage() {
           ) : isPro ? (
             <UpgradeButton planId="enterprise" label="Mejorar a Enterprise" />
           ) : (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-fg-muted">
               Estás en el plan más alto. Si necesitas más capacidad, escríbenos.
             </p>
           )}
@@ -212,17 +212,17 @@ function UsageBar({
   max: number;
   pct: number;
 }) {
-  const tone = barPct >= 100 ? "bg-red-500" : barPct >= 80 ? "bg-amber-500" : "bg-green-500";
+  const tone = barPct >= 100 ? "bg-danger" : barPct >= 80 ? "bg-warning-strong" : "bg-success0";
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
-        <dt className="text-gray-700">{label}</dt>
-        <dd className="font-mono text-xs text-gray-700">
+        <dt className="text-fg-muted">{label}</dt>
+        <dd className="font-mono text-xs text-fg-muted">
           {used.toLocaleString("es-ES")} / {max.toLocaleString("es-ES")}
         </dd>
       </div>
       <div
-        className="mt-1 h-2 w-full overflow-hidden rounded bg-gray-200"
+        className="mt-1 h-2 w-full overflow-hidden rounded bg-surface-muted"
         role="progressbar"
         aria-valuenow={barPct}
         aria-valuemin={0}

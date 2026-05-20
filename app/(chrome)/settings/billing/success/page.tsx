@@ -14,14 +14,14 @@ export default async function BillingSuccessPage({
 
   return (
     <div className="mx-auto max-w-md">
-      <div className="rounded border border-green-200 bg-green-50 p-6 text-center">
-        <h1 className="text-xl font-semibold text-green-900">Suscripción confirmada</h1>
-        <p className="mt-2 text-sm text-green-800">
+      <div className="rounded border border-success-outline bg-success p-6 text-center">
+        <h1 className="text-xl font-semibold text-success-deep">Suscripción confirmada</h1>
+        <p className="mt-2 text-sm text-success-foreground">
           Stripe ha procesado el pago. Tu plan se activará en cuanto recibamos el webhook
           (suele ser inmediato).
         </p>
         {sessionId ? (
-          <p className="mt-4 text-xs text-green-700">
+          <p className="mt-4 text-xs text-success-emphasis">
             ID de sesión Stripe: <code className="font-mono">{sessionId}</code>
           </p>
         ) : null}

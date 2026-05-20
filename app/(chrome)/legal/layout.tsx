@@ -24,7 +24,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
   return (
     <div className="grid gap-8 md:grid-cols-[14rem_1fr]">
       <aside className="md:sticky md:top-8 md:h-fit">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
           Información legal
         </h2>
         <nav className="space-y-1 text-sm">
@@ -32,14 +32,14 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
             <Link
               key={l.href}
               href={l.href}
-              className="block rounded px-2 py-1.5 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              className="block rounded px-2 py-1.5 text-fg-muted hover:bg-surface-muted hover:text-fg"
             >
               {l.label}
             </Link>
           ))}
         </nav>
       </aside>
-      <article className="prose prose-sm max-w-none rounded border border-gray-200 bg-white p-6">
+      <article className="prose prose-sm max-w-none rounded border border-outline-soft bg-surface p-6">
         {children}
       </article>
     </div>

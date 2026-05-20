@@ -41,13 +41,13 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center gap-4">
-        <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
+        <Link href="/invoices" className="text-fg-muted hover:text-fg">
           ← Volver a facturas
         </Link>
         {invoice.aeatStatus !== AeatJobStatus.NOT_SENT ? (
           <a
             href={`/invoices/${invoice.id}/pdf`}
-            className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-hover"
             download
           >
             Descargar PDF
@@ -55,10 +55,10 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         ) : null}
       </div>
 
-      <div className="rounded border border-gray-200 bg-white">
-        <div className="border-b border-gray-200 px-4 py-4">
+      <div className="rounded border border-outline-soft bg-surface">
+        <div className="border-b border-outline-soft px-4 py-4">
           <h1 className="text-xl font-semibold">{invoice.number}</h1>
-          <dl className="mt-2 grid gap-1 text-sm text-gray-700 sm:grid-cols-2">
+          <dl className="mt-2 grid gap-1 text-sm text-fg-muted sm:grid-cols-2">
             <div>
               <span className="font-medium">Cliente:</span> {invoice.customerName}
             </div>
@@ -85,7 +85,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
           </dl>
         </div>
 
-        <div className="border-b border-gray-200 px-4 py-4">
+        <div className="border-b border-outline-soft px-4 py-4">
           <VerifactuSendPanel
             invoiceId={invoice.id}
             invoiceNumber={invoice.number}
@@ -103,13 +103,13 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
 
         <div className="space-y-2 p-4 md:hidden">
           {invoice.items.map((item) => (
-            <article key={item.id} className="rounded border border-gray-200 bg-gray-50 p-3">
-              <p className="font-medium text-gray-900">{item.description}</p>
-              <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-600">
+            <article key={item.id} className="rounded border border-outline-soft bg-surface-hover p-3">
+              <p className="font-medium text-fg">{item.description}</p>
+              <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-fg-muted">
                 <span>Cant.: {item.quantity}</span>
                 <span>Precio u.: {formatCents(invoice.currency, item.unitPriceCents)}</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-gray-900">
+              <p className="mt-2 text-sm font-medium text-fg">
                 Importe: {formatCents(invoice.currency, item.lineTotalCents)}
               </p>
             </article>
@@ -119,11 +119,11 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[400px] text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 font-medium text-gray-900">Concepto</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Cant.</th>
-                <th className="px-4 py-3 font-medium text-gray-900">Precio u.</th>
-                <th className="px-4 py-3 font-medium text-gray-900 text-right">
+              <tr className="border-b border-outline-soft bg-surface-hover">
+                <th className="px-4 py-3 font-medium text-fg">Concepto</th>
+                <th className="px-4 py-3 font-medium text-fg">Cant.</th>
+                <th className="px-4 py-3 font-medium text-fg">Precio u.</th>
+                <th className="px-4 py-3 font-medium text-fg text-right">
                   Importe
                 </th>
               </tr>
@@ -132,7 +132,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
               {invoice.items.map((item) => (
                 <tr
                   key={item.id}
-                  className="border-b border-gray-100 last:border-0"
+                  className="border-b border-outline-soft last:border-0"
                 >
                   <td className="px-4 py-3">{item.description}</td>
                   <td className="px-4 py-3">{item.quantity}</td>
@@ -148,17 +148,17 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
           </table>
         </div>
 
-        <div className="border-t border-gray-200 px-4 py-3 text-sm">
+        <div className="border-t border-outline-soft px-4 py-3 text-sm">
           <div className="ml-auto flex max-w-xs flex-col gap-1 text-right">
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Base imponible</span>
+              <span className="text-fg-muted">Base imponible</span>
               <span>{formatCents(invoice.currency, invoice.subtotalCents)}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">IVA</span>
+              <span className="text-fg-muted">IVA</span>
               <span>{formatCents(invoice.currency, invoice.taxCents)}</span>
             </div>
-            <div className="flex justify-between gap-4 border-t border-gray-200 pt-2 font-medium">
+            <div className="flex justify-between gap-4 border-t border-outline-soft pt-2 font-medium">
               <span>Total</span>
               <span>{formatCents(invoice.currency, invoice.totalCents)}</span>
             </div>
@@ -166,8 +166,8 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         </div>
 
         {invoice.notes ? (
-          <div className="border-t border-gray-200 px-4 py-3 text-sm text-gray-600">
-            <span className="font-medium text-gray-700">Notas:</span> {invoice.notes}
+          <div className="border-t border-outline-soft px-4 py-3 text-sm text-fg-muted">
+            <span className="font-medium text-fg-muted">Notas:</span> {invoice.notes}
           </div>
         ) : null}
       </div>

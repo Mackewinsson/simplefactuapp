@@ -29,7 +29,7 @@ export function CreateTenantForm() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-900 hover:bg-blue-100"
+          className="rounded border border-accent-outline bg-accent-muted px-3 py-1.5 text-sm font-medium text-accent-foreground-muted hover:bg-accent-muted-hover"
         >
           + Nuevo tenant
         </button>
@@ -38,26 +38,26 @@ export function CreateTenantForm() {
   }
 
   return (
-    <div className="rounded border border-gray-200 bg-white p-4">
+    <div className="rounded border border-outline-soft bg-surface p-4">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-semibold text-gray-900">Crear tenant</h2>
+        <h2 className="text-sm font-semibold text-fg">Crear tenant</h2>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-xs text-gray-500 hover:text-gray-700"
+          className="text-xs text-fg-subtle hover:text-fg-muted"
         >
           Cerrar
         </button>
       </div>
-      <p className="mt-1 text-xs text-gray-600">
+      <p className="mt-1 text-xs text-fg-muted">
         Pensado para integradores externos que usan la API directamente. Tras crear el
         tenant podrás generar su API key y subirle un certificado desde la vista de
         detalle.
       </p>
       <form action={formAction} className="mt-4 grid gap-3 md:grid-cols-2">
         <label className="block text-sm">
-          <span className="text-gray-700">
-            Identificador <span className="text-red-600">*</span>
+          <span className="text-fg-muted">
+            Identificador <span className="text-danger-emphasis">*</span>
           </span>
           <input
             type="text"
@@ -65,27 +65,27 @@ export function CreateTenantForm() {
             required
             placeholder="ext_acme"
             pattern="[a-zA-Z0-9_\-]+"
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 font-mono text-sm"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm"
           />
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-fg-subtle">
             Letras, números, guiones y guiones bajos. Inmutable después de crear.
           </span>
         </label>
         <label className="block text-sm">
-          <span className="text-gray-700">Nombre comercial</span>
+          <span className="text-fg-muted">Nombre comercial</span>
           <input
             type="text"
             name="name"
             placeholder="ACME SL"
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
           />
         </label>
         <label className="block text-sm">
-          <span className="text-gray-700">Plan</span>
+          <span className="text-fg-muted">Plan</span>
           <select
             name="planId"
             defaultValue="free"
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
           >
             <option value="free">free</option>
             <option value="pro">pro</option>
@@ -93,16 +93,16 @@ export function CreateTenantForm() {
           </select>
         </label>
         <label className="block text-sm">
-          <span className="text-gray-700">Email de notificaciones</span>
+          <span className="text-fg-muted">Email de notificaciones</span>
           <input
             type="email"
             name="notificationEmail"
             placeholder="contact@acme.es"
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
           />
-          <span className="mt-1 block text-xs text-gray-500">
+          <span className="mt-1 block text-xs text-fg-subtle">
             Opcional (referencia interna del integrador). Estos tenants se crean con origen{" "}
-            <code className="rounded bg-gray-100 px-0.5">API</code>: la API{" "}
+            <code className="rounded bg-surface-muted px-0.5">API</code>: la API{" "}
             <strong className="font-medium">no</strong> envía correos automáticos Resend al
             titular como en usuarios web.
           </span>
@@ -111,23 +111,23 @@ export function CreateTenantForm() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-accent-hover disabled:opacity-50"
           >
             {pending ? "Creando..." : "Crear tenant"}
           </button>
           {state && !state.ok && state.error ? (
-            <p role="alert" className="mt-2 text-sm text-red-700">
+            <p role="alert" className="mt-2 text-sm text-danger-foreground">
               {state.error}
             </p>
           ) : null}
           {state && state.ok && state.message ? (
-            <div className="mt-2 text-sm text-green-800">
+            <div className="mt-2 text-sm text-success-foreground">
               <p>{state.message}</p>
               {state.tenantId ? (
                 <p className="mt-1">
                   <Link
                     href={`/admin/tenants/${encodeURIComponent(state.tenantId)}`}
-                    className="text-blue-600 hover:underline"
+                    className="text-accent hover:underline"
                   >
                     Abrir el tenant para emitir API key y subir certificado →
                   </Link>

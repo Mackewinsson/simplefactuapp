@@ -44,8 +44,8 @@ export default async function AdminLeadsPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">Leads</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <h1 className="text-lg font-semibold text-fg">Leads</h1>
+          <p className="mt-0.5 text-sm text-fg-subtle">
             {total} {total === 1 ? "registro" : "registros"} en total
           </p>
         </div>
@@ -57,12 +57,12 @@ export default async function AdminLeadsPage({
           name="q"
           defaultValue={q}
           placeholder="Buscar nombre o email…"
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+          className="rounded-md border border-outline px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-outline"
         />
         <select
           name="type"
           defaultValue={type ?? ""}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+          className="rounded-md border border-outline px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-outline"
         >
           <option value="">Todos los perfiles</option>
           <option value="autonomo">Autónomo</option>
@@ -70,14 +70,14 @@ export default async function AdminLeadsPage({
         </select>
         <button
           type="submit"
-          className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700"
+          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
         >
           Filtrar
         </button>
         {(q || type) && (
           <a
             href="/admin/leads"
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+            className="rounded-md border border-outline px-3 py-1.5 text-sm text-fg-muted hover:bg-surface-hover"
           >
             Limpiar
           </a>
@@ -86,11 +86,11 @@ export default async function AdminLeadsPage({
 
       {/* Tabla */}
       {leads.length === 0 ? (
-        <p className="text-sm text-gray-500">No hay leads con estos filtros.</p>
+        <p className="text-sm text-fg-subtle">No hay leads con estos filtros.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-x-auto rounded-lg border border-outline-soft">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+            <thead className="bg-surface-hover text-left text-xs font-medium uppercase tracking-wide text-fg-subtle">
               <tr>
                 <th className="px-4 py-3">Nombre</th>
                 <th className="px-4 py-3">Email</th>
@@ -99,33 +99,33 @@ export default async function AdminLeadsPage({
                 <th className="px-4 py-3">Fecha</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-outline-soft">
               {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                <tr key={lead.id} className="hover:bg-surface-hover">
+                  <td className="px-4 py-3 font-medium text-fg">
                     {lead.name}
                   </td>
                   <td className="px-4 py-3">
                     <a
                       href={`mailto:${lead.email}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-accent hover:underline"
                     >
                       {lead.email}
                     </a>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                    <span className="inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-fg-muted">
                       {TYPE_LABEL[lead.type] ?? lead.type}
                     </span>
                   </td>
-                  <td className="max-w-xs px-4 py-3 text-gray-600">
+                  <td className="max-w-xs px-4 py-3 text-fg-muted">
                     {lead.message ? (
                       <span className="line-clamp-2">{lead.message}</span>
                     ) : (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-fg-subtle">—</span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-gray-500">
+                  <td className="whitespace-nowrap px-4 py-3 text-fg-subtle">
                     {new Date(lead.createdAt).toLocaleString("es-ES", {
                       day: "2-digit",
                       month: "2-digit",
@@ -147,18 +147,18 @@ export default async function AdminLeadsPage({
           {page > 1 && (
             <a
               href={`?page=${page - 1}${type ? `&type=${type}` : ""}${q ? `&q=${q}` : ""}`}
-              className="rounded border border-gray-300 px-3 py-1.5 hover:bg-gray-50"
+              className="rounded border border-outline px-3 py-1.5 hover:bg-surface-hover"
             >
               ← Anterior
             </a>
           )}
-          <span className="text-gray-500">
+          <span className="text-fg-subtle">
             Página {page} de {totalPages}
           </span>
           {page < totalPages && (
             <a
               href={`?page=${page + 1}${type ? `&type=${type}` : ""}${q ? `&q=${q}` : ""}`}
-              className="rounded border border-gray-300 px-3 py-1.5 hover:bg-gray-50"
+              className="rounded border border-outline px-3 py-1.5 hover:bg-surface-hover"
             >
               Siguiente →
             </a>

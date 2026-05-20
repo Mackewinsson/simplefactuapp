@@ -30,9 +30,9 @@ export function BrandWordmark({ href = "/", className }: Props) {
     >
       <span aria-hidden className="pointer-events-none">
         {idx === -1 ? (
-          <span className="text-lg font-semibold text-slate-900 normal-case">{before}</span>
+          <span className="text-lg font-semibold text-fg normal-case">{before}</span>
         ) : (
-          <span className="flex items-baseline text-lg font-semibold tracking-tight text-slate-900 normal-case">
+          <span className="flex items-baseline text-lg font-semibold tracking-tight text-fg normal-case">
             <span>{before}</span>
             <span className="-mx-px translate-y-[-0.04em] px-0.5 text-base font-medium text-fg-muted">
               *

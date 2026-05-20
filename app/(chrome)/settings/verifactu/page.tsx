@@ -59,15 +59,15 @@ export default async function VerifactuSettingsPage() {
     return (
       <div>
         <div className="mb-6">
-          <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
+          <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg">
             ← Volver
           </Link>
         </div>
         <h1 className="mb-2 text-2xl font-semibold">Verifactu (AEAT)</h1>
-        <div className="rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+        <div className="rounded border border-warning-outline bg-warning p-4 text-sm text-warning-deeper">
           <p className="font-medium">No se pudo preparar tu cuenta de Verifactu</p>
-          <p className="mt-2 text-amber-900">{provisionError ?? "Intenta de nuevo cuando el API esté disponible."}</p>
-          <p className="mt-3 text-amber-800">
+          <p className="mt-2 text-warning-foreground">{provisionError ?? "Intenta de nuevo cuando el API esté disponible."}</p>
+          <p className="mt-3 text-warning-deep">
             Comprueba que el servicio de registro Verifactu está disponible y vuelve a cargar esta página. Si el
             problema continúa, contacta con soporte.
           </p>
@@ -79,7 +79,7 @@ export default async function VerifactuSettingsPage() {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/invoices" className="text-sm text-gray-600 hover:text-gray-900">
+        <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg">
           ← Volver
         </Link>
       </div>

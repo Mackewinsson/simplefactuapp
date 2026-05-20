@@ -14,10 +14,10 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 border-t border-gray-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-xs text-gray-600 md:flex-row md:items-center md:justify-between">
+    <footer className="mt-16 border-t border-outline-soft bg-surface">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-xs text-fg-muted md:flex-row md:items-center md:justify-between">
         <div>
-          © {year} <span className="font-medium text-gray-800">{titularName}</span>
+          © {year} <span className="font-medium text-fg">{titularName}</span>
           {titularNif !== "((NIF_TITULAR))" ? (
             <>
               {" · "}
@@ -28,25 +28,25 @@ export function Footer() {
           <span>Servicio compatible con Veri*Factu (AEAT)</span>
         </div>
         <nav className="flex flex-wrap gap-x-4 gap-y-1">
-          <Link href="/legal/aviso-legal" className="hover:text-gray-900">
+          <Link href="/legal/aviso-legal" className="hover:text-fg">
             Aviso legal
           </Link>
-          <Link href="/legal/privacidad" className="hover:text-gray-900">
+          <Link href="/legal/privacidad" className="hover:text-fg">
             Privacidad
           </Link>
-          <Link href="/legal/terminos" className="hover:text-gray-900">
+          <Link href="/legal/terminos" className="hover:text-fg">
             Términos
           </Link>
-          <Link href="/legal/dpa" className="hover:text-gray-900">
+          <Link href="/legal/dpa" className="hover:text-fg">
             DPA
           </Link>
-          <Link href="/legal/cookies" className="hover:text-gray-900">
+          <Link href="/legal/cookies" className="hover:text-fg">
             Cookies
           </Link>
-          <Link href="/legal/cancelacion" className="hover:text-gray-900">
+          <Link href="/legal/cancelacion" className="hover:text-fg">
             Cancelación
           </Link>
-          <Link href="/legal/accesibilidad" className="hover:text-gray-900">
+          <Link href="/legal/accesibilidad" className="hover:text-fg">
             Accesibilidad
           </Link>
         </nav>

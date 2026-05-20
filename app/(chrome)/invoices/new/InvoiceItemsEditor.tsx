@@ -123,13 +123,13 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-lg rounded-lg border border-gray-200 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-lg rounded-lg border border-outline-soft bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-gray-900">Línea de factura</h3>
+          <h3 className="text-base font-semibold text-fg">Línea de factura</h3>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="rounded p-1 text-fg-subtle hover:bg-surface-muted hover:text-fg-muted"
           >
             ✕
           </button>
@@ -137,8 +137,8 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
 
         <div className="space-y-4">
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">
-              Descripción <span className="text-red-500">*</span>
+            <span className="mb-1 block text-sm font-medium text-fg-muted">
+              Descripción <span className="text-danger-emphasis">*</span>
             </span>
             <textarea
               id="invoice-item-modal-description"
@@ -152,14 +152,14 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
               aria-invalid={descriptionError ? true : undefined}
               aria-describedby={descriptionError ? "invoice-item-modal-error-description" : undefined}
               className={`w-full rounded border px-3 py-2 text-sm ${
-                descriptionError ? "border-red-500 ring-1 ring-red-200" : "border-gray-300"
+                descriptionError ? "border-danger-emphasis ring-1 ring-danger-ring" : "border-outline"
               }`}
               placeholder="Descripción del producto o servicio"
             />
             {descriptionError ? (
               <span
                 id="invoice-item-modal-error-description"
-                className="mt-1 block text-sm text-red-600"
+                className="mt-1 block text-sm text-danger-emphasis"
               >
                 {descriptionError}
               </span>
@@ -168,18 +168,18 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">Cantidad</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Cantidad</span>
               <input
                 type="number"
                 min={1}
                 value={item.quantity || ""}
                 onChange={(e) => set("quantity", parseInt(e.target.value, 10) || 1)}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-gray-700">
-                Importe unitario (€) <span className="text-red-500">*</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">
+                Importe unitario (€) <span className="text-danger-emphasis">*</span>
               </span>
               <input
                 id="invoice-item-modal-unitPrice"
@@ -194,13 +194,13 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
                 aria-invalid={unitPriceError ? true : undefined}
                 aria-describedby={unitPriceError ? "invoice-item-modal-error-unitPrice" : undefined}
                 className={`w-full rounded border px-3 py-2 text-sm ${
-                  unitPriceError ? "border-red-500 ring-1 ring-red-200" : "border-gray-300"
+                  unitPriceError ? "border-danger-emphasis ring-1 ring-danger-ring" : "border-outline"
                 }`}
               />
               {unitPriceError ? (
                 <span
                   id="invoice-item-modal-error-unitPrice"
-                  className="mt-1 block text-sm text-red-600"
+                  className="mt-1 block text-sm text-danger-emphasis"
                 >
                   {unitPriceError}
                 </span>
@@ -209,7 +209,7 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm text-gray-700">
+            <label className="flex items-center gap-2 text-sm text-fg-muted">
               <input
                 type="checkbox"
                 checked={hasDiscount}
@@ -227,7 +227,7 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
             {hasDiscount && (
               <div className="mt-2 space-y-3">
                 <label className="block">
-                  <span className="mb-1 block text-xs font-medium text-gray-600">
+                  <span className="mb-1 block text-xs font-medium text-fg-muted">
                     Descuento (€)
                   </span>
                   <input
@@ -236,11 +236,11 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
                     value={discountInput}
                     onChange={(e) => handleDiscountInput(e.target.value)}
                     placeholder="0.00"
-                    className="w-full rounded border border-gray-300 px-3 py-1.5 text-sm"
+                    className="w-full rounded border border-outline px-3 py-1.5 text-sm"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1 block text-xs font-medium text-gray-600">
+                  <span className="mb-1 block text-xs font-medium text-fg-muted">
                     Concepto del descuento (opcional)
                   </span>
                   <input
@@ -249,7 +249,7 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
                     onChange={(e) => setDiscountConceptInput(e.target.value.slice(0, 250))}
                     maxLength={250}
                     placeholder="p. ej. Pronto pago"
-                    className="w-full rounded border border-gray-300 px-3 py-1.5 text-sm"
+                    className="w-full rounded border border-outline px-3 py-1.5 text-sm"
                   />
                 </label>
               </div>
@@ -257,11 +257,11 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           </div>
 
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">Tipo impositivo</span>
+            <span className="mb-1 block text-sm font-medium text-fg-muted">Tipo impositivo</span>
             <select
               value={item.tipoImpositivo}
               onChange={(e) => set("tipoImpositivo", e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded border border-outline px-3 py-2 text-sm"
             >
               {TIPO_IMPOSITIVO_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -272,11 +272,11 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">Clave de régimen</span>
+            <span className="mb-1 block text-sm font-medium text-fg-muted">Clave de régimen</span>
             <select
               value={item.claveRegimen}
               onChange={(e) => set("claveRegimen", e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded border border-outline px-3 py-2 text-sm"
             >
               {CLAVE_REGIMEN_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -287,13 +287,13 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-gray-700">
+            <span className="mb-1 block text-sm font-medium text-fg-muted">
               Calificación de la operación
             </span>
             <select
               value={item.calificacion}
               onChange={(e) => set("calificacion", e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded border border-outline px-3 py-2 text-sm"
             >
               {CALIFICACION_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -303,16 +303,16 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
             </select>
           </label>
 
-          <div className="rounded border border-gray-100 bg-gray-50 p-3 text-sm">
-            <div className="flex justify-between text-gray-600">
+          <div className="rounded border border-outline-soft bg-surface-hover p-3 text-sm">
+            <div className="flex justify-between text-fg-muted">
               <span>Base imponible</span>
               <span>{formatCents(currency, line.base)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-fg-muted">
               <span>Cuota ({item.tipoImpositivo}%)</span>
               <span>{formatCents(currency, line.cuota)}</span>
             </div>
-            <div className="mt-1 flex justify-between border-t border-gray-200 pt-1 font-medium">
+            <div className="mt-1 flex justify-between border-t border-outline-soft pt-1 font-medium">
               <span>Total línea</span>
               <span>{formatCents(currency, line.total)}</span>
             </div>
@@ -323,14 +323,14 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
           >
             Guardar línea
           </button>
@@ -380,13 +380,13 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-700">Líneas</span>
+        <span className="text-sm font-semibold text-fg-muted">Líneas</span>
         <div className="flex gap-2">
           {onAddFromCatalog ? (
             <button
               type="button"
               onClick={onAddFromCatalog}
-              className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
+              className="text-sm text-fg-subtle hover:text-fg-muted hover:underline"
             >
               Recuperar producto/servicio
             </button>
@@ -394,7 +394,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
           <button
             type="button"
             onClick={() => setIsAdding(true)}
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-accent hover:underline"
           >
             + Añadir producto/servicio
           </button>
@@ -411,41 +411,41 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
               <article
                 key={i}
                 id={`invoice-line-${i}-m`}
-                className="rounded border border-gray-200 bg-white p-3"
+                className="rounded border border-outline-soft bg-surface p-3"
               >
                 <div
                   className={
                     descErr
-                      ? "rounded-md border border-red-500 bg-red-50/40 px-2 py-1.5 -mx-0.5"
+                      ? "rounded-md border border-danger-emphasis bg-danger/40 px-2 py-1.5 -mx-0.5"
                       : undefined
                   }
                 >
-                  <p className="font-medium text-gray-900">{row.description || "—"}</p>
-                  {descErr ? <p className="mt-1 text-sm text-red-600">{descErr}</p> : null}
+                  <p className="font-medium text-fg">{row.description || "—"}</p>
+                  {descErr ? <p className="mt-1 text-sm text-danger-emphasis">{descErr}</p> : null}
                 </div>
-                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-600">
+                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-fg-muted">
                   <span>Cant.: {row.quantity}</span>
                   <span
                     className={
-                      priceErr ? "rounded border border-red-500 bg-red-50/40 px-1 py-0.5 -mx-1" : undefined
+                      priceErr ? "rounded border border-danger-emphasis bg-danger/40 px-1 py-0.5 -mx-1" : undefined
                     }
                   >
                     Precio: {formatCents(currency, parseDecimalToCents(row.unitPrice))}
                     {priceErr ? (
-                      <span className="mt-0.5 block text-xs text-red-600">{priceErr}</span>
+                      <span className="mt-0.5 block text-xs text-danger-emphasis">{priceErr}</span>
                     ) : null}
                   </span>
                   <span>Base: {formatCents(currency, line.base)}</span>
                   <span>IVA: {formatCents(currency, line.cuota)}</span>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-fg-subtle">
                   {row.claveRegimen} · {row.calificacion} · {row.tipoImpositivo}%
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
                     type="button"
                     onClick={() => setEditingIdx(i)}
-                    className="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
+                    className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-muted"
                   >
                     Editar
                   </button>
@@ -453,7 +453,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                     <button
                       type="button"
                       onClick={() => removeItem(i)}
-                      className="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50"
+                      className="rounded px-2 py-1 text-xs text-danger-emphasis hover:bg-danger"
                     >
                       Eliminar
                     </button>
@@ -462,16 +462,16 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
               </article>
             );
           })}
-          <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm">
-            <div className="flex justify-between text-gray-600">
+          <div className="rounded border border-outline-soft bg-surface-hover p-3 text-sm">
+            <div className="flex justify-between text-fg-muted">
               <span>Base imponible</span>
               <span>{formatCents(currency, totals.base)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-fg-muted">
               <span>IVA</span>
               <span>{formatCents(currency, totals.cuota)}</span>
             </div>
-            <div className="mt-1 flex justify-between border-t border-gray-200 pt-1 font-medium text-gray-900">
+            <div className="mt-1 flex justify-between border-t border-outline-soft pt-1 font-medium text-fg">
               <span>Total</span>
               <span>{formatCents(currency, totals.base + totals.cuota)}</span>
             </div>
@@ -480,15 +480,15 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
       )}
 
       {items.length > 0 && (
-        <div className="hidden overflow-x-auto rounded border border-gray-200 md:block">
+        <div className="hidden overflow-x-auto rounded border border-outline-soft md:block">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-3 py-2 font-medium text-gray-700">Descripción</th>
-                <th className="px-3 py-2 font-medium text-gray-700 text-right">Cant.</th>
-                <th className="px-3 py-2 font-medium text-gray-700 text-right">Precio u.</th>
-                <th className="px-3 py-2 font-medium text-gray-700 text-right">Base</th>
-                <th className="px-3 py-2 font-medium text-gray-700 text-right">IVA</th>
+              <tr className="border-b border-outline-soft bg-surface-hover">
+                <th className="px-3 py-2 font-medium text-fg-muted">Descripción</th>
+                <th className="px-3 py-2 font-medium text-fg-muted text-right">Cant.</th>
+                <th className="px-3 py-2 font-medium text-fg-muted text-right">Precio u.</th>
+                <th className="px-3 py-2 font-medium text-fg-muted text-right">Base</th>
+                <th className="px-3 py-2 font-medium text-fg-muted text-right">IVA</th>
                 <th className="px-3 py-2"></th>
               </tr>
             </thead>
@@ -501,22 +501,22 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                   <tr
                     key={i}
                     id={`invoice-line-${i}-d`}
-                    className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50"
+                    className="border-b border-outline-soft last:border-0 hover:bg-surface-hover/50"
                   >
                     <td className="px-3 py-2">
                       <div
                         className={
                           descErr
-                            ? "rounded-md border border-red-500 bg-red-50/40 px-2 py-1 -mx-1"
+                            ? "rounded-md border border-danger-emphasis bg-danger/40 px-2 py-1 -mx-1"
                             : undefined
                         }
                       >
                         <span className="line-clamp-1">{row.description || "—"}</span>
                         {descErr ? (
-                          <span className="mt-1 block text-sm text-red-600">{descErr}</span>
+                          <span className="mt-1 block text-sm text-danger-emphasis">{descErr}</span>
                         ) : null}
                         {row.claveRegimen !== "01" || row.calificacion !== "S1" ? (
-                          <span className="block text-xs text-gray-400">
+                          <span className="block text-xs text-fg-subtle">
                             {row.claveRegimen} · {row.calificacion} · {row.tipoImpositivo}%
                           </span>
                         ) : null}
@@ -527,13 +527,13 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                       <div
                         className={
                           priceErr
-                            ? "inline-block rounded border border-red-500 bg-red-50/40 px-2 py-1 text-right"
+                            ? "inline-block rounded border border-danger-emphasis bg-danger/40 px-2 py-1 text-right"
                             : undefined
                         }
                       >
                         {formatCents(currency, parseDecimalToCents(row.unitPrice))}
                         {priceErr ? (
-                          <span className="mt-1 block text-xs text-red-600">{priceErr}</span>
+                          <span className="mt-1 block text-xs text-danger-emphasis">{priceErr}</span>
                         ) : null}
                       </div>
                     </td>
@@ -544,7 +544,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                         <button
                           type="button"
                           onClick={() => setEditingIdx(i)}
-                          className="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
+                          className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-muted"
                         >
                           Editar
                         </button>
@@ -552,7 +552,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                           <button
                             type="button"
                             onClick={() => removeItem(i)}
-                            className="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50"
+                            className="rounded px-2 py-1 text-xs text-danger-emphasis hover:bg-danger"
                           >
                             ×
                           </button>
@@ -564,8 +564,8 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
               })}
             </tbody>
             <tfoot>
-              <tr className="border-t border-gray-200 bg-gray-50">
-                <td colSpan={3} className="px-3 py-2 text-right text-xs font-medium text-gray-600">
+              <tr className="border-t border-outline-soft bg-surface-hover">
+                <td colSpan={3} className="px-3 py-2 text-right text-xs font-medium text-fg-muted">
                   Totales:
                 </td>
                 <td className="px-3 py-2 text-right text-sm font-medium">

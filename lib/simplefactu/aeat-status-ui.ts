@@ -12,20 +12,20 @@ export function registrationStatusBadge(
   if (cancellationStatus === "SUCCEEDED") {
     return {
       label: "Anulada",
-      className: "line-through text-gray-400 bg-gray-100",
+      className: "line-through text-fg-subtle bg-surface-muted",
     };
   }
   switch (status) {
     case "SUCCEEDED":
-      return { label: "Registrada", className: "text-green-800 bg-green-100" };
+      return { label: "Registrada", className: "text-success-foreground bg-success-hover" };
     case "PENDING":
     case "PROCESSING":
-      return { label: "Enviando…", className: "text-amber-800 bg-amber-100" };
+      return { label: "Enviando…", className: "text-warning-deep bg-warning-hover" };
     case "FAILED":
     case "DEAD":
-      return { label: "Error", className: "text-red-800 bg-red-100" };
+      return { label: "Error", className: "text-danger-foreground bg-danger-hover" };
     default:
-      return { label: "No enviada", className: "text-gray-500 bg-gray-100" };
+      return { label: "No enviada", className: "text-fg-subtle bg-surface-muted" };
   }
 }
 
@@ -69,30 +69,30 @@ export function cancellationStatusDetailLabel(status: string): string {
 export function registrationStatusBadgeClass(status: string): string {
   switch (status) {
     case "SUCCEEDED":
-      return "text-green-800 bg-green-100";
+      return "text-success-foreground bg-success-hover";
     case "PENDING":
     case "PROCESSING":
-      return "text-amber-800 bg-amber-100";
+      return "text-warning-deep bg-warning-hover";
     case "FAILED":
     case "DEAD":
-      return "text-red-800 bg-red-100";
+      return "text-danger-foreground bg-danger-hover";
     case "NOT_SENT":
     default:
-      return "text-gray-600 bg-gray-100";
+      return "text-fg-muted bg-surface-muted";
   }
 }
 
 export function cancellationStatusBadgeClass(status: string): string {
   switch (status) {
     case "SUCCEEDED":
-      return "text-green-800 bg-green-100";
+      return "text-success-foreground bg-success-hover";
     case "PENDING":
-      return "text-amber-800 bg-amber-100";
+      return "text-warning-deep bg-warning-hover";
     case "FAILED":
     case "DEAD":
-      return "text-red-800 bg-red-100";
+      return "text-danger-foreground bg-danger-hover";
     case "NONE":
     default:
-      return "text-gray-600 bg-gray-100";
+      return "text-fg-muted bg-surface-muted";
   }
 }

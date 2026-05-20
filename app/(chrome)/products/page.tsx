@@ -24,7 +24,7 @@ export default async function ProductsPage() {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/invoices" className="text-gray-600 hover:text-gray-900">
+        <Link href="/invoices" className="text-fg-muted hover:text-fg">
           ← Volver a facturas
         </Link>
       </div>
@@ -32,12 +32,12 @@ export default async function ProductsPage() {
         <h1 className="text-2xl font-semibold">Productos</h1>
         <Link
           href="/invoices/new"
-          className="rounded bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
         >
           Nueva factura (catálogo)
         </Link>
       </div>
-      <p className="mb-4 text-sm text-gray-600">
+      <p className="mb-4 text-sm text-fg-muted">
         Catálogo reutilizable al añadir líneas en una factura.
       </p>
       <ProductList products={products} />
