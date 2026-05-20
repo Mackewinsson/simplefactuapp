@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import { ApiReferenceReact } from "@scalar/api-reference-react";
 import "@scalar/api-reference-react/style.css";
+import { useLocalizeScalarUi } from "@/lib/docs/localize-scalar-ui";
 
 export type ScalarServerEntry = { url: string; description?: string };
 
@@ -21,8 +23,11 @@ export function ApiReferenceClient({
   specUrl: string;
   scalarServers: ScalarServerEntry[];
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  useLocalizeScalarUi(containerRef);
+
   return (
-    <div className="-mx-4 md:-mx-8">
+    <div ref={containerRef} className="-mx-4 md:-mx-8">
       <ApiReferenceReact
         configuration={{
           url: specUrl,
