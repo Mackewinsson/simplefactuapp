@@ -38,6 +38,17 @@ export function ApiReferenceClient({
           // with the rest of /docs (Fumadocs default theme).
           theme: "default",
           hideClientButton: false,
+          // Default to Shell/curl, which generates correct code for all endpoints.
+          defaultHttpClient: {
+            targetKey: "shell",
+            clientKey: "curl",
+          },
+          // Hide the PowerShell Invoke-WebRequest client: Scalar generates code
+          // that sets Content-Type both in the $headers hashtable and via
+          // -ContentType, which causes a runtime error in PowerShell.
+          hiddenClients: {
+            powershell: ["webrequest"],
+          },
           // Pre-fill the auth widget with the right header name so users
           // don't have to guess.
           authentication: {
