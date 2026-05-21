@@ -409,8 +409,10 @@ export type AdminInvoiceRecord = {
 
 export type AdminInvoiceRecordsResponse = {
   success: boolean;
-  records: AdminInvoiceRecord[];
-  pagination: { total: number; limit: number; offset: number };
+  rows: AdminInvoiceRecord[];
+  total: number;
+  limit: number;
+  offset: number;
 };
 
 export async function getAdminInvoiceRecords(
