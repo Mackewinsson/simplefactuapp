@@ -1,13 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
-import { getAdminJob, SimplefactuAdminError } from "@/lib/simplefactu/admin-server";
+import { getAdminJob, getAeatConsulta, SimplefactuAdminError } from "@/lib/simplefactu/admin-server";
 import { RetryJobButton } from "./RetryJobButton";
 
-export default async function AdminJobDetailPage({ params }: { params: Promise<{ jobId: string }> }) {
+export default async function AdminJobDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ jobId: string }>;
+  searchParams: Promise<{ consulta?: string }>;
+}) {
   await requireAdmin();
   const { jobId } = await params;
+  const sp = await searchParams;
   const id = decodeURIComponent(jobId);
+  const showConsulta = sp.consulta === "1";
 
   let data: Awaited<ReturnType<typeof getAdminJob>> | null = null;
   let loadErr: string | null = null;
@@ -40,6 +48,30 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
   const previewJson =
     preview !== undefined ? JSON.stringify(preview, null, 2).slice(0, 12000) : null;
 
+  // Parse payload to extract AEAT consulta params
+  let consultaNif: string | null = null;
+  let consultaNumSerie: string | null = null;
+  let consultaFecha: string | null = null;
+  if (j.payload_json) {
+    try {
+      const p = JSON.parse(j.payload_json) as Record<string, unknown>;
+      const invoice = (p.invoice ?? p) as Record<string, unknown>;
+      consultaNif = String(invoice.nif ?? "");
+      consultaNumSerie = String(invoice.numSerie ?? invoice.num_serie ?? "");
+      consultaFecha = String(invoice.fecha ?? "");
+    } catch { /* skip */ }
+  }
+
+  let consulta: Awaited<ReturnType<typeof getAeatConsulta>> | null = null;
+  let consultaErr: string | null = null;
+  if (showConsulta && consultaNif && consultaNumSerie && consultaFecha) {
+    try {
+      consulta = await getAeatConsulta({ nif: consultaNif, numSerie: consultaNumSerie, fecha: consultaFecha });
+    } catch (e: unknown) {
+      consultaErr = e instanceof Error ? e.message : "Error al consultar AEAT";
+    }
+  }
+
   return (
     <div className="space-y-4">
       <Link href="/admin/jobs" className="text-sm text-accent hover:underline">
@@ -50,7 +82,14 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
       <dl className="grid gap-2 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-fg-subtle">Tenant (API)</dt>
-          <dd className="font-mono text-xs">{j.tenant_id}</dd>
+          <dd className="font-mono text-xs">
+            <Link
+              href={`/admin/tenants/${encodeURIComponent(j.tenant_id)}`}
+              className="text-accent hover:underline"
+            >
+              {j.tenant_id}
+            </Link>
+          </dd>
         </div>
         <div>
           <dt className="text-fg-subtle">Tipo / Estado</dt>
@@ -103,6 +142,38 @@ export default async function AdminJobDetailPage({ params }: { params: Promise<{
       ) : (
         <p className="text-sm text-fg-subtle">Sin fila en job_results.</p>
       )}
+
+      {/* AEAT Consulta */}
+      <section className="rounded-lg border border-outline-soft bg-surface p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-fg">Consulta AEAT</h2>
+          {!showConsulta && consultaNif && (
+            <Link
+              href={`/admin/jobs/${encodeURIComponent(j.id)}?consulta=1`}
+              className="rounded border border-outline-soft px-3 py-1 text-xs text-accent hover:bg-surface-hover hover:underline"
+            >
+              Consultar estado en AEAT →
+            </Link>
+          )}
+        </div>
+        {!consultaNif ? (
+          <p className="mt-2 text-xs text-fg-subtle">Sin datos de factura disponibles en el payload.</p>
+        ) : showConsulta ? (
+          consultaErr ? (
+            <p className="mt-2 text-sm text-danger-foreground">{consultaErr}</p>
+          ) : consulta ? (
+            <pre className="mt-2 max-h-64 overflow-auto rounded bg-surface-hover p-3 text-xs">
+              {JSON.stringify(consulta, null, 2)}
+            </pre>
+          ) : null
+        ) : (
+          <p className="mt-2 text-xs text-fg-muted">
+            NIF: <span className="font-mono">{consultaNif}</span> — Serie:{" "}
+            <span className="font-mono">{consultaNumSerie}</span> — Fecha:{" "}
+            <span className="font-mono">{consultaFecha}</span>
+          </p>
+        )}
+      </section>
     </div>
   );
 }

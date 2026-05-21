@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
-import { getAdminMetrics, getDiagnostics, getRateLimitConfig } from "@/lib/simplefactu/admin-server";
+import { getAdminMetrics, getAdminMetricsGlobal, getDiagnostics, getRateLimitConfig } from "@/lib/simplefactu/admin-server";
 import { probeApiReady } from "@/lib/simplefactu/public-health";
 import { AdminOpsAlerts } from "../AdminOpsAlerts";
 
@@ -41,6 +41,14 @@ export default async function AdminSystemPage({
     rateErr = e instanceof Error ? e.message : "Error";
   }
 
+  let globalMetrics: Awaited<ReturnType<typeof getAdminMetricsGlobal>> | null = null;
+  let globalMetricsErr: string | null = null;
+  try {
+    globalMetrics = await getAdminMetricsGlobal(from, to);
+  } catch (e: unknown) {
+    globalMetricsErr = e instanceof Error ? e.message : "Error";
+  }
+
   let metrics: Awaited<ReturnType<typeof getAdminMetrics>> | null = null;
   let metricsErr: string | null = null;
   if (tenantId) {
@@ -79,6 +87,18 @@ export default async function AdminSystemPage({
             {JSON.stringify(rate, null, 2)}
           </pre>
         )}
+      </section>
+
+      <section className="rounded-lg border border-outline-soft bg-surface p-4">
+        <h2 className="mb-2 text-sm font-semibold text-fg">Métricas globales ({from} → {to})</h2>
+        <p className="mb-3 text-xs text-fg-subtle">Actividad total de la plataforma en el rango de fechas.</p>
+        {globalMetricsErr ? (
+          <p className="text-sm text-danger-foreground">{globalMetricsErr}</p>
+        ) : globalMetrics ? (
+          <pre className="max-h-48 overflow-auto rounded bg-surface-hover p-3 text-xs">
+            {JSON.stringify({ totals: globalMetrics.totals }, null, 2)}
+          </pre>
+        ) : null}
       </section>
 
       <section className="rounded-lg border border-outline-soft bg-surface p-4">

@@ -102,9 +102,12 @@ export default async function AdminJobsPage({
               <tbody>
                 {data.jobs.map((j) => (
                   <tr key={j.id} className="border-b border-outline-soft hover:bg-surface-hover">
-                    <td className="px-2 py-2 font-mono">{j.id.slice(0, 8)}…</td>
+                    <td className="px-2 py-2 font-mono" title={j.id}>
+                      {j.id.slice(0, 8)}…
+                    </td>
                     <td className="max-w-[140px] truncate px-2 py-2 font-mono" title={j.tenant_id}>
-                      {j.tenant_id}
+                      <Link href={`/admin/tenants/${encodeURIComponent(j.tenant_id)}`}
+                        className="hover:underline">{j.tenant_id}</Link>
                     </td>
                     <td className="px-2 py-2">{j.type}</td>
                     <td className="px-2 py-2">{j.status}</td>

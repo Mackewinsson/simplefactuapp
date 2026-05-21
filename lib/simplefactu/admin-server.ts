@@ -361,3 +361,169 @@ export async function getTenantChains(tenantId: string): Promise<{
 }> {
   return adminJson(`/admin/tenants/${encodeURIComponent(tenantId)}/chains`, { method: "GET" });
 }
+
+// --- Invoice records ---
+
+export type AdminInvoiceRecord = {
+  id: string;
+  tenant_id: string;
+  nif_emisor: string;
+  serie: string | null;
+  num_serie: string;
+  fecha: string;
+  tipo: "ALTA" | "ANULACION";
+  huella: string;
+  csv: string | null;
+  numero_instalacion: string | null;
+  estado: string;
+  created_at: string;
+};
+
+export type AdminInvoiceRecordsResponse = {
+  success: boolean;
+  records: AdminInvoiceRecord[];
+  pagination: { total: number; limit: number; offset: number };
+};
+
+export async function getAdminInvoiceRecords(
+  tenantId: string,
+  params: { from?: string; to?: string; serie?: string; tipo?: string; limit: number; offset: number }
+): Promise<AdminInvoiceRecordsResponse> {
+  const q = new URLSearchParams({ limit: String(params.limit), offset: String(params.offset) });
+  if (params.from) q.set("from", params.from);
+  if (params.to) q.set("to", params.to);
+  if (params.serie) q.set("serie", params.serie);
+  if (params.tipo) q.set("tipo", params.tipo);
+  return adminJson<AdminInvoiceRecordsResponse>(
+    `/admin/tenants/${encodeURIComponent(tenantId)}/invoice-records?${q}`,
+    { method: "GET" }
+  );
+}
+
+// --- Webhooks ---
+
+export type AdminWebhookConfig = {
+  success: boolean;
+  tenantId: string;
+  webhookUrl: string | null;
+  hasSecret: boolean;
+};
+
+export async function getTenantWebhook(tenantId: string): Promise<AdminWebhookConfig> {
+  return adminJson<AdminWebhookConfig>(
+    `/admin/tenants/${encodeURIComponent(tenantId)}/webhook`,
+    { method: "GET" }
+  );
+}
+
+export async function patchTenantWebhook(
+  tenantId: string,
+  body: { webhookUrl?: string | null; webhookSecret?: string | null }
+): Promise<{ success: boolean; message?: string }> {
+  return adminJson(`/admin/tenants/${encodeURIComponent(tenantId)}/webhook`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+// --- Email prefs ---
+
+export type AdminEmailPrefs = {
+  success: boolean;
+  tenantId: string;
+  notificationEmail: string | null;
+  notifyOnDeadJobs: boolean;
+  notifyOnCertExpiry: boolean;
+};
+
+export async function getTenantEmailPrefs(tenantId: string): Promise<AdminEmailPrefs> {
+  return adminJson<AdminEmailPrefs>(
+    `/admin/tenants/${encodeURIComponent(tenantId)}/email-prefs`,
+    { method: "GET" }
+  );
+}
+
+export async function patchTenantEmailPrefs(
+  tenantId: string,
+  body: { notificationEmail?: string | null; notifyOnDeadJobs?: boolean; notifyOnCertExpiry?: boolean }
+): Promise<{ success: boolean; message?: string }> {
+  return adminJson(`/admin/tenants/${encodeURIComponent(tenantId)}/email-prefs`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+// --- AEAT Consulta ---
+
+export type AeatConsultaResult = {
+  success: boolean;
+  found?: boolean;
+  estado?: string;
+  csv?: string | null;
+  details?: unknown;
+  message?: string;
+};
+
+export async function getAeatConsulta(params: {
+  nif: string;
+  numSerie: string;
+  fecha: string;
+}): Promise<AeatConsultaResult> {
+  const q = new URLSearchParams({ nif: params.nif, numSerie: params.numSerie, fecha: params.fecha });
+  return adminJson<AeatConsultaResult>(`/admin/aeat/consulta?${q}`, { method: "GET" });
+}
+
+// --- Events ---
+
+export type AdminEvent = {
+  id: string;
+  tenant_id: string | null;
+  event_type: string;
+  severity: string;
+  payload_json: string | null;
+  prev_huella: string | null;
+  huella: string;
+  created_at: string;
+};
+
+export type AdminEventsResponse = {
+  success: boolean;
+  events: AdminEvent[];
+  pagination?: { total: number; limit: number; offset: number };
+};
+
+export async function getAdminEvents(params: {
+  tenantId?: string;
+  type?: string;
+  from?: string;
+  to?: string;
+  limit: number;
+  offset: number;
+}): Promise<AdminEventsResponse> {
+  const q = new URLSearchParams({ limit: String(params.limit), offset: String(params.offset) });
+  if (params.tenantId) q.set("tenantId", params.tenantId);
+  if (params.type) q.set("type", params.type);
+  if (params.from) q.set("from", params.from);
+  if (params.to) q.set("to", params.to);
+  return adminJson<AdminEventsResponse>(`/admin/events?${q}`, { method: "GET" });
+}
+
+export type EventsChainVerifyResponse = {
+  success: boolean;
+  valid: boolean;
+  rowsChecked: number;
+  broken?: { id: string; event_type: string; created_at: string } | null;
+};
+
+export async function verifyEventsChain(tenantId?: string): Promise<EventsChainVerifyResponse> {
+  const q = new URLSearchParams();
+  if (tenantId) q.set("tenantId", tenantId);
+  return adminJson<EventsChainVerifyResponse>(`/admin/events/verify-chain?${q}`, { method: "GET" });
+}
+
+// --- Global metrics (tenantId now optional) ---
+
+export async function getAdminMetricsGlobal(from: string, to: string): Promise<AdminMetricsResponse> {
+  const q = new URLSearchParams({ from, to });
+  return adminJson<AdminMetricsResponse>(`/admin/metrics?${q}`, { method: "GET" });
+}

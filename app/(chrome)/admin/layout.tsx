@@ -30,6 +30,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin/audit" className={linkClass}>
           Auditoría
         </Link>
+        <Link href="/admin/events" className={linkClass}>
+          Eventos SIF
+        </Link>
         <Link href="/admin/leads" className={linkClass}>
           Leads
         </Link>

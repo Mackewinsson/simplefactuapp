@@ -13,6 +13,8 @@ import {
   postRevokeApiKey,
   postUploadTenantCertificate,
   deleteTenantCertificate,
+  patchTenantWebhook,
+  patchTenantEmailPrefs,
   SimplefactuAdminError,
 } from "@/lib/simplefactu/admin-server";
 import { BFF_KEY_SCOPES } from "@/lib/verifactu/provision";
@@ -247,6 +249,43 @@ export async function adminUploadCertificateAction(_prev: ActionState, formData:
     await logAdminAction({ userId, action: "certificate.upload", target: tenantId });
     revalidatePath(`/admin/tenants/${encodeURIComponent(tenantId)}`);
     return { ok: true, message: "Certificado actualizado." };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Error";
+    return { ok: false, error: msg };
+  }
+}
+
+export async function adminPatchWebhookAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const { userId } = await requireAdmin();
+  const tenantId = formData.get("tenantId")?.toString()?.trim();
+  if (!tenantId) return { ok: false, error: "Falta tenantId" };
+  const webhookUrl = formData.get("webhookUrl")?.toString()?.trim() || null;
+  const webhookSecret = formData.get("webhookSecret")?.toString()?.trim() || undefined;
+  try {
+    const body: { webhookUrl?: string | null; webhookSecret?: string | null } = { webhookUrl };
+    if (webhookSecret !== undefined) body.webhookSecret = webhookSecret || null;
+    await patchTenantWebhook(tenantId, body);
+    await logAdminAction({ userId, action: "tenant.webhook.patch", target: tenantId, metadata: { hasUrl: Boolean(webhookUrl) } });
+    revalidatePath(`/admin/tenants/${encodeURIComponent(tenantId)}`);
+    return { ok: true, message: webhookUrl ? "Webhook configurado." : "Webhook eliminado." };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Error";
+    return { ok: false, error: msg };
+  }
+}
+
+export async function adminPatchEmailPrefsAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const { userId } = await requireAdmin();
+  const tenantId = formData.get("tenantId")?.toString()?.trim();
+  if (!tenantId) return { ok: false, error: "Falta tenantId" };
+  const notificationEmail = formData.get("notificationEmail")?.toString()?.trim() || null;
+  const notifyOnDeadJobs = formData.get("notifyOnDeadJobs") === "on";
+  const notifyOnCertExpiry = formData.get("notifyOnCertExpiry") === "on";
+  try {
+    await patchTenantEmailPrefs(tenantId, { notificationEmail, notifyOnDeadJobs, notifyOnCertExpiry });
+    await logAdminAction({ userId, action: "tenant.email_prefs.patch", target: tenantId });
+    revalidatePath(`/admin/tenants/${encodeURIComponent(tenantId)}`);
+    return { ok: true, message: "Preferencias de notificación actualizadas." };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";
     return { ok: false, error: msg };
