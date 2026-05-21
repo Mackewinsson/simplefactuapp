@@ -45,6 +45,8 @@ export async function adminCreateTenantAction(
   const name = formData.get("name")?.toString()?.trim() ?? "";
   const planIdRaw = formData.get("planId")?.toString()?.trim() ?? "free";
   const notificationEmail = formData.get("notificationEmail")?.toString()?.trim() ?? "";
+  const parentTenantId = formData.get("parentTenantId")?.toString()?.trim() ?? "";
+  const allowedNif = formData.get("allowedNif")?.toString()?.trim() ?? "";
 
   if (!id) return { ok: false, error: "Falta el identificador del tenant." };
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
@@ -66,6 +68,8 @@ export async function adminCreateTenantAction(
       planId: "free" | "pro" | "enterprise";
       notificationEmail?: string;
       source: "API";
+      parentTenantId?: string;
+      allowedNif?: string;
     } = {
       id,
       planId: planIdRaw as "free" | "pro" | "enterprise",
@@ -73,13 +77,15 @@ export async function adminCreateTenantAction(
     };
     if (name) body.name = name;
     if (notificationEmail) body.notificationEmail = notificationEmail;
+    if (parentTenantId) body.parentTenantId = parentTenantId;
+    if (allowedNif) body.allowedNif = allowedNif;
 
     await postCreateTenant(body);
     await logAdminAction({
       userId,
       action: "tenant.create",
       target: id,
-      metadata: { name, planId: planIdRaw, hasEmail: Boolean(notificationEmail) },
+      metadata: { name, planId: planIdRaw, hasEmail: Boolean(notificationEmail), parentTenantId: parentTenantId || null, allowedNif: allowedNif || null },
     });
     revalidatePath("/admin/tenants");
     return {
@@ -106,11 +112,16 @@ export async function adminPatchTenantAction(
   const name = formData.get("name")?.toString()?.trim() ?? "";
   const planId = formData.get("planId")?.toString()?.trim() ?? "";
   const status = formData.get("status")?.toString()?.trim() ?? "";
+  // allowedNif: empty string means "clear the restriction" (send null); absent means "don't touch"
+  const allowedNifRaw = formData.get("allowedNif");
   try {
-    const body: { name?: string; planId?: string; status?: string } = {};
+    const body: { name?: string; planId?: string; status?: string; allowedNif?: string | null } = {};
     if (name !== "") body.name = name;
     if (planId) body.planId = planId;
     if (status) body.status = status;
+    if (allowedNifRaw !== null) {
+      body.allowedNif = allowedNifRaw.toString().trim() || null;
+    }
     await patchTenant(tenantId, body);
     await logAdminAction({
       userId,

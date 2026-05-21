@@ -107,6 +107,31 @@ export function CreateTenantForm() {
             titular como en usuarios web.
           </span>
         </label>
+        <label className="block text-sm">
+          <span className="text-fg-muted">Tenant padre (opcional)</span>
+          <input
+            type="text"
+            name="parentTenantId"
+            placeholder="acme_holding"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm"
+          />
+          <span className="mt-1 block text-xs text-fg-subtle">
+            Si este tenant pertenece a un grupo o reseller, pon aquí el id del tenant padre.
+          </span>
+        </label>
+        <label className="block text-sm">
+          <span className="text-fg-muted">NIF autorizado (opcional)</span>
+          <input
+            type="text"
+            name="allowedNif"
+            placeholder="B12345678"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm uppercase"
+          />
+          <span className="mt-1 block text-xs text-fg-subtle">
+            Si se especifica, este tenant <strong className="font-medium">solo podrá emitir facturas</strong> para
+            ese NIF. Útil cuando cada tienda o filial tiene un NIF propio.
+          </span>
+        </label>
         <div className="md:col-span-2">
           <button
             type="submit"

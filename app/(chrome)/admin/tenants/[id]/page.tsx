@@ -9,13 +9,13 @@ import {
   getAdminInvoiceRecords,
   getTenantWebhook,
   getTenantEmailPrefs,
+  getSubtenants,
   SimplefactuAdminError,
+  type CertificateMetaResponse,
   type AdminInvoiceRecordsResponse,
   type AdminWebhookConfig,
   type AdminEmailPrefs,
-  type CertificateMetaResponse,
-  type AdminChainRow,
-  type AdminApiKeyRow,
+  type SubtenantsResponse,
 } from "@/lib/simplefactu/admin-server";
 import { TenantDetailForms } from "@/app/(chrome)/admin/tenants/TenantDetailForms";
 import { TenantKeysAndCert } from "@/app/(chrome)/admin/tenants/TenantKeysAndCert";
@@ -43,14 +43,49 @@ export default async function AdminTenantDetailPage({
   const invoiceSerie = sp.serie?.trim() || undefined;
   const invoiceTipo = sp.tipo?.trim() || undefined;
 
-  let err: string | null = null;
+  const safe = <T,>(p: Promise<T>): Promise<T | null> => p.catch(() => null);
 
   let tenantRes: Awaited<ReturnType<typeof getTenant>> | null = null;
+  let err: string | null = null;
+
   try {
     tenantRes = await getTenant(tenantId);
   } catch (e: unknown) {
-    if (e instanceof SimplefactuAdminError && e.status === 404) notFound();
+    if (e instanceof SimplefactuAdminError && e.status === 404) {
+      notFound();
+    }
     err = e instanceof Error ? e.message : "Error";
+  }
+
+  let cert: CertificateMetaResponse | null = null;
+  let keys: Awaited<ReturnType<typeof listApiKeysForTenant>>["keys"] = [];
+  let chains: Awaited<ReturnType<typeof getTenantChains>> | null = null;
+  let invoices: AdminInvoiceRecordsResponse | null = null;
+  let webhook: AdminWebhookConfig | null = null;
+  let emailPrefs: AdminEmailPrefs | null = null;
+  let subtenants: SubtenantsResponse | null = null;
+
+  if (tenantRes?.tenant) {
+    const [certRes, keysRes, chainsRes, invoicesRes, webhookRes, emailPrefsRes, subtenantsRes] =
+      await Promise.all([
+        safe(getTenantCertificateMeta(tenantId)),
+        safe(listApiKeysForTenant(tenantId)),
+        safe(getTenantChains(tenantId)),
+        safe(getAdminInvoiceRecords(tenantId, {
+          from: invoiceFrom, to: invoiceTo, serie: invoiceSerie, tipo: invoiceTipo,
+          limit: INVOICE_PAGE_SIZE, offset: ioffset,
+        })),
+        safe(getTenantWebhook(tenantId)),
+        safe(getTenantEmailPrefs(tenantId)),
+        safe(getSubtenants(tenantId)),
+      ]);
+    cert = certRes;
+    keys = keysRes?.keys ?? [];
+    chains = chainsRes;
+    invoices = invoicesRes;
+    webhook = webhookRes;
+    emailPrefs = emailPrefsRes;
+    subtenants = subtenantsRes;
   }
 
   if (!tenantRes?.tenant) {
@@ -65,27 +100,6 @@ export default async function AdminTenantDetailPage({
   }
 
   const t = tenantRes.tenant;
-
-  const safe = <T,>(p: Promise<T>): Promise<T | null> => p.catch(() => null);
-
-  const [certRes, keysRes, chainsRes, invoicesRes, webhookRes, emailPrefsRes] = await Promise.all([
-    safe(getTenantCertificateMeta(tenantId)),
-    safe(listApiKeysForTenant(tenantId)),
-    safe(getTenantChains(tenantId)),
-    safe(getAdminInvoiceRecords(tenantId, {
-      from: invoiceFrom, to: invoiceTo, serie: invoiceSerie, tipo: invoiceTipo,
-      limit: INVOICE_PAGE_SIZE, offset: ioffset,
-    })),
-    safe(getTenantWebhook(tenantId)),
-    safe(getTenantEmailPrefs(tenantId)),
-  ]);
-
-  const cert: CertificateMetaResponse | null = certRes;
-  const keys: AdminApiKeyRow[] = keysRes?.keys ?? [];
-  const chains: { success: boolean; tenantId: string; chains: AdminChainRow[] } | null = chainsRes;
-  const invoices: AdminInvoiceRecordsResponse | null = invoicesRes;
-  const webhook: AdminWebhookConfig | null = webhookRes;
-  const emailPrefs: AdminEmailPrefs | null = emailPrefsRes;
 
   const invoiceTotal = invoices?.pagination.total ?? 0;
   const invoiceTotalPages = Math.max(1, Math.ceil(invoiceTotal / INVOICE_PAGE_SIZE));
@@ -111,6 +125,23 @@ export default async function AdminTenantDetailPage({
           </Link>
           <h1 className="mt-2 text-xl font-semibold text-fg">Tenant: {t.id}</h1>
           {t.name && <p className="text-sm text-fg-muted">{t.name}</p>}
+          {t.parent_tenant_id && (
+            <p className="mt-1 text-xs text-fg-subtle">
+              Tenant padre:{" "}
+              <Link
+                href={`/admin/tenants/${encodeURIComponent(t.parent_tenant_id)}`}
+                className="font-mono text-accent hover:underline"
+              >
+                {t.parent_tenant_id}
+              </Link>
+            </p>
+          )}
+          {t.allowed_nif && (
+            <p className="mt-1 text-xs text-fg-subtle">
+              NIF autorizado:{" "}
+              <span className="font-mono font-medium text-warning-deeper">{t.allowed_nif}</span>
+            </p>
+          )}
         </div>
         <Link
           href={`/admin/jobs?tenant_id=${encodeURIComponent(tenantId)}`}
@@ -283,6 +314,58 @@ export default async function AdminTenantDetailPage({
 
       {/* Email prefs */}
       <TenantEmailPrefsForm tenantId={tenantId} initial={emailPrefs} />
+
+      {/* Sub-tenants (RP hierarchy) */}
+      {subtenants && subtenants.subtenants.length > 0 && (
+        <section className="rounded-lg border border-outline-soft bg-surface p-4">
+          <h2 className="mb-3 text-sm font-semibold text-fg">
+            Sub-tenants ({subtenants.subtenants.length})
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-xs">
+              <thead className="border-b border-outline-soft bg-surface-hover text-[10px] uppercase text-fg-subtle">
+                <tr>
+                  <th className="px-2 py-2">ID</th>
+                  <th className="px-2 py-2">Nombre</th>
+                  <th className="px-2 py-2">NIF autorizado</th>
+                  <th className="px-2 py-2">Plan</th>
+                  <th className="px-2 py-2">Estado</th>
+                  <th className="px-2 py-2">Cert.</th>
+                  <th className="px-2 py-2">Creado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subtenants.subtenants.map((s) => (
+                  <tr key={s.id} className="border-b border-outline-soft hover:bg-surface-hover">
+                    <td className="px-2 py-2 font-mono">
+                      <Link
+                        href={`/admin/tenants/${encodeURIComponent(s.id)}`}
+                        className="text-accent hover:underline"
+                      >
+                        {s.id}
+                      </Link>
+                    </td>
+                    <td className="px-2 py-2 text-fg-muted">{s.name ?? "—"}</td>
+                    <td className="px-2 py-2 font-mono font-medium text-warning-deeper">
+                      {s.allowed_nif ?? <span className="text-fg-subtle font-normal">Sin restricción</span>}
+                    </td>
+                    <td className="px-2 py-2 text-fg-muted">{s.plan_id}</td>
+                    <td className="px-2 py-2">
+                      <span className={s.status === "ACTIVE" ? "text-success-foreground" : "text-warning-deeper"}>
+                        {s.status}
+                      </span>
+                    </td>
+                    <td className="px-2 py-2 text-fg-muted">
+                      {s.has_certificate ? "✓" : "—"}
+                    </td>
+                    <td className="whitespace-nowrap px-2 py-2 text-fg-muted">{s.created_at}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* Keys + cert */}
       <section className="rounded-lg border border-outline-soft bg-surface p-4">
