@@ -77,12 +77,17 @@ export async function createInvoiceAction(
   const createdByFirstName = (formFirstName?.trim() || user?.firstName) ?? null;
   const createdByLastName = (formLastName?.trim() || user?.lastName) ?? null;
 
+  const isTaxFreeLine = (calificacion: string) =>
+    /^E[1-6]$/.test(calificacion) || calificacion === "N1" || calificacion === "N2";
+
   const itemRows = items.map((i) => {
     const unitPriceCents = parseDecimalToCents(i.unitPrice);
     const discountCents = i.discountCents ?? 0;
     const lineTotalCents = Math.max(0, i.quantity * unitPriceCents - discountCents);
     const taxRate = parseFloat(i.tipoImpositivo) || 0;
-    const itemTaxCents = Math.round((lineTotalCents * taxRate) / 100);
+    const itemTaxCents = isTaxFreeLine(i.calificacion)
+      ? 0
+      : Math.round((lineTotalCents * taxRate) / 100);
     return {
       description: i.description,
       quantity: i.quantity,

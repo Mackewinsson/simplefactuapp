@@ -8,7 +8,6 @@ import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 
 /* ── Layout constants ────────────────────────────────── */
-const FALLBACK_COMPANY_NAME = process.env.INVOICE_COMPANY_NAME ?? "";
 const PAGE_W = 595;
 const PAGE_H = 842; // A4
 const MARGIN = 50;
@@ -67,9 +66,22 @@ export async function GET(
   });
   if (!invoice) notFound();
 
-  if (invoice.aeatStatus === AeatJobStatus.NOT_SENT) {
+  if (invoice.aeatStatus !== AeatJobStatus.SUCCEEDED) {
     return new NextResponse(
-      "El PDF se habilita cuando la factura se ha enviado a Verifactu al menos una vez.",
+      "El PDF está disponible cuando la factura se ha registrado correctamente en Verifactu (AEAT).",
+      { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } }
+    );
+  }
+
+  const account = await prisma.userVerifactuAccount.findUnique({
+    where: { userId },
+    select: { issuerNif: true, issuerLegalName: true },
+  });
+  const issuerName = (account?.issuerLegalName || "").trim();
+  const issuerNif = (account?.issuerNif || "").trim();
+  if (!issuerName) {
+    return new NextResponse(
+      "Configura la razón social del emisor en Ajustes → Verifactu antes de descargar el PDF.",
       { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } }
     );
   }
@@ -119,19 +131,11 @@ export async function GET(
   };
 
   /* ── 1. Header ──────────────────────────────────────── */
-  // Left: issuer name; Right: invoice reference block — both at FONT_LG for balance
-  const createdByName = [invoice.createdByFirstName, invoice.createdByLastName]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const topLeftLabel = createdByName || FALLBACK_COMPANY_NAME;
-  if (topLeftLabel) {
-    text(topLeftLabel, MARGIN, { size: FONT_LG, font: bold });
-  }
-
+  // Left: fiscal issuer (Verifactu profile); Right: invoice reference block
   const isCancelled =
     invoice.aeatCancellationStatus === AeatCancellationStatus.SUCCEEDED;
 
+  text(issuerName, MARGIN, { size: FONT_LG, font: bold });
   const invLabel = isCancelled
     ? `Factura ${invoice.number} — ANULADA`
     : `Factura ${invoice.number}`;
@@ -141,6 +145,11 @@ export async function GET(
     color: isCancelled ? RED : BLACK,
   });
   y -= LH + 6;
+
+  if (issuerNif) {
+    text(`NIF: ${issuerNif}`, MARGIN, { size: FONT_SM, color: GRAY });
+    y -= LH_SM;
+  }
 
   textR(`Fecha: ${fmtDate(invoice.issueDate)}`, RIGHT, { size: FONT_SM, color: GRAY });
   y -= LH_SM;

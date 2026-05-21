@@ -80,10 +80,19 @@ export async function uploadCertificateAction(
     code?: string;
     docsHint?: string;
     warnings?: string[];
-    certificate?: { normalizedFromLegacy?: boolean };
+    certificate?: { nif?: string; normalizedFromLegacy?: boolean };
   };
 
   if (!res.ok) {
+    if (res.status === 422 && json.code === "cert_nif_mismatch") {
+      return {
+        ok: false,
+        errors: [
+          json.message ||
+            "El NIF del certificado no coincide con el NIF del emisor configurado. Sube el certificado del titular correcto.",
+        ],
+      };
+    }
     if (res.status === 422 && json.code === "wrong_passphrase") {
       return { ok: false, errors: ["La contraseña no coincide con el certificado."] };
     }
@@ -123,6 +132,21 @@ export async function uploadCertificateAction(
     }
     const msg = json.message || json.error || `HTTP ${res.status}`;
     return { ok: false, errors: [msg] };
+  }
+
+  const account = await prisma.userVerifactuAccount.findUnique({
+    where: { userId },
+    select: { issuerNif: true },
+  });
+  const certNif = (json.certificate?.nif || "").trim().toUpperCase();
+  const issuerNif = (account?.issuerNif || "").trim().toUpperCase();
+  if (issuerNif && certNif && issuerNif !== certNif) {
+    return {
+      ok: false,
+      errors: [
+        `El certificado pertenece al NIF ${certNif}, pero tu emisor configurado es ${issuerNif}. Sube el certificado del titular correcto o actualiza el NIF del emisor.`,
+      ],
+    };
   }
 
   await prisma.userVerifactuAccount.update({

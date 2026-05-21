@@ -103,4 +103,51 @@ assert.equal((cancel.facturaAnulada as { numSerieFacturaAnulada: string }).numSe
 assert.ok(formatSimplefactuHttpError(402, { message: "cap" }).includes("Límite del plan"));
 assert.ok(formatSimplefactuHttpError(429, { retryAfterSeconds: 30 }).includes("30"));
 
+// Exempt E1 → causaExencion, no calif/cuota
+const itemE1: InvoiceItem = {
+  ...item,
+  description: "Consulta médica",
+  unitPriceCents: 20000,
+  lineTotalCents: 20000,
+  calificacion: "E1",
+  tipoImpositivo: "0.0",
+};
+const invoiceE1: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  subtotalCents: 20000,
+  taxCents: 0,
+  totalCents: 20000,
+  taxRatePercent: 0,
+  items: [itemE1],
+};
+const sendE1 = buildSendInvoicePayload(invoiceE1, accountBase);
+const detE1 = (sendE1.detalles as Record<string, unknown>[])[0];
+assert.equal(detE1.causaExencion, "E1");
+assert.equal(detE1.base, 200);
+assert.equal(detE1.calif, undefined);
+assert.equal(detE1.cuota, undefined);
+assert.equal(sendE1.cuotaTotal, 0);
+assert.equal(sendE1.total, 200);
+
+// Not subject N1 → calif only, no tipo/cuota
+const itemN1: InvoiceItem = {
+  ...item,
+  description: "Operación no sujeta",
+  calificacion: "N1",
+  tipoImpositivo: "0.0",
+};
+const invoiceN1: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  subtotalCents: 10000,
+  taxCents: 0,
+  totalCents: 10000,
+  items: [itemN1],
+};
+const sendN1 = buildSendInvoicePayload(invoiceN1, accountBase);
+const detN1 = (sendN1.detalles as Record<string, unknown>[])[0];
+assert.equal(detN1.calif, "N1");
+assert.equal(detN1.causaExencion, undefined);
+assert.equal(detN1.tipo, undefined);
+assert.equal(detN1.cuota, undefined);
+
 console.log("test-verifactu-payloads: OK");

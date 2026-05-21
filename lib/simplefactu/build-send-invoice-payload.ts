@@ -61,16 +61,29 @@ function formatImporte(v: number): number {
   return Math.round(v * 100) / 100;
 }
 
+function isExemptCause(calificacion: string): boolean {
+  return /^E[1-6]$/.test(calificacion);
+}
+
+function isNotSubject(calificacion: string): boolean {
+  return calificacion === "N1" || calificacion === "N2";
+}
+
+function isTaxFreeLine(calificacion: string): boolean {
+  return isExemptCause(calificacion) || isNotSubject(calificacion);
+}
+
+type DetalleGroup =
+  | { kind: "exempt"; clave: string; causaExencion: string; baseCents: number }
+  | { kind: "notSubject"; clave: string; calif: string; baseCents: number }
+  | { kind: "taxed"; clave: string; calif: string; tipo: number; baseCents: number; cuotaCents: number };
+
 /**
  * Build the detalles array from invoice items.
- * Groups by (claveRegimen, calificacion, tipoImpositivo) and sums base/cuota per group.
+ * AEAT: causaExencion (E1–E6) XOR calif (S1/S2/N1/N2); no tipo/cuota on exempt or not-subject lines.
  */
 function buildDetalles(items: InvoiceItem[]): Record<string, unknown>[] {
-  type Key = string;
-  const groups = new Map<
-    Key,
-    { clave: string; calif: string; tipo: number; baseCents: number; cuotaCents: number }
-  >();
+  const groups = new Map<string, DetalleGroup>();
 
   for (const item of items) {
     const claveRegimen = (item as unknown as Record<string, string>).claveRegimen ?? "01";
@@ -78,29 +91,62 @@ function buildDetalles(items: InvoiceItem[]): Record<string, unknown>[] {
     const tipoImpositivo = parseFloat(
       (item as unknown as Record<string, string>).tipoImpositivo ?? "21.0"
     ) || 0;
-
-    const key: Key = `${claveRegimen}|${calificacion}|${tipoImpositivo}`;
     const discountCents = (item as unknown as Record<string, number>).discountCents ?? 0;
     const baseCents = Math.max(0, item.quantity * item.unitPriceCents - discountCents);
-    const cuotaCents = Math.round((baseCents * tipoImpositivo) / 100);
+
+    let key: string;
+    let group: DetalleGroup;
+
+    if (isExemptCause(calificacion)) {
+      key = `${claveRegimen}|causa:${calificacion}`;
+      group = { kind: "exempt", clave: claveRegimen, causaExencion: calificacion, baseCents };
+    } else if (isNotSubject(calificacion)) {
+      key = `${claveRegimen}|calif:${calificacion}`;
+      group = { kind: "notSubject", clave: claveRegimen, calif: calificacion, baseCents };
+    } else {
+      key = `${claveRegimen}|calif:${calificacion}|tipo:${tipoImpositivo}`;
+      const cuotaCents = Math.round((baseCents * tipoImpositivo) / 100);
+      group = {
+        kind: "taxed",
+        clave: claveRegimen,
+        calif: calificacion,
+        tipo: tipoImpositivo,
+        baseCents,
+        cuotaCents,
+      };
+    }
 
     const existing = groups.get(key);
-    if (existing) {
-      existing.baseCents += baseCents;
-      existing.cuotaCents += cuotaCents;
-    } else {
-      groups.set(key, { clave: claveRegimen, calif: calificacion, tipo: tipoImpositivo, baseCents, cuotaCents });
+    if (!existing) {
+      groups.set(key, group);
+      continue;
+    }
+
+    existing.baseCents += baseCents;
+    if (existing.kind === "taxed" && group.kind === "taxed") {
+      existing.cuotaCents += group.cuotaCents;
     }
   }
 
-  return Array.from(groups.values()).map(({ clave, calif, tipo, baseCents, cuotaCents }) => ({
-    clave,
-    calif,
-    tipo,
-    base: formatImporte(baseCents / 100),
-    cuota: formatImporte(cuotaCents / 100),
-  }));
+  return Array.from(groups.values()).map((g) => {
+    const base = formatImporte(g.baseCents / 100);
+    if (g.kind === "exempt") {
+      return { clave: g.clave, causaExencion: g.causaExencion, base };
+    }
+    if (g.kind === "notSubject") {
+      return { clave: g.clave, calif: g.calif, base };
+    }
+    return {
+      clave: g.clave,
+      calif: g.calif,
+      tipo: g.tipo,
+      base,
+      cuota: formatImporte(g.cuotaCents / 100),
+    };
+  });
 }
+
+export { isExemptCause, isNotSubject, isTaxFreeLine };
 
 /**
  * Build JSON body for POST /send-invoice. Omits huella / primerRegistro so the API infers and generates.
