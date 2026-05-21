@@ -64,6 +64,20 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
               <option value="TRIAL">TRIAL</option>
             </select>
           </label>
+          <label className="block text-sm">
+            <span className="text-fg-muted">NIF autorizado</span>
+            <input
+              name="allowedNif"
+              type="text"
+              defaultValue={tenant.allowed_nif ?? ""}
+              placeholder="B12345678 — vacío para sin restricción"
+              className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm uppercase"
+            />
+            <span className="mt-1 block text-xs text-fg-subtle">
+              Si se rellena, este tenant solo podrá emitir facturas para ese NIF. Borra el campo
+              para eliminar la restricción.
+            </span>
+          </label>
           <button
             type="submit"
             disabled={patchPending}

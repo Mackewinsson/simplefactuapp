@@ -103,6 +103,10 @@ export type AdminTenant = {
   /** 1 = certificate present, 0 = absent (or boolean in some DB dialects) */
   has_certificate?: number | boolean;
   cert_updated_at?: string | null;
+  /** RP hierarchy: ID of the parent tenant, if this is a sub-tenant */
+  parent_tenant_id?: string | null;
+  /** If set, this tenant may ONLY emit invoices for this NIF */
+  allowed_nif?: string | null;
 };
 
 export type ListTenantsResponse = {
@@ -146,6 +150,10 @@ export async function postCreateTenant(body: {
   notificationEmail?: string;
   /** B2B / admin-created tenants default to API — no tenant-facing Resend rollups */
   source?: "FRONTEND" | "API";
+  /** RP hierarchy: parent tenant ID */
+  parentTenantId?: string;
+  /** NIF this sub-tenant is restricted to; omit for no restriction */
+  allowedNif?: string;
 }): Promise<{ success: boolean; tenant: AdminTenant }> {
   return adminJson("/admin/tenants", {
     method: "POST",
@@ -155,12 +163,32 @@ export async function postCreateTenant(body: {
 
 export async function patchTenant(
   id: string,
-  body: { name?: string; planId?: string; status?: string }
+  body: { name?: string; planId?: string; status?: string; allowedNif?: string | null }
 ): Promise<{ success: boolean; tenant: AdminTenant }> {
   return adminJson(`/admin/tenants/${encodeURIComponent(id)}`, {
     method: "PATCH",
     body: JSON.stringify(body),
   });
+}
+
+export type SubtenantsResponse = {
+  success: boolean;
+  subtenants: Array<{
+    id: string;
+    name: string | null;
+    plan_id: string;
+    status: string;
+    allowed_nif: string | null;
+    has_certificate: number | boolean;
+    created_at: string;
+  }>;
+};
+
+export async function getSubtenants(parentId: string): Promise<SubtenantsResponse> {
+  return adminJson<SubtenantsResponse>(
+    `/admin/tenants/${encodeURIComponent(parentId)}/subtenants`,
+    { method: "GET" }
+  );
 }
 
 export async function getTenantCertificateMeta(tenantId: string): Promise<CertificateMetaResponse> {
