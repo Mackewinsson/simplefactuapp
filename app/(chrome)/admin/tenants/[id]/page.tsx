@@ -10,6 +10,12 @@ import {
   getTenantWebhook,
   getTenantEmailPrefs,
   SimplefactuAdminError,
+  type AdminInvoiceRecordsResponse,
+  type AdminWebhookConfig,
+  type AdminEmailPrefs,
+  type CertificateMetaResponse,
+  type AdminChainRow,
+  type AdminApiKeyRow,
 } from "@/lib/simplefactu/admin-server";
 import { TenantDetailForms } from "@/app/(chrome)/admin/tenants/TenantDetailForms";
 import { TenantKeysAndCert } from "@/app/(chrome)/admin/tenants/TenantKeysAndCert";
@@ -37,36 +43,14 @@ export default async function AdminTenantDetailPage({
   const invoiceSerie = sp.serie?.trim() || undefined;
   const invoiceTipo = sp.tipo?.trim() || undefined;
 
-  let tenantRes: Awaited<ReturnType<typeof getTenant>> | null = null;
-  let cert: Awaited<ReturnType<typeof getTenantCertificateMeta>> | null = null;
-  let keys: Awaited<ReturnType<typeof listApiKeysForTenant>>["keys"] = [];
-  let chains: Awaited<ReturnType<typeof getTenantChains>> | null = null;
-  let invoices: Awaited<ReturnType<typeof getAdminInvoiceRecords>> | null = null;
-  let webhook: Awaited<ReturnType<typeof getTenantWebhook>> | null = null;
-  let emailPrefs: Awaited<ReturnType<typeof getTenantEmailPrefs>> | null = null;
   let err: string | null = null;
 
+  let tenantRes: Awaited<ReturnType<typeof getTenant>> | null = null;
   try {
     tenantRes = await getTenant(tenantId);
   } catch (e: unknown) {
-    if (e instanceof SimplefactuAdminError && e.status === 404) {
-      notFound();
-    }
+    if (e instanceof SimplefactuAdminError && e.status === 404) notFound();
     err = e instanceof Error ? e.message : "Error";
-  }
-
-  if (tenantRes?.tenant) {
-    await Promise.allSettled([
-      getTenantCertificateMeta(tenantId).then((r) => { cert = r; }).catch(() => {}),
-      listApiKeysForTenant(tenantId).then((r) => { keys = r.keys ?? []; }).catch(() => {}),
-      getTenantChains(tenantId).then((r) => { chains = r; }).catch(() => {}),
-      getAdminInvoiceRecords(tenantId, {
-        from: invoiceFrom, to: invoiceTo, serie: invoiceSerie, tipo: invoiceTipo,
-        limit: INVOICE_PAGE_SIZE, offset: ioffset,
-      }).then((r) => { invoices = r; }).catch(() => {}),
-      getTenantWebhook(tenantId).then((r) => { webhook = r; }).catch(() => {}),
-      getTenantEmailPrefs(tenantId).then((r) => { emailPrefs = r; }).catch(() => {}),
-    ]);
   }
 
   if (!tenantRes?.tenant) {
@@ -81,6 +65,27 @@ export default async function AdminTenantDetailPage({
   }
 
   const t = tenantRes.tenant;
+
+  const safe = <T,>(p: Promise<T>): Promise<T | null> => p.catch(() => null);
+
+  const [certRes, keysRes, chainsRes, invoicesRes, webhookRes, emailPrefsRes] = await Promise.all([
+    safe(getTenantCertificateMeta(tenantId)),
+    safe(listApiKeysForTenant(tenantId)),
+    safe(getTenantChains(tenantId)),
+    safe(getAdminInvoiceRecords(tenantId, {
+      from: invoiceFrom, to: invoiceTo, serie: invoiceSerie, tipo: invoiceTipo,
+      limit: INVOICE_PAGE_SIZE, offset: ioffset,
+    })),
+    safe(getTenantWebhook(tenantId)),
+    safe(getTenantEmailPrefs(tenantId)),
+  ]);
+
+  const cert: CertificateMetaResponse | null = certRes;
+  const keys: AdminApiKeyRow[] = keysRes?.keys ?? [];
+  const chains: { success: boolean; tenantId: string; chains: AdminChainRow[] } | null = chainsRes;
+  const invoices: AdminInvoiceRecordsResponse | null = invoicesRes;
+  const webhook: AdminWebhookConfig | null = webhookRes;
+  const emailPrefs: AdminEmailPrefs | null = emailPrefsRes;
 
   const invoiceTotal = invoices?.pagination.total ?? 0;
   const invoiceTotalPages = Math.max(1, Math.ceil(invoiceTotal / INVOICE_PAGE_SIZE));
