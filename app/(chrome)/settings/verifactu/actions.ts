@@ -96,6 +96,12 @@ export async function uploadCertificateAction(
         ],
       };
     }
+    if (res.status === 422 && json.code === "expired") {
+      return {
+        ok: false,
+        errors: [json.message || "El certificado ha expirado. Renuévalo en la FNMT y sube el nuevo .pfx."],
+      };
+    }
     if (res.status === 422 && json.code === "legacy_rc2") {
       return {
         ok: false,
