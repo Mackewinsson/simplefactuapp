@@ -15,11 +15,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin" className={linkClass}>
           Inicio
         </Link>
-        <Link href="/admin/tenants" className={linkClass}>
-          Tenants
-        </Link>
         <Link href="/admin/users" className={linkClass}>
-          Usuarios (Clerk)
+          Usuarios
         </Link>
         <Link href="/admin/jobs" className={linkClass}>
           Jobs AEAT
