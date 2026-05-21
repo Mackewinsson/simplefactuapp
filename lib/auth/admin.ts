@@ -36,9 +36,14 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
     return true;
   }
 
-  const api = await clerkClient();
-  const user = await api.users.getUser(userId);
-  return hasAdminRoleInMetadata(user.publicMetadata as Record<string, unknown>);
+  try {
+    const api = await clerkClient();
+    const user = await api.users.getUser(userId);
+    return hasAdminRoleInMetadata(user.publicMetadata as Record<string, unknown>);
+  } catch {
+    // Clerk API unreachable (network error, rate limit, etc.) — deny access
+    return false;
+  }
 }
 
 /**

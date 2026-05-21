@@ -101,7 +101,7 @@ export default async function AdminTenantDetailPage({
 
   const t = tenantRes.tenant;
 
-  const invoiceTotal = invoices?.pagination.total ?? 0;
+  const invoiceTotal = invoices?.total ?? 0;
   const invoiceTotalPages = Math.max(1, Math.ceil(invoiceTotal / INVOICE_PAGE_SIZE));
 
   function invoiceHref(p: number, extra?: Record<string, string>) {
@@ -247,7 +247,7 @@ export default async function AdminTenantDetailPage({
           </button>
         </form>
 
-        {invoices?.records?.length ? (
+        {invoices?.rows?.length ? (
           <>
             <p className="mb-2 text-xs text-fg-muted">
               {invoiceTotal} registros — página {ipage} de {invoiceTotalPages}
@@ -266,7 +266,7 @@ export default async function AdminTenantDetailPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.records.map((r) => (
+                  {invoices.rows.map((r) => (
                     <tr key={r.id} className="border-b border-outline-soft hover:bg-surface-hover">
                       <td className="whitespace-nowrap px-2 py-2">{r.fecha}</td>
                       <td className="px-2 py-2 font-mono">{r.num_serie}</td>
@@ -286,7 +286,7 @@ export default async function AdminTenantDetailPage({
                       </td>
                       <td className="px-2 py-2 font-mono text-fg-muted">{r.csv ?? "—"}</td>
                       <td className="max-w-[120px] truncate px-2 py-2 font-mono text-fg-subtle"
-                        title={r.huella}>{r.huella.slice(0, 12)}…</td>
+                        title={r.huella ?? ""}>{r.huella?.slice(0, 12) ?? ""}…</td>
                       <td className="whitespace-nowrap px-2 py-2 text-fg-muted">{r.created_at}</td>
                     </tr>
                   ))}
@@ -305,6 +305,7 @@ export default async function AdminTenantDetailPage({
         ) : (
           <p className="text-sm text-fg-subtle">
             {invoices ? "Sin facturas registradas con estos filtros." : "No se pudo cargar el ledger de facturas."}
+
           </p>
         )}
       </section>
