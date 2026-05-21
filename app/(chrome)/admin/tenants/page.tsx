@@ -47,23 +47,41 @@ export default async function AdminTenantsPage({
                   <th className="px-3 py-2">Nombre</th>
                   <th className="px-3 py-2">Plan</th>
                   <th className="px-3 py-2">Estado</th>
+                  <th className="px-3 py-2">Certificado</th>
                   <th className="px-3 py-2"></th>
                 </tr>
               </thead>
               <tbody>
-                {data.tenants.map((t) => (
+                {data.tenants.map((t) => {
+                  const hasCert = !!t.has_certificate;
+                  return (
                   <tr key={t.id} className="border-b border-outline-soft hover:bg-surface-hover">
                     <td className="px-3 py-2 font-mono text-xs">{t.id}</td>
                     <td className="px-3 py-2">{t.name ?? "—"}</td>
                     <td className="px-3 py-2">{t.plan_id}</td>
                     <td className="px-3 py-2">{t.status}</td>
                     <td className="px-3 py-2">
+                      {hasCert ? (
+                        <span
+                          title={t.cert_updated_at ? `Actualizado: ${t.cert_updated_at}` : "Certificado presente"}
+                          className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success-foreground"
+                        >
+                          ✓ Sí
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-surface-hover px-2 py-0.5 text-xs text-fg-subtle">
+                          — No
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
                       <Link href={`/admin/tenants/${encodeURIComponent(t.id)}`} className="text-accent hover:underline">
                         Ver
                       </Link>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

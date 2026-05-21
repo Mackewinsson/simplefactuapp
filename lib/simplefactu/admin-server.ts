@@ -100,6 +100,9 @@ export type AdminTenant = {
   status: string;
   stripe_customer_id?: string | null;
   created_at?: string;
+  /** 1 = certificate present, 0 = absent (or boolean in some DB dialects) */
+  has_certificate?: number | boolean;
+  cert_updated_at?: string | null;
 };
 
 export type ListTenantsResponse = {
