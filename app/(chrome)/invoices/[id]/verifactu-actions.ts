@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { buildSendInvoicePayload } from "@/lib/simplefactu/build-send-invoice-payload";
 import { buildCancelInvoicePayload } from "@/lib/simplefactu/build-cancel-invoice-payload";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
-import { formatSimplefactuHttpError, formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import { formatSimplefactuHttpError, formatVerifactuActionError, formatUserFacingError } from "@/lib/simplefactu/api-errors";
 import { resyncVerifactuQrFromJob, syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
@@ -131,7 +131,7 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
         },
       });
       revalidatePath(`/invoices/${invoice.id}`);
-      return { ok: false, message: msg };
+      return { ok: false, message: formatUserFacingError(msg) };
     }
 
     const jobId = postJson.jobId as string | undefined;
@@ -332,7 +332,7 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
         },
       });
       revalidatePath(`/invoices/${invoice.id}`);
-      return { ok: false, message: msg };
+      return { ok: false, message: formatUserFacingError(msg) };
     }
 
     const jobId = postJson.jobId as string | undefined;

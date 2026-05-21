@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { formatSimplefactuHttpError, formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import { adminFetch } from "@/lib/simplefactu/admin-server";
 import {
   NIF_VERIFY_MATCH_USER,
   NIF_VERIFY_NEED_BOTH_USER,
@@ -35,28 +36,34 @@ export async function saveIssuerProfileAction(
     return { ok: false, errors: [formatVerifactuActionError(e)] };
   }
 
-  // Persist locally
+  // Vincular el NIF en el API antes de guardarlo localmente, para que la
+  // restricción de plataforma quede activa en cuanto el usuario confirma.
+  const patchRes = await adminFetch(`/admin/tenants/${encodeURIComponent(tenantId)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ allowedNif: issuerNif }),
+  });
+  if (!patchRes.ok) {
+    const patchJson = (await patchRes.json().catch(() => ({}))) as Record<string, unknown>;
+    return {
+      ok: false,
+      errors: [
+        formatSimplefactuHttpError(patchRes.status, patchJson) ||
+          "No se pudo vincular tu NIF en el servidor. Inténtalo de nuevo.",
+      ],
+    };
+  }
+
   await prisma.userVerifactuAccount.update({
     where: { userId },
     data: { issuerNif, issuerLegalName },
   });
 
-  // Propagate allowedNif to the API tenant so platform-level enforcement matches
-  // the user's declared identity. Web tenants are always single-identity (one NIF
-  // per user). Best-effort: a failure here does not block the user — AEAT still
-  // validates the NIF against the certificate independently.
-  try {
-    const { adminFetch } = await import("@/lib/simplefactu/admin-server");
-    await adminFetch(`/admin/tenants/${encodeURIComponent(tenantId)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ allowedNif: issuerNif }),
-    });
-  } catch {
-    // Non-fatal: AEAT rejects mismatched NIFs anyway (error 4116)
-  }
-
   revalidatePath("/settings/verifactu");
-  return { ok: true, message: "Datos del emisor guardados." };
+  return {
+    ok: true,
+    message:
+      "Datos del emisor guardados. Solo podrás emitir facturas con este NIF.",
+  };
 }
 
 export async function uploadCertificateAction(

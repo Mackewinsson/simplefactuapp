@@ -2,7 +2,7 @@ import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import type { SimplefactuClient } from "@/lib/simplefactu/client";
-import { formatSimplefactuNetworkError } from "@/lib/simplefactu/api-errors";
+import { formatSimplefactuNetworkError, formatUserFacingError } from "@/lib/simplefactu/api-errors";
 import {
   sendCancellationAcceptedEmail,
   sendCancellationFailedEmail,
@@ -135,7 +135,7 @@ export async function syncJobStatusToInvoice(
           sendInvoiceFailedEmail({ to: email, invoiceNumber: invoice.number, errorMessage: err })
         );
       }
-      return { ok: false, message: err, terminal: true };
+      return { ok: false, message: formatUserFacingError(err), terminal: true };
     }
     return {
       ok: true,

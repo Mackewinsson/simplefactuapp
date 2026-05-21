@@ -16,7 +16,7 @@ import {
   cancellationStatusBadgeClass,
 } from "@/lib/simplefactu/aeat-status-ui";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
-import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import { formatVerifactuActionError, formatUserFacingError } from "@/lib/simplefactu/api-errors";
 import { IssueCorrectionButton } from "./IssueCorrectionButton";
 
 type Props = {
@@ -131,7 +131,7 @@ export function VerifactuSendPanel({
     startTransition(async () => {
       try {
         const r = await action(id);
-        setMessage(r.message);
+        setMessage(formatUserFacingError(r.message));
       } catch (e) {
         setMessage(formatVerifactuActionError(e));
       }
@@ -144,7 +144,7 @@ export function VerifactuSendPanel({
     startTransition(async () => {
       try {
         const r = await cancelInvoiceVerifactuAction(invoiceId);
-        setMessage(r.message);
+        setMessage(formatUserFacingError(r.message));
       } catch (e) {
         setMessage(formatVerifactuActionError(e));
       }

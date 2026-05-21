@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import type { Invoice, InvoiceItem, UserVerifactuAccount } from "@prisma/client";
 import { buildSendInvoicePayload } from "../lib/simplefactu/build-send-invoice-payload";
 import { buildCancelInvoicePayload } from "../lib/simplefactu/build-cancel-invoice-payload";
-import { formatSimplefactuHttpError } from "../lib/simplefactu/api-errors";
+import { formatSimplefactuHttpError, formatUserFacingError } from "../lib/simplefactu/api-errors";
 
 process.env.VERIFACTU_SI_ID = process.env.VERIFACTU_SI_ID || "01";
 
@@ -102,5 +102,22 @@ assert.equal((cancel.facturaAnulada as { numSerieFacturaAnulada: string }).numSe
 
 assert.ok(formatSimplefactuHttpError(402, { message: "cap" }).includes("Límite del plan"));
 assert.ok(formatSimplefactuHttpError(429, { retryAfterSeconds: 30 }).includes("30"));
+assert.ok(
+  formatSimplefactuHttpError(403, {
+    message: "Este tenant solo puede emitir facturas para el NIF B12345678.",
+  }).includes("Ajustes → Verifactu")
+);
+assert.ok(
+  formatSimplefactuHttpError(400, {
+    details: [{ field: "descripcion", message: "descripcion is required" }],
+  }).includes("descripcion")
+);
+assert.ok(
+  formatSimplefactuHttpError(409, {
+    error: "Chain Continuity Error",
+    message: "Huella mismatch",
+  }).includes("Encadenamiento roto")
+);
+assert.ok(formatUserFacingError("[4116] formato incorrecto").includes("NIF del ObligadoEmision"));
 
 console.log("test-verifactu-payloads: OK");
