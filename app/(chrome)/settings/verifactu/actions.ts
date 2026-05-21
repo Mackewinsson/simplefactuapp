@@ -28,16 +28,32 @@ export async function saveIssuerProfileAction(
     return { ok: false, errors: ["El NIF y la razón social del emisor son obligatorios."] };
   }
 
+  let tenantId: string;
   try {
-    await ensureVerifactuApiKey(userId);
+    ({ tenantId } = await ensureVerifactuApiKey(userId));
   } catch (e) {
     return { ok: false, errors: [formatVerifactuActionError(e)] };
   }
 
+  // Persist locally
   await prisma.userVerifactuAccount.update({
     where: { userId },
     data: { issuerNif, issuerLegalName },
   });
+
+  // Propagate allowedNif to the API tenant so platform-level enforcement matches
+  // the user's declared identity. Web tenants are always single-identity (one NIF
+  // per user). Best-effort: a failure here does not block the user — AEAT still
+  // validates the NIF against the certificate independently.
+  try {
+    const { adminFetch } = await import("@/lib/simplefactu/admin-server");
+    await adminFetch(`/admin/tenants/${encodeURIComponent(tenantId)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ allowedNif: issuerNif }),
+    });
+  } catch {
+    // Non-fatal: AEAT rejects mismatched NIFs anyway (error 4116)
+  }
 
   revalidatePath("/settings/verifactu");
   return { ok: true, message: "Datos del emisor guardados." };
