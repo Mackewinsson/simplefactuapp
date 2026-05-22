@@ -7,6 +7,7 @@ import type { InvoiceRecordRow } from "../lib/simplefactu/invoice-records";
 
 const sample: InvoiceRecordRow = {
   id: "rec-1",
+  tenantId: "sf_test",
   numSerie: "2026/F-001",
   fecha: "21-05-2026",
   tipo: "ALTA",
