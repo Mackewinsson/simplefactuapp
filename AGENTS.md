@@ -227,6 +227,8 @@ Puerto Next: **3001** en ambos modos (API en 3000). El API local usa `ENABLE_AEA
 
 ## Despliegue
 
+**CI antes de deploy:** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) ejecuta `pnpm check` (lint + typecheck + tests) y `next build` en cada push/PR a `develop`/`main`. En Vercel, `pnpm build` ejecuta antes `prebuild` → `pnpm check`. Conviene activar en Vercel **“Wait for GitHub Checks”** / required check `CI` en la rama.
+
 | Paso | Acción |
 |------|--------|
 | 1 | Vercel: dominio Preview `qa.simplefactu.com` → rama `develop`; Production → `main` |

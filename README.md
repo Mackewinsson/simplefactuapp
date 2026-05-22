@@ -54,7 +54,9 @@ Catálogo completo con referencias de ficheros: **[AGENTS.md — Variables de en
    - Desarrollo local: `pnpm prisma migrate dev`
    - Producción: `pnpm prisma migrate deploy`
 
-4. **Build:** `pnpm build` (requiere claves Clerk en el entorno). Luego `pnpm start` o el comando de arranque de tu host.
+4. **Build:** `pnpm build` (ejecuta antes `pnpm check`: lint + typecheck + tests). Requiere claves Clerk en el entorno. Luego `pnpm start` o el comando de arranque de tu host.
+
+**CI:** cada push a `develop`/`main` corre [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Vercel debe esperar el check verde (o confiar en `prebuild` dentro del build).
 
 ## Base de datos de producción (Neon)
 

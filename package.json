@@ -8,6 +8,8 @@
     "dev:qa": "next dev --turbopack -p 3001",
     "dev:stack": "DOTENV_CONFIG_PATH=.env.local.stack NODE_OPTIONS='-r dotenv/config' next dev --turbopack -p 3001",
     "env:sync-qa": "bash ../simplefactu/scripts/sync-local-env-from-qa.sh",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm test",
+    "prebuild": "pnpm run check",
     "build": "next build",
     "start": "next start",
     "prisma:migrate:deploy": "prisma migrate deploy",
