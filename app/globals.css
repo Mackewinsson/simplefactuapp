@@ -82,4 +82,93 @@
   .link-accent {
     @apply text-accent hover:underline;
   }
+
+  /* Badges de estado (chips) */
+  .badge {
+    @apply inline-flex items-center rounded px-2 py-0.5 text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply text-success-foreground bg-success-hover;
+  }
+  .badge-success::before {
+    content: '';
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background-color: rgb(var(--color-success-emphasis));
+    margin-right: 0.375rem;
+    flex-shrink: 0;
+    vertical-align: middle;
+    position: relative;
+    top: -0.5px;
+  }
+
+  .badge-warning {
+    @apply text-warning-deep bg-warning-hover;
+  }
+  .badge-warning::before {
+    content: '';
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background-color: rgb(var(--color-warning-strong));
+    margin-right: 0.375rem;
+    flex-shrink: 0;
+    vertical-align: middle;
+    position: relative;
+    top: -0.5px;
+    animation: badge-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .badge-danger {
+    @apply text-danger-foreground bg-danger-hover;
+  }
+  .badge-danger::before {
+    content: '';
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background-color: rgb(var(--color-danger-emphasis));
+    margin-right: 0.375rem;
+    flex-shrink: 0;
+    vertical-align: middle;
+    position: relative;
+    top: -0.5px;
+  }
+
+  .badge-neutral {
+    @apply text-fg-muted bg-surface-muted ring-1 ring-outline-soft;
+  }
+
+  /* Avisos en bloque */
+  .alert-warning {
+    @apply rounded border border-warning-outline bg-warning p-4 text-sm text-warning-foreground;
+  }
+
+  .alert-danger {
+    @apply rounded border border-danger-outline bg-danger p-4 text-sm text-danger-foreground;
+  }
+
+  .alert-info {
+    @apply rounded border border-info-outline bg-accent-muted p-4 text-sm text-accent-foreground-muted;
+  }
+
+  /* Barras de progreso */
+  .progress-track {
+    @apply h-2 w-full overflow-hidden rounded bg-surface-muted;
+  }
+
+  .progress-fill {
+    @apply h-full bg-accent transition-all duration-500;
+  }
+}
+
+/* Badge pulse animation — usado por .badge-warning::before para indicar estado async en curso */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }

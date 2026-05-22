@@ -6,6 +6,7 @@ type Props = {
   aeatQrText: string | null;
   aeatQrDataUrl: string | null;
   pdfHref: string;
+  partial?: boolean;
 };
 
 /**
@@ -17,11 +18,19 @@ export function VerifactuSuccessBanner({
   aeatQrText,
   aeatQrDataUrl,
   pdfHref,
+  partial = false,
 }: Props) {
+  const box = partial
+    ? "mb-4 rounded-lg border border-warning-outline bg-warning p-4 text-warning-foreground"
+    : "mb-4 rounded-lg border border-success-outline bg-success p-4 text-success-foreground";
+  const sub = partial ? "text-warning-emphasis" : "text-success-emphasis";
+
   return (
-    <div className="mb-4 rounded-lg border border-success-outline bg-success p-4 text-success-foreground">
-      <p className="text-base font-semibold">Factura registrada en AEAT</p>
-      <p className="mt-1 text-sm text-success-emphasis">
+    <div className={box}>
+      <p className="text-base font-semibold">
+        {partial ? "Factura aceptada con advertencias AEAT" : "Factura registrada en AEAT"}
+      </p>
+      <p className={`mt-1 text-sm ${sub}`}>
         La factura <span className="font-mono">{invoiceNumber}</span> está en Verifactu. Guarda el
         CSV y descarga el PDF con el QR de verificación.
       </p>

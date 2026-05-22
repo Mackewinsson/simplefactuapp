@@ -11,7 +11,17 @@ export default async function CustomersPage() {
   const customers = await prisma.customer.findMany({
     where: { userId },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, nif: true, email: true, tipoPersona: true },
+    select: {
+      id: true,
+      name: true,
+      nif: true,
+      email: true,
+      tipoPersona: true,
+      idScheme: true,
+      idType: true,
+      codigoPais: true,
+      foreignId: true,
+    },
   });
 
   return (

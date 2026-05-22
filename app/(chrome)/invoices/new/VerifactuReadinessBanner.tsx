@@ -12,10 +12,10 @@ type Props = {
 export function VerifactuReadinessBanner({ readiness }: Props) {
   if (readiness.provisionError) {
     return (
-      <div className="mb-6 rounded border border-danger-outline bg-danger p-4 text-sm text-danger-foreground">
+      <div className="alert-danger mb-6">
         <p className="font-medium">No se pudo conectar con Verifactu</p>
         <p className="mt-2">{readiness.provisionError}</p>
-        <p className="mt-3 text-danger-deep">
+        <p className="mt-3 text-fg-muted">
           Si acabas de desplegar, comprueba que{" "}
           <code className="rounded bg-surface-muted px-1">SIMPLEFACTU_ADMIN_KEY</code> en el front
           coincide con <code className="rounded bg-surface-muted px-1">ADMIN_KEY</code> del API del
@@ -39,7 +39,7 @@ export function VerifactuReadinessBanner({ readiness }: Props) {
   if (missing.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded border border-warning-outline bg-warning p-4 text-sm text-warning-foreground">
+    <div className="alert-warning mb-6">
       <p className="font-medium">Antes de enviar a AEAT</p>
       <p className="mt-1 text-warning-deep">
         Puedes guardar la factura en borrador, pero el envío a Verifactu fallará hasta completar:

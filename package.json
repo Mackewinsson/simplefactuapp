@@ -5,6 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:3001": "next dev --turbopack -p 3001",
+    "dev:qa": "next dev --turbopack -p 3001",
+    "dev:stack": "DOTENV_CONFIG_PATH=.env.local.stack NODE_OPTIONS='-r dotenv/config' next dev --turbopack -p 3001",
+    "env:sync-qa": "bash ../simplefactu/scripts/sync-local-env-from-qa.sh",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm test",
+    "prebuild": "pnpm run check",
     "build": "next build",
     "start": "next start",
     "prisma:migrate:deploy": "prisma migrate deploy",
@@ -13,7 +18,9 @@
     "postinstall": "prisma generate",
     "test:money": "tsx scripts/test-money.ts",
     "test:payloads": "tsx scripts/test-verifactu-payloads.ts",
-    "test": "npm run test:money && npm run test:payloads",
+    "test:csv": "tsx scripts/test-invoice-records-csv.ts",
+    "test:validation": "tsx scripts/test-create-invoice-validation.ts",
+    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation",
     "prepare": "node -e \"if(!process.env.CI && !process.env.DOCKER_BUILD){require('child_process').execSync('husky',{stdio:'inherit'})}\" || true"
   },
   "lint-staged": {

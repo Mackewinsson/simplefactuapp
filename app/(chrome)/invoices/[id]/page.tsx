@@ -45,7 +45,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <Link href="/invoices" className="text-fg-muted hover:text-fg">
           ← Volver a facturas
         </Link>
-        {invoice.aeatStatus !== AeatJobStatus.NOT_SENT ? (
+        {invoice.aeatStatus === AeatJobStatus.SUCCEEDED ? (
           <a
             href={`/invoices/${invoice.id}/pdf`}
             className="rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-hover"
@@ -94,12 +94,14 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
               aeatQrText={invoice.aeatQrText}
               aeatQrDataUrl={aeatQrDataUrl}
               pdfHref={`/invoices/${invoice.id}/pdf`}
+              partial={invoice.aeatEstadoEnvio === "ParcialmenteCorrecto"}
             />
           ) : null}
           <VerifactuSendPanel
             invoiceId={invoice.id}
             invoiceNumber={invoice.number}
             aeatStatus={invoice.aeatStatus}
+            aeatEstadoEnvio={invoice.aeatEstadoEnvio}
             aeatLastError={invoice.aeatLastError}
             aeatCsv={invoice.aeatCsv}
             aeatJobId={invoice.aeatJobId}

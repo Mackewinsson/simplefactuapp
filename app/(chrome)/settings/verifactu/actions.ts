@@ -103,10 +103,19 @@ export async function uploadCertificateAction(
     code?: string;
     docsHint?: string;
     warnings?: string[];
-    certificate?: { normalizedFromLegacy?: boolean };
+    certificate?: { nif?: string; normalizedFromLegacy?: boolean };
   };
 
   if (!res.ok) {
+    if (res.status === 422 && json.code === "cert_nif_mismatch") {
+      return {
+        ok: false,
+        errors: [
+          json.message ||
+            "El NIF del certificado no coincide con el NIF del emisor configurado. Sube el certificado del titular correcto.",
+        ],
+      };
+    }
     if (res.status === 422 && json.code === "wrong_passphrase") {
       return { ok: false, errors: ["La contraseña no coincide con el certificado."] };
     }
@@ -148,6 +157,21 @@ export async function uploadCertificateAction(
     return { ok: false, errors: [msg] };
   }
 
+  const account = await prisma.userVerifactuAccount.findUnique({
+    where: { userId },
+    select: { issuerNif: true },
+  });
+  const certNif = (json.certificate?.nif || "").trim().toUpperCase();
+  const issuerNif = (account?.issuerNif || "").trim().toUpperCase();
+  if (issuerNif && certNif && issuerNif !== certNif) {
+    return {
+      ok: false,
+      errors: [
+        `El certificado pertenece al NIF ${certNif}, pero tu emisor configurado es ${issuerNif}. Sube el certificado del titular correcto o actualiza el NIF del emisor.`,
+      ],
+    };
+  }
+
   await prisma.userVerifactuAccount.update({
     where: { userId },
     data: { certificateUploadedAt: new Date() },
@@ -165,6 +189,46 @@ export async function uploadCertificateAction(
   }
 
   return { ok: true, message: successMsg };
+}
+
+export async function deleteCertificateAction(
+  _prev: VerifactuSettingsState | null
+): Promise<VerifactuSettingsState> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
+
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
+    const res = await client.deleteMeCertificate();
+    const json = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+
+    if (!res.ok) {
+      return {
+        ok: false,
+        errors: [
+          formatSimplefactuHttpError(res.status, json) ||
+            json.message ||
+            json.error ||
+            "No se pudo eliminar el certificado.",
+        ],
+      };
+    }
+
+    await prisma.userVerifactuAccount.update({
+      where: { userId },
+      data: { certificateUploadedAt: null },
+    });
+
+    revalidatePath("/settings/verifactu");
+    revalidatePath("/onboarding");
+    return { ok: true, message: "Certificado eliminado. Sube uno nuevo para enviar facturas a AEAT." };
+  } catch (e) {
+    return { ok: false, errors: [formatVerifactuActionError(e)] };
+  }
 }
 
 export async function verifyNifAction(
@@ -206,7 +270,12 @@ export async function verifyNifAction(
   const success = json.success === true;
 
   revalidatePath("/settings/verifactu");
+  revalidatePath("/onboarding");
   if (success) {
+    await prisma.userVerifactuAccount.update({
+      where: { userId },
+      data: { vnifVerifiedAt: new Date() },
+    });
     return { ok: true, message: NIF_VERIFY_MATCH_USER };
   }
   return { ok: false, errors: [NIF_VERIFY_NOT_MATCH_USER] };

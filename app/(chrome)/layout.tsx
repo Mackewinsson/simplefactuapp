@@ -4,6 +4,7 @@ import { AppNav } from "../AppNav";
 import { HeaderUserArea } from "../HeaderUserArea";
 import { Footer } from "../Footer";
 import { OnboardingBanner } from "../OnboardingBanner";
+import { OnboardingRedirect } from "./OnboardingRedirect";
 
 /**
  * Layout for the authenticated/transactional surface of the app: header
@@ -19,7 +20,7 @@ import { OnboardingBanner } from "../OnboardingBanner";
 export default function ChromeLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <header className="border-b border-outline-soft bg-surface">
+      <header className="sticky top-0 z-50 border-b border-outline-soft bg-surface/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex min-w-0 items-baseline gap-3 lg:gap-8">
             <BrandWordmark href="/" />
@@ -31,6 +32,7 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <OnboardingBanner />
+      <OnboardingRedirect />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
         {children}
       </main>

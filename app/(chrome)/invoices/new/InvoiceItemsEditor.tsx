@@ -62,11 +62,16 @@ const TIPO_IMPOSITIVO_OPTIONS = [
   { value: "21.0", label: "21%" },
 ];
 
+function isTaxFreeCalificacion(calificacion: string): boolean {
+  return /^E[1-6]$/.test(calificacion) || calificacion === "N1" || calificacion === "N2";
+}
+
 function calcLine(item: InvoiceItemRow): { base: number; cuota: number; total: number } {
   const unitCents = parseDecimalToCents(item.unitPrice);
   const baseCents = Math.max(0, item.quantity * unitCents - item.discountCents);
-  const taxRate = parseFloat(item.tipoImpositivo) || 0;
-  const cuotaCents = Math.round((baseCents * taxRate) / 100);
+  const cuotaCents = isTaxFreeCalificacion(item.calificacion)
+    ? 0
+    : Math.round((baseCents * (parseFloat(item.tipoImpositivo) || 0)) / 100);
   return { base: baseCents, cuota: cuotaCents, total: baseCents + cuotaCents };
 }
 
@@ -256,20 +261,22 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
             )}
           </div>
 
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-fg-muted">Tipo impositivo</span>
-            <select
-              value={item.tipoImpositivo}
-              onChange={(e) => set("tipoImpositivo", e.target.value)}
-              className="w-full rounded border border-outline px-3 py-2 text-sm"
-            >
-              {TIPO_IMPOSITIVO_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          {!isTaxFreeCalificacion(item.calificacion) ? (
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Tipo impositivo</span>
+              <select
+                value={item.tipoImpositivo}
+                onChange={(e) => set("tipoImpositivo", e.target.value)}
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
+              >
+                {TIPO_IMPOSITIVO_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
 
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-fg-muted">Clave de régimen</span>
@@ -292,7 +299,14 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
             </span>
             <select
               value={item.calificacion}
-              onChange={(e) => set("calificacion", e.target.value)}
+              onChange={(e) => {
+                const next = e.target.value;
+                setItem((prev) => ({
+                  ...prev,
+                  calificacion: next,
+                  tipoImpositivo: isTaxFreeCalificacion(next) ? "0.0" : prev.tipoImpositivo,
+                }));
+              }}
               className="w-full rounded border border-outline px-3 py-2 text-sm"
             >
               {CALIFICACION_OPTIONS.map((o) => (
@@ -308,10 +322,12 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
               <span>Base imponible</span>
               <span>{formatCents(currency, line.base)}</span>
             </div>
-            <div className="flex justify-between text-fg-muted">
-              <span>Cuota ({item.tipoImpositivo}%)</span>
-              <span>{formatCents(currency, line.cuota)}</span>
-            </div>
+            {!isTaxFreeCalificacion(item.calificacion) ? (
+              <div className="flex justify-between text-fg-muted">
+                <span>Cuota ({item.tipoImpositivo}%)</span>
+                <span>{formatCents(currency, line.cuota)}</span>
+              </div>
+            ) : null}
             <div className="mt-1 flex justify-between border-t border-outline-soft pt-1 font-medium">
               <span>Total línea</span>
               <span>{formatCents(currency, line.total)}</span>

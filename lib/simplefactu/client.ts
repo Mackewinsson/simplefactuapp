@@ -86,6 +86,10 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       });
     },
 
+    async deleteMeCertificate(): Promise<Response> {
+      return fetch(joinUrl(baseUrl, "/me/certificate"), { method: "DELETE", headers });
+    },
+
     async postSendInvoice(body: Record<string, unknown>, idempotencyKey: string): Promise<Response> {
       return fetch(joinUrl(baseUrl, "/send-invoice"), {
         method: "POST",
@@ -140,6 +144,19 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
         method: "POST",
         headers,
         body: JSON.stringify(body),
+      });
+    },
+
+    async getMeInvoiceRecords(searchParams: URLSearchParams): Promise<Response> {
+      const qs = searchParams.toString();
+      const path = qs ? `/me/invoice-records?${qs}` : "/me/invoice-records";
+      return fetch(joinUrl(baseUrl, path), { method: "GET", headers });
+    },
+
+    async getMeInvoiceRecord(id: string): Promise<Response> {
+      return fetch(joinUrl(baseUrl, `/me/invoice-records/${encodeURIComponent(id)}`), {
+        method: "GET",
+        headers,
       });
     },
 

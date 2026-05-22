@@ -16,6 +16,7 @@ const accountBase: UserVerifactuAccount = {
   issuerNif: "B12345678",
   issuerLegalName: "Test SL",
   certificateUploadedAt: null,
+  vnifVerifiedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -49,6 +50,8 @@ const invoiceBase: Invoice & { items: InvoiceItem[] } = {
   customerIdType: null,
   customerCodigoPais: null,
   customerForeignId: null,
+  tipoFactura: "F1",
+  aeatEstadoEnvio: null,
   currency: "EUR",
   subtotalCents: 10000,
   taxCents: 2100,
@@ -119,5 +122,94 @@ assert.ok(
   }).includes("Encadenamiento roto")
 );
 assert.ok(formatUserFacingError("[4116] formato incorrecto").includes("NIF del ObligadoEmision"));
+
+// Exempt E1 → causaExencion, no calif/cuota
+const itemE1: InvoiceItem = {
+  ...item,
+  description: "Consulta médica",
+  unitPriceCents: 20000,
+  lineTotalCents: 20000,
+  calificacion: "E1",
+  tipoImpositivo: "0.0",
+};
+const invoiceE1: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  subtotalCents: 20000,
+  taxCents: 0,
+  totalCents: 20000,
+  taxRatePercent: 0,
+  items: [itemE1],
+};
+const sendE1 = buildSendInvoicePayload(invoiceE1, accountBase);
+const detE1 = (sendE1.detalles as Record<string, unknown>[])[0];
+assert.equal(detE1.causaExencion, "E1");
+assert.equal(detE1.base, 200);
+assert.equal(detE1.calif, undefined);
+assert.equal(detE1.cuota, undefined);
+assert.equal(sendE1.cuotaTotal, 0);
+assert.equal(sendE1.total, 200);
+
+// Not subject N1 → calif only, no tipo/cuota
+const itemN1: InvoiceItem = {
+  ...item,
+  description: "Operación no sujeta",
+  calificacion: "N1",
+  tipoImpositivo: "0.0",
+};
+const invoiceN1: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  subtotalCents: 10000,
+  taxCents: 0,
+  totalCents: 10000,
+  items: [itemN1],
+};
+const sendN1 = buildSendInvoicePayload(invoiceN1, accountBase);
+const detN1 = (sendN1.detalles as Record<string, unknown>[])[0];
+assert.equal(detN1.calif, "N1");
+assert.equal(detN1.causaExencion, undefined);
+assert.equal(detN1.tipo, undefined);
+assert.equal(detN1.cuota, undefined);
+
+// ID_OTRO destinatario (NIF-IVA UE, sin codigoPais)
+const invoiceIdOtro: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  customerName: "Cliente FR SA",
+  customerNif: null,
+  customerIdScheme: "ID_OTRO",
+  customerIdType: "02",
+  customerForeignId: "FR12345678901",
+  customerCodigoPais: null,
+};
+const sendIdOtro = buildSendInvoicePayload(invoiceIdOtro, accountBase);
+assert.equal(sendIdOtro.destNif, undefined);
+assert.deepEqual(sendIdOtro.destIdOtro, { idType: "02", id: "FR12345678901" });
+
+const invoiceIdOtroPassport: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceIdOtro,
+  customerIdType: "03",
+  customerForeignId: "X1234567",
+  customerCodigoPais: "US",
+};
+const sendPassport = buildSendInvoicePayload(invoiceIdOtroPassport, accountBase);
+assert.deepEqual(sendPassport.destIdOtro, {
+  idType: "03",
+  id: "X1234567",
+  codigoPais: "US",
+});
+
+const invoiceF2: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  tipoFactura: "F2",
+  customerName: "—",
+  customerNif: null,
+  subtotalCents: 5000,
+  taxCents: 1050,
+  totalCents: 6050,
+};
+const sendF2 = buildSendInvoicePayload(invoiceF2, accountBase);
+assert.equal(sendF2.tipoFactura, "F2");
+assert.equal(sendF2.facturaSinIdentifDestinatarioArt61d, "S");
+assert.equal(sendF2.destNif, undefined);
+assert.equal(sendF2.destNombre, undefined);
 
 console.log("test-verifactu-payloads: OK");

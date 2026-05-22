@@ -179,12 +179,20 @@ export default async function InvoicesPage({
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold">Facturas</h1>
-        <Link
-          href="/invoices/new"
-          className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
-        >
-          Nueva factura
-        </Link>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <Link
+            href="/invoices/records"
+            className="w-full rounded border border-outline bg-surface px-4 py-2 text-center text-sm font-medium text-fg-muted hover:bg-surface-hover sm:w-auto"
+          >
+            Registro AEAT
+          </Link>
+          <Link
+            href="/invoices/new"
+            className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
+          >
+            Nueva factura
+          </Link>
+        </div>
       </div>
 
       <InvoiceViewTabs
@@ -334,14 +342,18 @@ export default async function InvoicesPage({
         <>
           <div className="space-y-3 md:hidden">
             {invoices.map((inv: InvoiceRow) => {
-              const badge = registrationStatusBadge(inv.aeatStatus, inv.aeatCancellationStatus);
+              const badge = registrationStatusBadge(
+                inv.aeatStatus,
+                inv.aeatCancellationStatus,
+                inv.aeatEstadoEnvio
+              );
               return (
                 <article key={inv.id} className="rounded border border-outline-soft bg-surface p-3">
                   <div className="flex items-start justify-between gap-3">
                     <Link href={`/invoices/${inv.id}`} className="font-medium text-accent hover:underline">
                       {inv.number}
                     </Link>
-                    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}>
+                    <span className={badge.className}>
                       {badge.label}
                     </span>
                   </div>
@@ -363,18 +375,22 @@ export default async function InvoicesPage({
           <div className="hidden overflow-x-auto rounded border border-outline-soft bg-surface md:block">
             <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
-                <tr className="border-b border-outline-soft bg-surface-hover">
-                  <th className="px-4 py-3 font-medium text-fg">Número</th>
-                  <th className="px-4 py-3 font-medium text-fg">Serie</th>
-                  <th className="px-4 py-3 font-medium text-fg">Cliente</th>
-                  <th className="px-4 py-3 font-medium text-fg">Fecha</th>
-                  <th className="px-4 py-3 font-medium text-fg">Total</th>
-                  <th className="px-4 py-3 font-medium text-fg">Veri*Factu</th>
+                <tr className="border-b border-outline-soft bg-surface-muted">
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Número</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Serie</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Cliente</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Fecha</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Total</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Veri*Factu</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map((inv: InvoiceRow) => {
-                  const badge = registrationStatusBadge(inv.aeatStatus, inv.aeatCancellationStatus);
+                  const badge = registrationStatusBadge(
+                inv.aeatStatus,
+                inv.aeatCancellationStatus,
+                inv.aeatEstadoEnvio
+              );
                   return (
                     <tr
                       key={inv.id}
@@ -401,9 +417,7 @@ export default async function InvoicesPage({
                         {formatCents(inv.currency, inv.totalCents)}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}
-                        >
+                        <span className={badge.className}>
                           {badge.label}
                         </span>
                       </td>

@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/docs`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/docs/concepts`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/docs/quickstart`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/docs/gestoria`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/docs/authentication`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${base}/docs/error-codes`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/docs/api-reference`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
@@ -21,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/legal/dpa`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/legal/cancelacion`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/legal/declaracion-responsable`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/sign-in`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/sign-up`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   const blogRoutes: MetadataRoute.Sitemap = articles.map((article) => ({

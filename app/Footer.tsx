@@ -49,6 +49,9 @@ export function Footer() {
           <Link href="/legal/accesibilidad" className="hover:text-fg">
             Accesibilidad
           </Link>
+          <Link href="/legal/declaracion-responsable" className="hover:text-fg">
+            Declaración responsable
+          </Link>
         </nav>
       </div>
     </footer>

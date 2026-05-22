@@ -28,8 +28,10 @@ Los scopes son los permisos de la clave. Cuando te emitamos la API key te asigna
 | `nif:read` | Verificar si un NIF existe en AEAT |
 | `tenant:certificates:read` | Consultar si tienes certificado subido |
 | `tenant:certificates:write` | Subir o borrar tu certificado |
+| `partner:tenants:read` | Listar y consultar sub-tenants (gestoría) |
+| `partner:tenants:write` | Crear autónomos, certificados y API keys de hijos |
 
-Si haces una llamada sin el scope correcto recibes `403 Prohibido`. Para un BFF completo (app web que gestiona facturas y sube certificados), la clave necesita todos los scopes anteriores.
+Si haces una llamada sin el scope correcto recibes `403 Prohibido`. Para un BFF completo (app web autónomo), la clave necesita los scopes de facturación y certificado. Para gestorías, ver [Gestoría](/docs/gestoria).
 
 ## Certificado digital AEAT
 
@@ -40,6 +42,8 @@ AEAT exige que cada envío SOAP esté firmado con tu **certificado digital** —
 Técnicamente, el certificado se usa para establecer una conexión **mTLS** (TLS mutuo): AEAT verifica que eres tú, no solo que el canal está cifrado.
 
 Tu certificado se guarda cifrado en nuestra base de datos con AES-256-GCM. Nosotros **nunca** lo devolvemos por ningún endpoint — solo lo usamos internamente para firmar los envíos.
+
+En entornos QA y producción, **cada tenant debe tener su propio certificado** (`REQUIRE_TENANT_CERTIFICATE=true`). No se usa un certificado global de la plataforma. Si intentas verificar un NIF o enviar una factura sin haber subido el PFX, recibirás `422` con código `tenant_certificate_required`.
 
 ### Subir el certificado
 

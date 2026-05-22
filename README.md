@@ -2,7 +2,7 @@
 
 Nombre del producto en la interfaz: edita `APP_DISPLAY_NAME` en [`lib/branding.ts`](lib/branding.ts).
 
-Listado mínimo de facturas, alta, descarga de PDF. Next.js App Router, TypeScript, Prisma, Postgres (Neon), autenticación con Clerk.
+App web de facturación con envío **Veri\*Factu** (AEAT): alta de facturas, certificado digital, seguimiento de jobs, archivo de registros AEAT, panel de gestoría y panel de operación. Next.js 15, TypeScript, Prisma, Postgres (Neon), Clerk.
 
 ## Inicio rápido
 
@@ -19,7 +19,12 @@ Abre [http://localhost:3000](http://localhost:3000). Opcional: `pnpm prisma db s
 
 ## Alcance
 
-- **Incluido:** listar facturas, crear factura, ver detalle, descargar PDF. Auth con Clerk (p. ej. Google OAuth); facturas aisladas por usuario. Sin envío a AEAT, sin editar ni borrar.
+- **Autónomo:** facturas, clientes, productos, certificado Verifactu, envío AEAT async, PDF con CSV/QR, onboarding, archivo `/invoices/records` + export CSV.
+- **Gestoría:** panel `/partner` — sub-tenants, certificados y API keys por autónomo (API `partner:*`, sin admin global en el día a día).
+- **Operación:** panel `/admin` con `SIMPLEFACTU_ADMIN_KEY` (tenants, jobs, reintentos, auditoría).
+- **No activo por defecto:** billing Stripe (`NEXT_PUBLIC_BILLING_ENABLED=false`).
+
+Desarrollo local contra **datos QA**: ver [AGENTS.md — Desarrollo local](AGENTS.md#desarrollo-local).
 
 ## Variables de entorno
 
@@ -49,7 +54,9 @@ Catálogo completo con referencias de ficheros: **[AGENTS.md — Variables de en
    - Desarrollo local: `pnpm prisma migrate dev`
    - Producción: `pnpm prisma migrate deploy`
 
-4. **Build:** `pnpm build` (requiere claves Clerk en el entorno). Luego `pnpm start` o el comando de arranque de tu host.
+4. **Build:** `pnpm build` (ejecuta antes `pnpm check`: lint + typecheck + tests). Requiere claves Clerk en el entorno. Luego `pnpm start` o el comando de arranque de tu host.
+
+**CI:** cada push a `develop`/`main` corre [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Vercel debe esperar el check verde (o confiar en `prebuild` dentro del build).
 
 ## Base de datos de producción (Neon)
 

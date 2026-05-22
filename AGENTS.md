@@ -57,12 +57,18 @@ app/
   invoices/                                 Listado, detalle, PDF, panel Veri*Factu
   invoices/new/                             Alta + Server Actions (verify NIF, envío)
   customers/ products/                      CRUD ligero
-  settings/verifactu/                       Certificado PFX y datos emisor (simplefactu /me/certificate)
+  settings/verifactu/                       Certificado PFX, onboarding, VNIF opcional
+  invoices/records/                         Archivo AEAT + export CSV
+  partner/                                  Panel gestoría (sub-tenants)
   admin/                                    Panel operador (tenants, jobs, sistema, auditoría, …)
+  partner-access-denied/                    Sin rol partner
   api/webhooks/clerk/                       Webhook Clerk (opcional)
 lib/
   simplefactu/client.ts                     Cliente HTTP firmado con x-api-key (solo servidor)
   simplefactu/admin-server.ts               Llamadas con x-admin-key (provisión, admin UI)
+  simplefactu/partner-server.ts             BFF /partner/* con clave partner
+  partner/provision.ts                      ensurePartnerApiKey — tenant `rp_<clerkUserId>`
+  auth/partner.ts                           requirePartner, PARTNER_CLERK_USER_IDS / role Clerk
   verifactu/provision.ts                    ensureVerifactuApiKey — tenant `sf_<clerkUserId>` + API key cifrada
   verifactu/crypto.ts                       Cifrado de secretos en DB (VERIFACTU_ENCRYPTION_KEY)
   simplefactu/build-*-payload.ts            Construcción cuerpos send-invoice / cancel
@@ -134,6 +140,8 @@ Si `SIMPLEFACTU_ADMIN_KEY` ≠ `ADMIN_KEY` del VPS → `401 Invalid x-admin-key`
 | `VERIFACTU_SI_SOLO_VERI`, `VERIFACTU_SI_MULTI_OT`, `VERIFACTU_SI_IND_MULTI_OT` | No | Flags SIF (`S`/`N`) |
 | **Admin panel (Clerk)** | | |
 | `ADMIN_CLERK_USER_IDS` | No | `middleware.ts` + `lib/auth/admin.ts` — allowlist opcional `/admin` |
+| **Partner / gestoría** | | |
+| `PARTNER_CLERK_USER_IDS` | No | `lib/auth/partner.ts` — allowlist opcional `/partner` |
 | **App / UI** | | |
 | `DATABASE_URL` | No | Prisma (`lib/prisma.ts`) |
 | `NODE_ENV` | Implícito en Vercel | Prisma logging, build |
@@ -160,15 +168,17 @@ Catálogo del API (VPS): [`../simplefactu/AGENTS.md` §4](../simplefactu/AGENTS.
 2. **`createSimplefactuClient`** (`lib/simplefactu/client.ts`): peticiones de usuario con `x-api-key` desde la clave desencriptada — send-invoice, jobs, verify-nif, certificado, etc.
 3. **`adminFetch`** (`lib/simplefactu/admin-server.ts`): usa `SIMPLEFACTU_ADMIN_KEY` para el panel `/admin/*` del front (listados, métricas, reintentos, cadenas, …).
 4. **Jobs async:** `POST /send-invoice` → 202 + `jobId`; polling `GET /jobs/:id` hasta estado terminal (ver `job-sync` y paneles de factura/admin).
+5. **Partner (gestoría):** `ensurePartnerApiKey` → tenant `rp_<userId>` + scopes `partner:tenants:*`; `partnerFetch` llama a `/partner/*`. Primera provisión usa `adminFetch` (una vez); operación diaria sin `SIMPLEFACTU_ADMIN_KEY`.
 
-Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resultado; encadenamiento y huellas según documentación del API.
+Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resultado; encadenamiento y huellas según documentación del API. Partner: [`../simplefactu/docs/PARTNER_GESTORIA.md`](../simplefactu/docs/PARTNER_GESTORIA.md).
 
 ---
 
 ## Seguridad
 
-- **Clerk:** rutas bajo `/invoices`, `/settings`, `/admin` exigen sesión (`middleware.ts`).
-- **`/admin`:** `app/admin/layout.tsx` llama a `requireAdmin()` (`lib/auth/admin.ts`). Acceso si el `userId` está en `ADMIN_CLERK_USER_IDS` **o** si `publicMetadata.role === "admin"` en Clerk. Además, si `ADMIN_CLERK_USER_IDS` no está vacío, `middleware.ts` redirige a `/invoices` a quien no esté en la lista antes de llegar al layout (doble capa opcional).
+- **Clerk:** rutas bajo `/invoices`, `/settings`, `/admin`, `/partner` exigen sesión (`middleware.ts`).
+- **`/admin`:** `requireAdmin()` — `ADMIN_CLERK_USER_IDS` o `publicMetadata.role === "admin"`.
+- **`/partner`:** `requirePartner()` — `PARTNER_CLERK_USER_IDS` o `publicMetadata.role === "partner"`. Sin permiso → `/partner-access-denied`.
 - **Secretos:** solo en Server Actions, Route Handlers y código servidor; el cliente nunca ve `SIMPLEFACTU_ADMIN_KEY` ni la API key en claro.
 
 ---
@@ -179,15 +189,21 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 - **`/invoices/new`:** alta; verificación NIF destinatario contra el API cuando procede.
 - **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la [referencia API](/docs/api-reference) (OpenAPI).
 - **`/admin`:** operación — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
+- **`/partner`:** listado y alta de autónomos, detalle (suspender, API key, certificado PFX). Ver [gestoría en docs públicos](content/docs/gestoria.md).
+- **`/invoices/records`:** histórico AEAT (`GET /me/invoice-records`) y export CSV.
 
 ---
 
 ## Desarrollo local
 
-1. **simplefactu:** `npm run dev` (puerto por defecto **3000**), migraciones y `.env` con `ADMIN_KEY`, DB, certificado de prueba.
-2. **simplefactuapp:** `cp .env.example .env.local` (plantillas QA/prod: `.env.qa.example`, `.env.prod.example` para Vercel/Bitwarden). Rellenar Clerk, `DATABASE_URL`, `SIMPLEFACTU_API_BASE_URL`, `SIMPLEFACTU_ADMIN_KEY` (= `ADMIN_KEY` del API local).
-3. **Puertos:** el API y Next compiten por 3000. Usar p. ej. `pnpm dev:3001` para Next y dejar el API en 3000, **o** cambiar el puerto del API y ajustar `SIMPLEFACTU_API_BASE_URL`.
-4. **CORS:** en simplefactu, `CORS_ORIGINS` debe incluir el origen del front (p. ej. `http://localhost:3001`).
+Datos siempre de **QA** (Neon Preview + Postgres del VPS), no SQLite/local aislado. Sincronizar: `cd ../simplefactu && ./scripts/sync-local-env-from-qa.sh` (o `pnpm env:sync-qa` en este repo).
+
+| Modo | Cuándo | Front | API |
+|------|--------|-------|-----|
+| **A — `pnpm dev:qa`** | UI rápida; clientes prueban en `qa.simplefactu.com` | `.env.local` → `api.qa.simplefactu.com` | Desplegada en VPS (no arrancar local) |
+| **B — `pnpm dev:stack`** | Probar cambios de API + front antes de subir | `.env.local.stack` → `localhost:3000` | `npm run tunnel:qa` + `npm run dev` en simplefactu |
+
+Puerto Next: **3001** en ambos modos (API en 3000). El API local usa `ENABLE_AEAT_WORKER=false` para no competir con el worker del VPS; los jobs los procesa QA en el servidor.
 
 ---
 
@@ -195,19 +211,23 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 
 - **Proveedor:** PostgreSQL (`schema.prisma`).
 - **`UserVerifactuAccount`:** mapeo `userId` Clerk → `simplefactuTenantId` + `apiKeyEncrypted`.
-- **`Invoice`:** campos `aeat*` para job id, estado, CSV, QR, errores, anulación.
+- **`UserPartnerAccount`:** mapeo `userId` → `partnerTenantId` (`rp_*`) + `apiKeyEncrypted` (gestoría).
+- **`Invoice`:** campos `aeat*` para job id, estado, CSV, QR, errores, anulación; `vnifVerifiedAt` en cuenta Verifactu.
 - Comandos típicos: `pnpm prisma migrate dev` (desarrollo), `pnpm prisma:migrate:deploy` (CI/producción), `pnpm prisma db seed` si usas seed.
 
 ---
 
 ## Tests y scripts
 
-- `pnpm test` — `test:money` + `test:payloads` (scripts bajo `scripts/`).
+- `pnpm test` — `test:money` + `test:payloads` + `test:csv` (scripts bajo `scripts/`).
 - `pnpm typecheck` / `pnpm lint` — calidad antes de PR.
+- API (hermano): `npm test` en simplefactu (~430 tests Jest).
 
 ---
 
 ## Despliegue
+
+**CI antes de deploy:** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) ejecuta `pnpm check` (lint + typecheck + tests) y `next build` en cada push/PR a `develop`/`main`. En Vercel, `pnpm build` ejecuta antes `prebuild` → `pnpm check`. Conviene activar en Vercel **“Wait for GitHub Checks”** / required check `CI` en la rama.
 
 | Paso | Acción |
 |------|--------|

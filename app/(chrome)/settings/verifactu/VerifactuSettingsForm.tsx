@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import {
   saveIssuerProfileAction,
   uploadCertificateAction,
+  deleteCertificateAction,
   verifyNifAction,
   type VerifactuSettingsState,
 } from "./actions";
@@ -29,6 +30,10 @@ type Props = {
   certUploadedAt: Date | null;
   remoteHasCertificate: boolean | null;
   remoteUpdatedAt: string | null;
+  certNotAfter: string | null;
+  certDaysUntilExpiry: number | null;
+  certExpiresWithin30Days: boolean;
+  certNif: string | null;
 };
 
 export function VerifactuSettingsForm({
@@ -37,9 +42,14 @@ export function VerifactuSettingsForm({
   certUploadedAt,
   remoteHasCertificate,
   remoteUpdatedAt,
+  certNotAfter,
+  certDaysUntilExpiry,
+  certExpiresWithin30Days,
+  certNif,
 }: Props) {
   const [issuerState, issuerAction] = useActionState(saveIssuerProfileAction, null);
   const [certState, certAction] = useActionState(uploadCertificateAction, null);
+  const [deleteState, deleteAction] = useActionState(deleteCertificateAction, null);
   const [vnifState, vnifAction] = useActionState(verifyNifAction, null);
 
   return (
@@ -59,13 +69,30 @@ export function VerifactuSettingsForm({
         {issuerState?.ok ? (
           <p className="mt-3 text-sm text-success-emphasis">{issuerState.message}</p>
         ) : null}
+        {certNif &&
+        initialIssuerNif.trim().toUpperCase() !== certNif.trim().toUpperCase() ? (
+          <form action={issuerAction} className="alert-warning mt-4 p-3">
+            <p className="text-sm text-warning-foreground">
+              El certificado pertenece al NIF <strong>{certNif}</strong>, distinto del emisor configurado (
+              {initialIssuerNif || "vacío"}).
+            </p>
+            <input type="hidden" name="issuerNif" value={certNif} />
+            <input type="hidden" name="issuerLegalName" value={initialIssuerLegalName} />
+            <button
+              type="submit"
+              className="mt-3 rounded bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+            >
+              Usar NIF del certificado ({certNif})
+            </button>
+          </form>
+        ) : null}
         <form action={issuerAction} className="mt-4 space-y-4">
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-fg-muted">NIF / CIF del emisor</span>
             <input
               name="issuerNif"
               defaultValue={initialIssuerNif}
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               autoComplete="off"
             />
           </label>
@@ -74,7 +101,7 @@ export function VerifactuSettingsForm({
             <input
               name="issuerLegalName"
               defaultValue={initialIssuerLegalName}
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               autoComplete="organization"
             />
           </label>
@@ -102,7 +129,39 @@ export function VerifactuSettingsForm({
                 : "No"}
             {remoteUpdatedAt ? ` (actualizado ${remoteUpdatedAt})` : ""}
           </div>
+          {remoteHasCertificate && certNotAfter ? (
+            <div>
+              <span className="font-medium">Caducidad:</span>{" "}
+              {new Date(certNotAfter).toLocaleDateString("es")}
+              {certDaysUntilExpiry != null
+                ? ` (${certDaysUntilExpiry} días restantes)`
+                : ""}
+              {certNif ? ` · NIF titular: ${certNif}` : ""}
+            </div>
+          ) : null}
         </dl>
+        {certExpiresWithin30Days && certNotAfter ? (
+          <div
+            role="alert"
+            className="mt-3 rounded border border-warning-outline bg-warning p-3 text-sm text-warning-foreground"
+          >
+            <p className="font-medium">El certificado caduca en menos de 30 días</p>
+            <p className="mt-1">
+              Renueva el PFX antes del{" "}
+              {new Date(certNotAfter).toLocaleDateString("es")} para seguir enviando facturas a AEAT.
+            </p>
+          </div>
+        ) : null}
+        {deleteState?.ok === false ? (
+          <ul className="mt-3 list-inside list-disc text-sm text-danger-foreground">
+            {deleteState.errors.map((e, i) => (
+              <li key={i}>{e}</li>
+            ))}
+          </ul>
+        ) : null}
+        {deleteState?.ok ? (
+          <p className="mt-3 text-sm text-success-emphasis">{deleteState.message}</p>
+        ) : null}
         {certState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-danger-foreground">
             {certState.errors.map((e, i) => (
@@ -136,12 +195,25 @@ export function VerifactuSettingsForm({
             <input
               name="pfxPassphrase"
               type="password"
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               autoComplete="new-password"
             />
           </label>
           <SubmitButton label="Subir certificado" />
         </form>
+        {remoteHasCertificate ? (
+          <form action={deleteAction} className="mt-6 border-t border-outline-soft pt-4">
+            <p className="text-sm text-fg-muted">
+              Elimina el certificado del tenant en el API. No podrás enviar facturas hasta subir uno nuevo.
+            </p>
+            <button
+              type="submit"
+              className="btn btn-md btn-danger mt-3"
+            >
+              Eliminar certificado
+            </button>
+          </form>
+        ) : null}
       </section>
 
       <section className="rounded border border-outline-soft bg-surface p-6">
@@ -166,7 +238,7 @@ export function VerifactuSettingsForm({
             <span className="mb-1 block text-sm font-medium text-fg-muted">NIF / CIF</span>
             <input
               name="verifyNif"
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               placeholder="p. ej. B12345678"
             />
           </label>
@@ -176,7 +248,7 @@ export function VerifactuSettingsForm({
             </span>
             <input
               name="verifyNombre"
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               placeholder="Razón social o nombre completo"
             />
           </label>
