@@ -9,6 +9,7 @@ import {
   sendInvoiceAcceptedEmail,
   sendInvoiceFailedEmail,
 } from "@/lib/email/invoice-notifications";
+import { getEstadoEnvioFromAeatParsed } from "@/lib/simplefactu/parse-aeat-response";
 
 type AeatError = {
   code?: string | null;
@@ -23,6 +24,7 @@ type JobJson = {
   result?: {
     qrInfo?: { csv?: string; qrText?: string } | null;
     aeatErrors?: AeatError[] | null;
+    response?: { aeatResponse?: unknown } | null;
   } | null;
 };
 
@@ -100,10 +102,14 @@ export async function syncJobStatusToInvoice(
     if (st === "SUCCEEDED") {
       const csv = job.result?.qrInfo?.csv ?? null;
       const qrText = job.result?.qrInfo?.qrText ?? null;
+      const estadoEnvio =
+        getEstadoEnvioFromAeatParsed(job.result?.response?.aeatResponse) ?? "Correcto";
+      const partial = estadoEnvio === "ParcialmenteCorrecto";
       await prisma.invoice.update({
         where: { id: invoiceId },
         data: {
           aeatStatus: AeatJobStatus.SUCCEEDED,
+          aeatEstadoEnvio: estadoEnvio,
           aeatCsv: csv,
           aeatQrText: qrText,
           aeatLastError: null,
@@ -115,7 +121,11 @@ export async function syncJobStatusToInvoice(
       );
       return {
         ok: true,
-        message: csv ? `Aceptada (CSV: ${csv})` : "Aceptada por Verifactu.",
+        message: partial
+          ? `Aceptada con advertencias AEAT (${estadoEnvio})${csv ? ` · CSV: ${csv}` : ""}`
+          : csv
+            ? `Aceptada (CSV: ${csv})`
+            : "Aceptada por Verifactu.",
         terminal: true,
       };
     }

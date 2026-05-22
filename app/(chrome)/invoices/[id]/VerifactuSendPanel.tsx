@@ -14,6 +14,7 @@ import {
   cancellationStatusDetailLabel,
   registrationStatusBadgeClass,
   cancellationStatusBadgeClass,
+  resolveRegistrationUiStatus,
 } from "@/lib/simplefactu/aeat-status-ui";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
@@ -23,6 +24,7 @@ type Props = {
   invoiceId: string;
   invoiceNumber: string;
   aeatStatus: string;
+  aeatEstadoEnvio?: string | null;
   aeatLastError: string | null;
   aeatCsv: string | null;
   aeatJobId: string | null;
@@ -37,6 +39,7 @@ export function VerifactuSendPanel({
   invoiceId,
   invoiceNumber,
   aeatStatus,
+  aeatEstadoEnvio,
   aeatLastError,
   aeatCsv,
   aeatJobId,
@@ -51,6 +54,7 @@ export function VerifactuSendPanel({
   const [message, setMessage] = useState<string | null>(null);
   const [polling, setPolling] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [sendConfirmOpen, setSendConfirmOpen] = useState(false);
   const autoSendFired = useRef(false);
 
   const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
@@ -68,6 +72,8 @@ export function VerifactuSendPanel({
   const cancelPending = aeatCancellationStatus === "PENDING";
   const pollActive = sendPending || cancelPending;
   const canSend = canSendNow;
+  const isRetry = aeatStatus === "FAILED";
+  const uiStatus = resolveRegistrationUiStatus(aeatStatus, aeatEstadoEnvio);
   const canRefresh = pollActive;
   const canResyncQr =
     aeatStatus === "SUCCEEDED" && !!aeatJobId && !!(aeatCsv?.trim() || aeatQrText?.trim());
@@ -160,9 +166,9 @@ export function VerifactuSendPanel({
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium">Estado del alta:</span>
           <span
-            className={`rounded px-1.5 py-0.5 text-xs font-medium ${registrationStatusBadgeClass(aeatStatus)}`}
+            className={`rounded px-1.5 py-0.5 text-xs font-medium ${registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}`}
           >
-            {registrationStatusDetailLabel(aeatStatus)}
+            {registrationStatusDetailLabel(uiStatus)}
           </span>
         </div>
         {aeatCsv ? (
@@ -253,11 +259,15 @@ export function VerifactuSendPanel({
         {canSend ? (
           <button
             type="button"
-            onClick={() => run(sendInvoiceToVerifactuAction, invoiceId)}
+            onClick={() => setSendConfirmOpen(true)}
             disabled={pending}
             className="btn btn-sm btn-cta"
           >
-            {pending ? "Procesando…" : "Enviar a Verifactu"}
+            {pending
+              ? "Procesando…"
+              : isRetry
+                ? "Reintentar envío a Verifactu"
+                : "Enviar a Verifactu"}
           </button>
         ) : null}
         {canRefresh ? (
@@ -292,6 +302,53 @@ export function VerifactuSendPanel({
           </button>
         ) : null}
       </div>
+
+      {sendConfirmOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-16"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !pending) setSendConfirmOpen(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="verifactu-send-title"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
+          >
+            <h3 id="verifactu-send-title" className="text-base font-semibold text-fg">
+              {isRetry ? "¿Reintentar el envío a Verifactu?" : "¿Enviar a Verifactu?"}
+            </h3>
+            <p className="mt-2 text-sm text-fg-muted">
+              La factura <span className="font-mono">{invoiceNumber}</span> quedará registrada ante AEAT.
+              <strong> No podrás editarla después</strong> — las correcciones requieren facturas rectificativas
+              (R1–R5).
+            </p>
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => setSendConfirmOpen(false)}
+                className="btn btn-sm btn-secondary"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  setSendConfirmOpen(false);
+                  run(sendInvoiceToVerifactuAction, invoiceId);
+                }}
+                className="btn btn-sm btn-cta"
+              >
+                {pending ? "Enviando…" : isRetry ? "Sí, reintentar" : "Sí, enviar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {cancelModalOpen ? (
         <div

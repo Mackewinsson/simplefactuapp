@@ -50,6 +50,7 @@ const invoiceBase: Invoice & { items: InvoiceItem[] } = {
   customerCodigoPais: null,
   customerForeignId: null,
   tipoFactura: "F1",
+  aeatEstadoEnvio: null,
   currency: "EUR",
   subtotalCents: 10000,
   taxCents: 2100,

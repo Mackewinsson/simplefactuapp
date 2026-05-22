@@ -4,10 +4,25 @@
 
 export type AeatStatusBadge = { label: string; className: string };
 
+/** Maps Prisma job status + AEAT ESTADOENVIO to UI status key. */
+export function resolveRegistrationUiStatus(
+  aeatStatus: string,
+  aeatEstadoEnvio?: string | null
+): string {
+  if (
+    aeatStatus === "SUCCEEDED" &&
+    aeatEstadoEnvio === "ParcialmenteCorrecto"
+  ) {
+    return "SUCCEEDED_WARN";
+  }
+  return aeatStatus;
+}
+
 /** Compact badge for invoice list rows (also respects successful cancellation). */
 export function registrationStatusBadge(
   status: string,
-  cancellationStatus: string
+  cancellationStatus: string,
+  aeatEstadoEnvio?: string | null
 ): AeatStatusBadge {
   if (cancellationStatus === "SUCCEEDED") {
     return {
@@ -15,9 +30,12 @@ export function registrationStatusBadge(
       className: "line-through text-fg-subtle bg-surface-muted",
     };
   }
-  switch (status) {
+  const ui = resolveRegistrationUiStatus(status, aeatEstadoEnvio);
+  switch (ui) {
     case "SUCCEEDED":
       return { label: "Registrada", className: "text-success-foreground bg-success-hover" };
+    case "SUCCEEDED_WARN":
+      return { label: "Aceptada con avisos", className: "text-warning-foreground bg-warning-hover" };
     case "PENDING":
     case "PROCESSING":
       return { label: "Enviando…", className: "text-warning-deep bg-warning-hover" };
@@ -40,6 +58,8 @@ export function registrationStatusDetailLabel(status: string): string {
       return "Procesándose en el servidor AEAT…";
     case "SUCCEEDED":
       return "Registrada correctamente en Verifactu";
+    case "SUCCEEDED_WARN":
+      return "Aceptada con advertencias en Verifactu (revisa el detalle)";
     case "FAILED":
       return "Error al enviar (puedes reintentar)";
     case "DEAD":
@@ -66,10 +86,16 @@ export function cancellationStatusDetailLabel(status: string): string {
   }
 }
 
-export function registrationStatusBadgeClass(status: string): string {
-  switch (status) {
+export function registrationStatusBadgeClass(
+  status: string,
+  aeatEstadoEnvio?: string | null
+): string {
+  const ui = resolveRegistrationUiStatus(status, aeatEstadoEnvio);
+  switch (ui) {
     case "SUCCEEDED":
       return "text-success-foreground bg-success-hover";
+    case "SUCCEEDED_WARN":
+      return "text-warning-foreground bg-warning-hover";
     case "PENDING":
     case "PROCESSING":
       return "text-warning-deep bg-warning-hover";

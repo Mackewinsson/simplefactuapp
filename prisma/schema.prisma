@@ -66,6 +66,8 @@ model Invoice {
   createdByFirstName String?
   createdByLastName  String?
   aeatStatus         AeatJobStatus @default(NOT_SENT)
+  /// AEAT ESTADOENVIO when SUCCEEDED (Correcto | ParcialmenteCorrecto)
+  aeatEstadoEnvio    String?
   aeatJobId          String?
   aeatLastError      String?
   aeatCsv            String?
@@ -131,13 +133,15 @@ model Product {
 }
 
 model Lead {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  type      String
-  message   String?
-  source    String   @default("landing")
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  type       String
+  message    String?
+  source     String   @default("landing")
+  consentAt  DateTime @default(now())
+  submitterIp String?
+  createdAt  DateTime @default(now())
 
   @@index([email])
   @@index([createdAt])

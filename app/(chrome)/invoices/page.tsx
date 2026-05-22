@@ -342,7 +342,11 @@ export default async function InvoicesPage({
         <>
           <div className="space-y-3 md:hidden">
             {invoices.map((inv: InvoiceRow) => {
-              const badge = registrationStatusBadge(inv.aeatStatus, inv.aeatCancellationStatus);
+              const badge = registrationStatusBadge(
+                inv.aeatStatus,
+                inv.aeatCancellationStatus,
+                inv.aeatEstadoEnvio
+              );
               return (
                 <article key={inv.id} className="rounded border border-outline-soft bg-surface p-3">
                   <div className="flex items-start justify-between gap-3">
@@ -382,7 +386,11 @@ export default async function InvoicesPage({
               </thead>
               <tbody>
                 {invoices.map((inv: InvoiceRow) => {
-                  const badge = registrationStatusBadge(inv.aeatStatus, inv.aeatCancellationStatus);
+                  const badge = registrationStatusBadge(
+                inv.aeatStatus,
+                inv.aeatCancellationStatus,
+                inv.aeatEstadoEnvio
+              );
                   return (
                     <tr
                       key={inv.id}

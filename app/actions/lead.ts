@@ -1,11 +1,23 @@
 "use server";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { sendLeadNotificationEmail } from "@/lib/email/invoice-notifications";
 
-const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_MAX_EMAIL = 3;
+const RATE_LIMIT_MAX_IP = 10;
 const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 h
+
+function clientIpFromHeaders(h: Headers): string | null {
+  const forwarded = h.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first.slice(0, 64);
+  }
+  const real = h.get("x-real-ip")?.trim();
+  return real ? real.slice(0, 64) : null;
+}
 
 const schema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(100),
@@ -26,17 +38,31 @@ export async function submitLead(
   }
 
   try {
-    // Rate limit: max RATE_LIMIT_MAX submissions per email in the last 24 h
     const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
-    const recent = await prisma.lead.count({
+    const h = await headers();
+    const submitterIp = clientIpFromHeaders(h);
+
+    const recentEmail = await prisma.lead.count({
       where: { email: parsed.data.email, createdAt: { gte: since } },
     });
-    if (recent >= RATE_LIMIT_MAX) {
+    if (recentEmail >= RATE_LIMIT_MAX_EMAIL) {
       return { ok: false, error: "Has enviado demasiados mensajes. Inténtalo mañana." };
     }
 
+    if (submitterIp) {
+      const recentIp = await prisma.lead.count({
+        where: { submitterIp, createdAt: { gte: since } },
+      });
+      if (recentIp >= RATE_LIMIT_MAX_IP) {
+        return { ok: false, error: "Demasiados envíos desde esta red. Inténtalo más tarde." };
+      }
+    }
+
     const { consent: _consent, ...leadData } = parsed.data;
-    await prisma.lead.create({ data: { ...leadData, source: "landing" } });
+    const consentAt = new Date();
+    await prisma.lead.create({
+      data: { ...leadData, source: "landing", consentAt, submitterIp },
+    });
     void sendLeadNotificationEmail(leadData);
     return { ok: true };
   } catch {

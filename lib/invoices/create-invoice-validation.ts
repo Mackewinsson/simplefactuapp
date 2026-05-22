@@ -84,6 +84,19 @@ export const createInvoiceFormSchema = z
     }
   })
   .superRefine((data, ctx) => {
+    const hasOperationDescription =
+      Boolean((data.notes ?? "").trim()) ||
+      data.items.some((i) => Boolean((i.description ?? "").trim()));
+    if (!hasOperationDescription) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Indica la descripción de la operación (notas) o al menos una línea con descripción.",
+        path: ["notes"],
+      });
+    }
+  })
+  .superRefine((data, ctx) => {
     if (data.tipoFactura === "F2") {
       const hasDest =
         (data.customerNif ?? "").trim() ||
@@ -141,6 +154,7 @@ const FORM_FIELD_KEYS = new Set<string>([
   "customerIdType",
   "customerForeignId",
   "customerCodigoPais",
+  "notes",
 ]);
 
 export function itemFieldErrorsFromZodIssues(

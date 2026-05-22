@@ -94,12 +94,14 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
               aeatQrText={invoice.aeatQrText}
               aeatQrDataUrl={aeatQrDataUrl}
               pdfHref={`/invoices/${invoice.id}/pdf`}
+              partial={invoice.aeatEstadoEnvio === "ParcialmenteCorrecto"}
             />
           ) : null}
           <VerifactuSendPanel
             invoiceId={invoice.id}
             invoiceNumber={invoice.number}
             aeatStatus={invoice.aeatStatus}
+            aeatEstadoEnvio={invoice.aeatEstadoEnvio}
             aeatLastError={invoice.aeatLastError}
             aeatCsv={invoice.aeatCsv}
             aeatJobId={invoice.aeatJobId}
