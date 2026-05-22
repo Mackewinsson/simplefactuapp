@@ -95,16 +95,33 @@ export default async function OnboardingPage() {
           return (
             <li
               key={step.id}
-              className={`rounded border p-5 ${
+              className={`rounded border p-5 transition-colors ${
                 step.done
-                  ? "border-outline-soft bg-surface-muted opacity-80"
+                  ? "border-success-outline bg-success-muted"
                   : "border-outline bg-surface"
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="text-xs font-medium text-fg-muted">Paso {index + 1}</span>
-                  <h2 className="mt-1 text-lg font-medium text-fg">{step.label}</h2>
+              <div className="flex items-start gap-4">
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                    step.done
+                      ? "bg-success-hover text-success-foreground"
+                      : "bg-surface-muted text-fg-muted"
+                  }`}
+                  aria-hidden
+                >
+                  {step.done ? "✓" : index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <h2 className="text-base font-semibold text-fg">{step.label}</h2>
+                    <span
+                      className={`shrink-0 ${step.done ? "badge badge-success" : "badge badge-neutral"}`}
+                      aria-hidden
+                    >
+                      {step.done ? "Hecho" : "Pendiente"}
+                    </span>
+                  </div>
                   <p className="mt-1 text-sm text-fg-muted">
                     {step.id === "issuer" &&
                       "NIF y razón social del obligado emisión, alineados con tu certificado."}
@@ -119,12 +136,6 @@ export default async function OnboardingPage() {
                     <span className="mt-1 inline-block text-xs text-fg-subtle">Opcional</span>
                   ) : null}
                 </div>
-                <span
-                  className={`shrink-0 ${step.done ? "badge badge-success" : "badge badge-neutral"}`}
-                  aria-hidden
-                >
-                  {step.done ? "Hecho" : "Pendiente"}
-                </span>
               </div>
               {!step.done && step.id === "vnif" ? (
                 <OnboardingVnifForm
@@ -135,7 +146,7 @@ export default async function OnboardingPage() {
               {!step.done && link ? (
                 <Link
                   href={link.href}
-                  className="mt-4 inline-block rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+                  className="mt-4 inline-block rounded bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover"
                 >
                   {link.cta}
                 </Link>

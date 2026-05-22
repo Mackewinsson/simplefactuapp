@@ -63,7 +63,7 @@ export async function OnboardingBanner() {
       <div
         role="status"
         aria-label={`Configuración: ${completed} de ${steps.length} pasos completados`}
-        className="border-b border-outline-soft bg-surface-muted text-fg"
+        className="border-b border-info-outline bg-accent-muted text-fg"
       >
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-1 flex-col gap-2">

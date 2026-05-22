@@ -92,7 +92,7 @@ export function VerifactuSettingsForm({
             <input
               name="issuerNif"
               defaultValue={initialIssuerNif}
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               autoComplete="off"
             />
           </label>
@@ -101,7 +101,7 @@ export function VerifactuSettingsForm({
             <input
               name="issuerLegalName"
               defaultValue={initialIssuerLegalName}
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               autoComplete="organization"
             />
           </label>
@@ -195,7 +195,7 @@ export function VerifactuSettingsForm({
             <input
               name="pfxPassphrase"
               type="password"
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               autoComplete="new-password"
             />
           </label>
@@ -238,7 +238,7 @@ export function VerifactuSettingsForm({
             <span className="mb-1 block text-sm font-medium text-fg-muted">NIF / CIF</span>
             <input
               name="verifyNif"
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               placeholder="p. ej. B12345678"
             />
           </label>
@@ -248,7 +248,7 @@ export function VerifactuSettingsForm({
             </span>
             <input
               name="verifyNombre"
-              className="w-full max-w-md rounded border border-outline px-3 py-2"
+              className="input max-w-md"
               placeholder="Razón social o nombre completo"
             />
           </label>

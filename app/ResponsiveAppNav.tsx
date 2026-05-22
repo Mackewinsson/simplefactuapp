@@ -45,8 +45,8 @@ export function ResponsiveAppNav({ links }: Props) {
               aria-current={active ? "page" : undefined}
               className={
                 active
-                  ? "border-b-2 border-fg py-2 text-sm font-semibold leading-none text-fg"
-                  : "border-b-2 border-transparent py-2 text-sm leading-none text-fg-muted hover:text-fg"
+                  ? "rounded px-2.5 py-1.5 text-sm font-semibold text-fg bg-surface-muted"
+                  : "rounded px-2.5 py-1.5 text-sm text-fg-muted hover:text-fg hover:bg-surface-muted/60 transition-colors"
               }
             >
               {link.label}

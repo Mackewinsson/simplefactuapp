@@ -337,7 +337,7 @@ export function NewInvoiceForm({
         ) : null}
 
         {/* ── Identificación de la factura ─────────────────────────────── */}
-        <section>
+        <section className="rounded border border-outline-soft bg-surface p-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Identificación
           </h2>
@@ -468,7 +468,7 @@ export function NewInvoiceForm({
         </section>
 
         {/* ── Tipo de factura ──────────────────────────────────────────── */}
-        <section>
+        <section className="rounded border border-outline-soft bg-surface p-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Tipo de factura
           </h2>
@@ -492,7 +492,7 @@ export function NewInvoiceForm({
 
         {/* ── Datos del destinatario ───────────────────────────────────── */}
         {tipoFactura === "F1" ? (
-        <section>
+        <section className="rounded border border-outline-soft bg-surface p-6">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">
               Destinatario
@@ -669,7 +669,7 @@ export function NewInvoiceForm({
         )}
 
         {/* ── Emisor ───────────────────────────────────────────────────── */}
-        <section>
+        <section className="rounded border border-outline-soft bg-surface p-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Emisor
           </h2>
@@ -754,7 +754,7 @@ export function NewInvoiceForm({
         </section>
 
         {/* ── Líneas ───────────────────────────────────────────────────── */}
-        <section>
+        <section className="rounded border border-outline-soft bg-surface p-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Productos / Servicios
           </h2>
@@ -786,13 +786,14 @@ export function NewInvoiceForm({
         <div className="flex flex-wrap gap-3">
           <SubmitButton
             label="Guardar borrador"
-            secondary
+            variant="secondary"
             onClick={() => {
               if (sendToAeatRef.current) sendToAeatRef.current.value = "0";
             }}
           />
           <SubmitButton
             label="Validar y enviar a Veri*Factu"
+            variant="cta"
             onClick={() => {
               if (sendToAeatRef.current) sendToAeatRef.current.value = "1";
             }}
@@ -844,22 +845,23 @@ export function NewInvoiceForm({
 
 type SubmitButtonProps = {
   label: string;
-  secondary?: boolean;
+  variant?: "primary" | "secondary" | "cta";
   onClick?: () => void;
 };
 
-function SubmitButton({ label, secondary, onClick }: SubmitButtonProps) {
+function SubmitButton({ label, variant = "primary", onClick }: SubmitButtonProps) {
   const { pending } = useFormStatus();
+  const cls = {
+    primary: "bg-primary text-primary-foreground hover:bg-primary-hover",
+    secondary: "border border-outline bg-surface text-fg-muted hover:bg-surface-hover",
+    cta: "bg-accent text-accent-foreground hover:bg-accent-hover",
+  }[variant];
   return (
     <button
       type="submit"
       disabled={pending}
       onClick={onClick}
-      className={`rounded px-4 py-2 text-sm font-medium disabled:opacity-70 disabled:pointer-events-none ${
-        secondary
-          ? "border border-outline bg-surface text-fg-muted hover:bg-surface-hover"
-          : "bg-primary text-primary-foreground hover:bg-primary-hover"
-      }`}
+      className={`rounded px-4 py-2 text-sm font-medium disabled:opacity-70 disabled:pointer-events-none ${cls}`}
     >
       {pending ? "Guardando…" : label}
     </button>

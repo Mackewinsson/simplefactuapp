@@ -375,13 +375,13 @@ export default async function InvoicesPage({
           <div className="hidden overflow-x-auto rounded border border-outline-soft bg-surface md:block">
             <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
-                <tr className="border-b border-outline-soft bg-surface-hover">
-                  <th className="px-4 py-3 font-medium text-fg">Número</th>
-                  <th className="px-4 py-3 font-medium text-fg">Serie</th>
-                  <th className="px-4 py-3 font-medium text-fg">Cliente</th>
-                  <th className="px-4 py-3 font-medium text-fg">Fecha</th>
-                  <th className="px-4 py-3 font-medium text-fg">Total</th>
-                  <th className="px-4 py-3 font-medium text-fg">Veri*Factu</th>
+                <tr className="border-b border-outline-soft bg-surface-muted">
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Número</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Serie</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Cliente</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Fecha</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Total</th>
+                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Veri*Factu</th>
                 </tr>
               </thead>
               <tbody>

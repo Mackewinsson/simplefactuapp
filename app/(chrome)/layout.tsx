@@ -20,7 +20,7 @@ import { OnboardingRedirect } from "./OnboardingRedirect";
 export default function ChromeLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <header className="border-b border-outline-soft bg-surface">
+      <header className="sticky top-0 z-50 border-b border-outline-soft bg-surface/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex min-w-0 items-baseline gap-3 lg:gap-8">
             <BrandWordmark href="/" />

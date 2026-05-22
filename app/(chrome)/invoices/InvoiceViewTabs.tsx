@@ -41,7 +41,9 @@ export function InvoiceViewTabs({
           className={tabClass(current === "verifactu")}
         >
           Verifactu
-          <span className="ml-1.5 tabular-nums text-xs font-normal text-fg-subtle">({verifactuCount})</span>
+          <span className="ml-1.5 inline-flex items-center rounded-full bg-surface-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none text-fg-subtle ring-1 ring-outline-soft">
+            {verifactuCount}
+          </span>
         </Link>
         <Link
           href={hrefSinEnviar}
@@ -50,7 +52,13 @@ export function InvoiceViewTabs({
           className={tabClass(current === "sin-enviar")}
         >
           Por enviar
-          <span className="ml-1.5 tabular-nums text-xs font-normal text-fg-subtle">({sinEnviarCount})</span>
+          <span className={`ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none ${
+            sinEnviarCount > 0
+              ? "bg-warning-hover text-warning-deep"
+              : "bg-surface-muted text-fg-subtle ring-1 ring-outline-soft"
+          }`}>
+            {sinEnviarCount}
+          </span>
         </Link>
       </div>
     </div>
