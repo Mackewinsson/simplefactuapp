@@ -32,6 +32,7 @@ model UserVerifactuAccount {
   issuerNif             String?
   issuerLegalName       String?
   certificateUploadedAt DateTime?
+  vnifVerifiedAt        DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 

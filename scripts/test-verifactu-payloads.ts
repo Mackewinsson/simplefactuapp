@@ -16,6 +16,7 @@ const accountBase: UserVerifactuAccount = {
   issuerNif: "B12345678",
   issuerLegalName: "Test SL",
   certificateUploadedAt: null,
+  vnifVerifiedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

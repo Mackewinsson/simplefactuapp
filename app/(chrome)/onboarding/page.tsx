@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getOnboardingStatus } from "@/lib/verifactu/onboarding-status";
+import { OnboardingVnifForm } from "./OnboardingVnifForm";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,10 @@ export default async function OnboardingPage() {
   if (!userId) redirect("/sign-in");
 
   const status = await getOnboardingStatus(userId);
+  const account = await prisma.userVerifactuAccount.findUnique({
+    where: { userId },
+    select: { issuerNif: true, issuerLegalName: true },
+  });
 
   if (status.complete) {
     redirect("/invoices");
@@ -46,8 +51,9 @@ export default async function OnboardingPage() {
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-semibold text-fg">Configura Verifactu</h1>
       <p className="mt-2 text-sm text-fg-muted">
-        Tres pasos para emitir facturas con registro en AEAT. Puedes salir y volver cuando quieras; te
-        redirigiremos aquí hasta completarlos.
+        Cuatro pasos para emitir facturas con registro en AEAT (el de comprobar NIF es opcional). Puedes
+        salir y volver cuando quieras; te redirigiremos aquí hasta completar emisor, certificado y primera
+        factura.
       </p>
 
       {status.certificateExpiresWithin30Days && status.certificateNotAfter ? (
@@ -85,7 +91,10 @@ export default async function OnboardingPage() {
 
       <ol className="mt-8 space-y-4">
         {status.steps.map((step, index) => {
-          const link = stepLinks[step.id];
+          const link =
+            step.id === "vnif"
+              ? null
+              : stepLinks[step.id as keyof typeof stepLinks];
           return (
             <li
               key={step.id}
@@ -102,11 +111,16 @@ export default async function OnboardingPage() {
                   <p className="mt-1 text-sm text-fg-muted">
                     {step.id === "issuer" &&
                       "NIF y razón social del obligado emisión, alineados con tu certificado."}
+                    {step.id === "vnif" &&
+                      "Confirma con AEAT que el nombre coincide con el NIF antes de subir el certificado."}
                     {step.id === "cert" &&
                       "Certificado digital .pfx para firmar el envío SOAP a AEAT (solo en servidor)."}
                     {step.id === "invoice" &&
                       "Al menos una factura con estado Correcto en AEAT (envío Verifactu)."}
                   </p>
+                  {step.optional ? (
+                    <span className="mt-1 inline-block text-xs text-fg-subtle">Opcional</span>
+                  ) : null}
                 </div>
                 <span
                   className={`shrink-0 rounded px-2 py-0.5 text-xs font-medium ${
@@ -119,7 +133,13 @@ export default async function OnboardingPage() {
                   {step.done ? "Hecho" : "Pendiente"}
                 </span>
               </div>
-              {!step.done ? (
+              {!step.done && step.id === "vnif" ? (
+                <OnboardingVnifForm
+                  defaultNif={account?.issuerNif ?? ""}
+                  defaultNombre={account?.issuerLegalName ?? ""}
+                />
+              ) : null}
+              {!step.done && link ? (
                 <Link
                   href={link.href}
                   className="mt-4 inline-block rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"

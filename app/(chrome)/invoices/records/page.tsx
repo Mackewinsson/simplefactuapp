@@ -12,6 +12,22 @@ const dateFormat = new Intl.DateTimeFormat("es", {
   timeStyle: "short",
 });
 
+function buildQueryParams(params: {
+  from?: string;
+  to?: string;
+  serie?: string;
+  tipo?: string;
+  page?: number;
+}): URLSearchParams {
+  const qs = new URLSearchParams();
+  if (params.from) qs.set("from", params.from);
+  if (params.to) qs.set("to", params.to);
+  if (params.serie) qs.set("serie", params.serie);
+  if (params.tipo) qs.set("tipo", params.tipo);
+  if (params.page && params.page > 1) qs.set("page", String(params.page));
+  return qs;
+}
+
 function buildHref(params: {
   from?: string;
   to?: string;
@@ -19,14 +35,18 @@ function buildHref(params: {
   tipo?: string;
   page?: number;
 }): string {
-  const qs = new URLSearchParams();
-  if (params.from) qs.set("from", params.from);
-  if (params.to) qs.set("to", params.to);
-  if (params.serie) qs.set("serie", params.serie);
-  if (params.tipo) qs.set("tipo", params.tipo);
-  if (params.page && params.page > 1) qs.set("page", String(params.page));
-  const s = qs.toString();
+  const s = buildQueryParams(params).toString();
   return `/invoices/records${s ? `?${s}` : ""}`;
+}
+
+function buildExportHref(params: {
+  from?: string;
+  to?: string;
+  serie?: string;
+  tipo?: string;
+}): string {
+  const s = buildQueryParams(params).toString();
+  return `/invoices/records/export${s ? `?${s}` : ""}`;
 }
 
 function tipoBadge(tipo: string) {
@@ -91,12 +111,22 @@ export default async function InvoiceRecordsPage({
             inmutable del SIF — no se puede editar ni borrar desde aquí.
           </p>
         </div>
-        <Link
-          href="/invoices/new"
-          className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
-        >
-          Nueva factura
-        </Link>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          {!loadError && data && data.total > 0 ? (
+            <a
+              href={buildExportHref({ from, to, serie, tipo })}
+              className="rounded border border-outline px-4 py-2 text-center text-sm font-medium text-fg hover:bg-surface-hover"
+            >
+              Exportar CSV
+            </a>
+          ) : null}
+          <Link
+            href="/invoices/new"
+            className="rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+          >
+            Nueva factura
+          </Link>
+        </div>
       </div>
 
       <form

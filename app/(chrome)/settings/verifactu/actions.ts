@@ -247,7 +247,12 @@ export async function verifyNifAction(
   const success = json.success === true;
 
   revalidatePath("/settings/verifactu");
+  revalidatePath("/onboarding");
   if (success) {
+    await prisma.userVerifactuAccount.update({
+      where: { userId },
+      data: { vnifVerifiedAt: new Date() },
+    });
     return { ok: true, message: NIF_VERIFY_MATCH_USER };
   }
   return { ok: false, errors: [NIF_VERIFY_NOT_MATCH_USER] };

@@ -69,6 +69,23 @@ export function VerifactuSettingsForm({
         {issuerState?.ok ? (
           <p className="mt-3 text-sm text-success-emphasis">{issuerState.message}</p>
         ) : null}
+        {certNif &&
+        initialIssuerNif.trim().toUpperCase() !== certNif.trim().toUpperCase() ? (
+          <form action={issuerAction} className="mt-4 rounded border border-warning-outline bg-warning-muted p-3">
+            <p className="text-sm text-warning-foreground">
+              El certificado pertenece al NIF <strong>{certNif}</strong>, distinto del emisor configurado (
+              {initialIssuerNif || "vacío"}).
+            </p>
+            <input type="hidden" name="issuerNif" value={certNif} />
+            <input type="hidden" name="issuerLegalName" value={initialIssuerLegalName} />
+            <button
+              type="submit"
+              className="mt-3 rounded bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+            >
+              Usar NIF del certificado ({certNif})
+            </button>
+          </form>
+        ) : null}
         <form action={issuerAction} className="mt-4 space-y-4">
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-fg-muted">NIF / CIF del emisor</span>

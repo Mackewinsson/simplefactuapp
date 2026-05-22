@@ -3,9 +3,11 @@ import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefact
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 
 export type OnboardingStep = {
-  id: "issuer" | "cert" | "invoice";
+  id: "issuer" | "vnif" | "cert" | "invoice";
   label: string;
   done: boolean;
+  /** Recommended but not required for onboarding complete */
+  optional?: boolean;
 };
 
 export type OnboardingStatus = {
@@ -27,6 +29,7 @@ export async function getOnboardingStatus(userId: string): Promise<OnboardingSta
   const issuerProfileDone = Boolean(
     account?.issuerNif?.trim() && account?.issuerLegalName?.trim()
   );
+  const vnifVerifiedDone = Boolean(account?.vnifVerifiedAt);
   const firstInvoiceDone = invoiceCount > 0;
 
   let certificateDone = Boolean(account?.certificateUploadedAt);
@@ -65,12 +68,20 @@ export async function getOnboardingStatus(userId: string): Promise<OnboardingSta
 
   const steps: OnboardingStep[] = [
     { id: "issuer", label: "Datos del emisor", done: issuerProfileDone },
+    {
+      id: "vnif",
+      label: "Comprobar NIF con Hacienda (recomendado)",
+      done: vnifVerifiedDone,
+      optional: true,
+    },
     { id: "cert", label: "Certificado AEAT", done: certificateDone },
     { id: "invoice", label: "Primera factura registrada", done: firstInvoiceDone },
   ];
 
+  const requiredSteps = steps.filter((s) => !s.optional);
+
   return {
-    complete: steps.every((s) => s.done),
+    complete: requiredSteps.every((s) => s.done),
     issuerProfileDone,
     certificateDone,
     firstInvoiceDone,
