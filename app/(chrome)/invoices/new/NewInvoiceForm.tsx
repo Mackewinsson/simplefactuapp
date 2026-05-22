@@ -203,6 +203,31 @@ export function NewInvoiceForm({
 
   const isNewSeries = serie && existingSeries.length > 0 && !existingSeries.includes(serie);
 
+  function applyTipoFactura(next: "F1" | "F2") {
+    if (next === "F2") {
+      setVnifFeedback(null);
+      setCustomerNif("");
+      setCustomerName("");
+      setCustomerEmail("");
+      setCustomerIdScheme("NIF");
+      setCustomerIdType("");
+      setCustomerCodigoPais("");
+      setCustomerForeignId("");
+      setFormFieldErrors((p) =>
+        stripFormFieldErrors(
+          p,
+          "customerNif",
+          "customerName",
+          "customerEmail",
+          "customerIdType",
+          "customerForeignId",
+          "customerCodigoPais"
+        )
+      );
+    }
+    setTipoFactura(next);
+  }
+
   function runVerifyRecipientNif() {
     setVnifFeedback(null);
     startVnifTransition(async () => {
@@ -272,13 +297,29 @@ export function NewInvoiceForm({
         <input type="hidden" name="items" value={JSON.stringify(items)} />
         <input type="hidden" name="customerName" value={tipoFactura === "F2" ? "—" : customerName} />
         <input type="hidden" name="tipoFactura" value={tipoFactura} />
-        <input type="hidden" name="customerNif" value={customerNif} />
-        <input type="hidden" name="customerEmail" value={customerEmail} />
-        <input type="hidden" name="customerTipoPersona" value={customerTipoPersona} />
-        <input type="hidden" name="customerIdScheme" value={customerIdScheme} />
-        <input type="hidden" name="customerIdType" value={customerIdType} />
-        <input type="hidden" name="customerCodigoPais" value={customerCodigoPais} />
-        <input type="hidden" name="customerForeignId" value={customerForeignId} />
+        <input type="hidden" name="customerNif" value={tipoFactura === "F2" ? "" : customerNif} />
+        <input type="hidden" name="customerEmail" value={tipoFactura === "F2" ? "" : customerEmail} />
+        <input
+          type="hidden"
+          name="customerTipoPersona"
+          value={tipoFactura === "F2" ? "" : customerTipoPersona}
+        />
+        <input
+          type="hidden"
+          name="customerIdScheme"
+          value={tipoFactura === "F2" ? "NIF" : customerIdScheme}
+        />
+        <input type="hidden" name="customerIdType" value={tipoFactura === "F2" ? "" : customerIdType} />
+        <input
+          type="hidden"
+          name="customerCodigoPais"
+          value={tipoFactura === "F2" ? "" : customerCodigoPais}
+        />
+        <input
+          type="hidden"
+          name="customerForeignId"
+          value={tipoFactura === "F2" ? "" : customerForeignId}
+        />
         <input type="hidden" name="sendToAeat" value="0" ref={sendToAeatRef} />
 
         {!suppressServerBanner && bannerErrorsFiltered.length > 0 ? (
@@ -431,29 +472,17 @@ export function NewInvoiceForm({
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
             Tipo de factura
           </h2>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <label className="flex cursor-pointer items-center gap-2">
-              <input
-                type="radio"
-                name="tipoFacturaUi"
-                checked={tipoFactura === "F1"}
-                onChange={() => setTipoFactura("F1")}
-              />
-              F1 — Factura completa (con destinatario)
-            </label>
-            <label className="flex cursor-pointer items-center gap-2">
-              <input
-                type="radio"
-                name="tipoFacturaUi"
-                checked={tipoFactura === "F2"}
-                onChange={() => {
-                  setTipoFactura("F2");
-                  setVnifFeedback(null);
-                }}
-              />
-              F2 — Simplificada (ticket ≤ 3.000 €, sin cliente)
-            </label>
-          </div>
+          <label className="block max-w-md">
+            <span className="mb-1 block text-sm font-medium text-fg-muted">Tipo</span>
+            <select
+              value={tipoFactura}
+              onChange={(e) => applyTipoFactura(e.target.value as "F1" | "F2")}
+              className="w-full rounded border border-outline px-3 py-2 text-sm"
+            >
+              <option value="F1">F1 — Factura completa (con destinatario)</option>
+              <option value="F2">F2 — Simplificada (ticket ≤ 3.000 €, sin cliente)</option>
+            </select>
+          </label>
           {tipoFactura === "F2" && totalCents > 300_000 ? (
             <p className="mt-2 text-sm text-danger-emphasis">
               El total supera 3.000 € — no válido para factura simplificada F2.

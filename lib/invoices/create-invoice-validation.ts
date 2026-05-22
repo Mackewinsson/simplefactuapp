@@ -18,7 +18,25 @@ export const createInvoiceItemSchema = z.object({
 
 const AEAT_ID_TYPES = ["02", "03", "04", "05", "06"] as const;
 
-export const createInvoiceFormSchema = z
+/** F2 must not carry destinatario fields (FormData may still post stale hidden values). */
+function stripDestinatarioForF2(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object") return raw;
+  const data = raw as Record<string, unknown>;
+  if (data.tipoFactura !== "F2") return raw;
+  return {
+    ...data,
+    customerName: String(data.customerName ?? "").trim() || "—",
+    customerNif: "",
+    customerEmail: "",
+    customerTipoPersona: undefined,
+    customerIdScheme: "NIF",
+    customerIdType: "",
+    customerCodigoPais: "",
+    customerForeignId: "",
+  };
+}
+
+const createInvoiceFormSchemaInner = z
   .object({
     number: z.string().min(1, "El número es obligatorio"),
     issueDate: z.string().min(1, "La fecha de expedición es obligatoria"),
@@ -47,6 +65,8 @@ export const createInvoiceFormSchema = z
     { message: "El precio unitario debe ser ≥ 0", path: ["items"] }
   )
   .superRefine((data, ctx) => {
+    if (data.tipoFactura === "F2") return;
+
     if (data.customerIdScheme === "NIF") {
       const nif = (data.customerNif ?? "").trim();
       if (!nif) {
@@ -141,6 +161,11 @@ export const createInvoiceFormSchema = z
       path: ["fechaOperacion"],
     });
   });
+
+export const createInvoiceFormSchema = z.preprocess(
+  stripDestinatarioForF2,
+  createInvoiceFormSchemaInner
+);
 
 export type CreateInvoiceFormParsed = z.infer<typeof createInvoiceFormSchema>;
 
