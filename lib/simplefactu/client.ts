@@ -147,6 +147,19 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       });
     },
 
+    async getMeInvoiceRecords(searchParams: URLSearchParams): Promise<Response> {
+      const qs = searchParams.toString();
+      const path = qs ? `/me/invoice-records?${qs}` : "/me/invoice-records";
+      return fetch(joinUrl(baseUrl, path), { method: "GET", headers });
+    },
+
+    async getMeInvoiceRecord(id: string): Promise<Response> {
+      return fetch(joinUrl(baseUrl, `/me/invoice-records/${encodeURIComponent(id)}`), {
+        method: "GET",
+        headers,
+      });
+    },
+
     parseJson,
   };
 }

@@ -179,12 +179,20 @@ export default async function InvoicesPage({
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold">Facturas</h1>
-        <Link
-          href="/invoices/new"
-          className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
-        >
-          Nueva factura
-        </Link>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <Link
+            href="/invoices/records"
+            className="w-full rounded border border-outline bg-surface px-4 py-2 text-center text-sm font-medium text-fg-muted hover:bg-surface-hover sm:w-auto"
+          >
+            Registro AEAT
+          </Link>
+          <Link
+            href="/invoices/new"
+            className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
+          >
+            Nueva factura
+          </Link>
+        </div>
       </div>
 
       <InvoiceViewTabs
