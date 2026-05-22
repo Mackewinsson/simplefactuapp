@@ -39,6 +39,17 @@ model UserVerifactuAccount {
   @@map("user_verifactu_accounts")
 }
 
+/// Clerk userId ↔ partner (gestoría) tenant + encrypted partner API key (BFF only).
+model UserPartnerAccount {
+  userId            String   @id
+  partnerTenantId   String
+  apiKeyEncrypted   String   @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("user_partner_accounts")
+}
+
 model Invoice {
   id                 String        @id @default(cuid())
   userId             String

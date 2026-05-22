@@ -134,6 +134,8 @@ Si `SIMPLEFACTU_ADMIN_KEY` ≠ `ADMIN_KEY` del VPS → `401 Invalid x-admin-key`
 | `VERIFACTU_SI_SOLO_VERI`, `VERIFACTU_SI_MULTI_OT`, `VERIFACTU_SI_IND_MULTI_OT` | No | Flags SIF (`S`/`N`) |
 | **Admin panel (Clerk)** | | |
 | `ADMIN_CLERK_USER_IDS` | No | `middleware.ts` + `lib/auth/admin.ts` — allowlist opcional `/admin` |
+| **Partner / gestoría** | | |
+| `PARTNER_CLERK_USER_IDS` | No | `lib/auth/partner.ts` — allowlist opcional `/partner` |
 | **App / UI** | | |
 | `DATABASE_URL` | No | Prisma (`lib/prisma.ts`) |
 | `NODE_ENV` | Implícito en Vercel | Prisma logging, build |
@@ -179,6 +181,7 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 - **`/invoices/new`:** alta; verificación NIF destinatario contra el API cuando procede.
 - **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la [referencia API](/docs/api-reference) (OpenAPI).
 - **`/admin`:** operación — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
+- **`/partner`:** gestoría — sub-tenants vía `GET/POST /partner/*` del API con clave partner (`UserPartnerAccount`, tenant `rp_<clerkUserId>`). Sin `SIMPLEFACTU_ADMIN_KEY` en el día a día.
 
 ---
 
