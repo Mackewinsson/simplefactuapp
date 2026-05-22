@@ -23,6 +23,7 @@ import { IssueCorrectionButton } from "./IssueCorrectionButton";
 type Props = {
   invoiceId: string;
   invoiceNumber: string;
+  pdfHref: string;
   aeatStatus: string;
   aeatEstadoEnvio?: string | null;
   aeatLastError: string | null;
@@ -38,6 +39,7 @@ type Props = {
 export function VerifactuSendPanel({
   invoiceId,
   invoiceNumber,
+  pdfHref,
   aeatStatus,
   aeatEstadoEnvio,
   aeatLastError,
@@ -129,6 +131,9 @@ export function VerifactuSendPanel({
     aeatCancellationStatus !== "SUCCEEDED" &&
     aeatCancellationStatus !== "PENDING";
 
+  const isRegistered = aeatStatus === "SUCCEEDED" && !!(aeatCsv?.trim());
+  const partialSuccess = aeatEstadoEnvio === "ParcialmenteCorrecto";
+
   function run(
     action: (id: string) => Promise<{ ok: boolean; message: string }>,
     id: string
@@ -162,56 +167,76 @@ export function VerifactuSendPanel({
   return (
     <div className="rounded border border-outline-soft bg-surface p-4">
       <h2 className="text-sm font-semibold text-fg">Verifactu (AEAT)</h2>
-      <dl className="mt-2 grid gap-1 text-sm text-fg-muted">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium">Estado del alta:</span>
-          <span
-            className={registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}
-          >
-            {registrationStatusDetailLabel(uiStatus)}
-          </span>
-        </div>
-        {aeatCsv ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-medium">CSV:</span>
-            <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs font-mono">
-              {aeatCsv}
-            </code>
-            {aeatQrText ? (
-              <a
-                href={aeatQrText}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-fg-link hover:underline"
-              >
-                Comprobar en AEAT ↗
-              </a>
-            ) : null}
-          </div>
-        ) : null}
-        {aeatQrDataUrl ? (
-          <div className="mt-3 flex flex-wrap items-start gap-3">
-            {/* QR is mandated by RD 1007/2023 art. 25. The leyenda VERI*FACTU
-                next to it is the consumer-facing trust mark required when
-                the issuer operates under Veri*Factu rules.
-                next/image would offer no optimization here: the source is an
-                inline data: URL already produced server-side. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={aeatQrDataUrl}
-              alt="QR de verificación AEAT (Veri*Factu)"
-              className="h-32 w-32 rounded border border-outline-soft bg-surface p-1"
-              width={128}
-              height={128}
-            />
-            <div className="text-xs text-fg-muted">
-              <p className="font-semibold">Factura verificable en sede AEAT</p>
-              <p className="font-mono tracking-wide text-fg">VERI*FACTU</p>
-              <p className="mt-1 text-fg-subtle">
-                Escanea o haz clic en «Comprobar en AEAT» para validar este
-                registro en la sede electrónica de la Agencia Tributaria.
+
+      {isRegistered ? (
+        <div
+          className={
+            partialSuccess
+              ? "alert-warning mt-3"
+              : "mt-3 rounded-lg border border-success-outline bg-success p-4 text-success-foreground"
+          }
+        >
+          <p className="text-base font-semibold text-fg">
+            {partialSuccess
+              ? "Factura aceptada con advertencias AEAT"
+              : "Factura registrada en AEAT"}
+          </p>
+          <p className={`mt-1 text-sm ${partialSuccess ? "text-warning-deep" : "text-success-emphasis"}`}>
+            La factura <span className="font-mono">{invoiceNumber}</span> está en Verifactu.
+            Guarda el CSV y descarga el PDF con el QR de verificación.
+          </p>
+          <dl className="mt-4 grid gap-3 text-sm">
+            <div>
+              <dt className="font-medium text-fg">Código seguro de verificación (CSV)</dt>
+              <dd className="mt-1 flex flex-wrap items-center gap-2">
+                <code className="rounded bg-surface px-2 py-1 font-mono text-sm text-fg">
+                  {aeatCsv}
+                </code>
+                {aeatQrText ? (
+                  <a
+                    href={aeatQrText}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-fg-link underline hover:text-fg"
+                  >
+                    Comprobar en AEAT ↗
+                  </a>
+                ) : null}
+              </dd>
+            </div>
+          </dl>
+          {aeatQrDataUrl ? (
+            <div className="mt-4 flex flex-wrap items-start gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={aeatQrDataUrl}
+                alt="QR de verificación AEAT (Veri*Factu)"
+                className="h-28 w-28 rounded border border-outline-soft bg-surface p-1"
+                width={112}
+                height={112}
+              />
+              <p className="max-w-xs text-xs text-fg-muted">
+                Incluye este QR en el PDF que entregues al cliente. La leyenda{" "}
+                <span className="font-mono font-semibold text-fg">VERI*FACTU</span> identifica el
+                registro ante Hacienda.
               </p>
             </div>
+          ) : null}
+          <div className="mt-4">
+            <a href={pdfHref} download className="btn btn-sm btn-cta">
+              Descargar PDF
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      <dl className="mt-3 grid gap-2 text-sm text-fg-muted">
+        {!isRegistered ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium">Estado del alta:</span>
+            <span className={registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}>
+              {registrationStatusDetailLabel(uiStatus)}
+            </span>
           </div>
         ) : null}
         {aeatLastError ? (
@@ -221,15 +246,15 @@ export function VerifactuSendPanel({
           </div>
         ) : null}
         {aeatStatus === "DEAD" ? (
-          <div className="mt-2">
+          <div>
             <IssueCorrectionButton invoiceId={invoiceId} originalNumSerie={invoiceNumber} />
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center gap-2">
+        <div
+          className={`flex flex-wrap items-center gap-2${isRegistered ? " border-t border-outline-soft pt-3" : ""}`}
+        >
           <span className="font-medium">Estado de la anulación:</span>
-          <span
-            className={cancellationStatusBadgeClass(aeatCancellationStatus)}
-          >
+          <span className={cancellationStatusBadgeClass(aeatCancellationStatus)}>
             {cancellationStatusDetailLabel(aeatCancellationStatus)}
           </span>
         </div>

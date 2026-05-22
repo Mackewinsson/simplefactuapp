@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { verifactuQrDataUrl } from "@/lib/verifactu/qr-image";
 import { VerifactuSendPanel } from "./VerifactuSendPanel";
-import { VerifactuSuccessBanner } from "./VerifactuSuccessBanner";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -45,15 +43,6 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <Link href="/invoices" className="text-fg-muted hover:text-fg">
           ← Volver a facturas
         </Link>
-        {invoice.aeatStatus === AeatJobStatus.SUCCEEDED ? (
-          <a
-            href={`/invoices/${invoice.id}/pdf`}
-            className="rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-hover"
-            download
-          >
-            Descargar PDF
-          </a>
-        ) : null}
       </div>
 
       <div className="rounded border border-outline-soft bg-surface">
@@ -87,19 +76,10 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         </div>
 
         <div className="border-b border-outline-soft px-4 py-4">
-          {invoice.aeatStatus === AeatJobStatus.SUCCEEDED && invoice.aeatCsv ? (
-            <VerifactuSuccessBanner
-              invoiceNumber={invoice.number}
-              aeatCsv={invoice.aeatCsv}
-              aeatQrText={invoice.aeatQrText}
-              aeatQrDataUrl={aeatQrDataUrl}
-              pdfHref={`/invoices/${invoice.id}/pdf`}
-              partial={invoice.aeatEstadoEnvio === "ParcialmenteCorrecto"}
-            />
-          ) : null}
           <VerifactuSendPanel
             invoiceId={invoice.id}
             invoiceNumber={invoice.number}
+            pdfHref={`/invoices/${invoice.id}/pdf`}
             aeatStatus={invoice.aeatStatus}
             aeatEstadoEnvio={invoice.aeatEstadoEnvio}
             aeatLastError={invoice.aeatLastError}
