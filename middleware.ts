@@ -22,7 +22,9 @@ export default clerkMiddleware(async (authFn, req) => {
   // Do not duplicate allowlist checks here: they omitted publicMetadata.role and made
   // /admin look like a no-op (redirect to /invoices without feedback).
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("x-pathname", req.nextUrl.pathname);
+  return response;
 });
 
 export const config = {

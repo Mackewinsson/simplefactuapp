@@ -6,6 +6,9 @@ const FORM_FOCUS_ORDER = [
   "fechaOperacion",
   "customerName",
   "customerNif",
+  "customerIdType",
+  "customerCodigoPais",
+  "customerForeignId",
   "customerEmail",
 ] as const satisfies readonly (keyof InvoiceFormFieldErrors)[];
 

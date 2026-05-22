@@ -4,6 +4,7 @@ import { AppNav } from "../AppNav";
 import { HeaderUserArea } from "../HeaderUserArea";
 import { Footer } from "../Footer";
 import { OnboardingBanner } from "../OnboardingBanner";
+import { OnboardingRedirect } from "./OnboardingRedirect";
 
 /**
  * Layout for the authenticated/transactional surface of the app: header
@@ -31,6 +32,7 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <OnboardingBanner />
+      <OnboardingRedirect />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
         {children}
       </main>

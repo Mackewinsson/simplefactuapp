@@ -2,17 +2,24 @@
 
 import { useState } from "react";
 import { createCustomerAction } from "@/app/(chrome)/customers/actions";
+import { DestinatarioIdFields } from "./DestinatarioIdFields";
+import type { CustomerIdScheme } from "@/lib/invoices/destinatario-id";
+import type { CustomerRow } from "@/app/(chrome)/customers/actions";
 
 type CustomerFormModalProps = {
-  onSave: (c: { name: string; nif: string; email: string; tipoPersona: string }) => void;
+  onSave: (c: CustomerRow) => void;
   onClose: () => void;
 };
 
 export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
   const [name, setName] = useState("");
-  const [nif, setNif] = useState("");
   const [email, setEmail] = useState("");
   const [tipoPersona, setTipoPersona] = useState("J");
+  const [idScheme, setIdScheme] = useState<CustomerIdScheme>("NIF");
+  const [nif, setNif] = useState("");
+  const [idType, setIdType] = useState("");
+  const [codigoPais, setCodigoPais] = useState("");
+  const [foreignId, setForeignId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,13 +34,17 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
       nif: nif.trim(),
       email: email.trim(),
       tipoPersona,
+      idScheme,
+      idType,
+      codigoPais,
+      foreignId,
     });
     setSaving(false);
-    if (!r.ok) {
+    if (!r.ok || !r.customer) {
       setError(r.error ?? "Error al guardar.");
       return;
     }
-    onSave({ name: name.trim(), nif: nif.trim(), email: email.trim(), tipoPersona });
+    onSave(r.customer);
     onClose();
   }
 
@@ -51,7 +62,9 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
         </div>
 
         {error ? (
-          <p className="mb-3 rounded border border-danger-outline bg-danger px-3 py-2 text-sm text-danger-foreground">{error}</p>
+          <p className="mb-3 rounded border border-danger-outline bg-danger px-3 py-2 text-sm text-danger-foreground">
+            {error}
+          </p>
         ) : null}
 
         <div className="space-y-3">
@@ -66,16 +79,30 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
               className="w-full rounded border border-outline px-3 py-2 text-sm"
             />
           </label>
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium text-fg-muted">NIF / CIF</span>
-            <input
-              type="text"
-              value={nif}
-              onChange={(e) => setNif(e.target.value)}
-              placeholder="B12345678"
-              className="w-full rounded border border-outline px-3 py-2 text-sm"
-            />
-          </label>
+
+          <DestinatarioIdFields
+            idScheme={idScheme}
+            onSchemeChange={(s) => {
+              setIdScheme(s);
+              if (s === "NIF") {
+                setIdType("");
+                setCodigoPais("");
+                setForeignId("");
+              } else {
+                setNif("");
+              }
+            }}
+            nif={nif}
+            onNifChange={setNif}
+            idType={idType}
+            onIdTypeChange={setIdType}
+            codigoPais={codigoPais}
+            onCodigoPaisChange={setCodigoPais}
+            foreignId={foreignId}
+            onForeignIdChange={setForeignId}
+            showVnif={false}
+          />
+
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-fg-muted">Correo</span>
             <input

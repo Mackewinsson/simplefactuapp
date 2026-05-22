@@ -164,12 +164,19 @@ export function buildSendInvoicePayload(
   }
 
   const inv = invoice as unknown as Record<string, unknown>;
+  const tipoFactura = String(inv.tipoFactura || "F1").trim() as "F1" | "F2";
+  const isF2 = tipoFactura === "F2";
+
   const scheme = String(inv.customerIdScheme || "NIF");
 
   let destNif: string | undefined;
   let destIdOtro: { codigoPais?: string; idType: string; id: string } | undefined;
 
-  if (scheme === "ID_OTRO") {
+  if (isF2) {
+    if (invoice.totalCents > 300_000) {
+      throw new Error("Factura simplificada F2: el importe total no puede superar 3.000 €.");
+    }
+  } else if (scheme === "ID_OTRO") {
     const idType = String(inv.customerIdType || "").trim();
     const id = String(inv.customerForeignId || "").trim();
     const codigoPais = String(inv.customerCodigoPais || "").trim().toUpperCase();
@@ -232,10 +239,14 @@ export function buildSendInvoicePayload(
     numSerie: invoice.number,
     fecha: toDdMmYyyy(invoice.issueDate),
     ...(fechaOperacionVal ? { fechaOperacion: toDdMmYyyy(fechaOperacionVal) } : {}),
-    tipoFactura: "F1",
+    tipoFactura,
     descripcion,
-    destNombre: invoice.customerName.trim(),
-    ...(destIdOtro ? { destIdOtro } : { destNif: destNif! }),
+    ...(isF2
+      ? { facturaSinIdentifDestinatarioArt61d: "S" }
+      : {
+          destNombre: invoice.customerName.trim(),
+          ...(destIdOtro ? { destIdOtro } : { destNif: destNif! }),
+        }),
     cuotaTotal,
     total,
     detalles,

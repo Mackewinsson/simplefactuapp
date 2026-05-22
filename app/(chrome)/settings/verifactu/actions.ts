@@ -168,6 +168,46 @@ export async function uploadCertificateAction(
   return { ok: true, message: successMsg };
 }
 
+export async function deleteCertificateAction(
+  _prev: VerifactuSettingsState | null
+): Promise<VerifactuSettingsState> {
+  const { userId } = await auth();
+  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
+
+  try {
+    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const client = createSimplefactuClient({
+      baseUrl: getSimplefactuBaseUrl(),
+      apiKey,
+    });
+    const res = await client.deleteMeCertificate();
+    const json = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+
+    if (!res.ok) {
+      return {
+        ok: false,
+        errors: [
+          formatSimplefactuHttpError(res.status, json) ||
+            json.message ||
+            json.error ||
+            "No se pudo eliminar el certificado.",
+        ],
+      };
+    }
+
+    await prisma.userVerifactuAccount.update({
+      where: { userId },
+      data: { certificateUploadedAt: null },
+    });
+
+    revalidatePath("/settings/verifactu");
+    revalidatePath("/onboarding");
+    return { ok: true, message: "Certificado eliminado. Sube uno nuevo para enviar facturas a AEAT." };
+  } catch (e) {
+    return { ok: false, errors: [formatVerifactuActionError(e)] };
+  }
+}
+
 export async function verifyNifAction(
   _prev: VerifactuSettingsState | null,
   formData: FormData

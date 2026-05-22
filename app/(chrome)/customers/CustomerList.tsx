@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCustomerAction, updateCustomerAction, type CustomerRow } from "./actions";
+import { DestinatarioIdFields } from "@/app/(chrome)/invoices/new/components/DestinatarioIdFields";
+import {
+  destinatarioIdFromCustomer,
+  type CustomerIdScheme,
+} from "@/lib/invoices/destinatario-id";
 
 type Props = { customers: CustomerRow[] };
 
@@ -11,18 +16,40 @@ export function CustomerList({ customers }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [editing, setEditing] = useState<CustomerRow | null>(null);
-  const [form, setForm] = useState({ name: "", nif: "", email: "", tipoPersona: "J" as "F" | "J" });
+  const [form, setForm] = useState({
+    name: "",
+    nif: "",
+    email: "",
+    tipoPersona: "J" as "F" | "J",
+    idScheme: "NIF" as CustomerIdScheme,
+    idType: "",
+    codigoPais: "",
+    foreignId: "",
+  });
   const [error, setError] = useState<string | null>(null);
 
   function startEdit(c: CustomerRow) {
     setEditing(c);
+    const id = destinatarioIdFromCustomer(c);
     setForm({
       name: c.name,
-      nif: c.nif ?? "",
+      nif: id.nif,
       email: c.email ?? "",
       tipoPersona: (c.tipoPersona === "F" ? "F" : "J") as "F" | "J",
+      idScheme: id.idScheme,
+      idType: id.idType,
+      codigoPais: id.codigoPais,
+      foreignId: id.foreignId,
     });
     setError(null);
+  }
+
+  function customerIdLabel(c: CustomerRow): string {
+    if (c.idScheme === "ID_OTRO") {
+      const parts = [c.idType, c.foreignId, c.codigoPais].filter(Boolean);
+      return parts.length ? parts.join(" · ") : "ID_OTRO";
+    }
+    return c.nif ?? "—";
   }
 
   function onDelete(id: string) {
@@ -66,7 +93,7 @@ export function CustomerList({ customers }: Props) {
         {customers.map((c) => (
           <article key={c.id} className="rounded border border-outline-soft bg-surface p-3">
             <p className="font-medium text-fg">{c.name}</p>
-            <p className="mt-1 text-sm text-fg-muted">NIF: {c.nif ?? "—"}</p>
+            <p className="mt-1 text-sm text-fg-muted">ID: {customerIdLabel(c)}</p>
             <p className="text-sm text-fg-muted">Correo: {c.email ?? "—"}</p>
             <p className="text-sm text-fg-muted">Tipo: {c.tipoPersona ?? "—"}</p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -96,7 +123,7 @@ export function CustomerList({ customers }: Props) {
           <thead>
             <tr className="border-b border-outline-soft bg-surface-hover">
               <th className="px-3 py-2 font-medium text-fg">Nombre</th>
-              <th className="px-3 py-2 font-medium text-fg">NIF</th>
+              <th className="px-3 py-2 font-medium text-fg">Identificación</th>
               <th className="px-3 py-2 font-medium text-fg">Correo</th>
               <th className="px-3 py-2 font-medium text-fg">Tipo</th>
               <th className="px-3 py-2 w-32"></th>
@@ -106,7 +133,7 @@ export function CustomerList({ customers }: Props) {
             {customers.map((c) => (
               <tr key={c.id} className="border-b border-outline-soft last:border-0">
                 <td className="px-3 py-2 font-medium">{c.name}</td>
-                <td className="px-3 py-2 text-fg-muted">{c.nif ?? "—"}</td>
+                <td className="px-3 py-2 text-fg-muted">{customerIdLabel(c)}</td>
                 <td className="px-3 py-2 text-fg-muted">{c.email ?? "—"}</td>
                 <td className="px-3 py-2 text-fg-muted">{c.tipoPersona ?? "—"}</td>
                 <td className="px-3 py-2">
@@ -157,14 +184,27 @@ export function CustomerList({ customers }: Props) {
                   required
                 />
               </label>
-              <label className="block">
-                <span className="mb-1 block text-xs font-medium text-fg-muted">NIF</span>
-                <input
-                  value={form.nif}
-                  onChange={(e) => setForm((f) => ({ ...f, nif: e.target.value }))}
-                  className="w-full rounded border border-outline px-3 py-2 text-sm"
-                />
-              </label>
+              <DestinatarioIdFields
+                idScheme={form.idScheme}
+                onSchemeChange={(s) =>
+                  setForm((f) => ({
+                    ...f,
+                    idScheme: s,
+                    ...(s === "NIF"
+                      ? { idType: "", codigoPais: "", foreignId: "" }
+                      : { nif: "" }),
+                  }))
+                }
+                nif={form.nif}
+                onNifChange={(v) => setForm((f) => ({ ...f, nif: v }))}
+                idType={form.idType}
+                onIdTypeChange={(v) => setForm((f) => ({ ...f, idType: v }))}
+                codigoPais={form.codigoPais}
+                onCodigoPaisChange={(v) => setForm((f) => ({ ...f, codigoPais: v }))}
+                foreignId={form.foreignId}
+                onForeignIdChange={(v) => setForm((f) => ({ ...f, foreignId: v }))}
+                showVnif={false}
+              />
               <label className="block">
                 <span className="mb-1 block text-xs font-medium text-fg-muted">Correo</span>
                 <input

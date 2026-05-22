@@ -39,6 +39,7 @@ export async function createInvoiceAction(
     createdByFirstName: formData.get("createdByFirstName")?.toString().trim() || null,
     createdByLastName: formData.get("createdByLastName")?.toString().trim() || null,
     sendToAeat: formData.get("sendToAeat") || "0",
+    tipoFactura: (formData.get("tipoFactura") as string) || "F1",
     items: (() => {
       try {
         return JSON.parse((formData.get("items") as string) || "[]");
@@ -71,6 +72,7 @@ export async function createInvoiceAction(
     createdByFirstName: formFirstName,
     createdByLastName: formLastName,
     sendToAeat,
+    tipoFactura,
     items,
   } = parsed.data;
 
@@ -125,16 +127,35 @@ export async function createInvoiceAction(
         issueDate: new Date(issueDate),
         dueDate: dueDate ? new Date(dueDate) : null,
         fechaOperacion: fechaOperacion ? new Date(fechaOperacion) : null,
-        customerName,
-        customerNif: customerIdScheme === "NIF" ? (customerNif?.trim() || null) : null,
-        customerEmail: customerEmail || null,
-        customerTipoPersona: customerTipoPersona || null,
-        customerIdScheme,
-        customerIdType: customerIdScheme === "ID_OTRO" ? (customerIdType?.trim() || null) : null,
+        tipoFactura,
+        customerName: tipoFactura === "F2" ? "—" : customerName,
+        customerNif:
+          tipoFactura === "F2"
+            ? null
+            : customerIdScheme === "NIF"
+              ? customerNif?.trim() || null
+              : null,
+        customerEmail: tipoFactura === "F2" ? null : customerEmail || null,
+        customerTipoPersona: tipoFactura === "F2" ? null : customerTipoPersona || null,
+        customerIdScheme: tipoFactura === "F2" ? "NIF" : customerIdScheme,
+        customerIdType:
+          tipoFactura === "F2"
+            ? null
+            : customerIdScheme === "ID_OTRO"
+              ? customerIdType?.trim() || null
+              : null,
         customerCodigoPais:
-          customerIdScheme === "ID_OTRO" ? (customerCodigoPais?.trim().toUpperCase() || null) : null,
+          tipoFactura === "F2"
+            ? null
+            : customerIdScheme === "ID_OTRO"
+              ? customerCodigoPais?.trim().toUpperCase() || null
+              : null,
         customerForeignId:
-          customerIdScheme === "ID_OTRO" ? (customerForeignId?.trim() || null) : null,
+          tipoFactura === "F2"
+            ? null
+            : customerIdScheme === "ID_OTRO"
+              ? customerForeignId?.trim() || null
+              : null,
         taxRatePercent,
         notes: notes || null,
         currency: CURRENCY_DEFAULT,

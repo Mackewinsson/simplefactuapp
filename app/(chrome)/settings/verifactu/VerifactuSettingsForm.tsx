@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import {
   saveIssuerProfileAction,
   uploadCertificateAction,
+  deleteCertificateAction,
   verifyNifAction,
   type VerifactuSettingsState,
 } from "./actions";
@@ -29,6 +30,10 @@ type Props = {
   certUploadedAt: Date | null;
   remoteHasCertificate: boolean | null;
   remoteUpdatedAt: string | null;
+  certNotAfter: string | null;
+  certDaysUntilExpiry: number | null;
+  certExpiresWithin30Days: boolean;
+  certNif: string | null;
 };
 
 export function VerifactuSettingsForm({
@@ -37,9 +42,14 @@ export function VerifactuSettingsForm({
   certUploadedAt,
   remoteHasCertificate,
   remoteUpdatedAt,
+  certNotAfter,
+  certDaysUntilExpiry,
+  certExpiresWithin30Days,
+  certNif,
 }: Props) {
   const [issuerState, issuerAction] = useActionState(saveIssuerProfileAction, null);
   const [certState, certAction] = useActionState(uploadCertificateAction, null);
+  const [deleteState, deleteAction] = useActionState(deleteCertificateAction, null);
   const [vnifState, vnifAction] = useActionState(verifyNifAction, null);
 
   return (
@@ -102,7 +112,39 @@ export function VerifactuSettingsForm({
                 : "No"}
             {remoteUpdatedAt ? ` (actualizado ${remoteUpdatedAt})` : ""}
           </div>
+          {remoteHasCertificate && certNotAfter ? (
+            <div>
+              <span className="font-medium">Caducidad:</span>{" "}
+              {new Date(certNotAfter).toLocaleDateString("es")}
+              {certDaysUntilExpiry != null
+                ? ` (${certDaysUntilExpiry} días restantes)`
+                : ""}
+              {certNif ? ` · NIF titular: ${certNif}` : ""}
+            </div>
+          ) : null}
         </dl>
+        {certExpiresWithin30Days && certNotAfter ? (
+          <div
+            role="alert"
+            className="mt-3 rounded border border-warning-outline bg-warning p-3 text-sm text-warning-foreground"
+          >
+            <p className="font-medium">El certificado caduca en menos de 30 días</p>
+            <p className="mt-1">
+              Renueva el PFX antes del{" "}
+              {new Date(certNotAfter).toLocaleDateString("es")} para seguir enviando facturas a AEAT.
+            </p>
+          </div>
+        ) : null}
+        {deleteState?.ok === false ? (
+          <ul className="mt-3 list-inside list-disc text-sm text-danger-foreground">
+            {deleteState.errors.map((e, i) => (
+              <li key={i}>{e}</li>
+            ))}
+          </ul>
+        ) : null}
+        {deleteState?.ok ? (
+          <p className="mt-3 text-sm text-success-emphasis">{deleteState.message}</p>
+        ) : null}
         {certState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-danger-foreground">
             {certState.errors.map((e, i) => (
@@ -142,6 +184,19 @@ export function VerifactuSettingsForm({
           </label>
           <SubmitButton label="Subir certificado" />
         </form>
+        {remoteHasCertificate ? (
+          <form action={deleteAction} className="mt-6 border-t border-outline-soft pt-4">
+            <p className="text-sm text-fg-muted">
+              Elimina el certificado del tenant en el API. No podrás enviar facturas hasta subir uno nuevo.
+            </p>
+            <button
+              type="submit"
+              className="mt-3 rounded border border-danger-outline px-4 py-2 text-sm font-medium text-danger-foreground hover:bg-danger-muted"
+            >
+              Eliminar certificado
+            </button>
+          </form>
+        ) : null}
       </section>
 
       <section className="rounded border border-outline-soft bg-surface p-6">

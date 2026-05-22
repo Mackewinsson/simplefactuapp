@@ -29,6 +29,11 @@ import { SeriesModal } from "./components/SeriesModal";
 import { CustomerFormModal } from "./components/CustomerFormModal";
 import { SelectCustomerModal } from "./components/SelectCustomerModal";
 import { SelectProductModal } from "./components/SelectProductModal";
+import { DestinatarioIdFields } from "./components/DestinatarioIdFields";
+import {
+  destinatarioIdFromCustomer,
+  type CustomerIdScheme,
+} from "@/lib/invoices/destinatario-id";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -90,10 +95,15 @@ export function NewInvoiceForm({
 
   const [issueDate, setIssueDate] = useState<string>(today());
   const [fechaOperacion, setFechaOperacion] = useState<string>("");
+  const [tipoFactura, setTipoFactura] = useState<"F1" | "F2">("F1");
 
   // Customer state
   const [customerName, setCustomerName] = useState("");
   const [customerNif, setCustomerNif] = useState("");
+  const [customerIdScheme, setCustomerIdScheme] = useState<CustomerIdScheme>("NIF");
+  const [customerIdType, setCustomerIdType] = useState("");
+  const [customerCodigoPais, setCustomerCodigoPais] = useState("");
+  const [customerForeignId, setCustomerForeignId] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerTipoPersona, setCustomerTipoPersona] = useState("J");
   const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
@@ -137,13 +147,28 @@ export function NewInvoiceForm({
       ? "La fecha de operación no puede ser posterior a la de expedición (salvo régimen 14 o 15)."
       : undefined);
 
-  function fillCustomer(c: { name: string; nif: string; email: string; tipoPersona: string } | CustomerRow) {
+  function fillCustomer(c: CustomerRow) {
     setVnifFeedback(null);
     setCustomerName(c.name);
-    setCustomerNif(c.nif ?? "");
     setCustomerEmail(c.email ?? "");
     setCustomerTipoPersona(c.tipoPersona ?? "J");
-    setFormFieldErrors((p) => stripFormFieldErrors(p, "customerName", "customerNif", "customerEmail"));
+    const id = destinatarioIdFromCustomer(c);
+    setCustomerIdScheme(id.idScheme);
+    setCustomerNif(id.nif);
+    setCustomerIdType(id.idType);
+    setCustomerCodigoPais(id.codigoPais);
+    setCustomerForeignId(id.foreignId);
+    setFormFieldErrors((p) =>
+      stripFormFieldErrors(
+        p,
+        "customerName",
+        "customerNif",
+        "customerEmail",
+        "customerIdType",
+        "customerCodigoPais",
+        "customerForeignId"
+      )
+    );
   }
 
   function addProductAsItem(p: ProductRow) {
@@ -212,17 +237,18 @@ export function NewInvoiceForm({
             issueDate,
             dueDate: undefined,
             fechaOperacion: fechaOperacion || undefined,
-            customerName,
-            customerNif,
+            customerName: tipoFactura === "F2" ? "—" : customerName,
+            customerNif: tipoFactura === "F2" ? undefined : customerNif,
+            tipoFactura,
             customerEmail: customerEmail || undefined,
             customerTipoPersona:
               customerTipoPersona === "F" || customerTipoPersona === "J"
                 ? customerTipoPersona
                 : undefined,
-            customerIdScheme: "NIF",
-            customerIdType: undefined,
-            customerCodigoPais: undefined,
-            customerForeignId: undefined,
+            customerIdScheme,
+            customerIdType: customerIdType || undefined,
+            customerCodigoPais: customerCodigoPais || undefined,
+            customerForeignId: customerForeignId || undefined,
             notes: operationNotes.trim() || undefined,
             createdByFirstName: null,
             createdByLastName: null,
@@ -244,11 +270,15 @@ export function NewInvoiceForm({
         {/* Hidden computed fields */}
         <input type="hidden" name="number" value={composedNumber} />
         <input type="hidden" name="items" value={JSON.stringify(items)} />
-        <input type="hidden" name="customerName" value={customerName} />
+        <input type="hidden" name="customerName" value={tipoFactura === "F2" ? "—" : customerName} />
+        <input type="hidden" name="tipoFactura" value={tipoFactura} />
         <input type="hidden" name="customerNif" value={customerNif} />
         <input type="hidden" name="customerEmail" value={customerEmail} />
         <input type="hidden" name="customerTipoPersona" value={customerTipoPersona} />
-        <input type="hidden" name="customerIdScheme" value="NIF" />
+        <input type="hidden" name="customerIdScheme" value={customerIdScheme} />
+        <input type="hidden" name="customerIdType" value={customerIdType} />
+        <input type="hidden" name="customerCodigoPais" value={customerCodigoPais} />
+        <input type="hidden" name="customerForeignId" value={customerForeignId} />
         <input type="hidden" name="sendToAeat" value="0" ref={sendToAeatRef} />
 
         {!suppressServerBanner && bannerErrorsFiltered.length > 0 ? (
@@ -396,7 +426,43 @@ export function NewInvoiceForm({
           </div>
         </section>
 
+        {/* ── Tipo de factura ──────────────────────────────────────────── */}
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
+            Tipo de factura
+          </h2>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="radio"
+                name="tipoFacturaUi"
+                checked={tipoFactura === "F1"}
+                onChange={() => setTipoFactura("F1")}
+              />
+              F1 — Factura completa (con destinatario)
+            </label>
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="radio"
+                name="tipoFacturaUi"
+                checked={tipoFactura === "F2"}
+                onChange={() => {
+                  setTipoFactura("F2");
+                  setVnifFeedback(null);
+                }}
+              />
+              F2 — Simplificada (ticket ≤ 3.000 €, sin cliente)
+            </label>
+          </div>
+          {tipoFactura === "F2" && totalCents > 300_000 ? (
+            <p className="mt-2 text-sm text-danger-emphasis">
+              El total supera 3.000 € — no válido para factura simplificada F2.
+            </p>
+          ) : null}
+        </section>
+
         {/* ── Datos del destinatario ───────────────────────────────────── */}
+        {tipoFactura === "F1" ? (
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">
@@ -421,10 +487,8 @@ export function NewInvoiceForm({
           </div>
 
           <p className="text-xs text-fg-subtle">
-            El botón «Comprobar con Hacienda» consulta si el <strong>nombre o razón social</strong> que has
-            escrito <strong>coincide con el que tiene registrado Hacienda</strong> para ese NIF o CIF. Solo
-            aplica a <strong>identificadores españoles</strong>; no sirve para NIF-IVA intracomunitario ni
-            otros tipos de identificación extranjeros.
+            Para clientes en la UE u otros países, elige <strong>Identificación extranjera (ID_OTRO)</strong>.
+            «Comprobar con Hacienda» solo aplica a NIF/CIF españoles.
           </p>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -456,47 +520,67 @@ export function NewInvoiceForm({
               ) : null}
             </label>
             <div className="sm:col-span-2">
-              <label
-                htmlFor="invoice-field-customerNif"
-                className="mb-1 block text-sm font-medium text-fg-muted"
-              >
-                NIF / CIF <span className="text-danger-emphasis">*</span>
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="invoice-field-customerNif"
-                  type="text"
-                  value={customerNif}
-                  onChange={(e) => {
-                    setCustomerNif(e.target.value);
-                    setVnifFeedback(null);
-                    setFormFieldErrors((p) => stripFormFieldErrors(p, "customerNif"));
-                  }}
-                  placeholder="B12345678"
-                  aria-invalid={formFieldErrors?.customerNif ? true : undefined}
-                  aria-describedby={
-                    formFieldErrors?.customerNif ? "invoice-error-customerNif" : undefined
+              <DestinatarioIdFields
+                idScheme={customerIdScheme}
+                onSchemeChange={(s) => {
+                  setCustomerIdScheme(s);
+                  setVnifFeedback(null);
+                  if (s === "NIF") {
+                    setCustomerIdType("");
+                    setCustomerCodigoPais("");
+                    setCustomerForeignId("");
+                  } else {
+                    setCustomerNif("");
                   }
-                  className={`min-w-0 flex-1 rounded border px-3 py-2 text-sm ${
-                    formFieldErrors?.customerNif ? inputErrorRing : inputNormal
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={runVerifyRecipientNif}
-                  disabled={
-                    vnifPending || !customerNif.trim() || !customerName.trim()
-                  }
-                  className="shrink-0 self-start rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-hover disabled:pointer-events-none disabled:opacity-50"
-                >
-                  {vnifPending ? "Comprobando…" : "Comprobar con Hacienda"}
-                </button>
-              </div>
-              {formFieldErrors?.customerNif ? (
-                <p id="invoice-error-customerNif" className="mt-1 text-sm text-danger-emphasis">
-                  {formFieldErrors.customerNif}
-                </p>
-              ) : null}
+                  setFormFieldErrors((p) =>
+                    stripFormFieldErrors(
+                      p,
+                      "customerNif",
+                      "customerIdType",
+                      "customerCodigoPais",
+                      "customerForeignId"
+                    )
+                  );
+                }}
+                nif={customerNif}
+                onNifChange={(v) => {
+                  setCustomerNif(v);
+                  setVnifFeedback(null);
+                  setFormFieldErrors((p) => stripFormFieldErrors(p, "customerNif"));
+                }}
+                idType={customerIdType}
+                onIdTypeChange={(v) => {
+                  setCustomerIdType(v);
+                  setFormFieldErrors((p) => stripFormFieldErrors(p, "customerIdType"));
+                }}
+                codigoPais={customerCodigoPais}
+                onCodigoPaisChange={(v) => {
+                  setCustomerCodigoPais(v);
+                  setFormFieldErrors((p) => stripFormFieldErrors(p, "customerCodigoPais"));
+                }}
+                foreignId={customerForeignId}
+                onForeignIdChange={(v) => {
+                  setCustomerForeignId(v);
+                  setFormFieldErrors((p) => stripFormFieldErrors(p, "customerForeignId"));
+                }}
+                errors={{
+                  customerNif: formFieldErrors?.customerNif,
+                  customerIdType: formFieldErrors?.customerIdType,
+                  customerCodigoPais: formFieldErrors?.customerCodigoPais,
+                  customerForeignId: formFieldErrors?.customerForeignId,
+                }}
+                showVnif={customerIdScheme === "NIF"}
+                vnifSlot={
+                  <button
+                    type="button"
+                    onClick={runVerifyRecipientNif}
+                    disabled={vnifPending || !customerNif.trim() || !customerName.trim()}
+                    className="shrink-0 self-start rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-hover disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    {vnifPending ? "Comprobando…" : "Comprobar con Hacienda"}
+                  </button>
+                }
+              />
             </div>
             {vnifFeedback ? (
               <div
@@ -548,6 +632,12 @@ export function NewInvoiceForm({
             </label>
           </div>
         </section>
+        ) : (
+          <p className="rounded border border-outline-soft bg-surface-muted px-4 py-3 text-sm text-fg-muted">
+            Factura simplificada sin identificación del destinatario (art. 61.d LIVA). El importe total
+            no puede superar 3.000 €.
+          </p>
+        )}
 
         {/* ── Emisor ───────────────────────────────────────────────────── */}
         <section>

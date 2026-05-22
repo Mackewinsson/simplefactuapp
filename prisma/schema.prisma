@@ -55,6 +55,8 @@ model Invoice {
   customerIdType     String?
   customerCodigoPais String?
   customerForeignId  String?
+  /// F1 completa | F2 simplificada (sin destinatario, art. 61.d LIVA)
+  tipoFactura        String        @default("F1")
   currency           String        @default("EUR")
   subtotalCents      Int
   taxCents           Int

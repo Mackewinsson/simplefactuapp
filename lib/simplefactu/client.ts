@@ -86,6 +86,10 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       });
     },
 
+    async deleteMeCertificate(): Promise<Response> {
+      return fetch(joinUrl(baseUrl, "/me/certificate"), { method: "DELETE", headers });
+    },
+
     async postSendInvoice(body: Record<string, unknown>, idempotencyKey: string): Promise<Response> {
       return fetch(joinUrl(baseUrl, "/send-invoice"), {
         method: "POST",

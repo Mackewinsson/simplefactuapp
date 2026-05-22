@@ -39,6 +39,7 @@ export const createInvoiceFormSchema = z
     createdByFirstName: z.string().optional().nullable(),
     createdByLastName: z.string().optional().nullable(),
     sendToAeat: z.enum(["0", "1"]).default("0"),
+    tipoFactura: z.enum(["F1", "F2"]).default("F1"),
     items: z.array(createInvoiceItemSchema).min(1, "Añade al menos una línea"),
   })
   .refine(
@@ -83,6 +84,36 @@ export const createInvoiceFormSchema = z
     }
   })
   .superRefine((data, ctx) => {
+    if (data.tipoFactura === "F2") {
+      const hasDest =
+        (data.customerNif ?? "").trim() ||
+        (data.customerForeignId ?? "").trim() ||
+        (data.customerIdType ?? "").trim();
+      if (hasDest) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Factura F2 no lleva datos de destinatario.",
+          path: ["customerNif"],
+        });
+      }
+      const itemsTotal = data.items.reduce((sum, item) => {
+        const unit = parseDecimalToCents(item.unitPrice);
+        const base = Math.max(0, item.quantity * unit - (item.discountCents ?? 0));
+        const taxRate = parseFloat(item.tipoImpositivo) || 0;
+        const cuota = ["E1", "E2", "E3", "E4", "E5", "E6", "N1", "N2"].includes(item.calificacion)
+          ? 0
+          : Math.round((base * taxRate) / 100);
+        return sum + base + cuota;
+      }, 0);
+      if (itemsTotal > 300_000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Factura simplificada F2: importe total máximo 3.000 €.",
+          path: ["number"],
+        });
+      }
+      return;
+    }
     const op = (data.fechaOperacion ?? "").trim();
     const ex = (data.issueDate ?? "").trim();
     if (!op || !ex || op <= ex) return;

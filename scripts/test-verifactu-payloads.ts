@@ -49,6 +49,7 @@ const invoiceBase: Invoice & { items: InvoiceItem[] } = {
   customerIdType: null,
   customerCodigoPais: null,
   customerForeignId: null,
+  tipoFactura: "F1",
   currency: "EUR",
   subtotalCents: 10000,
   taxCents: 2100,
@@ -149,5 +150,47 @@ assert.equal(detN1.calif, "N1");
 assert.equal(detN1.causaExencion, undefined);
 assert.equal(detN1.tipo, undefined);
 assert.equal(detN1.cuota, undefined);
+
+// ID_OTRO destinatario (NIF-IVA UE, sin codigoPais)
+const invoiceIdOtro: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  customerName: "Cliente FR SA",
+  customerNif: null,
+  customerIdScheme: "ID_OTRO",
+  customerIdType: "02",
+  customerForeignId: "FR12345678901",
+  customerCodigoPais: null,
+};
+const sendIdOtro = buildSendInvoicePayload(invoiceIdOtro, accountBase);
+assert.equal(sendIdOtro.destNif, undefined);
+assert.deepEqual(sendIdOtro.destIdOtro, { idType: "02", id: "FR12345678901" });
+
+const invoiceIdOtroPassport: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceIdOtro,
+  customerIdType: "03",
+  customerForeignId: "X1234567",
+  customerCodigoPais: "US",
+};
+const sendPassport = buildSendInvoicePayload(invoiceIdOtroPassport, accountBase);
+assert.deepEqual(sendPassport.destIdOtro, {
+  idType: "03",
+  id: "X1234567",
+  codigoPais: "US",
+});
+
+const invoiceF2: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  tipoFactura: "F2",
+  customerName: "—",
+  customerNif: null,
+  subtotalCents: 5000,
+  taxCents: 1050,
+  totalCents: 6050,
+};
+const sendF2 = buildSendInvoicePayload(invoiceF2, accountBase);
+assert.equal(sendF2.tipoFactura, "F2");
+assert.equal(sendF2.facturaSinIdentifDestinatarioArt61d, "S");
+assert.equal(sendF2.destNif, undefined);
+assert.equal(sendF2.destNombre, undefined);
 
 console.log("test-verifactu-payloads: OK");

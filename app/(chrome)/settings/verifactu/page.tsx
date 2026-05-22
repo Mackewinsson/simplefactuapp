@@ -26,6 +26,10 @@ export default async function VerifactuSettingsPage() {
 
   let remoteHasCertificate: boolean | null = null;
   let remoteUpdatedAt: string | null = null;
+  let certNotAfter: string | null = null;
+  let certDaysUntilExpiry: number | null = null;
+  let certExpiresWithin30Days = false;
+  let certNif: string | null = null;
   try {
     const { apiKey } = await ensureVerifactuApiKey(userId);
     const client = createSimplefactuClient({
@@ -34,9 +38,22 @@ export default async function VerifactuSettingsPage() {
     });
     const res = await client.getMeCertificate();
     if (res.ok) {
-      const j = (await res.json()) as { hasCertificate?: boolean; updatedAt?: string };
+      const j = (await res.json()) as {
+        hasCertificate?: boolean;
+        updatedAt?: string;
+        certificate?: {
+          notAfter?: string;
+          daysUntilExpiry?: number;
+          expiresWithin30Days?: boolean;
+          nif?: string;
+        };
+      };
       remoteHasCertificate = Boolean(j.hasCertificate);
       remoteUpdatedAt = j.updatedAt ?? null;
+      certNotAfter = j.certificate?.notAfter ?? null;
+      certDaysUntilExpiry = j.certificate?.daysUntilExpiry ?? null;
+      certExpiresWithin30Days = Boolean(j.certificate?.expiresWithin30Days);
+      certNif = j.certificate?.nif ?? null;
 
       // Self-heal: if the API confirms a certificate but the local timestamp
       // is missing (e.g. wiped by an earlier key rotation), backfill it from
@@ -90,6 +107,10 @@ export default async function VerifactuSettingsPage() {
         certUploadedAt={account.certificateUploadedAt ?? null}
         remoteHasCertificate={remoteHasCertificate}
         remoteUpdatedAt={remoteUpdatedAt}
+        certNotAfter={certNotAfter}
+        certDaysUntilExpiry={certDaysUntilExpiry}
+        certExpiresWithin30Days={certExpiresWithin30Days}
+        certNif={certNif}
       />
     </div>
   );
