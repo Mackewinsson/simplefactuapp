@@ -23,10 +23,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Placeholders — sufficient for prisma generate + next build (no DB connect at build time).
+      # Real Clerk test keys from repo secrets (pk_test_ci_placeholder fails next build prerender).
       DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?sslmode=require
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci_placeholder
-      CLERK_SECRET_KEY: sk_test_ci_placeholder
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY_PREVIEW }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY_PREVIEW }}
       NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
       NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
       NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /invoices
