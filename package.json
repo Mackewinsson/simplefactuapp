@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:3001": "next dev --turbopack -p 3001",
+    "dev:qa": "next dev --turbopack -p 3001",
+    "dev:stack": "DOTENV_CONFIG_PATH=.env.local.stack NODE_OPTIONS='-r dotenv/config' next dev --turbopack -p 3001",
+    "env:sync-qa": "bash ../simplefactu/scripts/sync-local-env-from-qa.sh",
     "build": "next build",
     "start": "next start",
     "prisma:migrate:deploy": "prisma migrate deploy",

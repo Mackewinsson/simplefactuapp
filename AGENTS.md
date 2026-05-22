@@ -184,10 +184,14 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 
 ## Desarrollo local
 
-1. **simplefactu:** `npm run dev` (puerto por defecto **3000**), migraciones y `.env` con `ADMIN_KEY`, DB, certificado de prueba.
-2. **simplefactuapp:** `cp .env.example .env.local` (plantillas QA/prod: `.env.qa.example`, `.env.prod.example` para Vercel/Bitwarden). Rellenar Clerk, `DATABASE_URL`, `SIMPLEFACTU_API_BASE_URL`, `SIMPLEFACTU_ADMIN_KEY` (= `ADMIN_KEY` del API local).
-3. **Puertos:** el API y Next compiten por 3000. Usar p. ej. `pnpm dev:3001` para Next y dejar el API en 3000, **o** cambiar el puerto del API y ajustar `SIMPLEFACTU_API_BASE_URL`.
-4. **CORS:** en simplefactu, `CORS_ORIGINS` debe incluir el origen del front (p. ej. `http://localhost:3001`).
+Datos siempre de **QA** (Neon Preview + Postgres del VPS), no SQLite/local aislado. Sincronizar: `cd ../simplefactu && ./scripts/sync-local-env-from-qa.sh` (o `pnpm env:sync-qa` en este repo).
+
+| Modo | Cuándo | Front | API |
+|------|--------|-------|-----|
+| **A — `pnpm dev:qa`** | UI rápida; clientes prueban en `qa.simplefactu.com` | `.env.local` → `api.qa.simplefactu.com` | Desplegada en VPS (no arrancar local) |
+| **B — `pnpm dev:stack`** | Probar cambios de API + front antes de subir | `.env.local.stack` → `localhost:3000` | `npm run tunnel:qa` + `npm run dev` en simplefactu |
+
+Puerto Next: **3001** en ambos modos (API en 3000). El API local usa `ENABLE_AEAT_WORKER=false` para no competir con el worker del VPS; los jobs los procesa QA en el servidor.
 
 ---
 
