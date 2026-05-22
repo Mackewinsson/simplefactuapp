@@ -57,12 +57,18 @@ app/
   invoices/                                 Listado, detalle, PDF, panel Veri*Factu
   invoices/new/                             Alta + Server Actions (verify NIF, envío)
   customers/ products/                      CRUD ligero
-  settings/verifactu/                       Certificado PFX y datos emisor (simplefactu /me/certificate)
+  settings/verifactu/                       Certificado PFX, onboarding, VNIF opcional
+  invoices/records/                         Archivo AEAT + export CSV
+  partner/                                  Panel gestoría (sub-tenants)
   admin/                                    Panel operador (tenants, jobs, sistema, auditoría, …)
+  partner-access-denied/                    Sin rol partner
   api/webhooks/clerk/                       Webhook Clerk (opcional)
 lib/
   simplefactu/client.ts                     Cliente HTTP firmado con x-api-key (solo servidor)
   simplefactu/admin-server.ts               Llamadas con x-admin-key (provisión, admin UI)
+  simplefactu/partner-server.ts             BFF /partner/* con clave partner
+  partner/provision.ts                      ensurePartnerApiKey — tenant `rp_<clerkUserId>`
+  auth/partner.ts                           requirePartner, PARTNER_CLERK_USER_IDS / role Clerk
   verifactu/provision.ts                    ensureVerifactuApiKey — tenant `sf_<clerkUserId>` + API key cifrada
   verifactu/crypto.ts                       Cifrado de secretos en DB (VERIFACTU_ENCRYPTION_KEY)
   simplefactu/build-*-payload.ts            Construcción cuerpos send-invoice / cancel
@@ -162,15 +168,17 @@ Catálogo del API (VPS): [`../simplefactu/AGENTS.md` §4](../simplefactu/AGENTS.
 2. **`createSimplefactuClient`** (`lib/simplefactu/client.ts`): peticiones de usuario con `x-api-key` desde la clave desencriptada — send-invoice, jobs, verify-nif, certificado, etc.
 3. **`adminFetch`** (`lib/simplefactu/admin-server.ts`): usa `SIMPLEFACTU_ADMIN_KEY` para el panel `/admin/*` del front (listados, métricas, reintentos, cadenas, …).
 4. **Jobs async:** `POST /send-invoice` → 202 + `jobId`; polling `GET /jobs/:id` hasta estado terminal (ver `job-sync` y paneles de factura/admin).
+5. **Partner (gestoría):** `ensurePartnerApiKey` → tenant `rp_<userId>` + scopes `partner:tenants:*`; `partnerFetch` llama a `/partner/*`. Primera provisión usa `adminFetch` (una vez); operación diaria sin `SIMPLEFACTU_ADMIN_KEY`.
 
-Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resultado; encadenamiento y huellas según documentación del API.
+Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resultado; encadenamiento y huellas según documentación del API. Partner: [`../simplefactu/docs/PARTNER_GESTORIA.md`](../simplefactu/docs/PARTNER_GESTORIA.md).
 
 ---
 
 ## Seguridad
 
-- **Clerk:** rutas bajo `/invoices`, `/settings`, `/admin` exigen sesión (`middleware.ts`).
-- **`/admin`:** `app/admin/layout.tsx` llama a `requireAdmin()` (`lib/auth/admin.ts`). Acceso si el `userId` está en `ADMIN_CLERK_USER_IDS` **o** si `publicMetadata.role === "admin"` en Clerk. Además, si `ADMIN_CLERK_USER_IDS` no está vacío, `middleware.ts` redirige a `/invoices` a quien no esté en la lista antes de llegar al layout (doble capa opcional).
+- **Clerk:** rutas bajo `/invoices`, `/settings`, `/admin`, `/partner` exigen sesión (`middleware.ts`).
+- **`/admin`:** `requireAdmin()` — `ADMIN_CLERK_USER_IDS` o `publicMetadata.role === "admin"`.
+- **`/partner`:** `requirePartner()` — `PARTNER_CLERK_USER_IDS` o `publicMetadata.role === "partner"`. Sin permiso → `/partner-access-denied`.
 - **Secretos:** solo en Server Actions, Route Handlers y código servidor; el cliente nunca ve `SIMPLEFACTU_ADMIN_KEY` ni la API key en claro.
 
 ---
@@ -181,7 +189,8 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 - **`/invoices/new`:** alta; verificación NIF destinatario contra el API cuando procede.
 - **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la [referencia API](/docs/api-reference) (OpenAPI).
 - **`/admin`:** operación — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
-- **`/partner`:** gestoría — sub-tenants vía `GET/POST /partner/*` del API con clave partner (`UserPartnerAccount`, tenant `rp_<clerkUserId>`). Sin `SIMPLEFACTU_ADMIN_KEY` en el día a día.
+- **`/partner`:** listado y alta de autónomos, detalle (suspender, API key, certificado PFX). Ver [gestoría en docs públicos](content/docs/gestoria.md).
+- **`/invoices/records`:** histórico AEAT (`GET /me/invoice-records`) y export CSV.
 
 ---
 
@@ -202,15 +211,17 @@ Puerto Next: **3001** en ambos modos (API en 3000). El API local usa `ENABLE_AEA
 
 - **Proveedor:** PostgreSQL (`schema.prisma`).
 - **`UserVerifactuAccount`:** mapeo `userId` Clerk → `simplefactuTenantId` + `apiKeyEncrypted`.
-- **`Invoice`:** campos `aeat*` para job id, estado, CSV, QR, errores, anulación.
+- **`UserPartnerAccount`:** mapeo `userId` → `partnerTenantId` (`rp_*`) + `apiKeyEncrypted` (gestoría).
+- **`Invoice`:** campos `aeat*` para job id, estado, CSV, QR, errores, anulación; `vnifVerifiedAt` en cuenta Verifactu.
 - Comandos típicos: `pnpm prisma migrate dev` (desarrollo), `pnpm prisma:migrate:deploy` (CI/producción), `pnpm prisma db seed` si usas seed.
 
 ---
 
 ## Tests y scripts
 
-- `pnpm test` — `test:money` + `test:payloads` (scripts bajo `scripts/`).
+- `pnpm test` — `test:money` + `test:payloads` + `test:csv` (scripts bajo `scripts/`).
 - `pnpm typecheck` / `pnpm lint` — calidad antes de PR.
+- API (hermano): `npm test` en simplefactu (~430 tests Jest).
 
 ---
 
