@@ -353,7 +353,7 @@ export default async function InvoicesPage({
                     <Link href={`/invoices/${inv.id}`} className="font-medium text-accent hover:underline">
                       {inv.number}
                     </Link>
-                    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}>
+                    <span className={badge.className}>
                       {badge.label}
                     </span>
                   </div>
@@ -417,9 +417,7 @@ export default async function InvoicesPage({
                         {formatCents(inv.currency, inv.totalCents)}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`rounded px-1.5 py-0.5 text-xs font-medium ${badge.className}`}
-                        >
+                        <span className={badge.className}>
                           {badge.label}
                         </span>
                       </td>

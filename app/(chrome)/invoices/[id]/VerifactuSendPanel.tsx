@@ -166,7 +166,7 @@ export function VerifactuSendPanel({
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium">Estado del alta:</span>
           <span
-            className={`rounded px-1.5 py-0.5 text-xs font-medium ${registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}`}
+            className={registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}
           >
             {registrationStatusDetailLabel(uiStatus)}
           </span>
@@ -228,7 +228,7 @@ export function VerifactuSendPanel({
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium">Estado de la anulación:</span>
           <span
-            className={`rounded px-1.5 py-0.5 text-xs font-medium ${cancellationStatusBadgeClass(aeatCancellationStatus)}`}
+            className={cancellationStatusBadgeClass(aeatCancellationStatus)}
           >
             {cancellationStatusDetailLabel(aeatCancellationStatus)}
           </span>

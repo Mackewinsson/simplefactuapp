@@ -82,4 +82,47 @@
   .link-accent {
     @apply text-accent hover:underline;
   }
+
+  /* Badges de estado (chips) */
+  .badge {
+    @apply inline-flex items-center rounded px-2 py-0.5 text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply text-success-foreground bg-success-hover;
+  }
+
+  .badge-warning {
+    @apply text-warning-deep bg-warning-hover;
+  }
+
+  .badge-danger {
+    @apply text-danger-foreground bg-danger-hover;
+  }
+
+  .badge-neutral {
+    @apply text-fg-muted bg-surface-muted ring-1 ring-outline-soft;
+  }
+
+  /* Avisos en bloque */
+  .alert-warning {
+    @apply rounded border border-warning-outline bg-warning p-4 text-sm text-warning-foreground;
+  }
+
+  .alert-danger {
+    @apply rounded border border-danger-outline bg-danger p-4 text-sm text-danger-foreground;
+  }
+
+  .alert-info {
+    @apply rounded border border-info-outline bg-accent-muted p-4 text-sm text-accent-foreground-muted;
+  }
+
+  /* Barras de progreso */
+  .progress-track {
+    @apply h-2 w-full overflow-hidden rounded bg-surface-muted;
+  }
+
+  .progress-fill {
+    @apply h-full bg-primary;
+  }
 }

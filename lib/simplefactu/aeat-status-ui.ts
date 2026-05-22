@@ -2,6 +2,8 @@
  * Human-readable labels and list badges for AEAT / Verifactu job states.
  */
 
+import { statusBadgeClass } from "@/lib/ui/status-badge";
+
 export type AeatStatusBadge = { label: string; className: string };
 
 /** Maps Prisma job status + AEAT ESTADOENVIO to UI status key. */
@@ -18,6 +20,28 @@ export function resolveRegistrationUiStatus(
   return aeatStatus;
 }
 
+function registrationBadgeClassName(
+  status: string,
+  aeatEstadoEnvio?: string | null
+): string {
+  const ui = resolveRegistrationUiStatus(status, aeatEstadoEnvio);
+  switch (ui) {
+    case "SUCCEEDED":
+      return statusBadgeClass("success");
+    case "SUCCEEDED_WARN":
+      return statusBadgeClass("warning");
+    case "PENDING":
+    case "PROCESSING":
+      return statusBadgeClass("warning");
+    case "FAILED":
+    case "DEAD":
+      return statusBadgeClass("danger");
+    case "NOT_SENT":
+    default:
+      return statusBadgeClass("neutral");
+  }
+}
+
 /** Compact badge for invoice list rows (also respects successful cancellation). */
 export function registrationStatusBadge(
   status: string,
@@ -27,23 +51,23 @@ export function registrationStatusBadge(
   if (cancellationStatus === "SUCCEEDED") {
     return {
       label: "Anulada",
-      className: "line-through text-fg-subtle bg-surface-muted",
+      className: `${statusBadgeClass("neutral")} line-through opacity-80`,
     };
   }
   const ui = resolveRegistrationUiStatus(status, aeatEstadoEnvio);
   switch (ui) {
     case "SUCCEEDED":
-      return { label: "Registrada", className: "text-success-foreground bg-success-hover" };
+      return { label: "Registrada", className: statusBadgeClass("success") };
     case "SUCCEEDED_WARN":
-      return { label: "Aceptada con avisos", className: "text-warning-foreground bg-warning-hover" };
+      return { label: "Aceptada con avisos", className: statusBadgeClass("warning") };
     case "PENDING":
     case "PROCESSING":
-      return { label: "Enviando…", className: "text-warning-deep bg-warning-hover" };
+      return { label: "Enviando…", className: statusBadgeClass("warning") };
     case "FAILED":
     case "DEAD":
-      return { label: "Error", className: "text-danger-foreground bg-danger-hover" };
+      return { label: "Error", className: statusBadgeClass("danger") };
     default:
-      return { label: "No enviada", className: "text-fg-subtle bg-surface-muted" };
+      return { label: "No enviada", className: statusBadgeClass("neutral") };
   }
 }
 
@@ -90,35 +114,20 @@ export function registrationStatusBadgeClass(
   status: string,
   aeatEstadoEnvio?: string | null
 ): string {
-  const ui = resolveRegistrationUiStatus(status, aeatEstadoEnvio);
-  switch (ui) {
-    case "SUCCEEDED":
-      return "text-success-foreground bg-success-hover";
-    case "SUCCEEDED_WARN":
-      return "text-warning-foreground bg-warning-hover";
-    case "PENDING":
-    case "PROCESSING":
-      return "text-warning-deep bg-warning-hover";
-    case "FAILED":
-    case "DEAD":
-      return "text-danger-foreground bg-danger-hover";
-    case "NOT_SENT":
-    default:
-      return "text-fg-muted bg-surface-muted";
-  }
+  return registrationBadgeClassName(status, aeatEstadoEnvio);
 }
 
 export function cancellationStatusBadgeClass(status: string): string {
   switch (status) {
     case "SUCCEEDED":
-      return "text-success-foreground bg-success-hover";
+      return statusBadgeClass("success");
     case "PENDING":
-      return "text-warning-deep bg-warning-hover";
+      return statusBadgeClass("warning");
     case "FAILED":
     case "DEAD":
-      return "text-danger-foreground bg-danger-hover";
+      return statusBadgeClass("danger");
     case "NONE":
     default:
-      return "text-fg-muted bg-surface-muted";
+      return statusBadgeClass("neutral");
   }
 }

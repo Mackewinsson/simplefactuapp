@@ -31,7 +31,7 @@ export default async function PartnerHomePage() {
       </div>
 
       {err ? (
-        <p className="rounded border border-danger-outline bg-danger-muted px-3 py-2 text-sm text-danger-emphasis">
+        <p className="alert-danger px-3 py-2 text-danger-emphasis">
           {err}
         </p>
       ) : null}

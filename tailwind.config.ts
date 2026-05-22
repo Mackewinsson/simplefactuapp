@@ -80,6 +80,7 @@ export default {
         },
         success: {
           DEFAULT: withAlpha("--color-success"),
+          muted: withAlpha("--color-success-muted"),
           hover: withAlpha("--color-success-hover"),
           outline: withAlpha("--color-success-outline"),
           foreground: withAlpha("--color-success-foreground"),
@@ -88,6 +89,7 @@ export default {
           bar: withAlpha("--color-success-bar"),
         },
         info: {
+          muted: withAlpha("--color-info-muted"),
           outline: withAlpha("--color-info-outline"),
           deep: withAlpha("--color-info-deep"),
         },

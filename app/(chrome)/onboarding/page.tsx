@@ -57,10 +57,7 @@ export default async function OnboardingPage() {
       </p>
 
       {status.certificateExpiresWithin30Days && status.certificateNotAfter ? (
-        <div
-          role="alert"
-          className="mt-6 rounded border border-warning-outline bg-warning p-4 text-sm text-warning-foreground"
-        >
+        <div role="alert" className="alert-warning mt-6">
           <p className="font-medium">Tu certificado caduca pronto</p>
           <p className="mt-1">
             Válido hasta{" "}
@@ -77,13 +74,13 @@ export default async function OnboardingPage() {
       ) : null}
 
       <div
-        className="mt-6 h-2 overflow-hidden rounded bg-surface-muted"
+        className="progress-track mt-6"
         role="progressbar"
         aria-valuenow={pct}
         aria-valuemin={0}
         aria-valuemax={100}
       >
-        <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
+        <div className="progress-fill" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-2 text-xs text-fg-muted">
         {completed} de {status.steps.length} pasos completados
@@ -123,11 +120,7 @@ export default async function OnboardingPage() {
                   ) : null}
                 </div>
                 <span
-                  className={`shrink-0 rounded px-2 py-0.5 text-xs font-medium ${
-                    step.done
-                      ? "bg-success-muted text-success-emphasis"
-                      : "bg-warning-muted text-warning-foreground"
-                  }`}
+                  className={`shrink-0 ${step.done ? "badge badge-success" : "badge badge-neutral"}`}
                   aria-hidden
                 >
                   {step.done ? "Hecho" : "Pendiente"}

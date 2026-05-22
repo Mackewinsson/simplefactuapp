@@ -50,9 +50,7 @@ function buildExportHref(params: {
 }
 
 function tipoBadge(tipo: string) {
-  return tipo === "ANULACION"
-    ? "bg-warning-muted text-warning-foreground"
-    : "bg-success-muted text-success-emphasis";
+  return tipo === "ANULACION" ? "badge badge-warning" : "badge badge-success";
 }
 
 export default async function InvoiceRecordsPage({
@@ -229,7 +227,7 @@ export default async function InvoiceRecordsPage({
                     <td className="px-3 py-2 text-fg-muted">{r.fecha}</td>
                     <td className="px-3 py-2">
                       <span
-                        className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${tipoBadge(r.tipo)}`}
+                        className={`inline-block ${tipoBadge(r.tipo)}`}
                       >
                         {r.tipo}
                       </span>

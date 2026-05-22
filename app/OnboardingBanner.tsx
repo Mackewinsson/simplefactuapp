@@ -63,35 +63,37 @@ export async function OnboardingBanner() {
       <div
         role="status"
         aria-label={`Configuración: ${completed} de ${steps.length} pasos completados`}
-        className="border-b border-warning-outline bg-warning text-warning-foreground"
+        className="border-b border-outline-soft bg-surface-muted text-fg"
       >
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-1 flex-col gap-2">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
               <span className="font-medium">Completa tu configuración</span>
-              <span className="text-xs">
+              <span className="text-xs text-fg-muted">
                 {completed} / {steps.length} pasos ·{" "}
-                <Link href="/onboarding" className="underline hover:no-underline">
+                <Link href="/onboarding" className="text-fg-link underline hover:no-underline">
                   Ver guía
                 </Link>
               </span>
               {next ? (
-                <span className="text-xs text-warning-muted">
-                  Siguiente: <strong>{next.label}</strong>
+                <span className="text-xs text-fg-muted">
+                  Siguiente: <strong className="text-fg">{next.label}</strong>
                 </span>
               ) : null}
             </div>
             {status.certificateExpiresWithin30Days ? (
-              <p className="text-xs font-medium">Tu certificado caduca en menos de 30 días</p>
+              <p className="text-xs font-medium text-warning-muted">
+                Tu certificado caduca en menos de 30 días
+              </p>
             ) : null}
             <div
-              className="h-1 w-full overflow-hidden rounded bg-warning-outline"
+              className="progress-track h-1"
               role="progressbar"
               aria-valuenow={pct}
               aria-valuemin={0}
               aria-valuemax={100}
             >
-              <div className="h-full bg-warning-strong" style={{ width: `${pct}%` }} />
+              <div className="progress-fill" style={{ width: `${pct}%` }} />
             </div>
             <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
               {steps.map((s) => (
@@ -105,7 +107,7 @@ export async function OnboardingBanner() {
           {next ? (
             <Link
               href={next.href}
-              className="self-start rounded border border-warning-outline bg-surface px-3 py-1.5 text-xs font-medium text-warning-foreground hover:bg-warning-hover md:self-center"
+              className="btn btn-sm btn-secondary self-start md:self-center"
             >
               {next.cta}
             </Link>

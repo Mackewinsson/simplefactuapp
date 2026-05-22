@@ -71,7 +71,7 @@ export function VerifactuSettingsForm({
         ) : null}
         {certNif &&
         initialIssuerNif.trim().toUpperCase() !== certNif.trim().toUpperCase() ? (
-          <form action={issuerAction} className="mt-4 rounded border border-warning-outline bg-warning-muted p-3">
+          <form action={issuerAction} className="alert-warning mt-4 p-3">
             <p className="text-sm text-warning-foreground">
               El certificado pertenece al NIF <strong>{certNif}</strong>, distinto del emisor configurado (
               {initialIssuerNif || "vacío"}).
@@ -208,7 +208,7 @@ export function VerifactuSettingsForm({
             </p>
             <button
               type="submit"
-              className="mt-3 rounded border border-danger-outline px-4 py-2 text-sm font-medium text-danger-foreground hover:bg-danger-muted"
+              className="btn btn-md btn-danger mt-3"
             >
               Eliminar certificado
             </button>

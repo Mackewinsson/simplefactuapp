@@ -212,7 +212,7 @@ function UsageBar({
   max: number;
   pct: number;
 }) {
-  const tone = barPct >= 100 ? "bg-danger" : barPct >= 80 ? "bg-warning-strong" : "bg-success0";
+  const tone = barPct >= 100 ? "bg-danger-emphasis" : barPct >= 80 ? "bg-warning-strong" : "bg-success-bar";
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
