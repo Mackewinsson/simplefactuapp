@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { fetchInvoiceRecords } from "@/lib/simplefactu/invoice-records";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import { statusBadgeClass } from "@/lib/ui/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -47,10 +48,6 @@ function buildExportHref(params: {
 }): string {
   const s = buildQueryParams(params).toString();
   return `/invoices/records/export${s ? `?${s}` : ""}`;
-}
-
-function tipoBadge(tipo: string) {
-  return tipo === "ANULACION" ? "badge badge-warning" : "badge badge-success";
 }
 
 export default async function InvoiceRecordsPage({
@@ -246,11 +243,11 @@ export default async function InvoiceRecordsPage({
                         href={`/invoices/records/${r.id}`}
                         className="block -mx-5 px-5 -my-4 py-4"
                       >
-                        <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${
-                          r.tipo === "ANULACION"
-                            ? "text-warning bg-warning/10 border border-warning-outline/25"
-                            : "text-success bg-success/10 border border-success-outline/25"
-                        }`}>
+                        <span
+                          className={statusBadgeClass(
+                            r.tipo === "ANULACION" ? "warning" : "success"
+                          )}
+                        >
                           {r.tipo}
                         </span>
                       </Link>
@@ -260,11 +257,11 @@ export default async function InvoiceRecordsPage({
                         href={`/invoices/records/${r.id}`}
                         className="block -mx-5 px-5 -my-4 py-4"
                       >
-                        <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${
-                          r.estado === "Correcto"
-                            ? "text-success bg-success/10 border border-success-outline/25"
-                            : "text-warning bg-warning/10 border border-warning-outline/25"
-                        }`}>
+                        <span
+                          className={statusBadgeClass(
+                            r.estado === "Correcto" ? "success" : "warning"
+                          )}
+                        >
                           {r.estado}
                         </span>
                       </Link>
