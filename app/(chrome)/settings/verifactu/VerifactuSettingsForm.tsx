@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { SubmitButton } from "@/app/components/SubmitButton";
 import {
   saveIssuerProfileAction,
   uploadCertificateAction,
@@ -10,19 +10,6 @@ import {
   verifyNifAction,
   type VerifactuSettingsState,
 } from "./actions";
-
-function SubmitButton({ label }: { label: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
-    >
-      {pending ? "Guardando…" : label}
-    </button>
-  );
-}
 
 type Props = {
   initialIssuerNif: string;

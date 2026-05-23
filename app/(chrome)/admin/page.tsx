@@ -79,7 +79,7 @@ export default async function AdminDashboardPage() {
         </div>
       ) : null}
 
-      <ul className="list-inside list-disc text-sm text-accent-hover">
+      <ul className="list-inside list-disc text-sm text-accent">
         <li>
           <Link href="/admin/tenants" className="hover:underline">
             Gestionar tenants

@@ -150,13 +150,13 @@ export function CustomerList({ customers }: Props) {
             <p className="font-medium text-fg">{c.name}</p>
             <p className="mt-1 text-sm text-fg-muted">ID: {customerIdLabel(c)}</p>
             <p className="text-sm text-fg-muted">Correo: {c.email ?? "—"}</p>
-            <p className="text-sm text-fg-muted">Tipo: {c.tipoPersona ?? "—"}</p>
+            <p className="text-sm text-fg-muted">Tipo: {c.tipoPersona === "J" ? "Jurídica" : c.tipoPersona === "F" ? "Física" : "—"}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => startEdit(c)}
                 disabled={pending}
-                className="rounded border border-outline bg-surface px-2 py-1 text-xs hover:bg-surface-hover"
+                className="btn btn-sm btn-secondary"
               >
                 Editar
               </button>
@@ -164,7 +164,7 @@ export function CustomerList({ customers }: Props) {
                 type="button"
                 onClick={() => onDelete(c.id)}
                 disabled={pending}
-                className="rounded border border-danger-outline bg-danger px-2 py-1 text-xs text-danger-foreground hover:bg-danger-hover"
+                className="btn btn-sm btn-danger"
               >
                 Eliminar
               </button>
@@ -176,12 +176,12 @@ export function CustomerList({ customers }: Props) {
       <div className="hidden overflow-x-auto rounded border border-outline-soft bg-surface md:block">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead>
-            <tr className="border-b border-outline-soft bg-surface-hover">
-              <th className="px-3 py-2 font-medium text-fg">Nombre</th>
-              <th className="px-3 py-2 font-medium text-fg">Identificación</th>
-              <th className="px-3 py-2 font-medium text-fg">Correo</th>
-              <th className="px-3 py-2 font-medium text-fg">Tipo</th>
-              <th className="px-3 py-2 w-32"></th>
+            <tr className="border-b border-outline-soft bg-surface-muted bg-surface-hover">
+              <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">Nombre</th>
+              <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">Identificación</th>
+              <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">Correo</th>
+              <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">Tipo</th>
+              <th scope="col" className="px-3 py-2 w-32"></th>
             </tr>
           </thead>
           <tbody>
@@ -190,14 +190,16 @@ export function CustomerList({ customers }: Props) {
                 <td className="px-3 py-2 font-medium">{c.name}</td>
                 <td className="px-3 py-2 text-fg-muted">{customerIdLabel(c)}</td>
                 <td className="px-3 py-2 text-fg-muted">{c.email ?? "—"}</td>
-                <td className="px-3 py-2 text-fg-muted">{c.tipoPersona ?? "—"}</td>
+                <td className="px-3 py-2 text-fg-muted">
+                  {c.tipoPersona === "J" ? "Jurídica" : c.tipoPersona === "F" ? "Física" : "—"}
+                </td>
                 <td className="px-3 py-2">
                   <div className="flex flex-wrap gap-1">
                     <button
                       type="button"
                       onClick={() => startEdit(c)}
                       disabled={pending}
-                      className="rounded border border-outline bg-surface px-2 py-1 text-xs hover:bg-surface-hover"
+                      className="btn btn-sm btn-secondary"
                     >
                       Editar
                     </button>
@@ -205,7 +207,7 @@ export function CustomerList({ customers }: Props) {
                       type="button"
                       onClick={() => onDelete(c.id)}
                       disabled={pending}
-                      className="rounded border border-danger-outline bg-danger px-2 py-1 text-xs text-danger-foreground hover:bg-danger-hover"
+                      className="btn btn-sm btn-danger"
                     >
                       Eliminar
                     </button>
@@ -225,7 +227,7 @@ export function CustomerList({ customers }: Props) {
           <form
             ref={editFormRef}
             onSubmit={onSaveEdit}
-            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl animate-[modal-enter_150ms_ease-out]"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="mb-3 text-base font-semibold">Editar cliente</h2>

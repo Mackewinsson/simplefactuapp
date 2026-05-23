@@ -35,9 +35,9 @@ export default async function CustomersPage() {
         <h1 className="text-2xl font-semibold">Clientes</h1>
         <Link
           href="/invoices/new"
-          className="rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+          className="btn btn-primary"
         >
-          Nueva factura (alta cliente)
+          Nueva factura
         </Link>
       </div>
       <p className="mb-4 text-sm text-fg-muted">

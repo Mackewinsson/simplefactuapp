@@ -22,7 +22,7 @@ export function BrandWordmark({ href = "/", className }: Props) {
       aria-label={APP_DISPLAY_NAME}
       className={[
         "inline-flex shrink-0 items-center transition-opacity",
-        "hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:rounded-sm",
+        "hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-outline focus-visible:ring-offset-2 focus-visible:rounded-sm",
         className ?? "",
       ]
         .filter(Boolean)

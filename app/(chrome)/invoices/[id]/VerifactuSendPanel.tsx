@@ -394,7 +394,7 @@ export function VerifactuSendPanel({
       {polling ? (
         <p className="mt-2 flex items-center gap-1.5 text-sm text-warning-muted">
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-warning-pulse" />
-          Actualizando automáticamente…
+          Actualizando automáticamente… <span className="text-xs text-fg-subtle">(suele tardar menos de 30 segundos)</span>
         </p>
       ) : canRefresh ? (
         <p className="mt-2 text-sm text-warning-deep">
@@ -462,7 +462,7 @@ export function VerifactuSendPanel({
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-send-title"
-            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl animate-[modal-enter_150ms_ease-out]"
           >
             <h3 id="verifactu-send-title" className="text-base font-semibold text-fg">
               {isRetry ? "¿Reintentar el envío a Verifactu?" : "¿Enviar a Verifactu?"}
@@ -510,7 +510,7 @@ export function VerifactuSendPanel({
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-cancel-title"
-            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl animate-[modal-enter_150ms_ease-out]"
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <h3 id="verifactu-cancel-title" className="text-base font-semibold text-fg">

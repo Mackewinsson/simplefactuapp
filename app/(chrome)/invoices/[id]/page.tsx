@@ -111,11 +111,11 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[400px] text-left text-sm">
             <thead>
-              <tr className="border-b border-outline-soft bg-surface-hover">
-                <th className="px-4 py-3 font-medium text-fg">Concepto</th>
-                <th className="px-4 py-3 font-medium text-fg">Cant.</th>
-                <th className="px-4 py-3 font-medium text-fg">Precio u.</th>
-                <th className="px-4 py-3 font-medium text-fg text-right">
+              <tr className="border-b border-outline-soft bg-surface-muted bg-surface-hover">
+                <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Concepto</th>
+                <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Cant.</th>
+                <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Precio u.</th>
+                <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle text-right">
                   Importe
                 </th>
               </tr>

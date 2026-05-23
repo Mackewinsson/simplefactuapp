@@ -339,14 +339,14 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
+            className="btn btn-secondary"
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+            className="btn btn-primary"
           >
             Guardar línea
           </button>
@@ -461,7 +461,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                   <button
                     type="button"
                     onClick={() => setEditingIdx(i)}
-                    className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-muted"
+                    className="btn btn-sm btn-secondary"
                   >
                     Editar
                   </button>
@@ -469,7 +469,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                     <button
                       type="button"
                       onClick={() => removeItem(i)}
-                      className="rounded px-2 py-1 text-xs text-danger-emphasis hover:bg-danger"
+                      className="btn btn-sm btn-danger"
                     >
                       Eliminar
                     </button>
@@ -499,13 +499,13 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
         <div className="hidden overflow-x-auto rounded border border-outline-soft md:block">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
-              <tr className="border-b border-outline-soft bg-surface-hover">
-                <th className="px-3 py-2 font-medium text-fg-muted">Descripción</th>
-                <th className="px-3 py-2 font-medium text-fg-muted text-right">Cant.</th>
-                <th className="px-3 py-2 font-medium text-fg-muted text-right">Precio u.</th>
-                <th className="px-3 py-2 font-medium text-fg-muted text-right">Base</th>
-                <th className="px-3 py-2 font-medium text-fg-muted text-right">IVA</th>
-                <th className="px-3 py-2"></th>
+              <tr className="border-b border-outline-soft bg-surface-muted bg-surface-hover">
+                <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">Descripción</th>
+                <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle text-right">Cant.</th>
+                <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle text-right">Precio u.</th>
+                <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle text-right">Base</th>
+                <th scope="col" className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle text-right">IVA</th>
+                <th scope="col" className="px-3 py-2 w-20"></th>
               </tr>
             </thead>
             <tbody>
@@ -560,7 +560,7 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                         <button
                           type="button"
                           onClick={() => setEditingIdx(i)}
-                          className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-muted"
+                          className="btn btn-sm btn-secondary"
                         >
                           Editar
                         </button>
@@ -568,7 +568,8 @@ export function InvoiceItemsEditor({ items, onChange, onAddFromCatalog, itemFiel
                           <button
                             type="button"
                             onClick={() => removeItem(i)}
-                            className="rounded px-2 py-1 text-xs text-danger-emphasis hover:bg-danger"
+                            className="btn btn-sm btn-danger px-2"
+                            title="Eliminar"
                           >
                             ×
                           </button>

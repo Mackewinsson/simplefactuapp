@@ -89,7 +89,7 @@ export async function OnboardingBanner() {
                 </p>
               ) : null}
               <div
-                className="progress-track h-1"
+                className="progress-track"
                 role="progressbar"
                 aria-valuenow={pct}
                 aria-valuemin={0}
@@ -97,10 +97,29 @@ export async function OnboardingBanner() {
               >
                 <div className="progress-fill" style={{ width: `${pct}%` }} />
               </div>
-              <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
                 {steps.map((s) => (
-                  <li key={s.id} className="flex items-center gap-1">
-                    <span aria-hidden>{s.done ? "✓" : "•"}</span>
+                  <li key={s.id} className="flex items-center gap-1.5">
+                    <svg
+                      aria-hidden="true"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      className={s.done ? "text-success-emphasis shrink-0" : "text-fg-subtle shrink-0"}
+                    >
+                      {s.done ? (
+                        <path
+                          d="M2 6l2.5 2.5L10 3.5"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      ) : (
+                        <circle cx="6" cy="6" r="2" fill="currentColor" />
+                      )}
+                    </svg>
                     <span className={s.done ? "line-through opacity-70" : ""}>{s.label}</span>
                   </li>
                 ))}
@@ -109,7 +128,7 @@ export async function OnboardingBanner() {
             {next ? (
               <Link
                 href={next.href}
-                className="btn btn-sm btn-secondary self-start md:self-center"
+                className="btn btn-sm btn-accent self-start md:self-center"
               >
                 {next.cta}
               </Link>

@@ -270,10 +270,7 @@ export default async function InvoicesPage({
         </label>
 
         <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-          <button
-            type="submit"
-            className="rounded bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary-hover"
-          >
+          <button type="submit" className="btn btn-sm btn-primary">
             Filtrar
           </button>
           {hasFilters && (
@@ -380,12 +377,12 @@ export default async function InvoicesPage({
             <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
                 <tr className="border-b border-outline-soft bg-surface-muted">
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Número</th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Serie</th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Cliente</th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Fecha</th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Total</th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Veri*Factu</th>
+                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Número</th>
+                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Serie</th>
+                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Cliente</th>
+                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Fecha</th>
+                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Total</th>
+                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Veri*Factu</th>
                 </tr>
               </thead>
               <tbody>
@@ -434,7 +431,7 @@ export default async function InvoicesPage({
                           {dateFormat.format(inv.issueDate)}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-fg-muted">
+                      <td className="px-4 py-3 font-medium text-fg">
                         <Link
                           href={`/invoices/${inv.id}`}
                           className="block -mx-4 px-4 -my-3 py-3"
