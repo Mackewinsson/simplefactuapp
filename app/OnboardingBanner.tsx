@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getOnboardingStatus } from "@/lib/verifactu/onboarding-status";
+import { OnboardingBannerDismissWrapper } from "./OnboardingBannerDismissWrapper";
 
 /**
  * Persistent onboarding banner until issuer, certificate and first AEAT invoice are done.
@@ -60,60 +61,62 @@ export async function OnboardingBanner() {
     const pct = Math.round((completed / steps.length) * 100);
 
     return (
-      <div
-        role="status"
-        aria-label={`Configuración: ${completed} de ${steps.length} pasos completados`}
-        className="border-b border-info-outline bg-accent-muted text-fg"
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-1 flex-col gap-2">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
-              <span className="font-medium">Completa tu configuración</span>
-              <span className="text-xs text-fg-muted">
-                {completed} / {steps.length} pasos ·{" "}
-                <Link href="/onboarding" className="text-fg-link underline hover:no-underline">
-                  Ver guía
-                </Link>
-              </span>
-              {next ? (
+      <OnboardingBannerDismissWrapper>
+        <div
+          role="status"
+          aria-label={`Configuración: ${completed} de ${steps.length} pasos completados`}
+          className="border-b border-info-outline bg-accent-muted text-fg"
+        >
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between pr-8 md:pr-10">
+            <div className="flex flex-1 flex-col gap-2">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+                <span className="font-medium">Completa tu configuración</span>
                 <span className="text-xs text-fg-muted">
-                  Siguiente: <strong className="text-fg">{next.label}</strong>
+                  {completed} / {steps.length} pasos ·{" "}
+                  <Link href="/onboarding" className="text-fg-link underline hover:no-underline">
+                    Ver guía
+                  </Link>
                 </span>
+                {next ? (
+                  <span className="text-xs text-fg-muted">
+                    Siguiente: <strong className="text-fg">{next.label}</strong>
+                  </span>
+                ) : null}
+              </div>
+              {status.certificateExpiresWithin30Days ? (
+                <p className="text-xs font-medium text-warning-muted">
+                  Tu certificado caduca en menos de 30 días
+                </p>
               ) : null}
+              <div
+                className="progress-track h-1"
+                role="progressbar"
+                aria-valuenow={pct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div className="progress-fill" style={{ width: `${pct}%` }} />
+              </div>
+              <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                {steps.map((s) => (
+                  <li key={s.id} className="flex items-center gap-1">
+                    <span aria-hidden>{s.done ? "✓" : "•"}</span>
+                    <span className={s.done ? "line-through opacity-70" : ""}>{s.label}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            {status.certificateExpiresWithin30Days ? (
-              <p className="text-xs font-medium text-warning-muted">
-                Tu certificado caduca en menos de 30 días
-              </p>
+            {next ? (
+              <Link
+                href={next.href}
+                className="btn btn-sm btn-secondary self-start md:self-center"
+              >
+                {next.cta}
+              </Link>
             ) : null}
-            <div
-              className="progress-track h-1"
-              role="progressbar"
-              aria-valuenow={pct}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div className="progress-fill" style={{ width: `${pct}%` }} />
-            </div>
-            <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-              {steps.map((s) => (
-                <li key={s.id} className="flex items-center gap-1">
-                  <span aria-hidden>{s.done ? "✓" : "•"}</span>
-                  <span className={s.done ? "line-through opacity-70" : ""}>{s.label}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-          {next ? (
-            <Link
-              href={next.href}
-              className="btn btn-sm btn-secondary self-start md:self-center"
-            >
-              {next.cta}
-            </Link>
-          ) : null}
         </div>
-      </div>
+      </OnboardingBannerDismissWrapper>
     );
   } catch {
     return null;

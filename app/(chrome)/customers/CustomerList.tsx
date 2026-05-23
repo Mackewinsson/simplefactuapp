@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCustomerAction, updateCustomerAction, type CustomerRow } from "./actions";
 import { DestinatarioIdFields } from "@/app/(chrome)/invoices/new/components/DestinatarioIdFields";
@@ -16,6 +16,61 @@ export function CustomerList({ customers }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [editing, setEditing] = useState<CustomerRow | null>(null);
+  
+  const editFormRef = useRef<HTMLFormElement>(null);
+
+  // Focus trap and Escape key for Editing Customer Modal
+  const editTriggerRef = useRef<HTMLElement | null>(null);
+  
+  useEffect(() => {
+    if (editing) {
+      editTriggerRef.current = document.activeElement as HTMLElement;
+    } else {
+      editTriggerRef.current?.focus();
+      editTriggerRef.current = null;
+    }
+  }, [editing]);
+
+  useEffect(() => {
+    if (!editing) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && !pending) setEditing(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editing, pending]);
+
+  useEffect(() => {
+    if (!editing) return;
+    const container = editFormRef.current;
+    if (!container) return;
+
+    const focusableElements = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    firstElement?.focus();
+
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    }
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
+  }, [editing]);
   const [form, setForm] = useState({
     name: "",
     nif: "",
@@ -168,6 +223,7 @@ export function CustomerList({ customers }: Props) {
           onClick={(e) => e.target === e.currentTarget && setEditing(null)}
         >
           <form
+            ref={editFormRef}
             onSubmit={onSaveEdit}
             className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}

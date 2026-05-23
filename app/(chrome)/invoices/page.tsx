@@ -348,11 +348,15 @@ export default async function InvoicesPage({
                 inv.aeatEstadoEnvio
               );
               return (
-                <article key={inv.id} className="rounded border border-outline-soft bg-surface p-3">
+                <Link
+                  key={inv.id}
+                  href={`/invoices/${inv.id}`}
+                  className="block rounded border border-outline-soft bg-surface p-3 hover:shadow-sm hover:border-outline transition-all"
+                >
                   <div className="flex items-start justify-between gap-3">
-                    <Link href={`/invoices/${inv.id}`} className="font-medium text-accent hover:underline">
+                    <span className="font-medium text-accent">
                       {inv.number}
-                    </Link>
+                    </span>
                     <span className={badge.className}>
                       {badge.label}
                     </span>
@@ -367,7 +371,7 @@ export default async function InvoicesPage({
                   <p className="mt-1 text-sm font-medium text-fg">
                     {formatCents(inv.currency, inv.totalCents)}
                   </p>
-                </article>
+                </Link>
               );
             })}
           </div>
@@ -387,39 +391,66 @@ export default async function InvoicesPage({
               <tbody>
                 {invoices.map((inv: InvoiceRow) => {
                   const badge = registrationStatusBadge(
-                inv.aeatStatus,
-                inv.aeatCancellationStatus,
-                inv.aeatEstadoEnvio
-              );
+                    inv.aeatStatus,
+                    inv.aeatCancellationStatus,
+                    inv.aeatEstadoEnvio
+                  );
                   return (
                     <tr
                       key={inv.id}
-                      className="border-b border-outline-soft last:border-0 hover:bg-surface-hover"
+                      className="border-b border-outline-soft last:border-0 hover:bg-surface-hover cursor-pointer"
                     >
                       <td className="px-4 py-3">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="font-medium text-accent hover:underline"
+                          className="font-medium text-accent hover:underline block -mx-4 px-4 -my-3 py-3"
                         >
                           {inv.number}
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-fg-muted">
-                          {extractSerie(inv.number)}
-                        </span>
+                        <Link
+                          href={`/invoices/${inv.id}`}
+                          className="block -mx-4 px-4 -my-3 py-3"
+                        >
+                          <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-fg-muted">
+                            {extractSerie(inv.number)}
+                          </span>
+                        </Link>
                       </td>
-                      <td className="px-4 py-3 text-fg-muted">{inv.customerName}</td>
                       <td className="px-4 py-3 text-fg-muted">
-                        {dateFormat.format(inv.issueDate)}
+                        <Link
+                          href={`/invoices/${inv.id}`}
+                          className="block -mx-4 px-4 -my-3 py-3"
+                        >
+                          {inv.customerName}
+                        </Link>
                       </td>
                       <td className="px-4 py-3 text-fg-muted">
-                        {formatCents(inv.currency, inv.totalCents)}
+                        <Link
+                          href={`/invoices/${inv.id}`}
+                          className="block -mx-4 px-4 -my-3 py-3"
+                        >
+                          {dateFormat.format(inv.issueDate)}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-fg-muted">
+                        <Link
+                          href={`/invoices/${inv.id}`}
+                          className="block -mx-4 px-4 -my-3 py-3"
+                        >
+                          {formatCents(inv.currency, inv.totalCents)}
+                        </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={badge.className}>
-                          {badge.label}
-                        </span>
+                        <Link
+                          href={`/invoices/${inv.id}`}
+                          className="block -mx-4 px-4 -my-3 py-3"
+                        >
+                          <span className={badge.className}>
+                            {badge.label}
+                          </span>
+                        </Link>
                       </td>
                     </tr>
                   );

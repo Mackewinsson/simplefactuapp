@@ -53,11 +53,15 @@ export function VerifactuSendPanel({
 }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: "ok" | "err" } | null>(null);
   const [polling, setPolling] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [sendConfirmOpen, setSendConfirmOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const autoSendFired = useRef(false);
+
+  const sendConfirmRef = useRef<HTMLDivElement>(null);
+  const cancelConfirmRef = useRef<HTMLDivElement>(null);
 
   const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
 
@@ -79,6 +83,15 @@ export function VerifactuSendPanel({
   const canRefresh = pollActive;
   const canResyncQr =
     aeatStatus === "SUCCEEDED" && !!aeatJobId && !!(aeatCsv?.trim() || aeatQrText?.trim());
+
+  // Copy CSV function
+  function copyCsv() {
+    if (!aeatCsv) return;
+    navigator.clipboard.writeText(aeatCsv).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   // Auto-poll every 3 s while a job is PENDING. Stops when terminal or after
   // 60 attempts (~3 min), at which point the manual button remains as fallback.
@@ -105,7 +118,7 @@ export function VerifactuSendPanel({
         stopped = true;
         clearInterval(id);
         setPolling(false);
-        setMessage(formatVerifactuActionError(e));
+        setMessage({ text: formatVerifactuActionError(e), type: "err" });
       }
       router.refresh();
     }, 3000);
@@ -117,6 +130,69 @@ export function VerifactuSendPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollActive, invoiceId]);
 
+  // Focus trap and Escape key for Send Confirm Modal
+  const sendConfirmTriggerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (sendConfirmOpen) {
+      sendConfirmTriggerRef.current = document.activeElement as HTMLElement;
+    } else {
+      sendConfirmTriggerRef.current?.focus();
+      sendConfirmTriggerRef.current = null;
+    }
+  }, [sendConfirmOpen]);
+
+  useEffect(() => {
+    if (!sendConfirmOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && !pending) setSendConfirmOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sendConfirmOpen, pending]);
+
+  useEffect(() => {
+    if (!sendConfirmOpen) return;
+    const container = sendConfirmRef.current;
+    if (!container) return;
+
+    const focusableElements = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    firstElement?.focus();
+
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    }
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
+  }, [sendConfirmOpen]);
+
+  // Focus trap and Escape key for Cancel Modal
+  const cancelTriggerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (cancelModalOpen) {
+      cancelTriggerRef.current = document.activeElement as HTMLElement;
+    } else {
+      cancelTriggerRef.current?.focus();
+      cancelTriggerRef.current = null;
+    }
+  }, [cancelModalOpen]);
+
   useEffect(() => {
     if (!cancelModalOpen) return;
     function onKey(e: KeyboardEvent) {
@@ -125,6 +201,38 @@ export function VerifactuSendPanel({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [cancelModalOpen, pending]);
+
+  useEffect(() => {
+    if (!cancelModalOpen) return;
+    const container = cancelConfirmRef.current;
+    if (!container) return;
+
+    const focusableElements = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    firstElement?.focus();
+
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    }
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
+  }, [cancelModalOpen]);
 
   const canCancelAeat =
     aeatStatus === "SUCCEEDED" &&
@@ -142,9 +250,9 @@ export function VerifactuSendPanel({
     startTransition(async () => {
       try {
         const r = await action(id);
-        setMessage(r.message);
+        setMessage({ text: r.message, type: r.ok ? "ok" : "err" });
       } catch (e) {
-        setMessage(formatVerifactuActionError(e));
+        setMessage({ text: formatVerifactuActionError(e), type: "err" });
       }
       router.refresh();
     });
@@ -155,9 +263,9 @@ export function VerifactuSendPanel({
     startTransition(async () => {
       try {
         const r = await cancelInvoiceVerifactuAction(invoiceId);
-        setMessage(r.message);
+        setMessage({ text: r.message, type: r.ok ? "ok" : "err" });
       } catch (e) {
-        setMessage(formatVerifactuActionError(e));
+        setMessage({ text: formatVerifactuActionError(e), type: "err" });
       }
       setCancelModalOpen(false);
       router.refresh();
@@ -192,6 +300,14 @@ export function VerifactuSendPanel({
                 <code className="rounded bg-surface px-2 py-1 font-mono text-sm text-fg">
                   {aeatCsv}
                 </code>
+                <button
+                  type="button"
+                  onClick={copyCsv}
+                  className="btn btn-sm btn-secondary"
+                  aria-label="Copiar CSV al portapapeles"
+                >
+                  {copied ? "✓ Copiado" : "Copiar"}
+                </button>
                 {aeatQrText ? (
                   <a
                     href={aeatQrText}
@@ -250,14 +366,16 @@ export function VerifactuSendPanel({
             <IssueCorrectionButton invoiceId={invoiceId} originalNumSerie={invoiceNumber} />
           </div>
         ) : null}
-        <div
-          className={`flex flex-wrap items-center gap-2${isRegistered ? " border-t border-outline-soft pt-3" : ""}`}
-        >
-          <span className="font-medium">Estado de la anulación:</span>
-          <span className={cancellationStatusBadgeClass(aeatCancellationStatus)}>
-            {cancellationStatusDetailLabel(aeatCancellationStatus)}
-          </span>
-        </div>
+        {(isRegistered || aeatCancellationStatus !== "NOT_SENT") && (
+          <div
+            className={`flex flex-wrap items-center gap-2${isRegistered ? " border-t border-outline-soft pt-3" : ""}`}
+          >
+            <span className="font-medium">Estado de la anulación:</span>
+            <span className={cancellationStatusBadgeClass(aeatCancellationStatus)}>
+              {cancellationStatusDetailLabel(aeatCancellationStatus)}
+            </span>
+          </div>
+        )}
         {aeatCancellationLastError ? (
           <div className="text-danger-foreground">
             <span className="font-medium">Error de anulación:</span>{" "}
@@ -266,8 +384,11 @@ export function VerifactuSendPanel({
         ) : null}
       </dl>
       {message ? (
-        <p className="mt-2 text-sm text-fg" role="status">
-          {message}
+        <p
+          className={`mt-2 text-sm ${message.type === "ok" ? "text-success-foreground" : "text-danger-foreground"}`}
+          role="status"
+        >
+          {message.text}
         </p>
       ) : null}
       {polling ? (
@@ -337,6 +458,7 @@ export function VerifactuSendPanel({
           }}
         >
           <div
+            ref={sendConfirmRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-send-title"
@@ -384,6 +506,7 @@ export function VerifactuSendPanel({
           }}
         >
           <div
+            ref={cancelConfirmRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-cancel-title"

@@ -71,7 +71,7 @@
   /* Campos de formulario */
   .input {
     @apply w-full rounded border border-outline bg-surface px-3 py-2 text-sm text-fg
-           focus:border-outline focus:outline-none focus:ring-1 focus:ring-outline;
+           focus:border-accent-outline focus:outline-none focus:ring-1 focus:ring-accent-outline;
   }
 
   .label {
