@@ -3,8 +3,16 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["500", "600", "700", "800"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: APP_DISPLAY_NAME,
@@ -33,7 +41,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={esES}>
-      <html lang="es" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <html
+        lang="es"
+        className={`${GeistSans.variable} ${GeistMono.variable} ${plusJakartaSans.variable}`}
+      >
         <body className="flex min-h-screen flex-col bg-surface font-sans text-fg antialiased">
           {children}
         </body>
@@ -41,3 +52,4 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+

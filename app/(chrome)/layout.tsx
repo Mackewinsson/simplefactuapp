@@ -19,8 +19,8 @@ import { OnboardingRedirect } from "./OnboardingRedirect";
  */
 export default function ChromeLayout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b border-outline-soft bg-surface/90 backdrop-blur-sm">
+    <div className="flex min-h-screen flex-col premium-glow-bg">
+      <header className="sticky top-0 z-50 border-b border-outline-soft/70 bg-surface/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex min-w-0 items-baseline gap-3 lg:gap-8">
             <BrandWordmark href="/" />
@@ -33,10 +33,10 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
       </header>
       <OnboardingBanner />
       <OnboardingRedirect />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 py-8 animate-fade-in-up">
         {children}
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -45,8 +45,8 @@ export function ResponsiveAppNav({ links }: Props) {
               aria-current={active ? "page" : undefined}
               className={
                 active
-                  ? "rounded px-2.5 py-1.5 text-sm font-semibold text-fg bg-surface-muted"
-                  : "rounded px-2.5 py-1.5 text-sm text-fg-muted hover:text-fg hover:bg-surface-muted/60 transition-colors"
+                  ? "rounded-lg border border-outline-soft bg-surface px-3 py-1.5 text-sm font-bold text-fg shadow-sm font-display transition-all"
+                  : "rounded-lg px-3 py-1.5 text-sm font-semibold text-fg-muted hover:text-fg hover:bg-surface-muted/50 transition-all font-display"
               }
             >
               {link.label}
@@ -57,12 +57,12 @@ export function ResponsiveAppNav({ links }: Props) {
 
       <button
         type="button"
-        className="inline-flex items-center rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-muted lg:hidden"
+        className="inline-flex items-center rounded-lg border border-outline bg-surface px-3 py-1.5 text-sm font-bold text-fg-muted hover:bg-surface-muted transition-all shadow-sm font-display"
         aria-expanded={isOpen}
         aria-controls="mobile-app-nav"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr-1.5">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr-1.5 text-fg-subtle">
           <rect x="1" y="3.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
           <rect x="1" y="7.25" width="14" height="1.5" rx="0.75" fill="currentColor"/>
           <rect x="1" y="11" width="14" height="1.5" rx="0.75" fill="currentColor"/>

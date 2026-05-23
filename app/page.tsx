@@ -12,12 +12,12 @@ export default async function PublicHomePage() {
   if (userId) redirect("/invoices");
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
+    <div className="flex min-h-screen flex-col premium-glow-bg">
       {/* ── Public header ─────────────────────────────── */}
-      <header className="border-b border-outline-soft bg-surface">
+      <header className="sticky top-0 z-50 border-b border-outline-soft/80 bg-surface/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <BrandWordmark />
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1 font-display">
             <Link
               href="/blog"
               className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
@@ -38,7 +38,7 @@ export default async function PublicHomePage() {
             </Link>
             <Link
               href="/sign-up"
-              className="btn btn-sm btn-primary sm:ml-2"
+              className="btn btn-sm btn-primary sm:ml-2 shadow-sm font-semibold"
             >
               Crear cuenta
             </Link>
@@ -46,12 +46,12 @@ export default async function PublicHomePage() {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col">
+      <main className="relative z-10 flex flex-1 flex-col">
         {/* ── Hero ──────────────────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-24">
+        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-24 animate-fade-in-up">
           {/* Compliance pill */}
-          <div className="mb-8 flex w-fit max-w-full items-start gap-2 rounded-xl border border-outline-soft bg-surface-muted px-3 py-1.5 text-xs font-medium text-fg-subtle">
-            <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-fg-subtle" />
+          <div className="mb-8 flex w-fit max-w-full items-start gap-2 rounded-xl border border-outline-soft/80 bg-surface-muted/65 px-3 py-1.5 text-xs font-semibold text-fg-subtle font-display shadow-sm">
+            <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent animate-pulse" />
             <span>Compatible con Veri·Factu — RD&nbsp;1007/2023&nbsp;·&nbsp;OM&nbsp;HAC/1177/2024</span>
           </div>
 
@@ -59,11 +59,11 @@ export default async function PublicHomePage() {
         </section>
 
         {/* ── Divider ───────────────────────────────────── */}
-        <div className="border-t border-outline-soft" />
+        <div className="border-t border-outline-soft/50" />
 
         {/* ── Cómo funciona ─────────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-          <p className="mb-10 text-xs font-medium uppercase tracking-widest text-fg-subtle">
+        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16 animate-fade-in-up delay-100">
+          <p className="mb-10 text-xs font-bold uppercase tracking-widest text-fg-subtle font-display">
             Cómo funciona
           </p>
           <div className="grid gap-8 sm:grid-cols-3">
@@ -86,22 +86,22 @@ export default async function PublicHomePage() {
         </section>
 
         {/* ── Divider ───────────────────────────────────── */}
-        <div className="border-t border-outline-soft" />
+        <div className="border-t border-outline-soft/50" />
 
         {/* ── Blog / Artículos ──────────────────────────── */}
-        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+        <section className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16 animate-fade-in-up delay-200">
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-fg-subtle">
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-fg-subtle font-display">
                 Blog
               </p>
-              <h2 className="text-xl font-semibold text-fg sm:text-2xl">
+              <h2 className="text-xl font-bold text-fg font-display tracking-tight sm:text-2xl">
                 Guías sobre Veri*Factu
               </h2>
             </div>
             <Link
               href="/blog"
-              className="shrink-0 text-sm text-fg-muted hover:text-fg"
+              className="shrink-0 text-sm font-medium text-fg-muted hover:text-fg font-display"
             >
               Ver todos →
             </Link>
@@ -124,12 +124,12 @@ export default async function PublicHomePage() {
         </section>
 
         {/* ── Divider ───────────────────────────────────── */}
-        <div className="border-t border-outline-soft" />
+        <div className="border-t border-outline-soft/50" />
 
         {/* ── Contacto / lead form ──────────────────────── */}
-        <section id="contacto" className="mx-auto w-full max-w-lg px-4 py-14 sm:px-6 sm:py-20">
+        <section id="contacto" className="mx-auto w-full max-w-lg px-4 py-14 sm:px-6 sm:py-20 animate-fade-in-up delay-300">
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-semibold text-fg">¿Tienes preguntas?</h2>
+            <h2 className="text-2xl font-bold text-fg font-display tracking-tight">¿Tienes preguntas?</h2>
             <p className="mt-2 text-sm text-fg-muted">
               Cuéntanos tu caso y te respondemos en menos de 24&nbsp;h. Sin compromisos.
             </p>
@@ -139,7 +139,7 @@ export default async function PublicHomePage() {
       </main>
 
       {/* ── Minimal public footer ─────────────────────── */}
-      <footer className="border-t border-outline-soft bg-surface">
+      <footer className="relative z-10 border-t border-outline-soft/80 bg-surface/75 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <span>
             Simple·Factu &mdash; Servicio compatible con Veri·Factu (AEAT)
@@ -172,12 +172,13 @@ function Step({
   body: string;
 }) {
   return (
-    <div>
-      <span className="text-xs font-medium tabular-nums text-fg-subtle">
+    <div className="group rounded-xl border border-outline-soft/40 bg-surface/40 p-5 hover:bg-surface/90 hover:border-outline-soft/80 hover:shadow-md transition-all duration-300">
+      <span className="text-xs font-bold font-mono text-fg-subtle bg-surface-muted px-2 py-0.5 rounded">
         {number}
       </span>
-      <h3 className="mt-2 text-sm font-semibold text-fg">{title}</h3>
-      <p className="mt-1.5 text-sm text-fg-muted">{body}</p>
+      <h3 className="mt-4 text-base font-bold text-fg font-display tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm text-fg-muted leading-relaxed">{body}</p>
     </div>
   );
 }
+

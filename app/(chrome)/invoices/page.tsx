@@ -177,18 +177,18 @@ export default async function InvoicesPage({
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold">Facturas</h1>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-3xl font-extrabold tracking-tight text-fg font-display">Facturas</h1>
+        <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row font-display">
           <Link
             href="/invoices/records"
-            className="w-full rounded border border-outline bg-surface px-4 py-2 text-center text-sm font-medium text-fg-muted hover:bg-surface-hover sm:w-auto"
+            className="w-full rounded-lg border border-outline bg-surface px-4 py-2.5 text-center text-sm font-semibold text-fg-muted hover:bg-surface-hover hover:-translate-y-[0.5px] transition-all shadow-sm sm:w-auto"
           >
             Registro AEAT
           </Link>
           <Link
             href="/invoices/new"
-            className="w-full rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover sm:w-auto"
+            className="w-full rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground hover:bg-primary-hover hover:-translate-y-[0.5px] transition-all shadow-md shadow-primary/10 sm:w-auto"
           >
             Nueva factura
           </Link>
@@ -206,28 +206,28 @@ export default async function InvoicesPage({
       {/* Filters */}
       <form
         method="get"
-        className="mb-4 flex flex-wrap items-end gap-3 rounded border border-outline-soft bg-surface p-3 text-sm"
+        className="mb-6 flex flex-wrap items-end gap-4 rounded-xl border border-outline-soft/85 bg-surface/75 backdrop-blur-md p-4 text-sm font-display shadow-sm"
       >
         <input type="hidden" name="page" value="1" />
         <input type="hidden" name="vista" value={vista} />
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Buscar</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Buscar</span>
           <input
             name="q"
             type="search"
             defaultValue={q ?? ""}
             placeholder="número, cliente, NIF…"
-            className="mt-1 block w-full min-w-0 rounded border border-outline px-2 py-1 text-sm sm:w-52"
+            className="mt-1.5 block w-full min-w-0 rounded-lg border border-outline px-3 py-2 text-sm transition-all focus:border-accent-outline focus:outline-none focus:ring-1 focus:ring-accent-outline sm:w-52"
           />
         </label>
 
         {vista === "verifactu" ? (
           <label className="block w-full sm:w-auto">
-            <span className="text-fg-muted">Estado Veri*Factu</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Estado Veri*Factu</span>
             <select
               name="status"
               defaultValue={statusSelectDefault}
-              className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-auto"
+              className="mt-1.5 block w-full rounded-lg border border-outline bg-surface px-3 py-2 text-sm transition-all focus:border-accent-outline focus:outline-none focus:ring-1 focus:ring-accent-outline sm:w-auto"
             >
               {AEAT_STATUSES_VERIFACTU.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -239,44 +239,44 @@ export default async function InvoicesPage({
         ) : null}
 
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Serie</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Serie</span>
           <input
             name="serie"
             type="text"
             defaultValue={serie ?? ""}
             placeholder="2026"
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-24"
+            className="mt-1.5 block w-full rounded-lg border border-outline px-3 py-2 text-sm transition-all focus:border-accent-outline focus:outline-none focus:ring-1 focus:ring-accent-outline sm:w-24"
           />
         </label>
 
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Desde</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Desde</span>
           <input
             name="from"
             type="date"
             defaultValue={from ?? ""}
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-auto"
+            className="mt-1.5 block w-full rounded-lg border border-outline px-3 py-2 text-sm transition-all focus:border-accent-outline focus:outline-none focus:ring-1 focus:ring-accent-outline sm:w-auto"
           />
         </label>
 
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Hasta</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-fg-subtle">Hasta</span>
           <input
             name="to"
             type="date"
             defaultValue={to ?? ""}
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-auto"
+            className="mt-1.5 block w-full rounded-lg border border-outline px-3 py-2 text-sm transition-all focus:border-accent-outline focus:outline-none focus:ring-1 focus:ring-accent-outline sm:w-auto"
           />
         </label>
 
         <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-          <button type="submit" className="btn btn-sm btn-primary">
+          <button type="submit" className="btn btn-sm btn-primary rounded-lg shadow-sm font-semibold">
             Filtrar
           </button>
           {hasFilters && (
             <Link
               href="/invoices"
-              className="rounded border border-outline px-3 py-1.5 text-sm text-fg-muted hover:bg-surface-hover"
+              className="rounded-lg border border-outline bg-surface px-3 py-1.5 text-sm font-semibold text-fg-muted hover:bg-surface-hover transition-colors"
             >
               Limpiar
             </Link>
@@ -285,49 +285,49 @@ export default async function InvoicesPage({
       </form>
 
       {invoices.length === 0 ? (
-        <div className="rounded border border-outline-soft bg-surface p-8 text-center">
+        <div className="panel-premium rounded-2xl p-10 text-center">
           {vista === "sin-enviar" ? (
             <>
-              <p className="mb-2 text-fg">
+              <p className="mb-2 text-lg font-bold font-display text-fg">
                 {hasFilters ? "No hay facturas por enviar con esos filtros." : "No tienes facturas pendientes de envío."}
               </p>
-              <p className="mb-4 text-sm text-fg-muted">
+              <p className="mb-6 text-sm text-fg-muted max-w-md mx-auto leading-relaxed">
                 Las facturas nuevas aparecen aquí hasta que las envíes a Verifactu desde el detalle.
               </p>
               <Link
                 href="/invoices/new"
-                className="inline-block rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+                className="inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary-hover shadow-md font-display transition-all"
               >
                 Nueva factura
               </Link>
             </>
           ) : (
             <>
-              <p className="mb-2 text-fg">
+              <p className="mb-2 text-lg font-bold font-display text-fg">
                 {hasFilters
                   ? "No hay facturas en Verifactu con esos filtros."
                   : "Aún no hay envíos a Verifactu."}
               </p>
               {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
-                <p className="mb-4 text-sm text-fg-muted">
+                <p className="mb-6 text-sm text-fg-muted max-w-md mx-auto leading-relaxed">
                   Tienes facturas listas para enviar. Abre una, revisa los datos y pulsa «Enviar a Verifactu».
                 </p>
               ) : !hasFilters ? (
-                <p className="mb-4 text-sm text-fg-muted">
+                <p className="mb-6 text-sm text-fg-muted max-w-md mx-auto leading-relaxed">
                   Cuando envíes una factura a Verifactu, el estado aparecerá aquí.
                 </p>
               ) : null}
               {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
                 <Link
                   href={hrefSinEnviar}
-                  className="inline-block rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-hover"
+                  className="inline-block rounded-lg border border-outline bg-surface px-5 py-2.5 text-sm font-bold text-fg hover:bg-surface-hover shadow-sm font-display transition-all"
                 >
                   Ver facturas por enviar ({sinEnviarCount})
                 </Link>
               ) : !hasFilters && sinEnviarCount === 0 && verifactuCount === 0 ? (
                 <Link
                   href="/invoices/new"
-                  className="inline-block rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+                  className="inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary-hover shadow-md font-display transition-all"
                 >
                   Crear factura
                 </Link>
@@ -337,7 +337,7 @@ export default async function InvoicesPage({
         </div>
       ) : (
         <>
-          <div className="space-y-3 md:hidden">
+          <div className="space-y-3 md:hidden animate-fade-in-up delay-100">
             {invoices.map((inv: InvoiceRow) => {
               const badge = registrationStatusBadge(
                 inv.aeatStatus,
@@ -348,24 +348,24 @@ export default async function InvoicesPage({
                 <Link
                   key={inv.id}
                   href={`/invoices/${inv.id}`}
-                  className="block rounded border border-outline-soft bg-surface p-3 hover:shadow-sm hover:border-outline transition-all"
+                  className="block rounded-xl border border-outline-soft/75 bg-surface/85 p-4 hover:shadow-md hover:border-accent/20 hover:bg-surface transition-all duration-300 transform hover:-translate-y-[1px]"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <span className="font-medium text-accent">
+                    <span className="font-bold text-accent font-mono text-sm">
                       {inv.number}
                     </span>
                     <span className={badge.className}>
                       {badge.label}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-fg-muted">{inv.customerName}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-muted">
+                  <p className="mt-2.5 text-sm font-semibold text-fg-muted">{inv.customerName}</p>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fg-subtle">
                     <span>{dateFormat.format(inv.issueDate)}</span>
-                    <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-fg-muted">
+                    <span className="rounded bg-surface-muted px-2 py-0.5 font-mono font-medium">
                       {extractSerie(inv.number)}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm font-medium text-fg">
+                  <p className="mt-2 text-sm font-extrabold text-fg font-display">
                     {formatCents(inv.currency, inv.totalCents)}
                   </p>
                 </Link>
@@ -373,19 +373,19 @@ export default async function InvoicesPage({
             })}
           </div>
 
-          <div className="hidden overflow-x-auto rounded border border-outline-soft bg-surface md:block">
-            <table className="w-full min-w-[700px] text-left text-sm">
+          <div className="hidden overflow-x-auto rounded-2xl md:block panel-premium animate-fade-in-up delay-100">
+            <table className="w-full min-w-[700px] text-left text-sm border-collapse">
               <thead>
-                <tr className="border-b border-outline-soft bg-surface-muted">
-                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Número</th>
-                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Serie</th>
-                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Cliente</th>
-                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Fecha</th>
-                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Total</th>
-                  <th scope="col" className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-fg-subtle">Veri*Factu</th>
+                <tr className="border-b border-outline-soft bg-surface-muted/50 font-display">
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Número</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Serie</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Cliente</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Fecha</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Total</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Veri*Factu</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-outline-soft/40">
                 {invoices.map((inv: InvoiceRow) => {
                   const badge = registrationStatusBadge(
                     inv.aeatStatus,
@@ -395,54 +395,54 @@ export default async function InvoicesPage({
                   return (
                     <tr
                       key={inv.id}
-                      className="border-b border-outline-soft last:border-0 hover:bg-surface-hover cursor-pointer"
+                      className="group hover:bg-surface-hover/80 transition-colors duration-200 cursor-pointer"
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="font-medium text-accent hover:underline block -mx-4 px-4 -my-3 py-3"
+                          className="font-bold text-accent hover:underline block -mx-5 px-5 -my-4 py-4 font-mono text-[13px]"
                         >
                           {inv.number}
                         </Link>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="block -mx-4 px-4 -my-3 py-3"
+                          className="block -mx-5 px-5 -my-4 py-4"
                         >
-                          <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs text-fg-muted">
+                          <span className="rounded bg-surface-muted px-2 py-0.5 font-mono text-[11px] font-medium text-fg-muted">
                             {extractSerie(inv.number)}
                           </span>
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-fg-muted">
+                      <td className="px-5 py-4 text-fg-muted font-medium">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="block -mx-4 px-4 -my-3 py-3"
+                          className="block -mx-5 px-5 -my-4 py-4"
                         >
                           {inv.customerName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-fg-muted">
+                      <td className="px-5 py-4 text-fg-subtle">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="block -mx-4 px-4 -my-3 py-3"
+                          className="block -mx-5 px-5 -my-4 py-4 font-mono text-[12px]"
                         >
                           {dateFormat.format(inv.issueDate)}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 font-medium text-fg">
+                      <td className="px-5 py-4 font-extrabold text-fg font-display text-[14px]">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="block -mx-4 px-4 -my-3 py-3"
+                          className="block -mx-5 px-5 -my-4 py-4"
                         >
                           {formatCents(inv.currency, inv.totalCents)}
                         </Link>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <Link
                           href={`/invoices/${inv.id}`}
-                          className="block -mx-4 px-4 -my-3 py-3"
+                          className="block -mx-5 px-5 -my-4 py-4"
                         >
                           <span className={badge.className}>
                             {badge.label}
@@ -455,6 +455,7 @@ export default async function InvoicesPage({
               </tbody>
             </table>
           </div>
+
 
           <div className="mt-4 flex flex-col gap-2 text-sm text-fg-muted sm:flex-row sm:items-center sm:justify-between">
             <span>
