@@ -3,11 +3,18 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { fetchInvoiceRecordById } from "@/lib/simplefactu/invoice-records";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import {
+  invoiceRecordEstadoBadgeVariant,
+  invoiceRecordEstadoLabel,
+  invoiceRecordTipoBadgeVariant,
+  invoiceRecordTipoLabel,
+} from "@/lib/simplefactu/invoice-record-labels";
+import { statusBadgeClass } from "@/lib/ui/status-badge";
 
 export const dynamic = "force-dynamic";
 
 const dateFormat = new Intl.DateTimeFormat("es", {
-  dateStyle: "medium",
+  dateStyle: "long",
   timeStyle: "short",
 });
 
@@ -38,7 +45,7 @@ export default async function InvoiceRecordDetailPage({
     return (
       <div>
         <Link href="/invoices/records" className="text-sm text-fg-muted hover:text-fg">
-          ← Registro AEAT
+          ← Histórico en Hacienda
         </Link>
         <div className="mt-4 rounded border border-danger-outline bg-danger p-4 text-sm text-danger-foreground">
           {loadError}
@@ -52,73 +59,49 @@ export default async function InvoiceRecordDetailPage({
   return (
     <div>
       <Link href="/invoices/records" className="text-sm text-fg-muted hover:text-fg">
-        ← Registro AEAT
+        ← Histórico en Hacienda
       </Link>
 
-      <h1 className="mt-4 text-2xl font-semibold">{record.numSerie}</h1>
+      <h1 className="mt-4 text-2xl font-semibold text-fg">{record.numSerie}</h1>
       <p className="mt-1 text-sm text-fg-muted">
-        {record.tipo} · {record.estado} · registrado{" "}
-        {dateFormat.format(new Date(record.createdAt))}
+        Registrado en Hacienda el {dateFormat.format(new Date(record.createdAt))}
       </p>
 
-      <dl className="mt-6 grid gap-3 rounded border border-outline-soft bg-surface p-4 text-sm sm:grid-cols-2">
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className={statusBadgeClass(invoiceRecordTipoBadgeVariant(record.tipo))}>
+          {invoiceRecordTipoLabel(record.tipo)}
+        </span>
+        <span className={statusBadgeClass(invoiceRecordEstadoBadgeVariant(record.estado))}>
+          {invoiceRecordEstadoLabel(record.estado)}
+        </span>
+      </div>
+
+      <dl className="mt-6 grid gap-4 rounded-xl border border-outline-soft bg-surface p-5 text-sm sm:grid-cols-2">
         <div>
-          <dt className="text-fg-muted">NIF emisor</dt>
-          <dd className="font-medium">{record.nifEmisor}</dd>
+          <dt className="text-fg-muted">Número</dt>
+          <dd className="mt-0.5 font-medium font-mono">{record.numSerie}</dd>
         </div>
         <div>
-          <dt className="text-fg-muted">Serie</dt>
-          <dd>{record.serie}</dd>
-        </div>
-        <div>
-          <dt className="text-fg-muted">Fecha expedición</dt>
-          <dd>{record.fecha}</dd>
-        </div>
-        <div>
-          <dt className="text-fg-muted">CSV AEAT</dt>
-          <dd className="font-mono text-xs">{record.csv ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-fg-muted">Nº instalación</dt>
-          <dd className="font-mono text-xs">{record.numeroInstalacion ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-fg-muted">Fecha/hora registro</dt>
-          <dd className="font-mono text-xs">{record.fechaHoraHusoGenRegistro ?? "—"}</dd>
+          <dt className="text-fg-muted">Fecha de la factura</dt>
+          <dd className="mt-0.5">{record.fecha}</dd>
         </div>
         <div className="sm:col-span-2">
-          <dt className="text-fg-muted">Huella</dt>
-          <dd className="break-all font-mono text-xs">{record.huella}</dd>
+          <dt className="text-fg-muted">Código CSV (verificación AEAT)</dt>
+          <dd className="mt-0.5 font-mono text-sm">{record.csv ?? "—"}</dd>
+          {record.csv ? (
+            <p className="mt-1 text-xs text-fg-subtle">
+              Es el mismo código que aparece en el PDF de la factura y sirve para comprobar el
+              registro en la sede de la AEAT.
+            </p>
+          ) : null}
         </div>
-        {record.huellaAnterior ? (
-          <div className="sm:col-span-2">
-            <dt className="text-fg-muted">Huella anterior</dt>
-            <dd className="break-all font-mono text-xs">{record.huellaAnterior}</dd>
-          </div>
-        ) : null}
       </dl>
 
-      {record.payload ? (
-        <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
-            Payload enviado
-          </h2>
-          <pre className="max-h-96 overflow-auto rounded border border-outline-soft bg-surface-muted p-3 text-xs">
-            {JSON.stringify(record.payload, null, 2)}
-          </pre>
-        </section>
-      ) : null}
-
-      {record.aeatResponse ? (
-        <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
-            Respuesta AEAT
-          </h2>
-          <pre className="max-h-96 overflow-auto rounded border border-outline-soft bg-surface-muted p-3 text-xs">
-            {JSON.stringify(record.aeatResponse, null, 2)}
-          </pre>
-        </section>
-      ) : null}
+      <p className="mt-6 text-xs text-fg-subtle">
+        Este histórico es una copia de lo que Hacienda ha aceptado. No se puede modificar desde
+        aquí; si necesitas corregir algo, emite una factura rectificativa o anula el registro desde
+        la factura original.
+      </p>
     </div>
   );
 }

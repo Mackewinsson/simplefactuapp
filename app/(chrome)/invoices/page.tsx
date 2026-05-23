@@ -183,8 +183,9 @@ export default async function InvoicesPage({
           <Link
             href="/invoices/records"
             className="w-full rounded-lg border border-outline bg-surface px-4 py-2.5 text-center text-sm font-semibold text-fg-muted hover:bg-surface-hover hover:-translate-y-[0.5px] transition-all shadow-sm sm:w-auto"
+            title="Facturas aceptadas por Hacienda"
           >
-            Registro AEAT
+            Histórico Hacienda
           </Link>
           <Link
             href="/invoices/new"

@@ -3,6 +3,12 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { fetchInvoiceRecords } from "@/lib/simplefactu/invoice-records";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import {
+  invoiceRecordEstadoBadgeVariant,
+  invoiceRecordEstadoLabel,
+  invoiceRecordTipoBadgeVariant,
+  invoiceRecordTipoLabel,
+} from "@/lib/simplefactu/invoice-record-labels";
 import { statusBadgeClass } from "@/lib/ui/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -100,10 +106,10 @@ export default async function InvoiceRecordsPage({
           <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg transition-colors">
             ← Facturas
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-fg tracking-tight">Registro AEAT (ledger)</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-fg tracking-tight">Histórico en Hacienda</h1>
           <p className="mt-1 max-w-2xl text-sm text-fg-muted">
-            Facturas y anulaciones aceptadas por la AEAT (Correcto o ParcialmenteCorrecto). Es el histórico
-            inmutable del SIF — no se puede editar ni borrar desde aquí.
+            Facturas y anulaciones que Hacienda ha aceptado. Puedes consultarlas aquí o exportarlas
+            en CSV para tu gestoría. Es solo consulta: no se puede editar ni borrar.
           </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row items-center">
@@ -140,15 +146,15 @@ export default async function InvoiceRecordsPage({
           />
         </label>
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-subtle font-bold text-xs uppercase tracking-wider">Tipo</span>
+          <span className="text-fg-subtle font-bold text-xs uppercase tracking-wider">Operación</span>
           <select
             name="tipo"
             defaultValue={tipo ?? ""}
             className="input mt-1.5 block w-full rounded-xl border-outline-soft/80 py-2 px-3 focus:border-accent-outline focus:ring-2 focus:ring-accent-outline/20 transition-all font-sans font-medium text-fg shadow-sm bg-surface/50 sm:w-36 text-xs"
           >
-            <option value="">Todos</option>
-            <option value="ALTA">Alta</option>
-            <option value="ANULACION">Anulación</option>
+            <option value="">Todas</option>
+            <option value="ALTA">Facturas</option>
+            <option value="ANULACION">Anulaciones</option>
           </select>
         </label>
         <label className="block w-full sm:w-auto">
@@ -195,14 +201,15 @@ export default async function InvoiceRecordsPage({
 
       {!loadError && data && data.rows.length === 0 ? (
         <p className="text-sm text-fg-muted">
-          No hay registros AEAT con estos filtros. Aparecen cuando una factura se acepta en Verifactu.
+          Aún no hay facturas registradas en Hacienda con estos filtros. Aparecerán aquí cuando
+          envíes una factura a Verifactu y Hacienda la acepte.
         </p>
       ) : null}
 
       {!loadError && data && data.rows.length > 0 ? (
         <>
           <p className="mb-2 text-xs text-fg-subtle font-semibold">
-            {total} registro{total === 1 ? "" : "s"} · página {page} de {totalPages}
+            {total} factura{total === 1 ? "" : "s"} · página {page} de {totalPages}
           </p>
           <div className="overflow-x-auto rounded-2xl border border-outline-soft/80 bg-surface/50 backdrop-blur-md shadow-sm overflow-hidden">
             <table className="w-full min-w-[720px] text-left text-sm font-sans">
@@ -210,10 +217,10 @@ export default async function InvoiceRecordsPage({
                 <tr>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Número</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Fecha</th>
-                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tipo</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Operación</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Estado</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">CSV</th>
-                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Registrado</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Enviado</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-soft/40 font-medium">
@@ -244,11 +251,9 @@ export default async function InvoiceRecordsPage({
                         className="block -mx-5 px-5 -my-4 py-4"
                       >
                         <span
-                          className={statusBadgeClass(
-                            r.tipo === "ANULACION" ? "warning" : "success"
-                          )}
+                          className={statusBadgeClass(invoiceRecordTipoBadgeVariant(r.tipo))}
                         >
-                          {r.tipo}
+                          {invoiceRecordTipoLabel(r.tipo)}
                         </span>
                       </Link>
                     </td>
@@ -258,11 +263,9 @@ export default async function InvoiceRecordsPage({
                         className="block -mx-5 px-5 -my-4 py-4"
                       >
                         <span
-                          className={statusBadgeClass(
-                            r.estado === "Correcto" ? "success" : "warning"
-                          )}
+                          className={statusBadgeClass(invoiceRecordEstadoBadgeVariant(r.estado))}
                         >
-                          {r.estado}
+                          {invoiceRecordEstadoLabel(r.estado)}
                         </span>
                       </Link>
                     </td>
