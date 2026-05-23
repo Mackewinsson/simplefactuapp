@@ -57,7 +57,7 @@ export function ResponsiveAppNav({ links }: Props) {
 
       <button
         type="button"
-        className="inline-flex items-center rounded-lg border border-outline bg-surface px-3 py-1.5 text-sm font-bold text-fg-muted hover:bg-surface-muted transition-all shadow-sm font-display"
+        className="inline-flex items-center rounded-lg border border-outline bg-surface px-3 py-1.5 text-sm font-bold text-fg-muted hover:bg-surface-muted transition-all shadow-sm font-display lg:hidden"
         aria-expanded={isOpen}
         aria-controls="mobile-app-nav"
         onClick={() => setIsOpen((prev) => !prev)}
