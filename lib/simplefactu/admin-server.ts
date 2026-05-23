@@ -522,6 +522,64 @@ export type AdminEventsResponse = {
   pagination?: { total: number; limit: number; offset: number };
 };
 
+type AdminEventsApiRow = {
+  id: string;
+  tenantId?: string | null;
+  tenant_id?: string | null;
+  eventType?: string;
+  event_type?: string;
+  severity: string;
+  payload?: unknown;
+  payload_json?: string | null;
+  prevHuella?: string | null;
+  prev_huella?: string | null;
+  huella: string;
+  createdAt?: string;
+  created_at?: string;
+};
+
+type AdminEventsApiResponse = {
+  success: boolean;
+  events?: AdminEventsApiRow[];
+  rows?: AdminEventsApiRow[];
+  pagination?: { total: number; limit: number; offset: number };
+  total?: number;
+  limit?: number;
+  offset?: number;
+};
+
+function normalizeAdminEvent(row: AdminEventsApiRow): AdminEvent {
+  const payload =
+    row.payload_json ??
+    (row.payload != null ? JSON.stringify(row.payload) : null);
+
+  return {
+    id: row.id,
+    tenant_id: row.tenant_id ?? row.tenantId ?? null,
+    event_type: row.event_type ?? row.eventType ?? "",
+    severity: row.severity,
+    payload_json: payload,
+    prev_huella: row.prev_huella ?? row.prevHuella ?? null,
+    huella: row.huella,
+    created_at: row.created_at ?? row.createdAt ?? "",
+  };
+}
+
+function normalizeAdminEventsResponse(body: AdminEventsApiResponse): AdminEventsResponse {
+  const rawRows = body.events ?? body.rows ?? [];
+  const pagination =
+    body.pagination ??
+    (body.total != null
+      ? { total: body.total, limit: body.limit ?? rawRows.length, offset: body.offset ?? 0 }
+      : undefined);
+
+  return {
+    success: body.success,
+    events: rawRows.map(normalizeAdminEvent),
+    pagination,
+  };
+}
+
 export async function getAdminEvents(params: {
   tenantId?: string;
   type?: string;
@@ -535,7 +593,8 @@ export async function getAdminEvents(params: {
   if (params.type) q.set("type", params.type);
   if (params.from) q.set("from", params.from);
   if (params.to) q.set("to", params.to);
-  return adminJson<AdminEventsResponse>(`/admin/events?${q}`, { method: "GET" });
+  const body = await adminJson<AdminEventsApiResponse>(`/admin/events?${q}`, { method: "GET" });
+  return normalizeAdminEventsResponse(body);
 }
 
 export type EventsChainVerifyResponse = {
