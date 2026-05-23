@@ -5,9 +5,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   await requireAdmin();
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg border border-warning-outline bg-warning px-4 py-2 text-sm text-warning-deeper">
-        Panel de administración: solo personal autorizado. Las acciones afectan a simplefactu y a los tenants.
+    <div className="space-y-8 animate-fade-in-up">
+      <div className="rounded-xl border border-warning-outline/65 bg-warning/60 px-4 py-3 text-sm text-warning-deeper font-display font-semibold shadow-sm flex items-center gap-2.5">
+        <span className="h-2 w-2 rounded-full bg-warning-strong shrink-0 animate-pulse" />
+        <span>Área Restringida: Solo personal operador autorizado. Las operaciones modifican el estado global del API y tenants.</span>
       </div>
       <AdminNav />
       {children}

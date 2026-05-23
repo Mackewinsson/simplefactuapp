@@ -20,18 +20,18 @@ export function AdminNav() {
   const getLinkClass = (href: string, exact = false) => {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
     return active
-      ? "text-sm font-semibold text-fg border-b-2 border-primary pb-3 -mb-[13px] relative z-10 transition-all"
-      : "text-sm text-fg-muted hover:text-fg hover:underline transition-all";
+      ? "rounded-lg border border-outline-soft bg-surface px-3 py-1.5 text-xs font-bold text-fg shadow-sm font-display transition-all"
+      : "rounded-lg px-3 py-1.5 text-xs font-semibold text-fg-muted hover:text-fg hover:bg-surface-muted/50 transition-all font-display";
   };
 
   return (
-    <nav className="flex flex-wrap gap-x-6 gap-y-2 border-b border-outline-soft pb-3 items-center">
+    <nav className="flex flex-wrap gap-2 border-b border-outline-soft/65 pb-4 items-center">
       {links.map((link) => (
         <Link key={link.href} href={link.href} className={getLinkClass(link.href, link.exact)}>
           {link.label}
         </Link>
       ))}
-      <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg hover:underline transition-all ml-auto">
+      <Link href="/invoices" className="rounded-lg border border-accent/20 bg-accent-muted/40 px-3 py-1.5 text-xs font-bold text-accent hover:bg-accent-muted transition-all font-display ml-auto">
         Volver a la app
       </Link>
     </nav>

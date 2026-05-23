@@ -21,41 +21,41 @@ export function AdminOpsAlerts({ diag, ready }: Props) {
   const origin = getSimplefactuApiOrigin();
 
   return (
-    <section className="rounded-lg border border-outline-soft bg-surface p-4 shadow-sm sm:col-span-2">
-      <h2 className="mb-2 text-sm font-semibold text-fg-muted">Operaciones y alertas</h2>
-      <dl className="grid gap-3 text-sm sm:grid-cols-2">
-        <div>
-          <dt className="text-fg-subtle">Sonda GET /ready</dt>
-          <dd className="mt-0.5">
+    <section className="panel-premium rounded-2xl p-6 sm:col-span-2">
+      <h2 className="mb-4 text-base font-bold text-fg font-display tracking-tight border-b border-outline-soft/60 pb-2">Operaciones y Alertas</h2>
+      <dl className="grid gap-4 text-sm sm:grid-cols-2 font-display">
+        <div className="border-b border-outline-soft/30 pb-2">
+          <dt className="text-fg-subtle font-semibold">Sonda GET /ready</dt>
+          <dd className="mt-1 flex items-center gap-2">
             {boolLabel(ready.ok)}{" "}
-            <span className="text-fg-muted">
+            <span className="text-xs text-fg-muted font-mono bg-surface-muted px-1.5 py-0.5 rounded border border-outline-soft/40">
               (HTTP {ready.status || "—"})
             </span>
             <a
               href={`${origin}/ready`}
               target="_blank"
               rel="noreferrer"
-              className="ml-2 text-xs text-accent hover:underline"
+              className="rounded bg-accent-muted px-2 py-0.5 text-[11px] font-bold text-accent hover:bg-accent-muted-hover transition-colors"
             >
-              Abrir ↗
+              Probar ↗
             </a>
           </dd>
           {!ready.ok && ready.errors?.length ? (
-            <ul className="mt-1 list-inside list-disc text-xs text-danger-foreground">
+            <ul className="mt-2 list-inside list-disc text-xs text-danger-foreground font-semibold bg-danger/40 p-2 rounded-lg border border-danger-outline/40">
               {ready.errors.map((e) => (
                 <li key={e}>{e}</li>
               ))}
             </ul>
           ) : null}
         </div>
-        <div>
-          <dt className="text-fg-subtle">Jobs DEAD (requieren revisión)</dt>
+        <div className="border-b border-outline-soft/30 pb-2">
+          <dt className="text-fg-subtle font-semibold">Jobs DEAD (requieren revisión)</dt>
           <dd
-            className={`mt-0.5 font-medium ${deadCount > 0 ? "text-danger-foreground" : "text-fg-muted"}`}
+            className={`mt-1 font-bold ${deadCount > 0 ? "text-danger-foreground" : "text-fg-muted"}`}
           >
             {deadCount}
             {deadCount > 0 ? (
-              <span className="ml-2 font-normal text-fg-muted">
+              <span className="ml-2 font-semibold">
                 —{" "}
                 <Link href="/admin/jobs?status=DEAD" className="text-accent hover:underline">
                   Ver en jobs
@@ -64,26 +64,31 @@ export function AdminOpsAlerts({ diag, ready }: Props) {
             ) : null}
           </dd>
         </div>
-        <div>
-          <dt className="text-fg-subtle">EMAILS_ENABLED (usuarios)</dt>
-          <dd className="mt-0.5">{boolLabel(Boolean(alerts?.emailsEnabled))}</dd>
+        <div className="border-b border-outline-soft/30 pb-2 sm:border-0 sm:pb-0">
+          <dt className="text-fg-subtle font-semibold">EMAILS_ENABLED (usuarios)</dt>
+          <dd className="mt-1 font-semibold">{boolLabel(Boolean(alerts?.emailsEnabled))}</dd>
         </div>
-        <div>
-          <dt className="text-fg-subtle">RESEND_API_KEY</dt>
-          <dd className="mt-0.5">{boolLabel(Boolean(alerts?.resendConfigured))}</dd>
+        <div className="border-b border-outline-soft/30 pb-2 sm:border-0 sm:pb-0">
+          <dt className="text-fg-subtle font-semibold">RESEND_API_KEY</dt>
+          <dd className="mt-1 font-semibold">{boolLabel(Boolean(alerts?.resendConfigured))}</dd>
         </div>
-        <div className="sm:col-span-2">
-          <dt className="text-fg-subtle">Alertas operador (DEAD_JOB_NOTIFY_*)</dt>
-          <dd className="mt-0.5 text-fg-muted">
-            Slack: {boolLabel(Boolean(alerts?.deadJobNotify?.slack))} · Discord:{" "}
-            {boolLabel(Boolean(alerts?.deadJobNotify?.discord))} · Email:{" "}
-            {boolLabel(Boolean(alerts?.deadJobNotify?.email))}
+        <div className="sm:col-span-2 pt-2">
+          <dt className="text-fg-subtle font-semibold">Alertas operador (DEAD_JOB_NOTIFY_*)</dt>
+          <dd className="mt-1.5 text-fg-muted font-semibold flex flex-wrap gap-2 text-xs">
+            <span className="rounded-lg border border-outline-soft bg-surface-muted/40 px-2 py-1 flex items-center gap-1.5">
+              Slack: {boolLabel(Boolean(alerts?.deadJobNotify?.slack))}
+            </span>
+            <span className="rounded-lg border border-outline-soft bg-surface-muted/40 px-2 py-1 flex items-center gap-1.5">
+              Discord: {boolLabel(Boolean(alerts?.deadJobNotify?.discord))}
+            </span>
+            <span className="rounded-lg border border-outline-soft bg-surface-muted/40 px-2 py-1 flex items-center gap-1.5">
+              Email: {boolLabel(Boolean(alerts?.deadJobNotify?.email))}
+            </span>
             {!alerts?.anyDeadJobNotify ? (
-              <p className="mt-2 text-xs text-warning-deep">
-                Sin canal configurado en el VPS: los jobs DEAD solo aparecen en logs. Ver{" "}
-                <code className="rounded bg-surface-muted px-1">docs/RUNBOOK.md</code> en el repo API
-                (Upptime + Resend).
-              </p>
+              <div className="mt-3 w-full rounded-xl border border-warning-outline bg-warning/50 p-3 text-xs text-warning-deep leading-relaxed">
+                <p className="font-bold">Aviso del Sistema</p>
+                <p className="mt-0.5 font-medium">Sin canal configurado en el VPS: los jobs DEAD solo aparecerán en logs. Consulta la documentación para configurar Upptime o Resend.</p>
+              </div>
             ) : null}
           </dd>
         </div>
