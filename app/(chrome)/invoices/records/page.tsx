@@ -100,27 +100,27 @@ export default async function InvoiceRecordsPage({
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg">
+          <Link href="/invoices" className="text-sm text-fg-muted hover:text-fg transition-colors">
             ← Facturas
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold">Registro AEAT (ledger)</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-fg tracking-tight">Registro AEAT (ledger)</h1>
           <p className="mt-1 max-w-2xl text-sm text-fg-muted">
-            Facturas y anulaciones aceptadas por AEAT (Correcto o ParcialmenteCorrecto). Es el histórico
+            Facturas y anulaciones aceptadas por la AEAT (Correcto o ParcialmenteCorrecto). Es el histórico
             inmutable del SIF — no se puede editar ni borrar desde aquí.
           </p>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row items-center">
           {!loadError && data && data.total > 0 ? (
             <a
               href={buildExportHref({ from, to, serie, tipo })}
-              className="rounded border border-outline px-4 py-2 text-center text-sm font-medium text-fg hover:bg-surface-hover"
+              className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all text-center w-full sm:w-auto"
             >
               Exportar CSV
             </a>
           ) : null}
           <Link
             href="/invoices/new"
-            className="rounded bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+            className="btn btn-sm btn-accent rounded-xl px-4 py-2 font-bold shadow-md shadow-accent/15 hover:shadow-lg hover:shadow-accent/25 hover:-translate-y-[0.5px] transition-all text-xs text-center w-full sm:w-auto"
           >
             Nueva factura
           </Link>
@@ -129,25 +129,25 @@ export default async function InvoiceRecordsPage({
 
       <form
         method="get"
-        className="mb-4 flex flex-wrap items-end gap-3 rounded border border-outline-soft bg-surface p-3 text-sm"
+        className="mb-6 flex flex-wrap items-end gap-4 rounded-2xl border border-outline-soft/80 bg-surface/50 backdrop-blur-md p-5 text-sm shadow-sm"
       >
         <input type="hidden" name="page" value="1" />
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Serie</span>
+          <span className="text-fg-subtle font-bold text-xs uppercase tracking-wider">Serie</span>
           <input
             name="serie"
             type="text"
             defaultValue={serie ?? ""}
             placeholder="2026"
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-24"
+            className="input mt-1.5 block w-full rounded-xl border-outline-soft/80 py-2 px-3 focus:border-accent-outline focus:ring-2 focus:ring-accent-outline/20 transition-all font-sans font-medium text-fg shadow-sm bg-surface/50 sm:w-28 text-xs"
           />
         </label>
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Tipo</span>
+          <span className="text-fg-subtle font-bold text-xs uppercase tracking-wider">Tipo</span>
           <select
             name="tipo"
             defaultValue={tipo ?? ""}
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm sm:w-36"
+            className="input mt-1.5 block w-full rounded-xl border-outline-soft/80 py-2 px-3 focus:border-accent-outline focus:ring-2 focus:ring-accent-outline/20 transition-all font-sans font-medium text-fg shadow-sm bg-surface/50 sm:w-36 text-xs"
           >
             <option value="">Todos</option>
             <option value="ALTA">Alta</option>
@@ -155,34 +155,34 @@ export default async function InvoiceRecordsPage({
           </select>
         </label>
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Desde</span>
+          <span className="text-fg-subtle font-bold text-xs uppercase tracking-wider">Desde</span>
           <input
             name="from"
             type="date"
             defaultValue={from ?? ""}
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm"
+            className="input mt-1.5 block w-full rounded-xl border-outline-soft/80 py-2 px-3 focus:border-accent-outline focus:ring-2 focus:ring-accent-outline/20 transition-all font-sans font-medium text-fg shadow-sm bg-surface/50 text-xs"
           />
         </label>
         <label className="block w-full sm:w-auto">
-          <span className="text-fg-muted">Hasta</span>
+          <span className="text-fg-subtle font-bold text-xs uppercase tracking-wider">Hasta</span>
           <input
             name="to"
             type="date"
             defaultValue={to ?? ""}
-            className="mt-1 block w-full rounded border border-outline px-2 py-1 text-sm"
+            className="input mt-1.5 block w-full rounded-xl border-outline-soft/80 py-2 px-3 focus:border-accent-outline focus:ring-2 focus:ring-accent-outline/20 transition-all font-sans font-medium text-fg shadow-sm bg-surface/50 text-xs"
           />
         </label>
         <div className="flex gap-2">
           <button
             type="submit"
-            className="rounded bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary-hover"
+            className="btn btn-sm btn-primary rounded-xl px-4 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] transition-all text-xs"
           >
             Filtrar
           </button>
           {hasFilters ? (
             <Link
               href="/invoices/records"
-              className="rounded border border-outline px-3 py-1.5 text-sm text-fg-muted hover:bg-surface-hover"
+              className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2.5 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
             >
               Limpiar
             </Link>
@@ -191,58 +191,100 @@ export default async function InvoiceRecordsPage({
       </form>
 
       {loadError ? (
-        <div className="rounded border border-danger-outline bg-danger p-4 text-sm text-danger-foreground">
+        <div className="rounded-xl border border-danger-outline bg-danger p-4 text-sm text-danger-foreground">
           {loadError}
         </div>
       ) : null}
 
       {!loadError && data && data.rows.length === 0 ? (
         <p className="text-sm text-fg-muted">
-          No hay registros AEAT con estos filtros. Los aparecen cuando una factura se acepta en Verifactu.
+          No hay registros AEAT con estos filtros. Aparecen cuando una factura se acepta en Verifactu.
         </p>
       ) : null}
 
       {!loadError && data && data.rows.length > 0 ? (
         <>
-          <p className="mb-2 text-xs text-fg-subtle">
+          <p className="mb-2 text-xs text-fg-subtle font-semibold">
             {total} registro{total === 1 ? "" : "s"} · página {page} de {totalPages}
           </p>
-          <div className="overflow-x-auto rounded border border-outline-soft bg-surface">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-outline-soft bg-surface-hover">
-                  <th className="px-3 py-2 font-medium">Número</th>
-                  <th className="px-3 py-2 font-medium">Fecha</th>
-                  <th className="px-3 py-2 font-medium">Tipo</th>
-                  <th className="px-3 py-2 font-medium">Estado</th>
-                  <th className="px-3 py-2 font-medium">CSV</th>
-                  <th className="px-3 py-2 font-medium">Registrado</th>
-                  <th className="px-3 py-2 w-20"></th>
+          <div className="overflow-x-auto rounded-2xl border border-outline-soft/80 bg-surface/50 backdrop-blur-md shadow-sm overflow-hidden">
+            <table className="w-full min-w-[720px] text-left text-sm font-sans">
+              <thead className="border-b border-outline-soft/80 bg-surface-muted/65 text-fg-subtle">
+                <tr>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Número</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Fecha</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tipo</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Estado</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">CSV</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Registrado</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-outline-soft/40 font-medium">
                 {data.rows.map((r) => (
-                  <tr key={r.id} className="border-b border-outline-soft last:border-0">
-                    <td className="px-3 py-2 font-medium text-fg">{r.numSerie}</td>
-                    <td className="px-3 py-2 text-fg-muted">{r.fecha}</td>
-                    <td className="px-3 py-2">
-                      <span
-                        className={`inline-block ${tipoBadge(r.tipo)}`}
-                      >
-                        {r.tipo}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-fg-muted">{r.estado}</td>
-                    <td className="px-3 py-2 font-mono text-xs text-fg-muted">{r.csv ?? "—"}</td>
-                    <td className="px-3 py-2 text-fg-muted">
-                      {dateFormat.format(new Date(r.createdAt))}
-                    </td>
-                    <td className="px-3 py-2">
+                  <tr
+                    key={r.id}
+                    className="group hover:bg-surface-hover/80 transition-colors duration-200 cursor-pointer"
+                  >
+                    <td className="px-5 py-4">
                       <Link
                         href={`/invoices/records/${r.id}`}
-                        className="text-accent hover:underline"
+                        className="font-bold text-accent hover:underline block -mx-5 px-5 -my-4 py-4 font-mono text-[13px]"
                       >
-                        Ver
+                        {r.numSerie}
+                      </Link>
+                    </td>
+                    <td className="px-5 py-4 text-fg-muted font-sans text-xs">
+                      <Link
+                        href={`/invoices/records/${r.id}`}
+                        className="block -mx-5 px-5 -my-4 py-4"
+                      >
+                        {r.fecha}
+                      </Link>
+                    </td>
+                    <td className="px-5 py-4">
+                      <Link
+                        href={`/invoices/records/${r.id}`}
+                        className="block -mx-5 px-5 -my-4 py-4"
+                      >
+                        <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${
+                          r.tipo === "ANULACION"
+                            ? "text-warning bg-warning/10 border border-warning-outline/25"
+                            : "text-success bg-success/10 border border-success-outline/25"
+                        }`}>
+                          {r.tipo}
+                        </span>
+                      </Link>
+                    </td>
+                    <td className="px-5 py-4">
+                      <Link
+                        href={`/invoices/records/${r.id}`}
+                        className="block -mx-5 px-5 -my-4 py-4"
+                      >
+                        <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${
+                          r.estado === "Correcto"
+                            ? "text-success bg-success/10 border border-success-outline/25"
+                            : "text-warning bg-warning/10 border border-warning-outline/25"
+                        }`}>
+                          {r.estado}
+                        </span>
+                      </Link>
+                    </td>
+                    <td className="px-5 py-4">
+                      <Link
+                        href={`/invoices/records/${r.id}`}
+                        className="block -mx-5 px-5 -my-4 py-4 font-mono text-[12px] text-fg-subtle"
+                      >
+                        <span className="font-mono text-[11px] font-medium text-fg-muted bg-surface-muted/80 px-2 py-0.5 rounded border border-outline-soft/40">
+                          {r.csv ?? "—"}
+                        </span>
+                      </Link>
+                    </td>
+                    <td className="px-5 py-4 text-fg-muted font-sans text-xs">
+                      <Link
+                        href={`/invoices/records/${r.id}`}
+                        className="block -mx-5 px-5 -my-4 py-4"
+                      >
+                        {dateFormat.format(new Date(r.createdAt))}
                       </Link>
                     </td>
                   </tr>

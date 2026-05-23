@@ -150,7 +150,11 @@ export function CustomerList({ customers }: Props) {
       {/* Mobile Card Layout */}
       <div className="space-y-3.5 md:hidden">
         {customers.map((c) => (
-          <article key={c.id} className="panel-premium rounded-2xl p-5 border border-outline-soft/80 bg-surface/50 backdrop-blur-sm">
+          <article
+            key={c.id}
+            onClick={() => startEdit(c)}
+            className="panel-premium rounded-2xl p-5 border border-outline-soft/80 bg-surface/50 backdrop-blur-sm cursor-pointer hover:bg-surface-hover/50 hover:border-outline transition-all duration-200"
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-extrabold text-fg text-base tracking-tight">{c.name}</p>
@@ -176,10 +180,13 @@ export function CustomerList({ customers }: Props) {
               </div>
             )}
             
-            <div className="mt-4 pt-3.5 border-t border-outline-soft/40 flex justify-end gap-2">
+            <div className="mt-4 pt-3.5 border-t border-outline-soft/40 flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
-                onClick={() => startEdit(c)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  startEdit(c);
+                }}
                 disabled={pending}
                 className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
               >
@@ -187,7 +194,10 @@ export function CustomerList({ customers }: Props) {
               </button>
               <button
                 type="button"
-                onClick={() => onDelete(c.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(c.id);
+                }}
                 disabled={pending}
                 className="btn btn-sm btn-danger rounded-xl font-bold px-4 py-2 text-xs shadow-sm transition-all"
               >
@@ -212,7 +222,11 @@ export function CustomerList({ customers }: Props) {
           </thead>
           <tbody>
             {customers.map((c) => (
-              <tr key={c.id} className="border-b border-outline-soft/50 last:border-0 hover:bg-surface/65 transition-colors font-medium">
+              <tr
+                key={c.id}
+                onClick={() => startEdit(c)}
+                className="border-b border-outline-soft/50 last:border-0 hover:bg-surface-hover/80 transition-colors font-medium cursor-pointer"
+              >
                 <td className="px-4 py-3.5 text-fg font-extrabold font-display">{c.name}</td>
                 <td className="px-4 py-3.5">
                   <code className="text-xs font-bold text-fg-subtle bg-surface-muted/80 px-2 py-0.5 rounded border border-outline-soft/40 font-mono">
@@ -229,11 +243,14 @@ export function CustomerList({ customers }: Props) {
                     {c.tipoPersona === "J" ? "Jurídica" : c.tipoPersona === "F" ? "Física" : "—"}
                   </span>
                 </td>
-                <td className="px-4 py-3.5 text-right">
+                <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                   <div className="inline-flex gap-1.5">
                     <button
                       type="button"
-                      onClick={() => startEdit(c)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEdit(c);
+                      }}
                       disabled={pending}
                       className="btn btn-sm btn-secondary rounded-xl font-bold px-3 py-1.5 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
                     >
@@ -241,7 +258,10 @@ export function CustomerList({ customers }: Props) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => onDelete(c.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(c.id);
+                      }}
                       disabled={pending}
                       className="btn btn-sm btn-danger rounded-xl font-bold px-3 py-1.5 text-xs shadow-sm transition-all"
                     >
