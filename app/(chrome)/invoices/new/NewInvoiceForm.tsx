@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState, useRef, useEffect, useTransition, useCallback, useMemo } from "react";
 import { useFormStatus } from "react-dom";
+import { SubmitButton } from "@/app/components/SubmitButton";
 import { createInvoiceAction } from "./actions";
 import type {
   CreateInvoiceState,
@@ -355,11 +356,16 @@ export function NewInvoiceForm({
                 <button
                   type="button"
                   onClick={() => setShowSeriesModal(true)}
-                  className="rounded border border-outline bg-surface px-3 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
+                  className="btn btn-secondary"
                 >
                   Cambiar
                 </button>
               </div>
+              {!serie && (
+                <p className="mt-1 text-xs text-fg-subtle">
+                  Pulsa «Cambiar» para crear tu primera serie (p. ej. <code className="rounded bg-surface-muted px-1 py-0.5 text-[11px]">2026</code>).
+                </p>
+              )}
               {isNewSeries ? (
                 <p className="mt-1 text-xs text-warning-muted">
                   Nueva serie — iniciará una cadena AEAT nueva con primerRegistro.
@@ -488,6 +494,33 @@ export function NewInvoiceForm({
               El total supera 3.000 € — no válido para factura simplificada F2.
             </p>
           ) : null}
+        </section>
+
+        {/* ── Emisor ───────────────────────────────────────────────────── */}
+        <section className="rounded border border-outline-soft bg-surface p-6">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
+            Emisor
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Nombre</span>
+              <input
+                type="text"
+                name="createdByFirstName"
+                defaultValue={defaultCreatedByFirstName}
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-fg-muted">Apellidos</span>
+              <input
+                type="text"
+                name="createdByLastName"
+                defaultValue={defaultCreatedByLastName}
+                className="w-full rounded border border-outline px-3 py-2 text-sm"
+              />
+            </label>
+          </div>
         </section>
 
         {/* ── Datos del destinatario ───────────────────────────────────── */}
@@ -649,7 +682,10 @@ export function NewInvoiceForm({
               ) : null}
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-fg-muted">Tipo de persona</span>
+              <span className="mb-1 block text-sm font-medium text-fg-muted">
+                Tipo de persona
+                <span className="ml-1 text-fg-subtle cursor-help" title="J: empresa o autónomo con NIF empresa. F: persona física con DNI/NIE.">(?)</span>
+              </span>
               <select
                 value={customerTipoPersona}
                 onChange={(e) => setCustomerTipoPersona(e.target.value)}
@@ -658,6 +694,9 @@ export function NewInvoiceForm({
                 <option value="J">J – Persona jurídica</option>
                 <option value="F">F – Persona física</option>
               </select>
+              <p className="mt-1 text-xs text-fg-subtle">
+                Jurídica: empresa, sociedad o autónomo con NIF-empresa. Física: persona con DNI o NIE.
+              </p>
             </label>
           </div>
         </section>
@@ -667,33 +706,6 @@ export function NewInvoiceForm({
             no puede superar 3.000 €.
           </p>
         )}
-
-        {/* ── Emisor ───────────────────────────────────────────────────── */}
-        <section className="rounded border border-outline-soft bg-surface p-6">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
-            Emisor
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-fg-muted">Nombre</span>
-              <input
-                type="text"
-                name="createdByFirstName"
-                defaultValue={defaultCreatedByFirstName}
-                className="w-full rounded border border-outline px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-fg-muted">Apellidos</span>
-              <input
-                type="text"
-                name="createdByLastName"
-                defaultValue={defaultCreatedByLastName}
-                className="w-full rounded border border-outline px-3 py-2 text-sm"
-              />
-            </label>
-          </div>
-        </section>
 
         {/* ── Descripción de la operación (opcional, colapsada por defecto) ─ */}
         <section>
@@ -800,7 +812,7 @@ export function NewInvoiceForm({
           />
           <Link
             href="/invoices"
-            className="rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
+            className="btn btn-secondary"
           >
             Cancelar
           </Link>
@@ -843,27 +855,4 @@ export function NewInvoiceForm({
   );
 }
 
-type SubmitButtonProps = {
-  label: string;
-  variant?: "primary" | "secondary" | "cta";
-  onClick?: () => void;
-};
 
-function SubmitButton({ label, variant = "primary", onClick }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
-  const cls = {
-    primary: "bg-primary text-primary-foreground hover:bg-primary-hover",
-    secondary: "border border-outline bg-surface text-fg-muted hover:bg-surface-hover",
-    cta: "bg-accent text-accent-foreground hover:bg-accent-hover",
-  }[variant];
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      onClick={onClick}
-      className={`rounded px-4 py-2 text-sm font-medium disabled:opacity-70 disabled:pointer-events-none ${cls}`}
-    >
-      {pending ? "Guardando…" : label}
-    </button>
-  );
-}

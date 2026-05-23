@@ -36,6 +36,9 @@ export default function GlobalError({
         <button onClick={reset} className="btn btn-md btn-primary">
           Intentar de nuevo
         </button>
+        <Link href="/invoices" className="btn btn-md btn-secondary">
+          Ir a mis facturas
+        </Link>
         <Link href="/" className="btn btn-md btn-secondary">
           Ir al inicio
         </Link>

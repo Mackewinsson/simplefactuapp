@@ -23,6 +23,7 @@ import { IssueCorrectionButton } from "./IssueCorrectionButton";
 type Props = {
   invoiceId: string;
   invoiceNumber: string;
+  pdfHref: string;
   aeatStatus: string;
   aeatEstadoEnvio?: string | null;
   aeatLastError: string | null;
@@ -38,6 +39,7 @@ type Props = {
 export function VerifactuSendPanel({
   invoiceId,
   invoiceNumber,
+  pdfHref,
   aeatStatus,
   aeatEstadoEnvio,
   aeatLastError,
@@ -51,11 +53,15 @@ export function VerifactuSendPanel({
 }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: "ok" | "err" } | null>(null);
   const [polling, setPolling] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [sendConfirmOpen, setSendConfirmOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const autoSendFired = useRef(false);
+
+  const sendConfirmRef = useRef<HTMLDivElement>(null);
+  const cancelConfirmRef = useRef<HTMLDivElement>(null);
 
   const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
 
@@ -77,6 +83,15 @@ export function VerifactuSendPanel({
   const canRefresh = pollActive;
   const canResyncQr =
     aeatStatus === "SUCCEEDED" && !!aeatJobId && !!(aeatCsv?.trim() || aeatQrText?.trim());
+
+  // Copy CSV function
+  function copyCsv() {
+    if (!aeatCsv) return;
+    navigator.clipboard.writeText(aeatCsv).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   // Auto-poll every 3 s while a job is PENDING. Stops when terminal or after
   // 60 attempts (~3 min), at which point the manual button remains as fallback.
@@ -103,7 +118,7 @@ export function VerifactuSendPanel({
         stopped = true;
         clearInterval(id);
         setPolling(false);
-        setMessage(formatVerifactuActionError(e));
+        setMessage({ text: formatVerifactuActionError(e), type: "err" });
       }
       router.refresh();
     }, 3000);
@@ -115,6 +130,69 @@ export function VerifactuSendPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollActive, invoiceId]);
 
+  // Focus trap and Escape key for Send Confirm Modal
+  const sendConfirmTriggerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (sendConfirmOpen) {
+      sendConfirmTriggerRef.current = document.activeElement as HTMLElement;
+    } else {
+      sendConfirmTriggerRef.current?.focus();
+      sendConfirmTriggerRef.current = null;
+    }
+  }, [sendConfirmOpen]);
+
+  useEffect(() => {
+    if (!sendConfirmOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && !pending) setSendConfirmOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sendConfirmOpen, pending]);
+
+  useEffect(() => {
+    if (!sendConfirmOpen) return;
+    const container = sendConfirmRef.current;
+    if (!container) return;
+
+    const focusableElements = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    firstElement?.focus();
+
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    }
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
+  }, [sendConfirmOpen]);
+
+  // Focus trap and Escape key for Cancel Modal
+  const cancelTriggerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (cancelModalOpen) {
+      cancelTriggerRef.current = document.activeElement as HTMLElement;
+    } else {
+      cancelTriggerRef.current?.focus();
+      cancelTriggerRef.current = null;
+    }
+  }, [cancelModalOpen]);
+
   useEffect(() => {
     if (!cancelModalOpen) return;
     function onKey(e: KeyboardEvent) {
@@ -124,10 +202,45 @@ export function VerifactuSendPanel({
     return () => window.removeEventListener("keydown", onKey);
   }, [cancelModalOpen, pending]);
 
+  useEffect(() => {
+    if (!cancelModalOpen) return;
+    const container = cancelConfirmRef.current;
+    if (!container) return;
+
+    const focusableElements = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    firstElement?.focus();
+
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    }
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
+  }, [cancelModalOpen]);
+
   const canCancelAeat =
     aeatStatus === "SUCCEEDED" &&
     aeatCancellationStatus !== "SUCCEEDED" &&
     aeatCancellationStatus !== "PENDING";
+
+  const isRegistered = aeatStatus === "SUCCEEDED" && !!(aeatCsv?.trim());
+  const partialSuccess = aeatEstadoEnvio === "ParcialmenteCorrecto";
 
   function run(
     action: (id: string) => Promise<{ ok: boolean; message: string }>,
@@ -137,9 +250,12 @@ export function VerifactuSendPanel({
     startTransition(async () => {
       try {
         const r = await action(id);
-        setMessage(formatUserFacingError(r.message));
+        setMessage({
+          text: formatUserFacingError(r.message),
+          type: r.ok ? "ok" : "err",
+        });
       } catch (e) {
-        setMessage(formatVerifactuActionError(e));
+        setMessage({ text: formatVerifactuActionError(e), type: "err" });
       }
       router.refresh();
     });
@@ -150,9 +266,12 @@ export function VerifactuSendPanel({
     startTransition(async () => {
       try {
         const r = await cancelInvoiceVerifactuAction(invoiceId);
-        setMessage(formatUserFacingError(r.message));
+        setMessage({
+          text: formatUserFacingError(r.message),
+          type: r.ok ? "ok" : "err",
+        });
       } catch (e) {
-        setMessage(formatVerifactuActionError(e));
+        setMessage({ text: formatVerifactuActionError(e), type: "err" });
       }
       setCancelModalOpen(false);
       router.refresh();
@@ -162,56 +281,84 @@ export function VerifactuSendPanel({
   return (
     <div className="rounded border border-outline-soft bg-surface p-4">
       <h2 className="text-sm font-semibold text-fg">Verifactu (AEAT)</h2>
-      <dl className="mt-2 grid gap-1 text-sm text-fg-muted">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium">Estado del alta:</span>
-          <span
-            className={registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}
-          >
-            {registrationStatusDetailLabel(uiStatus)}
-          </span>
-        </div>
-        {aeatCsv ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-medium">CSV:</span>
-            <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs font-mono">
-              {aeatCsv}
-            </code>
-            {aeatQrText ? (
-              <a
-                href={aeatQrText}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-fg-link hover:underline"
-              >
-                Comprobar en AEAT ↗
-              </a>
-            ) : null}
-          </div>
-        ) : null}
-        {aeatQrDataUrl ? (
-          <div className="mt-3 flex flex-wrap items-start gap-3">
-            {/* QR is mandated by RD 1007/2023 art. 25. The leyenda VERI*FACTU
-                next to it is the consumer-facing trust mark required when
-                the issuer operates under Veri*Factu rules.
-                next/image would offer no optimization here: the source is an
-                inline data: URL already produced server-side. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={aeatQrDataUrl}
-              alt="QR de verificación AEAT (Veri*Factu)"
-              className="h-32 w-32 rounded border border-outline-soft bg-surface p-1"
-              width={128}
-              height={128}
-            />
-            <div className="text-xs text-fg-muted">
-              <p className="font-semibold">Factura verificable en sede AEAT</p>
-              <p className="font-mono tracking-wide text-fg">VERI*FACTU</p>
-              <p className="mt-1 text-fg-subtle">
-                Escanea o haz clic en «Comprobar en AEAT» para validar este
-                registro en la sede electrónica de la Agencia Tributaria.
+
+      {isRegistered ? (
+        <div
+          className={
+            partialSuccess
+              ? "alert-warning mt-3"
+              : "mt-3 rounded-lg border border-success-outline bg-success p-4 text-success-foreground"
+          }
+        >
+          <p className="text-base font-semibold text-fg">
+            {partialSuccess
+              ? "Factura aceptada con advertencias AEAT"
+              : "Factura registrada en AEAT"}
+          </p>
+          <p className={`mt-1 text-sm ${partialSuccess ? "text-warning-deep" : "text-success-emphasis"}`}>
+            La factura <span className="font-mono">{invoiceNumber}</span> está en Verifactu.
+            Guarda el CSV y descarga el PDF con el QR de verificación.
+          </p>
+          <dl className="mt-4 grid gap-3 text-sm">
+            <div>
+              <dt className="font-medium text-fg">Código seguro de verificación (CSV)</dt>
+              <dd className="mt-1 flex flex-wrap items-center gap-2">
+                <code className="rounded bg-surface px-2 py-1 font-mono text-sm text-fg">
+                  {aeatCsv}
+                </code>
+                <button
+                  type="button"
+                  onClick={copyCsv}
+                  className="btn btn-sm btn-secondary"
+                  aria-label="Copiar CSV al portapapeles"
+                >
+                  {copied ? "✓ Copiado" : "Copiar"}
+                </button>
+                {aeatQrText ? (
+                  <a
+                    href={aeatQrText}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-fg-link underline hover:text-fg"
+                  >
+                    Comprobar en AEAT ↗
+                  </a>
+                ) : null}
+              </dd>
+            </div>
+          </dl>
+          {aeatQrDataUrl ? (
+            <div className="mt-4 flex flex-wrap items-start gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={aeatQrDataUrl}
+                alt="QR de verificación AEAT (Veri*Factu)"
+                className="h-28 w-28 rounded border border-outline-soft bg-surface p-1"
+                width={112}
+                height={112}
+              />
+              <p className="max-w-xs text-xs text-fg-muted">
+                Incluye este QR en el PDF que entregues al cliente. La leyenda{" "}
+                <span className="font-mono font-semibold text-fg">VERI*FACTU</span> identifica el
+                registro ante Hacienda.
               </p>
             </div>
+          ) : null}
+          <div className="mt-4">
+            <a href={pdfHref} download className="btn btn-sm btn-cta">
+              Descargar PDF
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      <dl className="mt-3 grid gap-2 text-sm text-fg-muted">
+        {!isRegistered ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium">Estado del alta:</span>
+            <span className={registrationStatusBadgeClass(aeatStatus, aeatEstadoEnvio)}>
+              {registrationStatusDetailLabel(uiStatus)}
+            </span>
           </div>
         ) : null}
         {aeatLastError ? (
@@ -221,18 +368,20 @@ export function VerifactuSendPanel({
           </div>
         ) : null}
         {aeatStatus === "DEAD" ? (
-          <div className="mt-2">
+          <div>
             <IssueCorrectionButton invoiceId={invoiceId} originalNumSerie={invoiceNumber} />
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium">Estado de la anulación:</span>
-          <span
-            className={cancellationStatusBadgeClass(aeatCancellationStatus)}
+        {(isRegistered || aeatCancellationStatus !== "NOT_SENT") && (
+          <div
+            className={`flex flex-wrap items-center gap-2${isRegistered ? " border-t border-outline-soft pt-3" : ""}`}
           >
-            {cancellationStatusDetailLabel(aeatCancellationStatus)}
-          </span>
-        </div>
+            <span className="font-medium">Estado de la anulación:</span>
+            <span className={cancellationStatusBadgeClass(aeatCancellationStatus)}>
+              {cancellationStatusDetailLabel(aeatCancellationStatus)}
+            </span>
+          </div>
+        )}
         {aeatCancellationLastError ? (
           <div className="text-danger-foreground">
             <span className="font-medium">Error de anulación:</span>{" "}
@@ -241,14 +390,17 @@ export function VerifactuSendPanel({
         ) : null}
       </dl>
       {message ? (
-        <p className="mt-2 text-sm text-fg" role="status">
-          {message}
+        <p
+          className={`mt-2 text-sm ${message.type === "ok" ? "text-success-foreground" : "text-danger-foreground"}`}
+          role="status"
+        >
+          {message.text}
         </p>
       ) : null}
       {polling ? (
         <p className="mt-2 flex items-center gap-1.5 text-sm text-warning-muted">
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-warning-pulse" />
-          Actualizando automáticamente…
+          Actualizando automáticamente… <span className="text-xs text-fg-subtle">(suele tardar menos de 30 segundos)</span>
         </p>
       ) : canRefresh ? (
         <p className="mt-2 text-sm text-warning-deep">
@@ -312,10 +464,11 @@ export function VerifactuSendPanel({
           }}
         >
           <div
+            ref={sendConfirmRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-send-title"
-            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl animate-[modal-enter_150ms_ease-out]"
           >
             <h3 id="verifactu-send-title" className="text-base font-semibold text-fg">
               {isRetry ? "¿Reintentar el envío a Verifactu?" : "¿Enviar a Verifactu?"}
@@ -359,10 +512,11 @@ export function VerifactuSendPanel({
           }}
         >
           <div
+            ref={cancelConfirmRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="verifactu-cancel-title"
-            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl"
+            className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl animate-[modal-enter_150ms_ease-out]"
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <h3 id="verifactu-cancel-title" className="text-base font-semibold text-fg">

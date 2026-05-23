@@ -10,17 +10,17 @@ import type { DocPage } from "@/lib/docs/source";
  */
 export function DocBody({ page }: { page: DocPage }) {
   return (
-    <>
-      <header className="not-prose mb-6">
-        <h1 className="text-2xl font-semibold text-fg">{page.frontmatter.title}</h1>
+    <div className="font-display">
+      <header className="not-prose mb-6 pb-6 border-b border-outline-soft/65">
+        <h1 className="text-3xl font-black tracking-tight text-fg">{page.frontmatter.title}</h1>
         {page.frontmatter.description ? (
-          <p className="mt-1 text-sm text-fg-muted">{page.frontmatter.description}</p>
+          <p className="mt-2 text-sm text-fg-muted leading-relaxed font-sans font-medium">{page.frontmatter.description}</p>
         ) : null}
       </header>
       <div
-        className="prose prose-sm max-w-none prose-headings:scroll-mt-24 prose-a:text-accent prose-pre:rounded prose-pre:bg-code prose-pre:text-code-foreground"
+        className="prose prose-sm max-w-none prose-headings:scroll-mt-24 prose-a:text-accent prose-a:font-bold hover:prose-a:underline prose-headings:font-display prose-headings:font-black prose-headings:tracking-tight prose-headings:text-fg prose-pre:rounded-2xl prose-pre:bg-code prose-pre:text-code-foreground prose-pre:border prose-pre:border-outline-soft/10 prose-pre:shadow-md prose-pre:p-5 prose-code:font-mono prose-code:text-xs prose-code:bg-surface-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-code:border prose-code:border-outline-soft/50 prose-code:before:content-none prose-code:after:content-none prose-strong:text-fg prose-strong:font-bold leading-relaxed font-sans text-fg-muted"
         dangerouslySetInnerHTML={{ __html: page.html }}
       />
-    </>
+    </div>
   );
 }

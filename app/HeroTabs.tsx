@@ -107,7 +107,7 @@ export function HeroTabs() {
       <div
         role="tablist"
         aria-label="Tipo de usuario"
-        className="inline-flex rounded-lg bg-surface-muted p-1"
+        className="inline-flex rounded-xl bg-surface-muted/80 border border-outline-soft/45 p-1 backdrop-blur-sm shadow-inner font-display"
       >
         {MODES.map((m, idx) => (
           <button
@@ -120,16 +120,16 @@ export function HeroTabs() {
             onClick={() => setMode(m)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
             className={[
-              "inline-flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-all",
+              "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cta-ring focus-visible:ring-offset-1",
               mode === m
-                ? "bg-surface shadow-sm text-fg"
-                : "text-fg-muted hover:text-fg",
+                ? "bg-surface shadow-sm text-fg border border-outline-soft/40"
+                : "text-fg-muted hover:text-fg hover:bg-surface/50 border border-transparent",
             ].join(" ")}
           >
             {LABELS[m]}
             {m === "autonomos" && (
-              <span className="rounded-full bg-fg px-1.5 py-0.5 text-[10px] font-semibold leading-none text-surface">
+              <span className="rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold leading-none text-accent-foreground shadow-sm">
                 Gratis
               </span>
             )}
@@ -142,55 +142,55 @@ export function HeroTabs() {
         id={`panel-${mode}`}
         role="tabpanel"
         aria-labelledby={`tab-${mode}`}
-        className="mt-8"
+        className="mt-8 animate-fade-in-up"
       >
-        <h1 className="text-3xl font-semibold tracking-tight text-fg sm:text-4xl lg:text-5xl">
+        <h1 className="text-3xl font-extrabold tracking-tight text-fg font-display sm:text-4xl lg:text-5xl leading-tight">
           {content.headline}
         </h1>
-        <p className="mt-4 max-w-xl text-base text-fg-muted sm:text-lg">
+        <p className="mt-4 max-w-xl text-base text-fg-muted sm:text-lg leading-relaxed">
           {content.sub}
         </p>
 
         <ul className="mt-6 space-y-3">
           {content.bullets.map((b) => (
-            <li key={b} className="flex items-start gap-2.5 text-sm text-fg-muted">
+            <li key={b} className="flex items-start gap-2.5 text-sm text-fg-muted font-medium">
               <CheckIcon />
               <span>{b}</span>
             </li>
           ))}
         </ul>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap font-display">
           <Link
             href={content.cta.href}
-            className="btn btn-md btn-primary w-full justify-center sm:w-auto"
+            className="btn btn-md btn-primary w-full justify-center sm:w-auto font-semibold shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-[0.5px] transition-all"
           >
             {content.cta.label}
           </Link>
           <Link
             href={content.ctaSecondary.href}
-            className="btn btn-md btn-secondary w-full justify-center sm:w-auto"
+            className="btn btn-md btn-secondary w-full justify-center sm:w-auto font-semibold shadow-sm hover:-translate-y-[0.5px] transition-all"
           >
             {content.ctaSecondary.label}
           </Link>
           {content.ctaTertiary && (
             <a
               href={content.ctaTertiary.href}
-              className="btn btn-md btn-ghost w-full justify-center sm:w-auto"
+              className="btn btn-md btn-ghost w-full justify-center sm:w-auto font-semibold hover:bg-surface-muted/70 transition-colors"
             >
               {content.ctaTertiary.label}
             </a>
           )}
         </div>
         {content.note && (
-          <p className="mt-4 text-xs text-fg-subtle">{content.note}</p>
+          <p className="mt-4 text-xs font-semibold text-fg-subtle/80 font-display">{content.note}</p>
         )}
 
         {/* Garantías técnicas — adaptadas al perfil */}
-        <ul className="mt-10 space-y-2.5 border-t border-outline-soft pt-8">
+        <ul className="mt-10 space-y-2.5 border-t border-outline-soft/60 pt-8">
           {content.trust.map((item) => (
-            <li key={item} className="flex items-start gap-2.5 text-sm text-fg-subtle">
-              <span aria-hidden className="mt-0.5 shrink-0 text-fg-subtle/50">—</span>
+            <li key={item} className="flex items-start gap-2.5 text-sm text-fg-subtle leading-relaxed">
+              <span aria-hidden className="mt-0.5 shrink-0 text-accent/60 font-bold">•</span>
               <span>{item}</span>
             </li>
           ))}

@@ -14,7 +14,7 @@ export async function AppNav() {
     { href: "/invoices", label: "Facturas" },
     { href: "/customers", label: "Clientes" },
     { href: "/products", label: "Productos" },
-    { href: "/settings/verifactu", label: "Verifactu" },
+    { href: "/settings/verifactu", label: "Ajustes AEAT" },
     { href: "/docs", label: "Documentación" },
   ];
 

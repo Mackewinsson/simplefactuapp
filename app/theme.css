@@ -86,4 +86,8 @@
   --color-info-muted: 239 246 255;
   --color-info-outline: 191 219 254;
   --color-info-deep: 30 64 175;
+
+  /* Premium Design Glow Tokens */
+  --glow-color-1: 37 99 235;
+  --glow-color-2: 30 41 59;
 }

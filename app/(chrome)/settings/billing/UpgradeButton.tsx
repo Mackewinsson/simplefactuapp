@@ -32,11 +32,11 @@ export function UpgradeButton({ planId, label, variant = "primary" }: Props) {
 
   const baseClasses =
     variant === "primary"
-      ? "btn btn-cta"
-      : "rounded border border-outline bg-surface px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-hover";
+      ? "btn btn-sm btn-cta rounded-xl px-5 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] active:translate-y-0 transition-all font-display w-full sm:w-auto"
+      : "btn btn-sm btn-secondary rounded-xl px-5 py-2.5 font-bold shadow-sm hover:-translate-y-[0.5px] active:translate-y-0 hover:bg-surface-muted transition-all font-display w-full sm:w-auto";
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5 w-full sm:w-auto">
       <button
         type="button"
         onClick={handleClick}
@@ -44,12 +44,22 @@ export function UpgradeButton({ planId, label, variant = "primary" }: Props) {
         className={baseClasses}
         aria-label={label}
       >
-        {pending ? "Redirigiendo..." : label}
+        {pending ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-4 w-4 text-current" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Redirigiendo...
+          </span>
+        ) : (
+          label
+        )}
       </button>
       {error ? (
-        <p role="alert" className="text-xs text-danger-foreground">
+        <div role="alert" className="text-xs text-danger-foreground font-semibold bg-danger/10 px-3 py-1.5 rounded-lg border border-danger-outline/35 backdrop-blur-sm animate-fade-in-up">
           {error}
-        </p>
+        </div>
       ) : null}
     </div>
   );

@@ -22,24 +22,26 @@ export default async function ProductsPage() {
   });
 
   return (
-    <div>
-      <div className="mb-6">
-        <Link href="/invoices" className="text-fg-muted hover:text-fg">
-          ← Volver a facturas
+    <div className="space-y-6 font-display animate-fade-in-up">
+      <div>
+        <Link href="/invoices" className="inline-flex items-center gap-1.5 text-xs font-bold text-fg-subtle hover:text-fg transition-colors group mb-3">
+          <span className="transform group-hover:-translate-x-0.5 transition-transform">←</span> Volver a facturas
         </Link>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3.5xl font-black tracking-tight text-fg">Productos y Servicios</h1>
+            <p className="mt-1.5 text-sm text-fg-muted font-sans font-medium">
+              Catálogo reutilizable de conceptos al añadir líneas en tus facturas Verifactu.
+            </p>
+          </div>
+          <Link
+            href="/invoices/new"
+            className="btn btn-sm btn-primary rounded-xl px-5 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] transition-all shrink-0"
+          >
+            Nueva factura
+          </Link>
+        </div>
       </div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Productos</h1>
-        <Link
-          href="/invoices/new"
-          className="rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
-        >
-          Nueva factura (catálogo)
-        </Link>
-      </div>
-      <p className="mb-4 text-sm text-fg-muted">
-        Catálogo reutilizable al añadir líneas en una factura.
-      </p>
       <ProductList products={products} />
     </div>
   );

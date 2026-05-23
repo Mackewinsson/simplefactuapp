@@ -82,20 +82,19 @@ export default async function AdminUsersPage({
         <p className="text-sm text-danger-foreground">{apiErr}</p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded border border-outline-soft bg-surface">
-            <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-outline-soft bg-surface-hover text-xs uppercase text-fg-subtle">
+          <div className="overflow-x-auto rounded-2xl border border-outline-soft/80 bg-surface/50 backdrop-blur-md shadow-sm overflow-hidden">
+            <table className="w-full min-w-[720px] text-left text-sm font-sans">
+              <thead className="border-b border-outline-soft/80 bg-surface-muted/65 text-fg-subtle">
                 <tr>
-                  <th className="px-3 py-2">Tipo</th>
-                  <th className="px-3 py-2">Nombre / Email</th>
-                  <th className="px-3 py-2">Tenant ID</th>
-                  <th className="px-3 py-2">Plan</th>
-                  <th className="px-3 py-2">Estado</th>
-                  <th className="px-3 py-2">Certificado</th>
-                  <th className="px-3 py-2"></th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tipo</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Nombre / Email</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tenant ID</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Plan</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Estado</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Certificado</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-outline-soft/40 font-medium">
                 {tenants.map((t) => {
                   const clerkId = tenantToClerkId.get(t.id);
                   const clerk = clerkId ? clerkById.get(clerkId) : null;
@@ -103,78 +102,103 @@ export default async function AdminUsersPage({
                   const hasCert = !!t.has_certificate;
 
                   return (
-                    <tr key={t.id} className="border-b border-outline-soft hover:bg-surface-hover">
+                    <tr
+                      key={t.id}
+                      className="group hover:bg-surface-hover/80 transition-colors duration-200 cursor-pointer"
+                    >
                       {/* Tipo */}
-                      <td className="px-3 py-2">
-                        {isWebUser ? (
-                          <span className="inline-flex items-center rounded-full bg-accent-muted px-2 py-0.5 text-xs font-medium text-accent-foreground-muted">
-                            Usuario web
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-surface-hover px-2 py-0.5 text-xs font-medium text-fg-subtle ring-1 ring-outline-soft">
-                            Cliente API
-                          </span>
-                        )}
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4"
+                        >
+                          {isWebUser ? (
+                            <span className="inline-flex items-center rounded-full bg-accent-muted px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-accent-foreground-muted ring-1 ring-accent-outline/20">
+                              Usuario web
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center rounded-full bg-surface-hover px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-fg-subtle ring-1 ring-outline-soft">
+                              Cliente API
+                            </span>
+                          )}
+                        </Link>
                       </td>
 
                       {/* Nombre / Email */}
-                      <td className="px-3 py-2">
-                        {isWebUser ? (
-                          <div>
-                            <p className="font-medium text-fg">{clerk!.name ?? "—"}</p>
-                            <p className="text-xs text-fg-muted">{clerk!.email ?? "—"}</p>
-                          </div>
-                        ) : (
-                          <p className="text-fg">{t.name ?? "—"}</p>
-                        )}
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4"
+                        >
+                          {isWebUser ? (
+                            <div>
+                              <p className="font-extrabold text-fg font-display">{clerk!.name ?? "—"}</p>
+                              <p className="text-xs text-fg-muted font-sans mt-0.5">{clerk!.email ?? "—"}</p>
+                            </div>
+                          ) : (
+                            <p className="font-extrabold text-fg font-display">{t.name ?? "—"}</p>
+                          )}
+                        </Link>
                       </td>
 
                       {/* Tenant ID */}
-                      <td className="px-3 py-2 font-mono text-xs text-fg-muted">{t.id}</td>
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4 font-mono text-[13px] font-bold text-accent hover:underline"
+                        >
+                          {t.id}
+                        </Link>
+                      </td>
 
                       {/* Plan */}
-                      <td className="px-3 py-2 text-fg-muted">{t.plan_id}</td>
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4 font-mono text-[11px] font-medium text-fg-muted bg-surface-muted/80 px-2 py-0.5 rounded border border-outline-soft/40 w-fit"
+                        >
+                          {t.plan_id}
+                        </Link>
+                      </td>
 
                       {/* Estado */}
-                      <td className="px-3 py-2">
-                        <span
-                          className={
-                            t.status === "ACTIVE"
-                              ? "text-success-foreground"
-                              : "text-warning-deeper"
-                          }
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4"
                         >
-                          {t.status}
-                        </span>
+                          <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${
+                            t.status === "ACTIVE" 
+                              ? "text-success bg-success/10 border border-success-outline/25" 
+                              : "text-danger bg-danger/10 border border-danger-outline/25"
+                          }`}>
+                            {t.status}
+                          </span>
+                        </Link>
                       </td>
 
                       {/* Certificado */}
-                      <td className="px-3 py-2">
-                        {hasCert ? (
-                          <span
-                            title={
-                              t.cert_updated_at
-                                ? `Actualizado: ${t.cert_updated_at}`
-                                : "Certificado presente"
-                            }
-                            className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success-foreground"
-                          >
-                            ✓ Sí
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-surface-hover px-2 py-0.5 text-xs text-fg-subtle">
-                            — No
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Acción */}
-                      <td className="px-3 py-2">
+                      <td className="px-5 py-4">
                         <Link
                           href={`/admin/tenants/${encodeURIComponent(t.id)}`}
-                          className="text-accent hover:underline"
+                          className="block -mx-5 px-5 -my-4 py-4"
                         >
-                          Ver
+                          {hasCert ? (
+                            <span
+                              title={
+                                t.cert_updated_at
+                                  ? `Actualizado: ${t.cert_updated_at}`
+                                  : "Certificado presente"
+                              }
+                              className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-success-foreground"
+                            >
+                              ✓ Sí
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-surface-hover px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-fg-subtle ring-1 ring-outline-soft">
+                              — No
+                            </span>
+                          )}
                         </Link>
                       </td>
                     </tr>
