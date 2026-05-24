@@ -116,6 +116,7 @@ export async function createCustomerAction(data: {
     select: customerSelect,
   });
 
+  revalidatePath("/customers");
   revalidatePath("/invoices/new");
   return { ok: true, customer };
 }

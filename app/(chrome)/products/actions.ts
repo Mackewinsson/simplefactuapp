@@ -75,6 +75,7 @@ export async function createProductAction(
     },
   });
 
+  revalidatePath("/products");
   revalidatePath("/invoices/new");
   return { ok: true, product };
 }
