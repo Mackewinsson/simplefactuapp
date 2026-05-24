@@ -32,8 +32,8 @@ export function UpgradeButton({ planId, label, variant = "primary" }: Props) {
 
   const baseClasses =
     variant === "primary"
-      ? "btn btn-sm btn-cta rounded-xl px-5 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] active:translate-y-0 transition-all font-display w-full sm:w-auto"
-      : "btn btn-sm btn-secondary rounded-xl px-5 py-2.5 font-bold shadow-sm hover:-translate-y-[0.5px] active:translate-y-0 hover:bg-surface-muted transition-all font-display w-full sm:w-auto";
+      ? "btn btn-lg btn-cta w-full sm:w-auto"
+      : "btn btn-lg btn-secondary w-full sm:w-auto";
 
   return (
     <div className="space-y-1.5 w-full sm:w-auto">

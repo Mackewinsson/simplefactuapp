@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createCustomerAction } from "@/app/(chrome)/customers/actions";
+import { ModalOverlay } from "@/app/components/ModalOverlay";
 import { DestinatarioIdFields } from "./DestinatarioIdFields";
 import type { CustomerIdScheme } from "@/lib/invoices/destinatario-id";
 import type { CustomerRow } from "@/app/(chrome)/customers/actions";
@@ -49,8 +50,8 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
+    <ModalOverlay
+      className="flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl">
@@ -129,7 +130,7 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-hover"
+            className="btn btn-md btn-secondary"
           >
             Cancelar
           </button>
@@ -137,12 +138,12 @@ export function CustomerFormModal({ onSave, onClose }: CustomerFormModalProps) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
+            className="btn btn-md btn-primary"
           >
             {saving ? "Guardando…" : "Guardar cliente"}
           </button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

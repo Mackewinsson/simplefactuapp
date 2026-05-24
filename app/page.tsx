@@ -38,7 +38,7 @@ export default async function PublicHomePage() {
             </Link>
             <Link
               href="/sign-up"
-              className="btn btn-sm btn-primary sm:ml-2 shadow-sm font-semibold"
+              className="btn btn-sm btn-primary sm:ml-2"
             >
               Crear cuenta
             </Link>

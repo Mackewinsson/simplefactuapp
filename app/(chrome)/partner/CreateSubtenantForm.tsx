@@ -68,7 +68,7 @@ export function CreateSubtenantForm() {
         <button
           type="submit"
           disabled={pending}
-          className="btn-primary text-sm disabled:opacity-50"
+          className="btn btn-sm btn-primary disabled:opacity-50"
         >
           {pending ? "Creando…" : "Crear autónomo"}
         </button>

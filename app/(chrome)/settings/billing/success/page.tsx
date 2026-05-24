@@ -26,10 +26,10 @@ export default async function BillingSuccessPage({
           </p>
         ) : null}
         <div className="mt-6 flex justify-center gap-3">
-          <Link href="/settings/billing" className="btn btn-cta">
+          <Link href="/settings/billing" className="btn btn-md btn-cta">
             Ver mi plan
           </Link>
-          <Link href="/invoices" className="btn">
+          <Link href="/invoices" className="btn btn-md btn-secondary">
             Ir a facturas
           </Link>
         </div>

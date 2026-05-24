@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { parseDecimalToCents, formatCents } from "@/lib/money";
+import { ModalOverlay } from "@/app/components/ModalOverlay";
 import type { InvoiceItemFieldErrorsMap } from "./invoice-form-state";
 
 export type InvoiceItemRow = {
@@ -124,8 +125,8 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
+    <ModalOverlay
+      className="flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-lg rounded-lg border border-outline-soft bg-surface p-6 shadow-xl">
@@ -339,20 +340,20 @@ function ItemModal({ initial, onSave, onClose, fieldErrors }: ItemModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="btn btn-secondary"
+            className="btn btn-md btn-secondary"
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="btn btn-primary"
+            className="btn btn-md btn-primary"
           >
             Guardar línea
           </button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }
 

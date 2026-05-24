@@ -106,7 +106,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded border border-warning-outline bg-warning px-3 py-1.5 text-xs font-medium text-warning-foreground hover:bg-warning-hover"
+        className="btn btn-sm btn-warning"
       >
         Emitir factura rectificativa
       </button>
@@ -230,7 +230,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
             !numSerie.trim() ||
             (modo === "S" && (baseRectificada.trim() === "" || cuotaRectificada.trim() === ""))
           }
-          className="rounded bg-warning-emphasis px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-warning-emphasis-hover disabled:opacity-50"
+          className="btn btn-sm btn-warning disabled:opacity-50"
         >
           {pending ? "Enviando..." : "Emitir rectificativa"}
         </button>
@@ -238,7 +238,7 @@ export function IssueCorrectionButton({ invoiceId, originalNumSerie }: Props) {
           type="button"
           onClick={() => setOpen(false)}
           disabled={pending}
-          className="rounded border border-warning-outline bg-surface px-3 py-1.5 text-xs font-medium text-warning-foreground hover:bg-warning-hover"
+          className="btn btn-sm btn-secondary"
         >
           Cancelar
         </button>

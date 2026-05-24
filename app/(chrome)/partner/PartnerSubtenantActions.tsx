@@ -42,7 +42,7 @@ export function PartnerSubtenantActions({
           type="button"
           onClick={() => void toggleStatus()}
           disabled={statusPending}
-          className="rounded border border-outline px-3 py-1.5 text-sm hover:bg-surface-muted disabled:opacity-50"
+          className="btn btn-sm btn-secondary disabled:opacity-50"
         >
           {statusPending
             ? "…"
@@ -63,7 +63,7 @@ export function PartnerSubtenantActions({
           <button
             type="submit"
             disabled={keyPending}
-            className="btn-primary text-sm disabled:opacity-50"
+            className="btn btn-sm btn-primary disabled:opacity-50"
           >
             {keyPending ? "Generando…" : "Generar API key"}
           </button>
@@ -114,7 +114,7 @@ export function PartnerSubtenantActions({
         <button
           type="submit"
           disabled={certPending}
-          className="btn-primary text-sm disabled:opacity-50"
+          className="btn btn-sm btn-primary disabled:opacity-50"
         >
           {certPending ? "Subiendo…" : "Subir certificado"}
         </button>

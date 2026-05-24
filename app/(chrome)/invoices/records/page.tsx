@@ -116,14 +116,14 @@ export default async function InvoiceRecordsPage({
           {!loadError && data && data.total > 0 ? (
             <a
               href={buildExportHref({ from, to, serie, tipo })}
-              className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all text-center w-full sm:w-auto"
+              className="btn btn-sm btn-secondary text-center w-full sm:w-auto"
             >
               Exportar CSV
             </a>
           ) : null}
           <Link
             href="/invoices/new"
-            className="btn btn-sm btn-accent rounded-xl px-4 py-2 font-bold shadow-md shadow-accent/15 hover:shadow-lg hover:shadow-accent/25 hover:-translate-y-[0.5px] transition-all text-xs text-center w-full sm:w-auto"
+            className="btn btn-sm btn-accent text-center w-full sm:w-auto"
           >
             Nueva factura
           </Link>
@@ -178,14 +178,14 @@ export default async function InvoiceRecordsPage({
         <div className="flex gap-2">
           <button
             type="submit"
-            className="btn btn-sm btn-primary rounded-xl px-4 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] transition-all text-xs"
+            className="btn btn-sm btn-primary"
           >
             Filtrar
           </button>
           {hasFilters ? (
             <Link
               href="/invoices/records"
-              className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2.5 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
+              className="btn btn-sm btn-secondary"
             >
               Limpiar
             </Link>
@@ -298,7 +298,7 @@ export default async function InvoiceRecordsPage({
               {page > 1 ? (
                 <Link
                   href={buildHref({ from, to, serie, tipo, page: page - 1 })}
-                  className="rounded border border-outline px-3 py-1 hover:bg-surface-hover"
+                  className="btn btn-sm btn-secondary"
                 >
                   ← Anterior
                 </Link>
@@ -309,7 +309,7 @@ export default async function InvoiceRecordsPage({
               {page < totalPages ? (
                 <Link
                   href={buildHref({ from, to, serie, tipo, page: page + 1 })}
-                  className="rounded border border-outline px-3 py-1 hover:bg-surface-hover"
+                  className="btn btn-sm btn-secondary"
                 >
                   Siguiente →
                 </Link>

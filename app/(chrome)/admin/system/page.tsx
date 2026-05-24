@@ -138,7 +138,7 @@ export default async function AdminSystemPage({
               className="mt-1 block rounded border border-outline px-2 py-1 font-mono text-xs"
             />
           </label>
-          <button type="submit" className="rounded bg-primary-hover px-3 py-1 text-primary-foreground hover:bg-primary-hover">
+          <button type="submit" className="btn btn-sm btn-primary">
             Consultar
           </button>
         </form>

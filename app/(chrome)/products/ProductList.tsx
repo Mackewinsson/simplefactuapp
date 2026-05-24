@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/money";
 import { deleteProductAction, updateProductAction, type ProductRow } from "./actions";
+import { ModalOverlay } from "@/app/components/ModalOverlay";
 
 const TIPO_OPTIONS = ["0.0", "4.0", "10.0", "21.0"] as const;
 
@@ -66,7 +67,7 @@ export function ProductList({ products }: Props) {
         </svg>
         <p className="text-sm font-bold text-fg mb-1">Tu catálogo está vacío</p>
         <p className="text-xs text-fg-muted mb-4 font-sans font-medium">Añade líneas en tu factura y guárdalas directamente en el catálogo, o gestiónalas aquí.</p>
-        <Link href="/invoices/new" className="btn btn-sm btn-accent rounded-xl px-4 py-2 font-bold shadow-md shadow-accent/15 hover:shadow-lg hover:shadow-accent/25 hover:-translate-y-[0.5px] transition-all">
+        <Link href="/invoices/new" className="btn btn-sm btn-accent">
           Crear concepto en factura
         </Link>
       </div>
@@ -108,7 +109,7 @@ export function ProductList({ products }: Props) {
                   startEdit(p);
                 }}
                 disabled={pending}
-                className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
+                className="btn btn-sm btn-secondary"
               >
                 Editar
               </button>
@@ -119,7 +120,7 @@ export function ProductList({ products }: Props) {
                   onDelete(p.id);
                 }}
                 disabled={pending}
-                className="btn btn-sm btn-danger rounded-xl font-bold px-4 py-2 text-xs shadow-sm transition-all"
+                className="btn btn-sm btn-danger"
               >
                 Eliminar
               </button>
@@ -166,7 +167,7 @@ export function ProductList({ products }: Props) {
                         startEdit(p);
                       }}
                       disabled={pending}
-                      className="btn btn-sm btn-secondary rounded-xl font-bold px-3 py-1.5 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
+                      className="btn btn-sm btn-secondary"
                     >
                       Editar
                     </button>
@@ -177,7 +178,7 @@ export function ProductList({ products }: Props) {
                         onDelete(p.id);
                       }}
                       disabled={pending}
-                      className="btn btn-sm btn-danger rounded-xl font-bold px-3 py-1.5 text-xs shadow-sm transition-all"
+                      className="btn btn-sm btn-danger"
                     >
                       Eliminar
                     </button>
@@ -191,8 +192,8 @@ export function ProductList({ products }: Props) {
 
       {/* Modal Dialog Editor */}
       {editing ? (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-20 animate-fade-in-up"
+        <ModalOverlay
+          className="flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-20 animate-fade-in-up"
           onClick={(e) => e.target === e.currentTarget && !pending && setEditing(null)}
         >
           <form
@@ -287,20 +288,20 @@ export function ProductList({ products }: Props) {
                 type="button"
                 onClick={() => setEditing(null)}
                 disabled={pending}
-                className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft shadow-sm text-xs hover:bg-surface-muted transition-all"
+                className="btn btn-sm btn-secondary"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={pending}
-                className="btn btn-sm btn-primary rounded-xl px-5 py-2 font-bold shadow-md hover:-translate-y-[0.5px] transition-all text-xs disabled:opacity-60"
+                className="btn btn-sm btn-primary"
               >
                 {pending ? "Guardando…" : "Guardar cambios"}
               </button>
             </div>
           </form>
-        </div>
+        </ModalOverlay>
       ) : null}
     </>
   );

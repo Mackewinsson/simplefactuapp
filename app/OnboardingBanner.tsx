@@ -126,7 +126,7 @@ export async function OnboardingBanner() {
             {next ? (
               <Link
                 href={next.href}
-                className="btn btn-sm btn-accent rounded-xl px-4 py-2 text-xs font-bold shadow-md shadow-accent/15 hover:shadow-lg hover:shadow-accent/25 hover:-translate-y-[0.5px] transition-all self-start md:self-center"
+                className="btn btn-sm btn-accent self-start md:self-center"
               >
                 {next.cta}
               </Link>

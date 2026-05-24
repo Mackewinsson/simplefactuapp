@@ -176,7 +176,7 @@ export default async function OnboardingPage() {
                 <div className="pl-13 pt-1">
                   <Link
                     href={link.href}
-                    className="mt-4 inline-block rounded-xl bg-accent px-5 py-2.5 text-xs font-bold text-accent-foreground shadow-md shadow-accent/15 hover:shadow-lg hover:shadow-accent/25 hover:-translate-y-[0.5px] transition-all"
+                    className="btn btn-lg btn-accent mt-4 inline-block"
                   >
                     {link.cta}
                   </Link>

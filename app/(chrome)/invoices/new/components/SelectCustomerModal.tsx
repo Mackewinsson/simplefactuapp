@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCustomersAction, type CustomerRow } from "@/app/(chrome)/customers/actions";
+import { ModalOverlay } from "@/app/components/ModalOverlay";
 
 type SelectCustomerModalProps = {
   onSelect: (c: CustomerRow) => void;
@@ -32,8 +33,8 @@ export function SelectCustomerModal({ onSelect, onClose }: SelectCustomerModalPr
   );
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
+    <ModalOverlay
+      className="flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl">
@@ -82,6 +83,6 @@ export function SelectCustomerModal({ onSelect, onClose }: SelectCustomerModalPr
           </button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

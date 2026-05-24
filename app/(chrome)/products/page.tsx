@@ -36,7 +36,7 @@ export default async function ProductsPage() {
           </div>
           <Link
             href="/invoices/new"
-            className="btn btn-sm btn-primary rounded-xl px-5 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] transition-all shrink-0"
+            className="btn btn-lg btn-primary shrink-0"
           >
             Nueva factura
           </Link>

@@ -241,8 +241,7 @@ export default async function AdminTenantDetailPage({
             </select>
           </label>
           <input type="hidden" name="ipage" value="1" />
-          <button type="submit"
-            className="rounded bg-primary-hover px-3 py-1 text-primary-foreground hover:bg-primary-hover">
+          <button type="submit" className="btn btn-sm btn-primary">
             Filtrar
           </button>
         </form>
