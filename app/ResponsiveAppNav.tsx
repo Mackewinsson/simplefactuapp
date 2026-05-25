@@ -13,6 +13,7 @@ function isNavLinkActive(pathname: string, href: string): boolean {
 type NavLink = {
   href: string;
   label: string;
+  badge?: "accent" | "warning";
 };
 
 type Props = {
@@ -44,15 +45,25 @@ export function ResponsiveAppNav({ links }: Props) {
       <nav className="hidden items-center lg:flex lg:gap-6">
         {links.map((link) => {
           const active = isNavLinkActive(pathname, link.href);
+          const badgeColors: Record<string, string> = {
+            accent:
+              "border-accent/30 bg-accent-muted/50 text-accent-foreground-muted hover:bg-accent-muted",
+            warning:
+              "border-warning-outline/60 bg-warning/60 text-warning-deep hover:bg-warning-hover",
+          };
+          const badgeStyle = link.badge ? badgeColors[link.badge] : null;
+
           return (
             <Link
               key={link.href}
               href={link.href}
               aria-current={active ? "page" : undefined}
               className={
-                active
-                  ? "rounded-lg border border-outline-soft bg-surface px-3 py-1.5 text-sm font-bold text-fg shadow-sm font-display transition-all"
-                  : "rounded-lg px-3 py-1.5 text-sm font-semibold text-fg-muted hover:text-fg hover:bg-surface-muted/50 transition-all font-display"
+                badgeStyle
+                  ? `rounded-lg border px-3 py-1.5 text-xs font-bold font-display transition-all ${badgeStyle} ${active ? "shadow-sm ring-1 ring-offset-1 ring-outline-soft" : ""}`
+                  : active
+                    ? "rounded-lg border border-outline-soft bg-surface px-3 py-1.5 text-sm font-bold text-fg shadow-sm font-display transition-all"
+                    : "rounded-lg px-3 py-1.5 text-sm font-semibold text-fg-muted hover:text-fg hover:bg-surface-muted/50 transition-all font-display"
               }
             >
               {link.label}
@@ -104,15 +115,25 @@ export function ResponsiveAppNav({ links }: Props) {
             <div className="flex flex-col gap-1.5">
               {links.map((link) => {
                 const active = isNavLinkActive(pathname, link.href);
+                const mobileBadge: Record<string, string> = {
+                  accent:
+                    "border-l-4 border-accent bg-accent-muted/40 text-accent-foreground-muted",
+                  warning:
+                    "border-l-4 border-warning-strong bg-warning/50 text-warning-deep",
+                };
+                const badgeStyle = link.badge ? mobileBadge[link.badge] : null;
+
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     aria-current={active ? "page" : undefined}
                     className={
-                      active
-                        ? "rounded-lg border-l-4 border-accent bg-accent-muted py-2.5 pl-3 pr-4 text-sm font-bold text-accent-foreground-muted font-display transition-all"
-                        : "rounded-lg px-3 py-2.5 text-sm font-semibold text-fg-muted hover:bg-surface-muted hover:text-fg font-display transition-all"
+                      badgeStyle
+                        ? `rounded-lg py-2.5 pl-3 pr-4 text-xs font-bold font-display transition-all ${badgeStyle} ${active ? "ring-1 ring-outline-soft" : ""}`
+                        : active
+                          ? "rounded-lg border-l-4 border-accent bg-accent-muted py-2.5 pl-3 pr-4 text-sm font-bold text-accent-foreground-muted font-display transition-all"
+                          : "rounded-lg px-3 py-2.5 text-sm font-semibold text-fg-muted hover:bg-surface-muted hover:text-fg font-display transition-all"
                     }
                     onClick={() => setIsOpen(false)}
                   >

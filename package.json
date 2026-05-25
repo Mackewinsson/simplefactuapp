@@ -20,7 +20,8 @@
     "test:payloads": "tsx scripts/test-verifactu-payloads.ts",
     "test:csv": "tsx scripts/test-invoice-records-csv.ts",
     "test:validation": "tsx scripts/test-create-invoice-validation.ts",
-    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation",
+    "test:roles": "tsx scripts/test-roles.ts",
+    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles",
     "prepare": "node -e \"if(!process.env.CI && !process.env.DOCKER_BUILD){require('child_process').execSync('husky',{stdio:'inherit'})}\" || true"
   },
   "lint-staged": {

@@ -174,11 +174,19 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 
 ---
 
-## Seguridad
+## Seguridad y roles
+
+Tres roles UI derivados de Clerk (`publicMetadata.role` o allowlists):
+
+| Rol | Asignación Clerk | Panel | Guard |
+|-----|------------------|-------|-------|
+| **Autónomo** (user) | Sin role (defecto) | `/invoices`, `/settings` | sesión Clerk |
+| **Integrador B2B** (partner) | `role = "partner"` o `PARTNER_CLERK_USER_IDS` | `/partner` — Consola integrador | `requirePartner()` |
+| **Operador plataforma** (admin) | `role = "admin"` o `ADMIN_CLERK_USER_IDS` | `/admin` — Operación plataforma | `requireAdmin()` |
+
+Resolución unificada: `lib/auth/app-role.ts` → `resolveAppRole()` (admin > partner > user). La navegación (`AppNav`) muestra solo los enlaces correspondientes al rol del usuario.
 
 - **Clerk:** rutas bajo `/invoices`, `/settings`, `/admin`, `/partner` exigen sesión (`middleware.ts`).
-- **`/admin`:** `requireAdmin()` — `ADMIN_CLERK_USER_IDS` o `publicMetadata.role === "admin"`.
-- **`/partner`:** `requirePartner()` — `PARTNER_CLERK_USER_IDS` o `publicMetadata.role === "partner"`. Sin permiso → `/partner-access-denied`.
 - **Secretos:** solo en Server Actions, Route Handlers y código servidor; el cliente nunca ve `SIMPLEFACTU_ADMIN_KEY` ni la API key en claro.
 
 ---
@@ -188,8 +196,8 @@ Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resu
 - **`/invoices`:** gestión de facturas; envío Veri\*Factu y seguimiento de job en detalle.
 - **`/invoices/new`:** alta; verificación NIF destinatario contra el API cuando procede.
 - **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la [referencia API](/docs/api-reference) (OpenAPI).
-- **`/admin`:** operación — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
-- **`/partner`:** listado y alta de autónomos, detalle (suspender, API key, certificado PFX). Ver [gestoría en docs públicos](content/docs/gestoria.md).
+- **`/admin`:** operación plataforma — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. Solo operadores simplefactu (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
+- **`/partner`:** consola de integrador B2B — dashboard KPIs, listado y alta de autónomos, detalle (suspender, API key, certificado PFX, jobs). Ver [documentación de integrador](content/docs/gestoria.md).
 - **`/invoices/records`:** histórico AEAT (`GET /me/invoice-records`) y export CSV.
 
 ---

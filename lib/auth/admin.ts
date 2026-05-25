@@ -1,5 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { devForceRole } from "@/lib/auth/app-role";
 
 function adminAllowlist(): Set<string> {
   const raw = process.env.ADMIN_CLERK_USER_IDS?.trim();
@@ -54,6 +55,8 @@ export async function requireAdmin(): Promise<{ userId: string }> {
   if (!userId) {
     redirect("/sign-in");
   }
+  const forced = devForceRole();
+  if (forced === "admin") return { userId };
   if (!(await isUserAdmin(userId))) {
     redirect("/admin-access-denied");
   }

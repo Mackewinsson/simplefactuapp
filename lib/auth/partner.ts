@@ -1,5 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { devForceRole } from "@/lib/auth/app-role";
 
 function partnerAllowlist(): Set<string> {
   const raw = process.env.PARTNER_CLERK_USER_IDS?.trim();
@@ -37,6 +38,8 @@ export async function isUserPartner(userId: string): Promise<boolean> {
 export async function requirePartner(): Promise<{ userId: string }> {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
+  const forced = devForceRole();
+  if (forced === "partner" || forced === "admin") return { userId };
   if (!(await isUserPartner(userId))) {
     redirect("/partner-access-denied");
   }

@@ -36,86 +36,78 @@ export function PartnerSubtenantActions({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap gap-3">
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={() => void toggleStatus()}
           disabled={statusPending}
-          className="btn btn-sm btn-secondary disabled:opacity-50"
+          className={`btn btn-sm ${status === "SUSPENDED" ? "btn-accent" : "btn-danger"}`}
         >
           {statusPending
             ? "…"
             : status === "SUSPENDED"
-              ? "Reactivar autónomo"
-              : "Suspender autónomo"}
+              ? "Reactivar cliente"
+              : "Suspender cliente"}
         </button>
-        {statusMsg ? <p className="text-sm text-fg-muted">{statusMsg}</p> : null}
+        {statusMsg ? <p className="text-sm text-fg-muted font-medium">{statusMsg}</p> : null}
       </div>
 
-      <div className="rounded border border-outline-soft bg-surface p-4">
-        <h3 className="text-sm font-semibold text-fg">API key del autónomo</h3>
-        <p className="mt-1 text-xs text-fg-muted">
+      <div className="rounded-xl border border-outline-soft/60 bg-surface/80 p-4 space-y-3">
+        <h3 className="text-sm font-bold text-fg font-display">API key del cliente</h3>
+        <p className="text-xs text-fg-muted">
           Para integraciones directas con simplefactu (envío de facturas, certificado, etc.).
         </p>
-        <form action={keyAction} className="mt-3">
+        <form action={keyAction}>
           <input type="hidden" name="childId" value={childId} />
-          <button
-            type="submit"
-            disabled={keyPending}
-            className="btn btn-sm btn-primary disabled:opacity-50"
-          >
+          <button type="submit" disabled={keyPending} className="btn btn-sm btn-primary">
             {keyPending ? "Generando…" : "Generar API key"}
           </button>
         </form>
         {keyState && !keyState.ok ? (
-          <p className="mt-2 text-sm text-danger-emphasis">{keyState.errors.join(", ")}</p>
+          <p className="text-sm text-danger-emphasis font-semibold">{keyState.errors.join(", ")}</p>
         ) : null}
         {keyState?.ok && keyState.apiKey ? (
-          <div className="mt-3 rounded bg-surface-muted p-3">
-            <p className="text-xs text-warning-deeper">{keyState.message}</p>
-            <code className="mt-2 block break-all text-xs">{keyState.apiKey}</code>
+          <div className="rounded-lg bg-surface-muted p-3 border border-outline-soft/40">
+            <p className="text-xs text-warning-deeper font-semibold">{keyState.message}</p>
+            <code className="mt-2 block break-all text-xs font-mono">{keyState.apiKey}</code>
           </div>
         ) : keyState?.ok ? (
-          <p className="mt-2 text-sm text-success-emphasis">{keyState.message}</p>
+          <p className="text-sm text-success-emphasis font-semibold">{keyState.message}</p>
         ) : null}
       </div>
 
       <form
         action={certAction}
-        className="space-y-3 rounded border border-outline-soft bg-surface p-4"
+        className="rounded-xl border border-outline-soft/60 bg-surface/80 p-4 space-y-3"
       >
-        <h3 className="text-sm font-semibold text-fg">Certificado AEAT (.pfx)</h3>
-        <label className="block text-sm">
-          <span className="text-fg-muted">Archivo PFX</span>
+        <h3 className="text-sm font-bold text-fg font-display">Certificado AEAT (.pfx)</h3>
+        <label className="block">
+          <span className="text-xs font-semibold text-fg-muted">Archivo PFX</span>
           <input
             type="file"
             name="pfx"
             accept=".pfx,.p12"
             required
-            className="mt-1 block w-full text-sm"
+            className="mt-1 block w-full text-sm file:mr-3 file:rounded-lg file:border file:border-outline-soft file:bg-surface file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-fg file:cursor-pointer"
           />
         </label>
-        <label className="block text-sm">
-          <span className="text-fg-muted">Contraseña</span>
+        <label className="block">
+          <span className="text-xs font-semibold text-fg-muted">Contraseña del certificado</span>
           <input
             type="password"
             name="pfxPassphrase"
             required
-            className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
+            className="input mt-1"
           />
         </label>
         {certState && !certState.ok ? (
-          <p className="text-sm text-danger-emphasis">{certState.errors.join(", ")}</p>
+          <p className="text-sm text-danger-emphasis font-semibold">{certState.errors.join(", ")}</p>
         ) : null}
         {certState?.ok ? (
-          <p className="text-sm text-success-emphasis">{certState.message}</p>
+          <p className="text-sm text-success-emphasis font-semibold">{certState.message}</p>
         ) : null}
-        <button
-          type="submit"
-          disabled={certPending}
-          className="btn btn-sm btn-primary disabled:opacity-50"
-        >
+        <button type="submit" disabled={certPending} className="btn btn-sm btn-primary">
           {certPending ? "Subiendo…" : "Subir certificado"}
         </button>
       </form>
