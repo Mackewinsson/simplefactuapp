@@ -1,11 +1,23 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { BrandWordmark } from "./BrandWordmark";
 import { HeroTabs } from "./HeroTabs";
 import { LeadForm } from "./LeadForm";
 import { BlogCarousel } from "./BlogCarousel";
 import { articles } from "@/lib/blog/articles";
+import { publicRobots } from "@/lib/seo/robots";
+
+export const metadata: Metadata = {
+  title: "Simple*Factu — Veri*Factu para autónomos y pymes",
+  description:
+    "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
+  robots: publicRobots,
+  alternates: {
+    canonical: "https://simplefactu.com",
+  },
+};
 
 export default async function PublicHomePage() {
   const { userId } = await auth();

@@ -8,6 +8,7 @@ import {
   getArticle,
 } from "@/lib/blog/articles";
 import { BrandWordmark } from "../../BrandWordmark";
+import { publicRobots } from "@/lib/seo/robots";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${article.title} — Simple*Factu`,
     description: article.seoDescription,
+    robots: publicRobots,
     alternates: { canonical: url },
     openGraph: {
       title: article.title,

@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth/admin";
 import { AdminNav } from "./AdminNav";
+import { privatePageMetadata } from "@/lib/seo/robots";
+
+export const metadata: Metadata = privatePageMetadata;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();

@@ -22,8 +22,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/legal/dpa`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/legal/cancelacion`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${base}/legal/declaracion-responsable`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
-    { url: `${base}/sign-in`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${base}/sign-up`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   const blogRoutes: MetadataRoute.Sitemap = articles.map((article) => ({

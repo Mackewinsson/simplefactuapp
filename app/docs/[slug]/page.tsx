@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { docsBrowserPageTitle } from "@/lib/branding";
 import { getDocPage, listDocSlugs } from "@/lib/docs/source";
 import { DocBody } from "../DocBody";
+import { publicRobots } from "@/lib/seo/robots";
 
 export const dynamic = "force-static";
 
@@ -31,5 +32,6 @@ export async function generateMetadata({
   return {
     title: docsBrowserPageTitle(page.frontmatter.title),
     description: page.frontmatter.description,
+    robots: publicRobots,
   };
 }

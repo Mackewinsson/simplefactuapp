@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import { requirePartner } from "@/lib/auth/partner";
 import { PartnerNav } from "./PartnerNav";
+import { privatePageMetadata } from "@/lib/seo/robots";
+
+export const metadata: Metadata = privatePageMetadata;
 
 export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
   await requirePartner();
