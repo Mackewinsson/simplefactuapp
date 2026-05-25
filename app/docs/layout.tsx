@@ -1,8 +1,14 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { APP_DOCS_LABEL } from "@/lib/branding";
 import { listDocs, ROOT_SLUG } from "@/lib/docs/source";
 import { DocsSidebarNav } from "./DocsSidebarNav";
+import { publicRobots } from "@/lib/seo/robots";
+
+export const metadata: Metadata = {
+  robots: publicRobots,
+};
 
 /**
  * Layout for /docs/*.

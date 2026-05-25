@@ -59,7 +59,7 @@ export function TenantWebhookForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
+          className="btn btn-sm btn-primary disabled:opacity-50"
         >
           {pending ? "Guardando…" : "Guardar webhook"}
         </button>

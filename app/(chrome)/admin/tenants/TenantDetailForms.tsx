@@ -81,7 +81,7 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
           <button
             type="submit"
             disabled={patchPending}
-            className="rounded bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
+            className="btn btn-sm btn-primary disabled:opacity-50"
           >
             {patchPending ? "Guardando…" : "Guardar cambios"}
           </button>
@@ -100,7 +100,7 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
             <button
               type="submit"
               disabled={onPending}
-              className="rounded border border-warning-outline bg-warning px-3 py-2 text-sm text-warning-foreground hover:bg-warning-hover disabled:opacity-50"
+              className="btn btn-sm btn-warning disabled:opacity-50"
             >
               {onPending ? "…" : "Maintenance ON"}
             </button>
@@ -110,7 +110,7 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
             <button
               type="submit"
               disabled={offPending}
-              className="rounded border border-outline bg-surface px-3 py-2 text-sm text-fg hover:bg-surface-hover disabled:opacity-50"
+              className="btn btn-sm btn-secondary disabled:opacity-50"
             >
               {offPending ? "…" : "Maintenance OFF"}
             </button>

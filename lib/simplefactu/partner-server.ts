@@ -46,7 +46,7 @@ export async function listPartnerSubtenants(userId: string): Promise<PartnerSubt
     message?: string;
   };
   if (!res.ok) {
-    throw new Error(json.message || `Error ${res.status} al listar autónomos`);
+    throw new Error(json.message || `Error ${res.status} al listar clientes`);
   }
   return json.subtenants ?? [];
 }
@@ -80,7 +80,7 @@ export async function listPartnerJobs(
     message?: string;
   };
   if (!res.ok) {
-    throw new Error(json.message || `Error ${res.status} al listar jobs`);
+    throw new Error(json.message || `Error ${res.status} al listar envíos`);
   }
   return { jobs: json.jobs ?? [], total: json.total ?? 0 };
 }

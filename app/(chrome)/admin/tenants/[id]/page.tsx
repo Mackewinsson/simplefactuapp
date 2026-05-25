@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { clerkClient } from "@clerk/nextjs/server";
 import { requireAdmin } from "@/lib/auth/admin";
+import { prisma } from "@/lib/prisma";
+import { TenantRoleManager } from "@/app/(chrome)/admin/tenants/TenantRoleManager";
 import {
   getTenant,
   getTenantCertificateMeta,
@@ -101,6 +104,24 @@ export default async function AdminTenantDetailPage({
 
   const t = tenantRes.tenant;
 
+  let clerkUserId: string | null = null;
+  let clerkUserRole: string | null = null;
+  const account = await prisma.userVerifactuAccount.findFirst({
+    where: { simplefactuTenantId: tenantId },
+    select: { userId: true },
+  });
+  if (account) {
+    clerkUserId = account.userId;
+    try {
+      const api = await clerkClient();
+      const user = await api.users.getUser(account.userId);
+      const meta = user.publicMetadata as Record<string, unknown>;
+      clerkUserRole = (meta?.role as string) ?? null;
+    } catch {
+      /* graceful */
+    }
+  }
+
   const invoiceTotal = invoices?.total ?? 0;
   const invoiceTotalPages = Math.max(1, Math.ceil(invoiceTotal / INVOICE_PAGE_SIZE));
 
@@ -150,6 +171,16 @@ export default async function AdminTenantDetailPage({
           Ver jobs de este tenant →
         </Link>
       </div>
+
+      {/* Role management (only for web users with a Clerk account) */}
+      {clerkUserId && (
+        <section className="panel-premium rounded-2xl p-5">
+          <h2 className="mb-4 text-sm font-bold text-fg font-display tracking-tight border-b border-outline-soft/60 pb-2">
+            Rol de usuario
+          </h2>
+          <TenantRoleManager clerkUserId={clerkUserId} currentRole={clerkUserRole} />
+        </section>
+      )}
 
       {/* Certificate summary */}
       <section className="rounded-lg border border-outline-soft bg-surface p-4">
@@ -241,8 +272,7 @@ export default async function AdminTenantDetailPage({
             </select>
           </label>
           <input type="hidden" name="ipage" value="1" />
-          <button type="submit"
-            className="rounded bg-primary-hover px-3 py-1 text-primary-foreground hover:bg-primary-hover">
+          <button type="submit" className="btn btn-sm btn-primary">
             Filtrar
           </button>
         </form>

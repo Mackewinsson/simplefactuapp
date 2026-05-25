@@ -182,14 +182,14 @@ export default async function InvoicesPage({
         <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row font-display">
           <Link
             href="/invoices/records"
-            className="w-full rounded-lg border border-outline bg-surface px-4 py-2.5 text-center text-sm font-semibold text-fg-muted hover:bg-surface-hover hover:-translate-y-[0.5px] transition-all shadow-sm sm:w-auto"
+            className="btn btn-lg btn-secondary w-full text-center sm:w-auto"
             title="Facturas aceptadas por Hacienda"
           >
             Histórico Hacienda
           </Link>
           <Link
             href="/invoices/new"
-            className="w-full rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground hover:bg-primary-hover hover:-translate-y-[0.5px] transition-all shadow-md shadow-primary/10 sm:w-auto"
+            className="btn btn-lg btn-primary w-full text-center sm:w-auto"
           >
             Nueva factura
           </Link>
@@ -271,13 +271,13 @@ export default async function InvoicesPage({
         </label>
 
         <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-          <button type="submit" className="btn btn-sm btn-primary rounded-lg shadow-sm font-semibold">
+          <button type="submit" className="btn btn-sm btn-primary">
             Filtrar
           </button>
           {hasFilters && (
             <Link
               href="/invoices"
-              className="rounded-lg border border-outline bg-surface px-3 py-1.5 text-sm font-semibold text-fg-muted hover:bg-surface-hover transition-colors"
+              className="btn btn-sm btn-secondary"
             >
               Limpiar
             </Link>
@@ -297,7 +297,7 @@ export default async function InvoicesPage({
               </p>
               <Link
                 href="/invoices/new"
-                className="inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary-hover shadow-md font-display transition-all"
+                className="btn btn-lg btn-primary inline-block"
               >
                 Nueva factura
               </Link>
@@ -321,14 +321,14 @@ export default async function InvoicesPage({
               {!hasFilters && verifactuCount === 0 && sinEnviarCount > 0 ? (
                 <Link
                   href={hrefSinEnviar}
-                  className="inline-block rounded-lg border border-outline bg-surface px-5 py-2.5 text-sm font-bold text-fg hover:bg-surface-hover shadow-sm font-display transition-all"
+                  className="btn btn-lg btn-secondary inline-block"
                 >
                   Ver facturas por enviar ({sinEnviarCount})
                 </Link>
               ) : !hasFilters && sinEnviarCount === 0 && verifactuCount === 0 ? (
                 <Link
                   href="/invoices/new"
-                  className="inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary-hover shadow-md font-display transition-all"
+                  className="btn btn-lg btn-primary inline-block"
                 >
                   Crear factura
                 </Link>
@@ -467,7 +467,7 @@ export default async function InvoicesPage({
                 {page > 1 && (
                   <Link
                     href={pageHref(page - 1)}
-                    className="rounded border border-outline px-2 py-1 hover:bg-surface-hover"
+                    className="btn btn-sm btn-secondary"
                   >
                     ← Anterior
                   </Link>
@@ -478,11 +478,7 @@ export default async function InvoicesPage({
                     <Link
                       key={p}
                       href={pageHref(p)}
-                      className={`rounded border px-2 py-1 ${
-                        p === page
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-outline hover:bg-surface-hover"
-                      }`}
+                      className={`btn btn-sm ${p === page ? "btn-primary" : "btn-secondary"}`}
                     >
                       {p}
                     </Link>
@@ -490,7 +486,7 @@ export default async function InvoicesPage({
                 {page < totalPages && (
                   <Link
                     href={pageHref(page + 1)}
-                    className="rounded border border-outline px-2 py-1 hover:bg-surface-hover"
+                    className="btn btn-sm btn-secondary"
                   >
                     Siguiente →
                   </Link>

@@ -134,7 +134,7 @@ export function LeadForm() {
       <button
         type="submit"
         disabled={pending}
-        className="btn btn-md btn-primary w-full disabled:opacity-60"
+        className="btn btn-md btn-primary w-full"
       >
         {pending ? "Enviando…" : "Enviar mensaje"}
       </button>

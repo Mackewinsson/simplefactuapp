@@ -55,13 +55,14 @@ export default async function AdminUsersPage({
     }
   }
 
-  // Build lookup: clerkUserId → { email, name }
+  // Build lookup: clerkUserId → { email, name, role }
   const clerkById = new Map(
     clerkUsers.map((u) => [
       u.id,
       {
         email: u.emailAddresses[0]?.emailAddress ?? null,
         name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.username || null,
+        role: (u.publicMetadata as Record<string, unknown>)?.role as string | undefined,
       },
     ])
   );
@@ -83,12 +84,13 @@ export default async function AdminUsersPage({
       ) : (
         <>
           <div className="overflow-x-auto rounded-2xl border border-outline-soft/80 bg-surface/50 backdrop-blur-md shadow-sm overflow-hidden">
-            <table className="w-full min-w-[720px] text-left text-sm font-sans">
+            <table className="w-full min-w-[820px] text-left text-sm font-sans">
               <thead className="border-b border-outline-soft/80 bg-surface-muted/65 text-fg-subtle">
                 <tr>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tipo</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Nombre / Email</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tenant ID</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Rol</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Plan</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Estado</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Certificado</th>
@@ -148,6 +150,16 @@ export default async function AdminUsersPage({
                           className="block -mx-5 px-5 -my-4 py-4 font-mono text-[13px] font-bold text-accent hover:underline"
                         >
                           {t.id}
+                        </Link>
+                      </td>
+
+                      {/* Rol */}
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4"
+                        >
+                          <RoleBadge role={clerk?.role} />
                         </Link>
                       </td>
 
@@ -223,5 +235,27 @@ export default async function AdminUsersPage({
         </>
       )}
     </div>
+  );
+}
+
+function RoleBadge({ role }: { role?: string }) {
+  if (role === "admin") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full text-warning-deep bg-warning/60 border border-warning-outline/40">
+        Admin
+      </span>
+    );
+  }
+  if (role === "partner") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full text-accent-foreground-muted bg-accent-muted/60 border border-accent-outline/30">
+        Integrador
+      </span>
+    );
+  }
+  return (
+    <span className="text-[10px] font-semibold text-fg-subtle">
+      —
+    </span>
   );
 }

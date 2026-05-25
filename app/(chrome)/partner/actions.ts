@@ -19,7 +19,7 @@ export async function createSubtenantAction(
   const allowedNif = String(formData.get("allowedNif") ?? "").trim();
 
   if (!id || !allowedNif) {
-    return { ok: false, errors: ["Identificador y NIF autorizado son obligatorios."] };
+    return { ok: false, errors: ["El identificador y el NIF son obligatorios."] };
   }
 
   const res = await partnerFetch(userId, "/partner/tenants", {
@@ -31,12 +31,12 @@ export async function createSubtenantAction(
   if (!res.ok) {
     return {
       ok: false,
-      errors: [json.message || json.error || `Error ${res.status} al crear autónomo`],
+      errors: [json.message || json.error || `Error ${res.status} al crear cliente`],
     };
   }
 
   revalidatePath("/partner");
-  return { ok: true, message: `Autónomo ${id} creado.` };
+  return { ok: true, message: `Cliente ${name || id} creado correctamente.` };
 }
 
 export async function updateSubtenantStatusAction(
@@ -59,7 +59,7 @@ export async function updateSubtenantStatusAction(
   revalidatePath(`/partner/tenants/${childId}`);
   return {
     ok: true,
-    message: status === "SUSPENDED" ? "Autónomo suspendido." : "Autónomo reactivado.",
+    message: status === "SUSPENDED" ? "Cliente suspendido." : "Cliente reactivado.",
   };
 }
 
@@ -69,7 +69,7 @@ export async function createSubtenantApiKeyFormAction(
 ): Promise<PartnerActionState> {
   const childId = String(formData.get("childId") ?? "").trim();
   if (!childId) {
-    return { ok: false, errors: ["Falta identificador del autónomo."] };
+    return { ok: false, errors: ["Falta identificador del cliente."] };
   }
 
   const { userId } = await requirePartner();

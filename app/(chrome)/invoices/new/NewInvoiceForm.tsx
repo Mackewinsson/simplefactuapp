@@ -356,7 +356,7 @@ export function NewInvoiceForm({
                 <button
                   type="button"
                   onClick={() => setShowSeriesModal(true)}
-                  className="btn btn-secondary"
+                  className="btn btn-md btn-secondary"
                 >
                   Cambiar
                 </button>
@@ -637,7 +637,7 @@ export function NewInvoiceForm({
                     type="button"
                     onClick={runVerifyRecipientNif}
                     disabled={vnifPending || !customerNif.trim() || !customerName.trim()}
-                    className="shrink-0 self-start rounded border border-outline bg-surface px-4 py-2 text-sm font-medium text-fg hover:bg-surface-hover disabled:pointer-events-none disabled:opacity-50"
+                    className="btn btn-md btn-secondary shrink-0 self-start"
                   >
                     {vnifPending ? "Comprobando…" : "Comprobar con Hacienda"}
                   </button>
@@ -812,7 +812,7 @@ export function NewInvoiceForm({
           />
           <Link
             href="/invoices"
-            className="btn btn-secondary"
+            className="btn btn-md btn-secondary"
           >
             Cancelar
           </Link>

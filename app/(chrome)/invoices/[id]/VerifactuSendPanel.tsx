@@ -18,6 +18,7 @@ import {
 } from "@/lib/simplefactu/aeat-status-ui";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { formatVerifactuActionError, formatUserFacingError } from "@/lib/simplefactu/api-errors";
+import { ModalOverlay } from "@/app/components/ModalOverlay";
 import { IssueCorrectionButton } from "./IssueCorrectionButton";
 
 type Props = {
@@ -456,8 +457,8 @@ export function VerifactuSendPanel({
       </div>
 
       {sendConfirmOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-16"
+        <ModalOverlay
+          className="flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-16"
           role="presentation"
           onClick={(e) => {
             if (e.target === e.currentTarget && !pending) setSendConfirmOpen(false);
@@ -500,12 +501,12 @@ export function VerifactuSendPanel({
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       ) : null}
 
       {cancelModalOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-16"
+        <ModalOverlay
+          className="flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-16"
           role="presentation"
           onClick={(e) => {
             if (e.target === e.currentTarget && !pending) setCancelModalOpen(false);
@@ -556,7 +557,7 @@ export function VerifactuSendPanel({
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       ) : null}
     </div>
   );

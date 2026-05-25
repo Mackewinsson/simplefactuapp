@@ -221,7 +221,7 @@ export function VerifactuSettingsForm({
             </p>
             <button
               type="submit"
-              className="btn btn-md btn-danger rounded-lg font-semibold font-display shadow-sm hover:opacity-90 transition-all mt-4"
+              className="btn btn-md btn-danger mt-4"
             >
               Eliminar certificado
             </button>

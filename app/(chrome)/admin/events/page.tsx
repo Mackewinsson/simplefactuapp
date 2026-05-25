@@ -83,7 +83,7 @@ export default async function AdminEventsPage({
           </div>
           <Link
             href={hrefForVerify()}
-            className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2.5 border-outline-soft hover:bg-surface-muted transition-all text-xs shrink-0 self-end shadow-sm"
+            className="btn btn-sm btn-secondary shrink-0 self-end"
           >
             Verificar integridad de la cadena →
           </Link>
@@ -158,7 +158,7 @@ export default async function AdminEventsPage({
         </label>
         <input type="hidden" name="page" value="1" />
         <button type="submit"
-          className="btn btn-sm btn-primary rounded-xl px-5 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] transition-all text-xs shrink-0 self-end">
+          className="btn btn-lg btn-primary shrink-0 self-end">
           Filtrar
         </button>
       </form>
@@ -277,7 +277,7 @@ export default async function AdminEventsPage({
               {page > 1 ? (
                 <Link
                   href={hrefForPage(page - 1)}
-                  className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
+                  className="btn btn-sm btn-secondary"
                 >
                   ← Anterior
                 </Link>
@@ -285,7 +285,7 @@ export default async function AdminEventsPage({
                 <button
                   type="button"
                   disabled
-                  className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs opacity-40 cursor-not-allowed"
+                  className="btn btn-sm btn-secondary"
                 >
                   ← Anterior
                 </button>
@@ -293,7 +293,7 @@ export default async function AdminEventsPage({
               {page < totalPages ? (
                 <Link
                   href={hrefForPage(page + 1)}
-                  className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs shadow-sm hover:bg-surface-muted transition-all"
+                  className="btn btn-sm btn-secondary"
                 >
                   Siguiente →
                 </Link>
@@ -301,7 +301,7 @@ export default async function AdminEventsPage({
                 <button
                   type="button"
                   disabled
-                  className="btn btn-sm btn-secondary rounded-xl font-bold px-4 py-2 border-outline-soft text-xs opacity-40 cursor-not-allowed"
+                  className="btn btn-sm btn-secondary"
                 >
                   Siguiente →
                 </button>

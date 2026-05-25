@@ -163,20 +163,20 @@ export function HeroTabs() {
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap font-display">
           <Link
             href={content.cta.href}
-            className="btn btn-md btn-primary w-full justify-center sm:w-auto font-semibold shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-[0.5px] transition-all"
+            className="btn btn-md btn-primary w-full justify-center sm:w-auto"
           >
             {content.cta.label}
           </Link>
           <Link
             href={content.ctaSecondary.href}
-            className="btn btn-md btn-secondary w-full justify-center sm:w-auto font-semibold shadow-sm hover:-translate-y-[0.5px] transition-all"
+            className="btn btn-md btn-secondary w-full justify-center sm:w-auto"
           >
             {content.ctaSecondary.label}
           </Link>
           {content.ctaTertiary && (
             <a
               href={content.ctaTertiary.href}
-              className="btn btn-md btn-ghost w-full justify-center sm:w-auto font-semibold hover:bg-surface-muted/70 transition-colors"
+              className="btn btn-md btn-ghost w-full justify-center sm:w-auto"
             >
               {content.ctaTertiary.label}
             </a>

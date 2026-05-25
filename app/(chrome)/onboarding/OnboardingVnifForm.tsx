@@ -10,7 +10,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="btn btn-sm btn-primary rounded-xl px-5 py-2.5 font-bold shadow-md hover:-translate-y-[0.5px] active:translate-y-0 transition-all font-display disabled:opacity-50"
+      className="btn btn-lg btn-primary"
     >
       {pending ? (
         <span className="flex items-center gap-2">

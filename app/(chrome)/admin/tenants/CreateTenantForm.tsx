@@ -29,7 +29,7 @@ export function CreateTenantForm() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded border border-accent-outline bg-accent-muted px-3 py-1.5 text-sm font-medium text-accent-foreground-muted hover:bg-accent-muted-hover"
+          className="btn btn-sm btn-accent"
         >
           + Nuevo tenant
         </button>
@@ -136,7 +136,7 @@ export function CreateTenantForm() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-accent-hover disabled:opacity-50"
+            className="btn btn-sm btn-accent disabled:opacity-50"
           >
             {pending ? "Creando..." : "Crear tenant"}
           </button>

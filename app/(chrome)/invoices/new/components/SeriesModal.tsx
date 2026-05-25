@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ModalOverlay } from "@/app/components/ModalOverlay";
 
 type SeriesModalProps = {
   existingSeries: string[];
@@ -12,8 +13,8 @@ export function SeriesModal({ existingSeries, onSelect, onClose }: SeriesModalPr
   const [newSerie, setNewSerie] = useState("");
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
+    <ModalOverlay
+      className="flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-sm rounded-lg border border-outline-soft bg-surface p-5 shadow-xl">
@@ -73,13 +74,13 @@ export function SeriesModal({ existingSeries, onSelect, onClose }: SeriesModalPr
                   onClose();
                 }
               }}
-              className="rounded border border-outline bg-surface px-3 py-2 text-sm font-medium hover:bg-surface-hover disabled:opacity-50"
+              className="btn btn-sm btn-primary"
             >
               Crear
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

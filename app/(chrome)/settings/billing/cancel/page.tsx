@@ -9,10 +9,10 @@ export default function BillingCancelPage() {
           Has cancelado el proceso de pago. No se ha cobrado nada y tu plan sigue como estaba.
         </p>
         <div className="mt-6 flex justify-center gap-3">
-          <Link href="/settings/billing" className="btn btn-cta">
+          <Link href="/settings/billing" className="btn btn-md btn-cta">
             Volver a planes
           </Link>
-          <Link href="/invoices" className="btn">
+          <Link href="/invoices" className="btn btn-md btn-secondary">
             Ir a facturas
           </Link>
         </div>

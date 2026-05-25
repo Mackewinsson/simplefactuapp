@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      <h1 className="text-3xl font-extrabold tracking-tight text-fg font-display">Panel de administración</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight text-fg font-display">Operación plataforma</h1>
 
       {err ? (
         <p className="rounded-xl border border-danger-outline/50 bg-danger/80 px-4 py-3 text-sm text-danger-foreground font-semibold">{err}</p>
@@ -93,7 +93,7 @@ export default async function AdminDashboardPage() {
       ) : null}
 
       <div className="mt-8 pt-6 border-t border-outline-soft/60">
-        <h2 className="text-lg font-bold text-fg font-display tracking-tight mb-4">Accesos Directos Administrativos</h2>
+        <h2 className="text-lg font-bold text-fg font-display tracking-tight mb-4">Accesos directos</h2>
         <div className="grid gap-4 sm:grid-cols-3 font-display">
           <Link
             href="/admin/tenants"

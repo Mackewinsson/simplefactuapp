@@ -106,7 +106,7 @@ export function TenantKeysAndCert({
           <button
             type="submit"
             disabled={createPending}
-            className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
+            className="btn btn-sm btn-primary disabled:opacity-50"
           >
             {createPending ? "Creando…" : "Crear clave (scopes estándar app)"}
           </button>
@@ -145,7 +145,7 @@ export function TenantKeysAndCert({
           <button
             type="submit"
             disabled={uploadPending}
-            className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
+            className="btn btn-sm btn-primary disabled:opacity-50"
           >
             {uploadPending ? "Subiendo…" : "Subir certificado"}
           </button>
@@ -170,7 +170,7 @@ export function TenantKeysAndCert({
               <button
                 type="submit"
                 disabled={deletePending}
-                className="rounded border border-danger-border bg-surface px-3 py-2 text-sm text-danger-foreground hover:bg-danger-hover disabled:opacity-50"
+                className="btn btn-sm btn-danger disabled:opacity-50"
               >
                 {deletePending ? "…" : "Eliminar certificado del tenant"}
               </button>

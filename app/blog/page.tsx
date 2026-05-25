@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { articles, formatArticleDate } from "@/lib/blog/articles";
 import { BrandWordmark } from "../BrandWordmark";
+import { publicRobots } from "@/lib/seo/robots";
 
 export const metadata: Metadata = {
   title: "Blog sobre Veri*Factu y facturación electrónica — Simple*Factu",
   description:
     "Artículos, guías y tutoriales sobre Veri*Factu, facturación electrónica, obligaciones fiscales para autónomos y pymes en España.",
+  robots: publicRobots,
   alternates: {
     canonical: "https://simplefactu.com/blog",
   },

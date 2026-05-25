@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { clerkClient } from "@clerk/nextjs/server";
 import { requireAdmin } from "@/lib/auth/admin";
 import { logAdminAction } from "@/lib/admin-audit";
 import {
@@ -318,6 +319,50 @@ export async function adminDeleteCertificateAction(_prev: ActionState, formData:
     return { ok: true, message: "Certificado eliminado en simplefactu." };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";
+    return { ok: false, error: msg };
+  }
+}
+
+const VALID_ROLES = ["partner", "admin"] as const;
+type AssignableRole = (typeof VALID_ROLES)[number];
+
+export async function adminSetUserRoleAction(
+  clerkUserId: string,
+  role: AssignableRole | null
+): Promise<ActionState> {
+  const { userId } = await requireAdmin();
+  if (!clerkUserId) return { ok: false, error: "Falta el ID de usuario Clerk." };
+  if (role !== null && !VALID_ROLES.includes(role)) {
+    return { ok: false, error: `Rol inválido: ${role}` };
+  }
+
+  try {
+    const api = await clerkClient();
+    const user = await api.users.getUser(clerkUserId);
+    const currentMeta = (user.publicMetadata ?? {}) as Record<string, unknown>;
+
+    await api.users.updateUser(clerkUserId, {
+      publicMetadata: { ...currentMeta, role: role ?? undefined },
+    });
+
+    const label = role ?? "user";
+    await logAdminAction({
+      userId,
+      action: "user.role.set",
+      target: clerkUserId,
+      metadata: { role: label, previousRole: currentMeta.role ?? "user" },
+    });
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/tenants");
+    return {
+      ok: true,
+      message: role
+        ? `Rol asignado: ${role === "partner" ? "Integrador" : "Admin"}`
+        : "Rol eliminado (autonomo)",
+    };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Error al actualizar rol";
     return { ok: false, error: msg };
   }
 }

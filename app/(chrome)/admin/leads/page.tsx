@@ -70,14 +70,14 @@ export default async function AdminLeadsPage({
         </select>
         <button
           type="submit"
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+          className="btn btn-sm btn-primary"
         >
           Filtrar
         </button>
         {(q || type) && (
           <a
             href="/admin/leads"
-            className="rounded-md border border-outline px-3 py-1.5 text-sm text-fg-muted hover:bg-surface-hover"
+            className="btn btn-sm btn-secondary"
           >
             Limpiar
           </a>
@@ -147,7 +147,7 @@ export default async function AdminLeadsPage({
           {page > 1 && (
             <a
               href={`?page=${page - 1}${type ? `&type=${type}` : ""}${q ? `&q=${q}` : ""}`}
-              className="rounded border border-outline px-3 py-1.5 hover:bg-surface-hover"
+              className="btn btn-sm btn-secondary"
             >
               ← Anterior
             </a>
@@ -158,7 +158,7 @@ export default async function AdminLeadsPage({
           {page < totalPages && (
             <a
               href={`?page=${page + 1}${type ? `&type=${type}` : ""}${q ? `&q=${q}` : ""}`}
-              className="rounded border border-outline px-3 py-1.5 hover:bg-surface-hover"
+              className="btn btn-sm btn-secondary"
             >
               Siguiente →
             </a>
