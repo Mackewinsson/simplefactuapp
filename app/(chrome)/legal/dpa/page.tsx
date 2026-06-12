@@ -1,6 +1,6 @@
-import { appDocumentTitle } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("DPA — Encargado de tratamiento") };
+export const metadata = legalPageMetadata("DPA — Encargado de tratamiento", "/legal/dpa");
 
 export default function DpaPage() {
   return (

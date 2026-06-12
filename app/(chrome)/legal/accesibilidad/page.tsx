@@ -7,9 +7,9 @@
  * es buena práctica y suma puntos en RFP de sector público.
  */
 
-import { appDocumentTitle } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("Declaración de accesibilidad") };
+export const metadata = legalPageMetadata("Declaración de accesibilidad", "/legal/accesibilidad");
 
 export default function AccessibilityStatementPage() {
   return (

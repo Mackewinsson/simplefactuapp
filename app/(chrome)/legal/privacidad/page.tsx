@@ -1,6 +1,7 @@
-import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("Política de privacidad") };
+export const metadata = legalPageMetadata("Política de privacidad", "/legal/privacidad");
 
 export default function PrivacyPolicyPage() {
   return (

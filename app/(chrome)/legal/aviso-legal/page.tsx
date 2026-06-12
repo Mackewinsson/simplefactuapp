@@ -1,6 +1,7 @@
-import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("Aviso legal") };
+export const metadata = legalPageMetadata("Aviso legal", "/legal/aviso-legal");
 
 export default function AvisoLegalPage() {
   return (

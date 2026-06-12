@@ -1,6 +1,7 @@
-import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("Política de cookies") };
+export const metadata = legalPageMetadata("Política de cookies", "/legal/cookies");
 
 export default function CookiesPolicyPage() {
   return (

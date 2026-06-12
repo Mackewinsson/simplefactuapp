@@ -3,6 +3,7 @@ import { docsBrowserPageTitle } from "@/lib/branding";
 import { getDocPage, listDocSlugs } from "@/lib/docs/source";
 import { DocBody } from "../DocBody";
 import { publicRobots } from "@/lib/seo/robots";
+import { canonicalUrl } from "@/lib/seo/site-url";
 
 export const dynamic = "force-static";
 
@@ -33,5 +34,6 @@ export async function generateMetadata({
     title: docsBrowserPageTitle(page.frontmatter.title),
     description: page.frontmatter.description,
     robots: publicRobots,
+    alternates: { canonical: canonicalUrl(`/docs/${slug}`) },
   };
 }

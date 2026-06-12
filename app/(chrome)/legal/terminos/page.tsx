@@ -1,6 +1,7 @@
-import { APP_DISPLAY_NAME, appDocumentTitle } from "@/lib/branding";
+import { APP_DISPLAY_NAME } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("Términos y condiciones") };
+export const metadata = legalPageMetadata("Términos y condiciones", "/legal/terminos");
 
 export default function TermsPage() {
   return (

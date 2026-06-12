@@ -6,6 +6,7 @@ import { GeistMono } from "geist/font/mono";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { APP_DISPLAY_NAME } from "@/lib/branding";
 import { siteRobots } from "@/lib/seo/robots";
+import { getSiteUrl } from "@/lib/seo/site-url";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -15,10 +16,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://simplefactu.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(getSiteUrl()),
   title: APP_DISPLAY_NAME,
   description: "Cumple Veri\u00b7Factu sin tocar AEAT \u2014 facturaci\u00f3n y API para aut\u00f3nomos y empresas. Huellas, encadenamiento y env\u00edo SOAP gestionados por nosotros.",
   robots: siteRobots(),

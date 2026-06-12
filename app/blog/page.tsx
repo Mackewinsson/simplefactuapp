@@ -3,6 +3,7 @@ import Link from "next/link";
 import { articles, formatArticleDate } from "@/lib/blog/articles";
 import { BrandWordmark } from "../BrandWordmark";
 import { publicRobots } from "@/lib/seo/robots";
+import { canonicalUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
   title: "Blog sobre Veri*Factu y facturación electrónica — Simple*Factu",
@@ -10,13 +11,13 @@ export const metadata: Metadata = {
     "Artículos, guías y tutoriales sobre Veri*Factu, facturación electrónica, obligaciones fiscales para autónomos y pymes en España.",
   robots: publicRobots,
   alternates: {
-    canonical: "https://simplefactu.com/blog",
+    canonical: canonicalUrl("/blog"),
   },
   openGraph: {
     title: "Blog sobre Veri*Factu y facturación electrónica",
     description:
       "Guías prácticas sobre Veri*Factu, certificado FNMT, plazos legales y facturación electrónica para autónomos y pymes en España.",
-    url: "https://simplefactu.com/blog",
+    url: canonicalUrl("/blog"),
     siteName: "Simple*Factu",
     locale: "es_ES",
     type: "website",

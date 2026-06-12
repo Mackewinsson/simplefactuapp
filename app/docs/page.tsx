@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { APP_DOCS_LABEL } from "@/lib/branding";
 import { getDocPage } from "@/lib/docs/source";
+import { publicRobots } from "@/lib/seo/robots";
+import { canonicalUrl } from "@/lib/seo/site-url";
 import { DocBody } from "./DocBody";
 
 export const dynamic = "force-static";
@@ -17,5 +19,7 @@ export async function generateMetadata() {
   return {
     title: APP_DOCS_LABEL,
     description: page.frontmatter.description,
+    robots: publicRobots,
+    alternates: { canonical: canonicalUrl("/docs") },
   };
 }

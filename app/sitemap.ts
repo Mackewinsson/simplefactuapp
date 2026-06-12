@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { articles } from "@/lib/blog/articles";
+import { getSiteUrl } from "@/lib/seo/site-url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://simplefactu.com";
+  const base = getSiteUrl();
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [

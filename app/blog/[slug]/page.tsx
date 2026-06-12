@@ -9,6 +9,7 @@ import {
 } from "@/lib/blog/articles";
 import { BrandWordmark } from "../../BrandWordmark";
 import { publicRobots } from "@/lib/seo/robots";
+import { canonicalUrl, getSiteUrl } from "@/lib/seo/site-url";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = getArticle(slug);
   if (!article) return {};
 
-  const url = `https://simplefactu.com/blog/${article.slug}`;
+  const url = canonicalUrl(`/blog/${article.slug}`);
   return {
     title: `${article.title} — Simple*Factu`,
     description: article.seoDescription,
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function jsonLd(article: ReturnType<typeof getArticle>) {
   if (!article) return null;
-  const url = `https://simplefactu.com/blog/${article.slug}`;
+  const url = canonicalUrl(`/blog/${article.slug}`);
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -58,7 +59,7 @@ function jsonLd(article: ReturnType<typeof getArticle>) {
     publisher: {
       "@type": "Organization",
       name: "Simple*Factu",
-      url: "https://simplefactu.com",
+      url: getSiteUrl(),
     },
     url,
     inLanguage: "es",

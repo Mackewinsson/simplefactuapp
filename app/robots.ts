@@ -1,13 +1,14 @@
 import type { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/seo/site-url";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://simplefactu.com";
+  const base = getSiteUrl();
 
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/docs", "/legal/"],
+        allow: ["/", "/blog", "/docs", "/legal/"],
         disallow: [
           "/invoices/",
           "/admin/",

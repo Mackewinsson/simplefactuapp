@@ -4,11 +4,12 @@
  * Real Decreto 1007/2023, de 5 de diciembre
  */
 
-import { appDocumentTitle } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = {
-  title: appDocumentTitle("Declaración responsable Veri*Factu"),
-};
+export const metadata = legalPageMetadata(
+  "Declaración responsable Veri*Factu",
+  "/legal/declaracion-responsable"
+);
 
 export default function DeclaracionResponsablePage() {
   return (

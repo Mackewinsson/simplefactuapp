@@ -8,6 +8,7 @@ import { LeadForm } from "./LeadForm";
 import { BlogCarousel } from "./BlogCarousel";
 import { articles } from "@/lib/blog/articles";
 import { publicRobots } from "@/lib/seo/robots";
+import { canonicalUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
   title: "Simple*Factu — Veri*Factu para autónomos y pymes",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
   robots: publicRobots,
   alternates: {
-    canonical: "https://simplefactu.com",
+    canonical: canonicalUrl("/"),
   },
 };
 

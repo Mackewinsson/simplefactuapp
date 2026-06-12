@@ -4,6 +4,18 @@ const nextConfig: NextConfig = {
   // Smaller Docker images and correct `node server.js` layout for `Dockerfile`
   output: "standalone",
   poweredByHeader: false,
+  async redirects() {
+    // Production: one canonical host so Google does not see duplicate www + apex URLs.
+    if (process.env.VERCEL_ENV !== "production") return [];
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.simplefactu.com" }],
+        destination: "https://simplefactu.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

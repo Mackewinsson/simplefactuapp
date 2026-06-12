@@ -7,9 +7,9 @@
  * aplica el desistimiento (servicios ya consumidos).
  */
 
-import { appDocumentTitle } from "@/lib/branding";
+import { legalPageMetadata } from "@/lib/seo/legal-metadata";
 
-export const metadata = { title: appDocumentTitle("Cancelación y reembolso") };
+export const metadata = legalPageMetadata("Cancelación y reembolso", "/legal/cancelacion");
 
 export default function CancellationPolicyPage() {
   return (

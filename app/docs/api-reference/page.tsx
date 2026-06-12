@@ -1,4 +1,6 @@
 import { docsBrowserPageTitle } from "@/lib/branding";
+import { publicRobots } from "@/lib/seo/robots";
+import { canonicalUrl } from "@/lib/seo/site-url";
 import { getSimplefactuDocsApiBaseUrl } from "@/lib/simplefactu/client";
 import { buildOpenApiServerList } from "@/lib/docs/rewrite-openapi-servers";
 import { ApiReferenceClient } from "./ApiReferenceClient";
@@ -20,7 +22,11 @@ import { ApiReferenceClient } from "./ApiReferenceClient";
  * upstream spec.
  */
 
-export const metadata = { title: docsBrowserPageTitle("Referencia API") };
+export const metadata = {
+  title: docsBrowserPageTitle("Referencia API"),
+  robots: publicRobots,
+  alternates: { canonical: canonicalUrl("/docs/api-reference") },
+};
 
 export default function ApiReferencePage() {
   const scalarServers = buildOpenApiServerList(getSimplefactuDocsApiBaseUrl());
