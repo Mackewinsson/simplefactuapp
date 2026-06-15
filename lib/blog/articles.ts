@@ -1757,6 +1757,229 @@ rm /tmp/cert.pem</code></pre>
 </p>
     `.trim(),
   },
+,
+  {
+    slug: "que-es-verifactu-por-que-tu-excel-ya-no-sirve",
+    title: "¿Qué es Veri*Factu y por qué hacer facturas en Excel ya no será legal?",
+    excerpt:
+      "Si eres autónomo o pyme, el panorama de la facturación en España cambia radicalmente. Descubre por qué las facturas en Word o Excel dejan de ser válidas con Veri*Factu.",
+    date: "2026-06-15",
+    readingMinutes: 5,
+    tags: ["verifactu", "autonomos", "pymes", "excel", "normativa"],
+    seoDescription:
+      "Descubre qué es Veri*Factu de la AEAT, por qué la nueva normativa prohíbe las facturas en Excel o Word y cómo adaptar tu programa de facturación para 2026.",
+    content: `
+<h2>El fin de las facturas en Excel y Word</h2>
+<p>
+  Si eres autónomo o gestionas una pequeña empresa (pyme), es muy probable que hayas escuchado hablar de <strong>Veri*Factu</strong>. El Reglamento de los sistemas informáticos de facturación, amparado por el <strong>Real Decreto 1007/2023</strong>, ha introducido un cambio sin precedentes: la Agencia Tributaria (AEAT) exige que los sistemas de facturación garanticen la inalterabilidad de los registros.
+</p>
+<p>
+  ¿Qué significa esto? Básicamente, significa decir adiós a las facturas hechas en plantillas de Excel, Word o PDFs editables. Un archivo de Excel se puede sobreescribir o eliminar sin dejar rastro, y eso es exactamente lo que la nueva normativa busca erradicar para combatir el fraude fiscal.
+</p>
+
+<h2>¿Qué es exactamente Veri*Factu?</h2>
+<p>
+  <strong>Veri*Factu</strong> no es un programa que debas descargar del gobierno, sino un estándar o "sello de calidad". Un software de facturación que cumple con Veri*Factu es capaz de enviar los datos de tus facturas directamente a los servidores de la Hacienda Pública en tiempo real, justo en el momento de su expedición.
+</p>
+<p>
+  Además, la ley exige que el software de facturación cumpla con los principios de <em>integridad, conservación, accesibilidad, legibilidad, trazabilidad e inalterabilidad</em>.
+</p>
+
+<h2>¿Por qué mi Excel de facturación ya no es válido?</h2>
+<ul>
+  <li><strong>Falta de trazabilidad:</strong> No hay un registro automático de cuándo se creó o modificó el archivo.</li>
+  <li><strong>Ausencia de huella digital:</strong> Veri*Factu obliga a generar un código único (hash SHA-256) por cada factura, algo que Excel no hace de forma nativa.</li>
+  <li><strong>Sin encadenamiento de facturas:</strong> La nueva ley obliga a que cada factura esté enlazada criptográficamente con la anterior. Si modificas una factura pasada, la cadena se rompe.</li>
+</ul>
+
+<h2>Cómo adaptarte sin complicaciones</h2>
+<p>
+  La buena noticia es que no necesitas ser un experto en tecnología para cumplir con la ley. Herramientas homologadas como <strong>Simple*Factu</strong> están diseñadas para que el cambio sea totalmente transparente para ti. 
+</p>
+<p>
+  Tú sigues creando tus facturas de forma sencilla, introduciendo los datos de tu cliente y los importes. Por detrás, el programa de facturación se encarga de aplicar la huella digital, encadenar los registros y enviar el XML a la AEAT. Adelántate al plazo legal (1 de enero de 2026) y evita las duras multas por usar sistemas informáticos no certificados.
+</p>
+    `.trim(),
+  },
+  {
+    slug: "que-es-encadenamiento-facturas-blockchain-verifactu",
+    title: "¿Qué es el encadenamiento de facturas en Veri*Factu y la huella digital?",
+    excerpt:
+      "Descubre cómo funciona el encadenamiento criptográfico y la huella digital SHA-256 que usa Hacienda para garantizar la inalterabilidad de las facturas.",
+    date: "2026-06-15",
+    readingMinutes: 5,
+    tags: ["verifactu", "blockchain", "tecnologia", "huella-digital", "aeat"],
+    seoDescription:
+      "Explicación sencilla del encadenamiento de facturas, la huella digital SHA-256 y los requisitos técnicos de Veri*Factu exigidos por la Agencia Tributaria.",
+    content: `
+<h2>El secreto técnico de Veri*Factu: Hash y Encadenamiento</h2>
+<p>
+  Al leer los requisitos técnicos de la normativa Veri*Factu y el RD 1007/2023, conceptos como <em>Hash</em> y <em>Encadenamiento de registros</em> pueden asustar. De repente, el software de facturación tradicional comienza a utilizar principios de seguridad que recuerdan mucho a la tecnología <strong>Blockchain</strong>.
+</p>
+<p>
+  Pero, ¿qué significa realmente que tus facturas estén "encadenadas" y por qué la AEAT ha implementado este complejo sistema informático?
+</p>
+
+<h2>La anatomía de una huella digital (Hash SHA-256)</h2>
+<p>
+  Imagina que cada vez que emites una factura electrónica, tu sistema informático de facturación (SIF) toma todos los datos clave: fecha, importes, tu NIF, el NIF del cliente, y la descripción. El sistema pasa estos datos por un algoritmo matemático (SHA-256) y genera una cadena de texto única de 64 caracteres. Esta es la <strong>huella digital</strong> de tu factura.
+</p>
+<p>
+  Si alguien intenta alterar un solo céntimo de esa factura en la base de datos, la huella digital cambiará por completo, alertando de la manipulación.
+</p>
+
+<h2>El encadenamiento de facturas: Un libro mayor inmutable</h2>
+<p>
+  Hacienda fue un paso más allá para evitar que se puedan borrar facturas enteras. Aquí es donde entra el concepto de <strong>encadenamiento</strong>:
+</p>
+<ul>
+  <li>Para calcular la huella digital de la <strong>Factura 2</strong>, el sistema de facturación debe incluir la huella de la <strong>Factura 1</strong>.</li>
+  <li>Para la <strong>Factura 3</strong>, se utiliza la huella de la <strong>Factura 2</strong>.</li>
+</ul>
+
+<h3>¿Qué pasa si intentas modificar una factura antigua?</h3>
+<p>
+  Si un usuario intenta alterar la Factura 1 meses después de haberla emitido, su huella digital cambiará. Y como la Factura 2 dependía de la huella original de la Factura 1, la Factura 2 quedará invalidada automáticamente. <strong>Toda la cadena se rompe</strong>. Es matemáticamente imposible modificar el pasado sin dejar un rastro evidente en la contabilidad.
+</p>
+
+<h2>La solución para los desarrolladores y pymes</h2>
+<p>
+  Implementar el encadenamiento de facturas, el cálculo de huellas y la firma digital es un desafío de ingeniería sustancial. Por eso, APIs y plataformas como <strong>Simple*Factu</strong> gestionan todo el proceso en segundo plano. Nuestra API mantiene esta cadena de bloques fiscal perfecta para cada "tenant" o cliente, asegurando que cada factura llegue a los servidores de la AEAT correctamente encadenada.
+</p>
+    `.trim(),
+  },
+  {
+    slug: "verifactu-para-gestorias-ventaja-competitiva",
+    title: "Veri*Factu para gestorías y asesorías: Cómo adaptar a tus clientes a la normativa",
+    excerpt:
+      "La llegada de Veri*Factu es un reto, pero también una oportunidad de oro para las gestorías. Aprende a centralizar la facturación de tus clientes fácilmente.",
+    date: "2026-06-15",
+    readingMinutes: 5,
+    tags: ["verifactu", "gestorias", "asesorias", "b2b", "despachos"],
+    seoDescription:
+      "Guía sobre Veri*Factu para gestorías y asesorías fiscales. Descubre cómo centralizar la facturación de tus clientes y convertirlos a la nueva normativa sin fricciones.",
+    content: `
+<h2>La revolución digital en las Asesorías Fiscales</h2>
+<p>
+  El sector de la asesoría fiscal y contable en España se enfrenta a su mayor transformación digital. La implantación de Veri*Factu y la facturación electrónica obligatoria supone el fin del papel y de las facturas enviadas por WhatsApp o guardadas en carpetas compartidas.
+</p>
+<p>
+  Para las <strong>gestorías y asesorías</strong>, esto representa inicialmente un reto organizativo, pero a largo plazo es una inmensa oportunidad para fidelizar clientes y automatizar procesos contables.
+</p>
+
+<h2>El problema: La fragmentación de software de facturación</h2>
+<p>
+  Si cada uno de tus clientes contrata un software de facturación distinto para cumplir con Veri*Factu, tu equipo contable perderá cientos de horas:
+</p>
+<ul>
+  <li>Aprendiendo a exportar datos de múltiples plataformas.</li>
+  <li>Unificando formatos de Excel o CSV para importar a tu ERP.</li>
+  <li>Persiguiendo errores de sincronización y certificados caducados.</li>
+</ul>
+
+<h2>La solución: Un ecosistema de facturación centralizado (Portal Partner)</h2>
+<p>
+  La estrategia ganadora para una gestoría moderna es ofrecer a sus clientes una herramienta de facturación propia, centralizada y homologada. Una plataforma donde el autónomo solo vea una interfaz sencilla para hacer facturas, mientras la asesoría mantiene el control total de la integración con la Agencia Tributaria.
+</p>
+<p>
+  La arquitectura <em>Partner</em> de <strong>Simple*Factu</strong> está diseñada precisamente para despachos profesionales:
+</p>
+<ol>
+  <li><strong>Gestión de clientes (Multi-tenant):</strong> Da de alta a nuevos clientes en segundos desde una única consola de integrador.</li>
+  <li><strong>Certificados digitales centralizados:</strong> Custodia y gestiona los certificados FNMT (.pfx) de tus clientes. El sistema te avisa antes de que caduquen.</li>
+  <li><strong>Contabilidad automatizada:</strong> Dado que todas las facturas de tus clientes pasan por el mismo sistema y se envían a la AEAT, exportar los registros para los modelos trimestrales (IVA, IRPF) se convierte en un proceso de un solo clic.</li>
+</ol>
+<p>
+  No vendas solo asesoramiento fiscal tradicional; vende la tranquilidad de estar 100% adaptado a Veri*Factu sin esfuerzo tecnológico.
+</p>
+    `.trim(),
+  },
+  {
+    slug: "5-mitos-verifactu-facturacion-electronica",
+    title: "5 mitos sobre Veri*Factu y la facturación electrónica obligatoria en España",
+    excerpt:
+      "Desmentimos los 5 miedos y mitos más comunes sobre la facturación en tiempo real con Hacienda para que adaptes tu empresa o negocio sin estrés.",
+    date: "2026-06-15",
+    readingMinutes: 4,
+    tags: ["verifactu", "mitos", "facturacion-electronica", "hacienda", "aeat"],
+    seoDescription:
+      "Desmintiendo los 5 mitos más comunes sobre Veri*Factu: multas inmediatas, cobro automático de IVA, sistemas caros y más realidades de la facturación electrónica.",
+    content: `
+<h2>Verdades y mentiras sobre la nueva normativa de facturación</h2>
+<p>
+  La obligación de usar sistemas informáticos de facturación adaptados a Veri*Factu ha generado mucho ruido. El miedo a "Hacienda en tiempo real" y a la facturación electrónica obligatoria (Ley Crea y Crece) ha provocado una ola de desinformación entre autónomos y pymes. A continuación, desmentimos los 5 mitos más extendidos.
+</p>
+
+<h3>Mito 1: "Hacienda me cobrará los impuestos en el mismo instante en que emita la factura."</h3>
+<p>
+  <strong>Falso.</strong> Veri*Factu cambia <em>cómo y cuándo</em> informas de la existencia de tus facturas, pero no altera el calendario fiscal. Seguirás liquidando tus modelos trimestrales (Modelo 303 de IVA, 130 de IRPF, etc.) en las mismas fechas de siempre. La gran ventaja es que la AEAT te ofrecerá borradores pre-rellenados.
+</p>
+
+<h3>Mito 2: "Si me equivoco en una factura enviada, me multarán inmediatamente."</h3>
+<p>
+  <strong>Falso.</strong> La normativa asume que los errores humanos ocurren. Si emites una factura a Veri*Factu con un error en el cliente o los importes, podrás emitir una <strong>factura rectificativa</strong> o una factura de anulación. Lo que está totalmente prohibido (y sancionado) es modificar los registros internos del software sin dejar rastro de la modificación.
+</p>
+
+<h3>Mito 3: "Cualquier programa viejo de facturas servirá con una simple actualización."</h3>
+<p>
+  <strong>Falso.</strong> Los requisitos técnicos son extremadamente rigurosos: huellas digitales SHA-256, encadenamiento criptográfico, firmas mTLS y comunicación SOAP. Esto requiere un rediseño profundo. Por eso, plataformas modernas como <strong>Simple*Factu</strong> nacen con esta arquitectura integrada de forma nativa.
+</p>
+
+<h3>Mito 4: "Tendré que comprar servidores o equipos carísimos."</h3>
+<p>
+  <strong>Falso.</strong> La inmensa mayoría de las soluciones Veri*Factu operan <em>en la nube (Cloud)</em>. Puedes seguir emitiendo facturas desde tu ordenador portátil, tablet o teléfono móvil actual. El proceso de encriptación y envío recae en los servidores del proveedor de software.
+</p>
+
+<h3>Mito 5: "Esto es solo para grandes empresas, los autónomos estamos exentos."</h3>
+<p>
+  <strong>Falso.</strong> Las grandes empresas (facturación mayor a 6 millones de euros) ya usan el <strong>SII (Suministro Inmediato de Información)</strong>. Veri*Factu está dirigido precisamente a todos los demás: autónomos, profesionales liberales, micropymes y pymes de cualquier sector en el territorio común de España.
+</p>
+    `.trim(),
+  },
+  {
+    slug: "error-frustrante-facturacion-aeat-timeouts",
+    title: "Errores comunes al conectar Veri*Factu con la AEAT y cómo solucionarlos",
+    excerpt:
+      "Si tu aplicación de facturación depende de llamadas síncronas a la AEAT, tendrás problemas. Aprende por qué una arquitectura asíncrona evita los timeouts.",
+    date: "2026-06-15",
+    readingMinutes: 6,
+    tags: ["verifactu", "desarrollo", "api", "timeouts", "integracion"],
+    seoDescription:
+      "Guía para desarrolladores: cómo manejar errores, mantenimientos y timeouts de la API SOAP de la AEAT al integrar Veri*Factu usando colas asíncronas.",
+    content: `
+<h2>El reto técnico de integrar la API de la AEAT</h2>
+<p>
+  Cualquier programador o empresa de software que se haya enfrentado a la integración de servicios web de la Administración Pública conoce la regla de oro: <strong>asume que el sistema fallará en el peor momento posible</strong>.
+</p>
+<p>
+  Al desarrollar un sistema informático de facturación (SIF) compatible con Veri*Factu, las conexiones con la Agencia Tributaria no son una excepción. Los tiempos de espera agotados (<em>timeouts</em>), los mantenimientos de red no programados y los errores HTTP 500 o respuestas SOAP incompletas son frecuentes, tanto en el entorno de preproducción como en producción.
+</p>
+
+<h2>El peligro de las integraciones síncronas</h2>
+<p>
+  El error de diseño más común es utilizar una arquitectura síncrona. 
+</p>
+<p>
+  Imagina que tu usuario hace clic en "Emitir Factura". Tu servidor (backend) genera el XML, aplica el certificado mTLS y abre una conexión HTTPS con <code>www1.agenciatributaria.gob.es</code>. Si el servidor de Hacienda tarda 30 segundos en responder, el navegador de tu cliente se quedará bloqueado y posiblemente mostrará un error. Si el usuario, frustrado, vuelve a pulsar el botón, corres el riesgo de duplicar la factura o romper el encadenamiento de huellas SHA-256.
+</p>
+
+<h2>La solución: Arquitectura Asíncrona basada en Jobs (Colas)</h2>
+<p>
+  Para construir un software Veri*Factu robusto, la comunicación con la AEAT debe desacoplarse de la interfaz de usuario. En <strong>Simple*Factu</strong>, resolvemos esto utilizando un sistema de trabajos en segundo plano (<em>Background Workers</em>):
+</p>
+<ol>
+  <li><strong>Idempotencia y respuesta rápida:</strong> Cuando el usuario emite la factura, nuestro sistema calcula la huella digital y guarda el registro localmente. Devolvemos un código de éxito al usuario inmediatamente (HTTP 202 Accepted).</li>
+  <li><strong>Cola de tareas (Jobs):</strong> La factura entra en una cola en estado <code>PENDING</code>.</li>
+  <li><strong>Workers en segundo plano:</strong> Un proceso independiente toma la tarea y se encarga de enviarla a la API de la AEAT.</li>
+  <li><strong>Estrategia de Backoff Exponencial:</strong> Si la conexión falla (ej. error 503 Service Unavailable), el worker no satura la red. Reintenta a los 2 segundos, luego a los 4, 8, 16... garantizando que el mensaje se entrega cuando el servicio se restablece.</li>
+</ol>
+
+<h2>Beneficios de delegar la integración</h2>
+<p>
+  Cumplir con la normativa técnica del RD 1007/2023 va más allá de validar un XML contra un archivo XSD. Implica construir infraestructura resiliente capaz de gestionar certificados, gestionar series de facturación y recuperarse de fallos externos sin afectar a la experiencia de tus usuarios finales.
+</p>
+    `.trim(),
+  }
 ];
 
 export function getArticle(slug: string): Article | undefined {

@@ -65,3 +65,8 @@ Títulos derivados de búsquedas relacionadas con «verifactu». Prioridad suger
 | `odoo-verifactu-integracion-modulos-cumplimiento` | Odoo y Veri\*Factu: integración, módulos y cumplimiento |
 | `factusol-verifactu-compatibilidad-migracion` | FactuSOL y Veri\*Factu: compatibilidad y migración |
 | `contasimple-verifactu-diferencias-cuando-usar-cada-uno` | ContaSimple y Veri\*Factu: diferencias y cuándo usar cada uno |
+| `que-es-verifactu-por-que-tu-excel-ya-no-sirve` | El tsunami fiscal que viene: ¿Qué es Veri\*Factu y por qué tu Excel ya no sirve? |
+| `que-es-encadenamiento-facturas-blockchain-verifactu` | El secreto de Veri\*Factu: ¿Qué es el encadenamiento de facturas y por qué se parece a Blockchain? |
+| `verifactu-para-gestorias-ventaja-competitiva` | Gestorías en la era Veri\*Factu: Cómo convertir una obligación legal en tu mayor ventaja competitiva |
+| `5-mitos-verifactu-facturacion-electronica` | 5 Mitos sobre Veri\*Factu que te están quitando el sueño (y la verdad detrás de ellos) |
+| `error-frustrante-facturacion-aeat-timeouts` | El error más frustrante de la facturación electrónica: Fallos de la AEAT y cómo evitarlos |
