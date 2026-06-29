@@ -153,7 +153,7 @@ export default async function ArticlePage({ params }: Props) {
 
           {/* Article body */}
           <div
-            className="prose prose-sm sm:prose max-w-none prose-headings:font-semibold prose-headings:text-fg prose-p:text-fg-muted prose-li:text-fg-muted prose-a:text-brand prose-strong:text-fg prose-code:rounded prose-code:bg-surface-muted prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-pre:overflow-x-auto prose-pre:rounded-lg prose-pre:bg-surface-muted prose-pre:p-4 prose-pre:text-xs prose-table:border-collapse prose-th:border prose-th:border-outline-soft prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:text-xs prose-th:text-fg prose-td:border prose-td:border-outline-soft prose-td:px-3 prose-td:py-2 prose-td:text-xs prose-td:text-fg-muted"
+            className="prose prose-sm sm:prose max-w-none prose-headings:font-semibold prose-headings:text-fg prose-p:text-fg-muted prose-li:text-fg-muted prose-a:text-brand prose-strong:text-fg prose-code:rounded prose-code:bg-surface-muted prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-pre:overflow-x-auto prose-pre:rounded-lg prose-pre:bg-surface-muted prose-pre:p-4 prose-pre:text-xs prose-table:border-collapse prose-th:border prose-th:border-outline-soft prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:text-xs prose-th:text-fg prose-td:border prose-td:border-outline-soft prose-td:px-3 prose-td:py-2 prose-td:text-xs prose-td:text-fg-muted [&_pre_code]:bg-transparent [&_pre_code]:p-0"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
 

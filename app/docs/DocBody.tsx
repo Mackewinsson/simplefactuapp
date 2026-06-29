@@ -18,7 +18,7 @@ export function DocBody({ page }: { page: DocPage }) {
         ) : null}
       </header>
       <div
-        className="prose prose-sm max-w-none prose-headings:scroll-mt-24 prose-a:text-accent prose-a:font-bold hover:prose-a:underline prose-headings:font-display prose-headings:font-black prose-headings:tracking-tight prose-headings:text-fg prose-pre:rounded-2xl prose-pre:bg-code prose-pre:text-code-foreground prose-pre:border prose-pre:border-outline-soft/10 prose-pre:shadow-md prose-pre:p-5 prose-code:font-mono prose-code:text-xs prose-code:bg-surface-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-code:border prose-code:border-outline-soft/50 prose-code:before:content-none prose-code:after:content-none prose-strong:text-fg prose-strong:font-bold leading-relaxed font-sans text-fg-muted"
+        className="prose prose-sm max-w-none prose-headings:scroll-mt-24 prose-a:text-accent prose-a:font-bold hover:prose-a:underline prose-headings:font-display prose-headings:font-black prose-headings:tracking-tight prose-headings:text-fg prose-pre:rounded-2xl prose-pre:bg-code prose-pre:text-code-foreground prose-pre:border prose-pre:border-outline-soft/10 prose-pre:shadow-md prose-pre:p-5 prose-code:font-mono prose-code:text-xs prose-code:bg-surface-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-code:border prose-code:border-outline-soft/50 prose-code:before:content-none prose-code:after:content-none prose-strong:text-fg prose-strong:font-bold leading-relaxed font-sans text-fg-muted [&_pre_code]:bg-transparent [&_pre_code]:border-none [&_pre_code]:p-0 [&_pre_code]:text-inherit"
         dangerouslySetInnerHTML={{ __html: page.html }}
       />
     </div>
