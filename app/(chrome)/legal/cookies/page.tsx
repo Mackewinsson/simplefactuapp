@@ -40,8 +40,8 @@ export default function CookiesPolicyPage() {
             <td>Sesión / 1 año</td>
           </tr>
           <tr>
-            <td>Cookies de Stripe</td>
-            <td>Stripe Payments Europe Ltd.</td>
+            <td>Cookies de Lemon Squeezy</td>
+            <td>Lemon Squeezy, LLC (Merchant of Record)</td>
             <td>
               Procesamiento seguro del pago y prevención del fraude.
             </td>

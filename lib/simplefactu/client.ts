@@ -135,18 +135,6 @@ export function createSimplefactuClient(config: SimplefactuClientConfig) {
       });
     },
 
-    async postMeUpgrade(body: {
-      planId: "pro" | "enterprise";
-      successUrl: string;
-      cancelUrl: string;
-    }): Promise<Response> {
-      return fetch(joinUrl(baseUrl, "/me/upgrade"), {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
-    },
-
     async getMeInvoiceRecords(searchParams: URLSearchParams): Promise<Response> {
       const qs = searchParams.toString();
       const path = qs ? `/me/invoice-records?${qs}` : "/me/invoice-records";

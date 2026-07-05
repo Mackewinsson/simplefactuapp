@@ -58,12 +58,16 @@ app/
   invoices/new/                             Alta + Server Actions (verify NIF, envío)
   customers/ products/                      CRUD ligero
   settings/verifactu/                       Certificado PFX, onboarding, VNIF opcional
+  settings/billing/                         Plan Pro (Lemon Squeezy checkout + portal)
   invoices/records/                         Archivo AEAT + export CSV
   partner/                                  Panel gestoría (sub-tenants)
   admin/                                    Panel operador (tenants, jobs, sistema, auditoría, …)
   partner-access-denied/                    Sin rol partner
   api/webhooks/clerk/                       Webhook Clerk (opcional)
+  api/webhooks/lemonsqueezy/                Webhook Lemon Squeezy → Neon + sync API
 lib/
+  billing/                                  plans, subscription-store, feature flag
+  lemonsqueezy/                             checkout client, webhook verify, tenant sync
   simplefactu/client.ts                     Cliente HTTP firmado con x-api-key (solo servidor)
   simplefactu/admin-server.ts               Llamadas con x-admin-key (provisión, admin UI)
   simplefactu/partner-server.ts             BFF /partner/* con clave partner
@@ -88,7 +92,7 @@ Referencia canónica de plantillas:
 | Fichero | Uso |
 |---------|-----|
 | [`.env.example`](.env.example) | Local → copiar a `.env.local` |
-| [`.env.qa.example`](.env.qa.example) | Vercel **Preview** / Bitwarden |
+| [`.env.qa.example`](.env.qa.example) | Vercel **Preview** / Bitwarden — Lemon Squeezy test ([`docs/BILLING_QA.md`](docs/BILLING_QA.md)) |
 | [`.env.prod.example`](.env.prod.example) | Vercel **Production** / Bitwarden |
 
 En runtime las vars viven en **Vercel**, no en GitHub. Backup: Secure Notes en Bitwarden (una por entorno).
@@ -113,6 +117,9 @@ El API **no** lee variables de Vercel. El front llama al API por HTTP con secret
 | `VERIFACTU_ENCRYPTION_KEY` | clave dev propia | clave QA (distinta de prod) | clave prod nueva |
 | Clerk | `pk_test_` / `sk_test_` | test | `pk_live_` / `sk_live_` |
 | `DATABASE_URL` | Neon dev / local | Neon QA | Neon prod |
+| `NEXT_PUBLIC_BILLING_ENABLED` | `false` | `true` (cuando actives billing QA) | `true` (live) |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3001` | `https://qa.simplefactu.com` | `https://simplefactu.com` |
+| `LEMONSQUEEZY_*` | test (opcional local) | test mode + [`docs/BILLING_QA.md`](docs/BILLING_QA.md) | live keys, webhook prod |
 
 QR de verificación AEAT: lo devuelve el API en `qrInfo.qrText` → Prisma `invoice.aeatQrText` (PDF y panel). Base URL en el VPS: `AEAT_QR_BASE_URL` / `AEAT_URL` ([API AGENTS.md](../simplefactu/AGENTS.md)).
 
@@ -146,7 +153,12 @@ Si `SIMPLEFACTU_ADMIN_KEY` ≠ `ADMIN_KEY` del VPS → `401 Invalid x-admin-key`
 | `DATABASE_URL` | No | Prisma (`lib/prisma.ts`) |
 | `NODE_ENV` | Implícito en Vercel | Prisma logging, build |
 | `NEXT_PUBLIC_BILLING_ENABLED` | Sí | `lib/billing/feature.ts` — UI billing (alinear con API `BILLING_ENABLED`) |
-| `NEXT_PUBLIC_APP_URL` | Sí | `settings/billing/actions.ts` — URLs Stripe checkout |
+| `NEXT_PUBLIC_APP_URL` | Sí | `settings/billing/actions.ts` — URL absoluta de éxito Lemon Squeezy |
+| `LEMONSQUEEZY_API_KEY` | No | `lib/lemonsqueezy/client.ts` — checkout Pro |
+| `LEMONSQUEEZY_STORE_ID` | No | Lemon Squeezy store ID |
+| `LEMONSQUEEZY_VARIANT_ID_PRO` | No | Variant ID del plan Pro (único self-serve MVP) |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | No | `app/api/webhooks/lemonsqueezy` — firma HMAC |
+| `LEMONSQUEEZY_TEST_MODE` | No | `true` en Preview/QA; omitir o `false` en Production |
 | `NEXT_PUBLIC_TITULAR_RAZON_SOCIAL`, `NEXT_PUBLIC_TITULAR_NIF` | Sí | `app/Footer.tsx` — aviso legal |
 | `INVOICE_COMPANY_NAME` | No | `invoices/[id]/pdf/route.ts` — fallback nombre en PDF |
 
@@ -167,8 +179,9 @@ Catálogo del API (VPS): [`../simplefactu/AGENTS.md` §4](../simplefactu/AGENTS.
 1. **`ensureVerifactuApiKey(userId)`** (`lib/verifactu/provision.ts`): si no hay fila o la clave devuelve 401 en el API, crea tenant `sf_<userId>` y API key vía `adminFetch` (`POST /admin/tenants`, `POST /admin/api-keys` con `BFF_KEY_SCOPES`), guarda la clave cifrada.
 2. **`createSimplefactuClient`** (`lib/simplefactu/client.ts`): peticiones de usuario con `x-api-key` desde la clave desencriptada — send-invoice, jobs, verify-nif, certificado, etc.
 3. **`adminFetch`** (`lib/simplefactu/admin-server.ts`): usa `SIMPLEFACTU_ADMIN_KEY` para el panel `/admin/*` del front (listados, métricas, reintentos, cadenas, …).
-4. **Jobs async:** `POST /send-invoice` → 202 + `jobId`; polling `GET /jobs/:id` hasta estado terminal (ver `job-sync` y paneles de factura/admin).
-5. **Partner (gestoría):** `ensurePartnerApiKey` → tenant `rp_<userId>` + scopes `partner:tenants:*`; `partnerFetch` llama a `/partner/*`. Primera provisión usa `adminFetch` (una vez); operación diaria sin `SIMPLEFACTU_ADMIN_KEY`.
+4. **Billing (Lemon Squeezy):** checkout Pro en `settings/billing/actions.ts` → Lemon Squeezy hosted checkout; webhook `POST /api/webhooks/lemonsqueezy` persiste `subscriptions` (Neon) y sincroniza `planId`/`status` al API vía `PATCH /admin/tenants/:id`. Enterprise: contacto ventas / asignación admin.
+5. **Jobs async:** `POST /send-invoice` → 202 + `jobId`; polling `GET /jobs/:id` hasta estado terminal (ver `job-sync` y paneles de factura/admin).
+6. **Partner (gestoría):** `ensurePartnerApiKey` → tenant `rp_<userId>` + scopes `partner:tenants:*`; `partnerFetch` llama a `/partner/*`. Primera provisión usa `adminFetch` (una vez); operación diaria sin `SIMPLEFACTU_ADMIN_KEY`.
 
 Contrato e idempotencia: misma `x-idempotency-key` + mismo cuerpo → mismo resultado; encadenamiento y huellas según documentación del API. Partner: [`../simplefactu/docs/PARTNER_GESTORIA.md`](../simplefactu/docs/PARTNER_GESTORIA.md).
 
@@ -196,6 +209,7 @@ Resolución unificada: `lib/auth/app-role.ts` → `resolveAppRole()` (admin > pa
 - **`/invoices`:** gestión de facturas; envío Veri\*Factu y seguimiento de job en detalle.
 - **`/invoices/new`:** alta; verificación NIF destinatario contra el API cuando procede.
 - **`/settings/verifactu`:** certificado y metadatos emisor enlazados a `/me/certificate` del API (la app sube en servidor con JSON). Quien llame al **API directamente** puede usar también `multipart/form-data` en ese endpoint; ver [Autenticación](/docs/authentication) y la [referencia API](/docs/api-reference) (OpenAPI).
+- **`/settings/billing`:** plan Pro vía Lemon Squeezy; Enterprise bajo presupuesto; estado en Neon `subscriptions` + `GET /me/plan`.
 - **`/admin`:** operación plataforma — tenants, jobs, sistema (métricas / rate limit), auditoría, soporte/reintentos, etc. Solo operadores simplefactu (consume endpoints admin del API documentados en el `AGENTS.md` del backend).
 - **`/partner`:** consola de integrador B2B — dashboard KPIs, listado y alta de autónomos, detalle (suspender, API key, certificado PFX, jobs). Ver [documentación de integrador](content/docs/gestoria.md).
 - **`/invoices/records`:** histórico AEAT (`GET /me/invoice-records`) y export CSV.
@@ -219,6 +233,7 @@ Puerto Next: **3001** en ambos modos (API en 3000). El API local usa `ENABLE_AEA
 
 - **Proveedor:** PostgreSQL (`schema.prisma`).
 - **`UserVerifactuAccount`:** mapeo `userId` Clerk → `simplefactuTenantId` + `apiKeyEncrypted`.
+- **`Subscription`:** Lemon Squeezy (`lsSubscriptionId`, `planId`, `customerPortalUrl`); webhook sincroniza al API.
 - **`UserPartnerAccount`:** mapeo `userId` → `partnerTenantId` (`rp_*`) + `apiKeyEncrypted` (gestoría).
 - **`Invoice`:** campos `aeat*` para job id, estado, CSV, QR, errores, anulación; `vnifVerifiedAt` en cuenta Verifactu.
 - Comandos típicos: `pnpm prisma migrate dev` (desarrollo), `pnpm prisma:migrate:deploy` (CI/producción), `pnpm prisma db seed` si usas seed.

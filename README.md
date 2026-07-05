@@ -22,7 +22,7 @@ Abre [http://localhost:3000](http://localhost:3000). Opcional: `pnpm prisma db s
 - **Autónomo:** facturas, clientes, productos, certificado Verifactu, envío AEAT async, PDF con CSV/QR, onboarding, archivo `/invoices/records` + export CSV.
 - **Gestoría:** panel `/partner` — sub-tenants, certificados y API keys por autónomo (API `partner:*`, sin admin global en el día a día).
 - **Operación:** panel `/admin` con `SIMPLEFACTU_ADMIN_KEY` (tenants, jobs, reintentos, auditoría).
-- **No activo por defecto:** billing Stripe (`NEXT_PUBLIC_BILLING_ENABLED=false`).
+- **No activo por defecto:** billing Lemon Squeezy (`NEXT_PUBLIC_BILLING_ENABLED=false`; checkout en `/settings/billing`, webhook `/api/webhooks/lemonsqueezy`).
 
 Desarrollo local contra **datos QA**: ver [AGENTS.md — Desarrollo local](AGENTS.md#desarrollo-local).
 
@@ -33,7 +33,7 @@ Los secretos viven en **Vercel** (Preview vs Production), no en este repositorio
 | Almacén | Plantilla | Runtime |
 | ----- | -------- | ------- |
 | Local | [`.env.example`](.env.example) → `.env.local` | `pnpm dev` |
-| QA | [`.env.qa.example`](.env.qa.example) | Vercel Preview (`develop`, `qa.simplefactu.com`) |
+| QA | [`.env.qa.example`](.env.qa.example) | Vercel Preview — ver [docs/BILLING_QA.md](docs/BILLING_QA.md) para billing |
 | Prod | [`.env.prod.example`](.env.prod.example) | Vercel Production (`main`, `simplefactu.com`) |
 | Bitwarden (recomendado) | Copia de cada plantilla rellena | Copia de seguridad offline |
 

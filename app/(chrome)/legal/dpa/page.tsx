@@ -111,7 +111,7 @@ export default function DpaPage() {
           (cláusulas contractuales tipo).
         </li>
         <li>
-          <strong>Stripe Payments Europe Ltd.</strong> — tratamiento de pagos,
+          <strong>Lemon Squeezy, LLC</strong> — tratamiento de pagos (Merchant of Record),
           UE / EE.UU.
         </li>
         <li>

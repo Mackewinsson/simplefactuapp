@@ -21,7 +21,8 @@
     "test:csv": "tsx scripts/test-invoice-records-csv.ts",
     "test:validation": "tsx scripts/test-create-invoice-validation.ts",
     "test:roles": "tsx scripts/test-roles.ts",
-    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles",
+    "test:billing": "tsx scripts/test-lemon-squeezy-billing.ts",
+    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles && npm run test:billing",
     "prepare": "node -e \"if(!process.env.CI && !process.env.DOCKER_BUILD){require('child_process').execSync('husky',{stdio:'inherit'})}\" || true"
   },
   "lint-staged": {
@@ -33,6 +34,7 @@
   "dependencies": {
     "@clerk/localizations": "^4.5.8",
     "@clerk/nextjs": "^6.37.3",
+    "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
     "@prisma/client": "^6.19.2",
     "@scalar/api-reference-react": "^0.9.34",
     "@tailwindcss/typography": "^0.5.19",

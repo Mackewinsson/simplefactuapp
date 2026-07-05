@@ -34,7 +34,7 @@ const PUBLIC_TAG_META: Record<string, { description: string }> = {
       "Certificado digital AEAT del tenant (`POST /me/certificate`, `GET /me/certificate`).",
   },
   Facturación: {
-    description: "Plan, uso mensual y checkout Stripe.",
+    description: "Plan, uso mensual y límites. Checkout en la app (Lemon Squeezy).",
   },
   Salud: {
     description: "Comprobaciones de vida y preparación del servicio.",

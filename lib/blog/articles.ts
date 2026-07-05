@@ -1757,7 +1757,6 @@ rm /tmp/cert.pem</code></pre>
 </p>
     `.trim(),
   },
-,
   {
     slug: "que-es-verifactu-por-que-tu-excel-ya-no-sirve",
     title: "¿Qué es Veri*Factu y por qué hacer facturas en Excel ya no será legal?",

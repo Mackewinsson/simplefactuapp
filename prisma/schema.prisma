@@ -173,3 +173,22 @@ model AdminActionLog {
   @@index([createdAt])
   @@map("admin_action_logs")
 }
+
+/// Lemon Squeezy subscription state (source of truth for billing UI).
+model Subscription {
+  userId              String    @id
+  simplefactuTenantId String
+  lsSubscriptionId    String    @unique
+  lsCustomerId        String?
+  lsVariantId         String
+  status              String
+  planId              String    @default("free")
+  renewsAt            DateTime?
+  endsAt              DateTime?
+  customerPortalUrl   String?   @db.Text
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([simplefactuTenantId])
+  @@map("subscriptions")
+}

@@ -47,10 +47,10 @@ export default function PrivacyPolicyPage() {
         </li>
       </ul>
 
-      <h3>2.3. Datos de facturación (Stripe)</h3>
+      <h3>2.3. Datos de facturación (Lemon Squeezy)</h3>
       <ul>
         <li>
-          Identificador del cliente Stripe y de las suscripciones activas.
+          Identificador del cliente Lemon Squeezy y de las suscripciones activas.
         </li>
         <li>
           Historial de pagos.{" "}
@@ -119,7 +119,7 @@ export default function PrivacyPolicyPage() {
           cláusulas contractuales tipo y certificación EU-US DPF.
         </li>
         <li>
-          <strong>Stripe Payments Europe Ltd.</strong> (cobros) — datos en
+          <strong>Lemon Squeezy, LLC</strong> (cobros, Merchant of Record) — datos en
           UE / EE.UU.
         </li>
         <li>
@@ -189,7 +189,7 @@ export default function PrivacyPolicyPage() {
       <h2>9. Cookies</h2>
       <p>
         {APP_DISPLAY_NAME} utiliza únicamente cookies técnicas necesarias para
-        mantener la sesión (Clerk) y procesar el pago (Stripe). No utiliza
+        mantener la sesión (Clerk) y procesar el pago (Lemon Squeezy). No utiliza
         cookies de analítica ni publicitarias. Por ello no requiere banner de
         consentimiento conforme al art. 22.2 LSSI. Ver{" "}
         <a href="/legal/cookies">Política de cookies</a>.

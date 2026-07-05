@@ -4,24 +4,22 @@ import { useState, useTransition } from "react";
 import { startUpgradeAction } from "./actions";
 
 type Props = {
-  planId: "pro" | "enterprise";
   label: string;
   variant?: "primary" | "secondary";
 };
 
 /**
  * Client component that triggers the server action and redirects the user
- * to the Stripe Checkout URL. We keep this as a separate component so the
- * billing page can stay a pure server component (faster initial render).
+ * to the Lemon Squeezy checkout URL.
  */
-export function UpgradeButton({ planId, label, variant = "primary" }: Props) {
+export function UpgradeButton({ label, variant = "primary" }: Props) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   const handleClick = () => {
     setError(null);
     startTransition(async () => {
-      const result = await startUpgradeAction(planId);
+      const result = await startUpgradeAction();
       if (result.ok) {
         window.location.href = result.checkoutUrl;
         return;

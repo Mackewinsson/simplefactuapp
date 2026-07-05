@@ -64,7 +64,7 @@ export default function AvisoLegalPage() {
 
       <h2>6. Enlaces a terceros</h2>
       <p>
-        El sitio puede contener enlaces a recursos externos (sede AEAT, Stripe,
+        El sitio puede contener enlaces a recursos externos (sede AEAT, Lemon Squeezy,
         Clerk). Mackewinsson Palencia no es responsable de los contenidos ni de
         las políticas de privacidad de dichos sitios.
       </p>

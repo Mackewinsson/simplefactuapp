@@ -1,17 +1,13 @@
 "use server";
 
 import { headers } from "next/headers";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
-import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
+import { isBillingEnabled } from "@/lib/billing/feature";
+import { isLemonSqueezyConfigured } from "@/lib/lemonsqueezy/config";
+import { createProCheckout } from "@/lib/lemonsqueezy/client";
 
-/**
- * Build absolute URLs for Stripe Checkout success/cancel callbacks. Stripe
- * needs absolute URLs; the app may run behind several reverse proxies, so we
- * derive the base from the request headers (x-forwarded-* aware) instead of
- * relying on a fixed env var.
- */
 async function getAppOrigin(): Promise<string> {
   const h = await headers();
   const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim();
@@ -29,44 +25,37 @@ export type StartUpgradeResult =
   | { ok: false; message: string };
 
 /**
- * Server action: opens a Stripe Checkout session for the upgrade and returns
- * the redirect URL. The caller is responsible for `window.location.href = url`
- * (or `redirect()` from Server Actions). Errors are returned as a tagged
- * union so the client can render a friendly message instead of a hard crash.
+ * Server action: creates a Lemon Squeezy checkout for Pro and returns the redirect URL.
  */
-export async function startUpgradeAction(
-  planId: "pro" | "enterprise"
-): Promise<StartUpgradeResult> {
+export async function startUpgradeAction(): Promise<StartUpgradeResult> {
+  if (!isBillingEnabled()) {
+    return { ok: false, message: "La facturación no está activa en este entorno." };
+  }
+
+  if (!isLemonSqueezyConfigured()) {
+    return {
+      ok: false,
+      message: "Lemon Squeezy no está configurado. Contacta con soporte.",
+    };
+  }
+
   const { userId } = await auth();
   if (!userId) return { ok: false, message: "Sesión expirada" };
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
-    const client = createSimplefactuClient({
-      baseUrl: getSimplefactuBaseUrl(),
-      apiKey,
-    });
-
+    const user = await currentUser();
+    const { tenantId } = await ensureVerifactuApiKey(userId);
     const origin = await getAppOrigin();
-    const res = await client.postMeUpgrade({
-      planId,
-      successUrl: `${origin}/settings/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${origin}/settings/billing/cancel`,
+
+    const checkoutUrl = await createProCheckout({
+      tenantId,
+      userId,
+      email: user?.primaryEmailAddress?.emailAddress ?? null,
+      name: user?.fullName ?? user?.firstName ?? null,
+      successUrl: `${origin}/settings/billing/success`,
     });
 
-    if (!res.ok) {
-      const body = (await client.parseJson(res)) as { message?: string } | null;
-      return {
-        ok: false,
-        message: body?.message || `El pago no pudo iniciarse (HTTP ${res.status})`,
-      };
-    }
-
-    const body = (await client.parseJson(res)) as { checkoutUrl?: string } | null;
-    if (!body?.checkoutUrl) {
-      return { ok: false, message: "Stripe no devolvió URL de checkout" };
-    }
-    return { ok: true, checkoutUrl: body.checkoutUrl };
+    return { ok: true, checkoutUrl };
   } catch (e) {
     return { ok: false, message: formatVerifactuActionError(e) };
   }

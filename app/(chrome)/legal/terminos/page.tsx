@@ -67,7 +67,7 @@ export default function TermsPage() {
       <h2>5. Suscripción y pago</h2>
       <p>
         El Servicio se ofrece con un plan gratuito limitado y planes de pago
-        mensual gestionados a través de Stripe Payments Europe Ltd. La cuota
+        mensual gestionados a través de Lemon Squeezy (Merchant of Record). La cuota
         se cobra por adelantado el día del alta y se renueva automáticamente
         cada mes salvo cancelación.
       </p>

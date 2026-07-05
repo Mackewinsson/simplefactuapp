@@ -23,6 +23,12 @@ export default function CancellationPolicyPage() {
 
       <h2>1. Derecho de desistimiento</h2>
       <h2>2. Cómo cancelar tu suscripción</h2>
+      <p>
+        Las suscripciones Pro se gestionan en Lemon Squeezy (Merchant of Record). Puedes cancelar o
+        actualizar el método de pago desde el portal de cliente enlazado en{" "}
+        <a href="/settings/billing">Plan y facturación</a> o desde el email de confirmación de Lemon
+        Squeezy.
+      </p>
       <h2>3. Política de reembolso</h2>
       <h2>4. Excepciones al derecho de desistimiento</h2>
       <h2>5. Periodo de gracia tras cancelación</h2>
