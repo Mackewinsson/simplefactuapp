@@ -4,25 +4,26 @@ import { getSiteUrl } from "@/lib/seo/site-url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
-  const now = new Date();
+  const staticLastMod = new Date("2026-06-12T00:00:00.000Z");
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: base, lastModified: now, changeFrequency: "monthly", priority: 1 },
-    { url: `${base}/docs`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/docs/concepts`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/docs/quickstart`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/docs/gestoria`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/docs/authentication`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/docs/error-codes`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${base}/docs/api-reference`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/legal/aviso-legal`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${base}/legal/privacidad`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${base}/legal/terminos`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${base}/legal/cookies`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${base}/legal/dpa`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${base}/legal/cancelacion`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
-    { url: `${base}/legal/declaracion-responsable`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
+    { url: base, lastModified: staticLastMod, changeFrequency: "monthly", priority: 1 },
+    { url: `${base}/docs`, lastModified: staticLastMod, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/docs/concepts`, lastModified: staticLastMod, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/docs/quickstart`, lastModified: staticLastMod, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/docs/gestoria`, lastModified: staticLastMod, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/docs/authentication`, lastModified: staticLastMod, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${base}/docs/error-codes`, lastModified: staticLastMod, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${base}/docs/api-reference`, lastModified: staticLastMod, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/blog`, lastModified: staticLastMod, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/legal/aviso-legal`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${base}/legal/privacidad`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${base}/legal/terminos`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${base}/legal/cookies`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/legal/dpa`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/legal/cancelacion`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${base}/legal/declaracion-responsable`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/legal/accesibilidad`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
   ];
 
   const blogRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
@@ -34,3 +35,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [...staticRoutes, ...blogRoutes];
 }
+

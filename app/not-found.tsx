@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandWordmark } from "./BrandWordmark";
+import { privateRobots } from "@/lib/seo/robots";
+
+export const metadata: Metadata = {
+  title: "Página no encontrada — Simple*Factu",
+  robots: privateRobots,
+};
 
 export default function NotFound() {
   return (

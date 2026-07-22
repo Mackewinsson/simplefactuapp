@@ -18,9 +18,20 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: APP_DISPLAY_NAME,
-  description: "Cumple Veri\u00b7Factu sin tocar AEAT \u2014 facturaci\u00f3n y API para aut\u00f3nomos y empresas. Huellas, encadenamiento y env\u00edo SOAP gestionados por nosotros.",
+  title: {
+    default: APP_DISPLAY_NAME,
+    template: `%s — ${APP_DISPLAY_NAME}`,
+  },
+  description: "Cumple Veri·Factu sin tocar AEAT — facturación y API para autónomos y empresas. Huellas, encadenamiento y envío SOAP gestionados por nosotros.",
   robots: siteRobots(),
+  openGraph: {
+    siteName: APP_DISPLAY_NAME,
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export const viewport: Viewport = {

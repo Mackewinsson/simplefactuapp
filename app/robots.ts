@@ -10,12 +10,25 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: ["/", "/blog", "/docs", "/legal/"],
         disallow: [
+          "/invoices",
           "/invoices/",
+          "/admin",
           "/admin/",
+          "/settings",
           "/settings/",
+          "/customers",
+          "/customers/",
+          "/products",
+          "/products/",
+          "/dashboard",
+          "/dashboard/",
+          "/partner",
+          "/partner/",
           "/onboarding",
           "/sign-in",
           "/sign-up",
+          "/admin-access-denied",
+          "/partner-access-denied",
           "/api/",
         ],
       },
@@ -23,3 +36,4 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: `${base}/sitemap.xml`,
   };
 }
+

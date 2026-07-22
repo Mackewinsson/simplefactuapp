@@ -8,7 +8,7 @@ import { LeadForm } from "./LeadForm";
 import { BlogCarousel } from "./BlogCarousel";
 import { articles } from "@/lib/blog/articles";
 import { publicRobots } from "@/lib/seo/robots";
-import { canonicalUrl } from "@/lib/seo/site-url";
+import { canonicalUrl, getSiteUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
   title: "Simple*Factu — Veri*Factu para autónomos y pymes",
@@ -18,6 +18,51 @@ export const metadata: Metadata = {
   alternates: {
     canonical: canonicalUrl("/"),
   },
+  openGraph: {
+    title: "Simple*Factu — Veri*Factu para autónomos y pymes",
+    description:
+      "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
+    url: canonicalUrl("/"),
+    siteName: "Simple*Factu",
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Simple*Factu — Veri*Factu para autónomos y pymes",
+    description:
+      "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
+  },
+};
+
+const homepageJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${getSiteUrl()}/#website`,
+      "url": getSiteUrl(),
+      "name": "Simple*Factu",
+      "description":
+        "Software y API Veri*Factu para autónomos y pymes en España",
+      "inLanguage": "es",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${getSiteUrl()}/#software`,
+      "name": "Simple*Factu",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "url": getSiteUrl(),
+      "description":
+        "Cumple Veri*Factu (RD 1007/2023, OM HAC/1177/2024) sin tocar la AEAT.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR",
+      },
+    },
+  ],
 };
 
 export default async function PublicHomePage() {
@@ -25,7 +70,12 @@ export default async function PublicHomePage() {
   if (userId) redirect("/invoices");
 
   return (
-    <div className="flex min-h-screen flex-col premium-glow-bg">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageJsonLd) }}
+      />
+      <div className="flex min-h-screen flex-col premium-glow-bg">
       {/* ── Public header ─────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b border-outline-soft/80 bg-surface/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -172,6 +222,7 @@ export default async function PublicHomePage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
 
