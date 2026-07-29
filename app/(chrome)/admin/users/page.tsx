@@ -30,20 +30,32 @@ export default async function AdminUsersPage({
   const total = data?.pagination.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  // Enrich with Clerk data: find which tenant IDs map to a Clerk user
+  // Enrich with Clerk data: find which tenant IDs map to a Clerk user (sf_* and rp_*)
   const tenantIds = tenants.map((t) => t.id);
-  const accounts = tenantIds.length
-    ? await prisma.userVerifactuAccount.findMany({
-        where: { simplefactuTenantId: { in: tenantIds } },
-        select: { userId: true, simplefactuTenantId: true },
-      })
-    : [];
+  const [vfAccounts, partnerAccounts] = await Promise.all([
+    tenantIds.length
+      ? prisma.userVerifactuAccount.findMany({
+          where: { simplefactuTenantId: { in: tenantIds } },
+          select: { userId: true, simplefactuTenantId: true },
+        })
+      : [],
+    tenantIds.length
+      ? prisma.userPartnerAccount.findMany({
+          where: { partnerTenantId: { in: tenantIds } },
+          select: { userId: true, partnerTenantId: true },
+        })
+      : [],
+  ]);
 
   // Build lookup: tenantId → clerkUserId
-  const tenantToClerkId = new Map(accounts.map((a) => [a.simplefactuTenantId, a.userId]));
+  const tenantToClerkId = new Map<string, string>();
+  vfAccounts.forEach((a) => tenantToClerkId.set(a.simplefactuTenantId, a.userId));
+  partnerAccounts.forEach((a) => tenantToClerkId.set(a.partnerTenantId, a.userId));
 
   // Fetch Clerk users in a single batch (only for matched accounts)
-  const clerkUserIds = accounts.map((a) => a.userId);
+  const clerkUserIds = Array.from(
+    new Set([...vfAccounts.map((a) => a.userId), ...partnerAccounts.map((a) => a.userId)])
+  );
   let clerkUsers: Awaited<ReturnType<Awaited<ReturnType<typeof clerkClient>>["users"]["getUserList"]>>["data"] = [];
   if (clerkUserIds.length) {
     try {
