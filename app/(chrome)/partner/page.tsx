@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { requirePartner } from "@/lib/auth/partner";
 import { listPartnerSubtenants } from "@/lib/simplefactu/partner-server";
+import { PartnerHierarchyTree } from "@/app/(chrome)/partner/PartnerHierarchyTree";
 
 export default async function PartnerHomePage() {
   const { userId } = await requirePartner();
+  const partnerId = `rp_${userId}`;
 
   let err: string | null = null;
   let subtenants: Awaited<ReturnType<typeof listPartnerSubtenants>> = [];
@@ -56,6 +58,12 @@ export default async function PartnerHomePage() {
           delay={3}
         />
       </div>
+
+      {/* Visual Hierarchy Tree Map */}
+      <PartnerHierarchyTree
+        partnerId={partnerId}
+        subtenants={subtenants}
+      />
 
       {/* Empty state */}
       {subtenants.length === 0 && !err && (

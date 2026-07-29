@@ -50,12 +50,21 @@ export default async function PartnerTenantDetailPage({
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      {/* Context banner */}
-      <div className="rounded-lg border border-accent/15 bg-accent-muted/30 px-4 py-2.5 text-xs text-accent-foreground-muted font-display font-semibold flex items-center gap-2">
-        <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Estás gestionando el NIF emisor <strong className="mx-1">{tenant.name || tenant.id}</strong> ({tenant.allowed_nif || "sin NIF asignado"}).
+      {/* Context banner with visual node hierarchy */}
+      <div className="rounded-2xl border border-accent/20 bg-accent-muted/20 p-4 text-xs font-display flex flex-wrap items-center justify-between gap-3 shadow-sm">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-accent bg-accent/15 px-2 py-0.5 rounded-md border border-accent/25">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            Cuenta Titular (rp_{userId.slice(0, 8)}…)
+          </span>
+          <span className="text-fg-subtle font-bold">➔</span>
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-fg bg-surface px-2.5 py-0.5 rounded-md border border-outline-soft">
+            NIF Emisor: {tenant.allowed_nif || tenant.id}
+          </span>
+        </div>
+        <span className="text-fg-muted font-medium text-[11px]">
+          Ficha de gestión individual
+        </span>
       </div>
 
       {/* Header */}
