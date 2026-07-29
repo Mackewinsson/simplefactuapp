@@ -45,35 +45,43 @@ export function PartnerHierarchyTree({
           </p>
         </div>
 
-        <div className="inline-flex rounded-xl bg-surface-muted/80 p-1 border border-outline-soft/60">
-          <button
-            type="button"
-            onClick={() => setActiveTab("tree")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold font-display rounded-lg transition-all ${
-              activeTab === "tree"
-                ? "bg-surface text-fg shadow-sm border border-outline-soft/80"
-                : "text-fg-muted hover:text-fg"
-            }`}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/partner/tenants/new"
+            className="btn btn-sm btn-accent"
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            Vista Jerárquica
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("grid")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold font-display rounded-lg transition-all ${
-              activeTab === "grid"
-                ? "bg-surface text-fg shadow-sm border border-outline-soft/80"
-                : "text-fg-muted hover:text-fg"
-            }`}
-          >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-            Tarjetas
-          </button>
+            + Alta de NIF Emisor
+          </Link>
+          <div className="inline-flex rounded-xl bg-surface-muted/80 p-1 border border-outline-soft/60">
+            <button
+              type="button"
+              onClick={() => setActiveTab("tree")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold font-display rounded-lg transition-all ${
+                activeTab === "tree"
+                  ? "bg-surface text-fg shadow-sm border border-outline-soft/80"
+                  : "text-fg-muted hover:text-fg"
+              }`}
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Árbol Jerárquico
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("grid")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold font-display rounded-lg transition-all ${
+                activeTab === "grid"
+                  ? "bg-surface text-fg shadow-sm border border-outline-soft/80"
+                  : "text-fg-muted hover:text-fg"
+              }`}
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              Tarjetas
+            </button>
+          </div>
         </div>
       </div>
 
@@ -93,9 +101,17 @@ export function PartnerHierarchyTree({
                 </span>
               </div>
 
-              <p className="text-base font-extrabold text-fg font-display">
-                {partnerName}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-base font-extrabold text-fg font-display">
+                  {partnerName}
+                </p>
+                <Link
+                  href="/partner/tenants/new"
+                  className="btn btn-xs btn-accent"
+                >
+                  + Alta NIF
+                </Link>
+              </div>
 
               {/* Health Bar (Semáforo de Salud) */}
               <div className="mt-4 pt-3 border-t border-outline-soft/40 space-y-2">
