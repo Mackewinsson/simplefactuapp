@@ -16,7 +16,13 @@ import { adminCreateTenantAction, type ActionState } from "@/app/(chrome)/admin/
  *   - Issue an API key (existing TenantKeysAndCert form).
  *   - Upload a PFX certificate (existing form).
  */
-export function CreateTenantForm() {
+export function CreateTenantForm({
+  defaultParentTenantId,
+  buttonLabel = "+ Nuevo tenant",
+}: {
+  defaultParentTenantId?: string;
+  buttonLabel?: string;
+} = {}) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     adminCreateTenantAction,
     null
@@ -31,7 +37,7 @@ export function CreateTenantForm() {
           onClick={() => setOpen(true)}
           className="btn btn-sm btn-accent"
         >
-          + Nuevo tenant
+          {buttonLabel}
         </button>
       </div>
     );
@@ -40,7 +46,9 @@ export function CreateTenantForm() {
   return (
     <div className="rounded border border-outline-soft bg-surface p-4">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-semibold text-fg">Crear tenant</h2>
+        <h2 className="text-sm font-semibold text-fg">
+          {defaultParentTenantId ? `Crear NIF emisor para ${defaultParentTenantId}` : "Crear tenant"}
+        </h2>
         <button
           type="button"
           onClick={() => setOpen(false)}
@@ -50,9 +58,9 @@ export function CreateTenantForm() {
         </button>
       </div>
       <p className="mt-1 text-xs text-fg-muted">
-        Pensado para integradores externos que usan la API directamente. Tras crear el
-        tenant podrás generar su API key y subirle un certificado desde la vista de
-        detalle.
+        {defaultParentTenantId
+          ? "Añadir un nuevo NIF emisor dependiente de esta cuenta gestoría."
+          : "Pensado para integradores externos que usan la API directamente. Tras crear el tenant podrás generar su API key y subirle un certificado desde la vista de detalle."}
       </p>
       <form action={formAction} className="mt-4 grid gap-3 md:grid-cols-2">
         <label className="block text-sm">
@@ -63,7 +71,7 @@ export function CreateTenantForm() {
             type="text"
             name="id"
             required
-            placeholder="ext_acme"
+            placeholder={defaultParentTenantId ? "empresa_cliente_nif" : "ext_acme"}
             pattern="[a-zA-Z0-9_\-]+"
             className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm"
           />
@@ -72,12 +80,21 @@ export function CreateTenantForm() {
           </span>
         </label>
         <label className="block text-sm">
-          <span className="text-fg-muted">Nombre comercial</span>
+          <span className="text-fg-muted">Nombre comercial / Razón social</span>
           <input
             type="text"
             name="name"
-            placeholder="ACME SL"
+            placeholder="Empresa Cliente SL"
             className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="text-fg-muted">NIF Emisor autorizado (`allowed_nif`)</span>
+          <input
+            type="text"
+            name="allowedNif"
+            placeholder="B12345678"
+            className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm uppercase"
           />
         </label>
         <label className="block text-sm">
@@ -93,30 +110,16 @@ export function CreateTenantForm() {
           </select>
         </label>
         <label className="block text-sm">
-          <span className="text-fg-muted">Email de notificaciones</span>
-          <input
-            type="email"
-            name="notificationEmail"
-            placeholder="contact@acme.es"
-            className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
-          />
-          <span className="mt-1 block text-xs text-fg-subtle">
-            Opcional (referencia interna del integrador). Estos tenants se crean con origen{" "}
-            <code className="rounded bg-surface-muted px-0.5">API</code>: la API{" "}
-            <strong className="font-medium">no</strong> envía correos automáticos Resend al
-            titular como en usuarios web.
-          </span>
-        </label>
-        <label className="block text-sm">
           <span className="text-fg-muted">Tenant padre (opcional)</span>
           <input
             type="text"
             name="parentTenantId"
+            defaultValue={defaultParentTenantId ?? ""}
             placeholder="acme_holding"
             className="mt-1 w-full rounded border border-outline px-3 py-2 font-mono text-sm"
           />
           <span className="mt-1 block text-xs text-fg-subtle">
-            Si este tenant pertenece a un grupo o reseller, pon aquí el id del tenant padre.
+            Si este tenant pertenece a un grupo o gestoría, ID del tenant padre.
           </span>
         </label>
         <label className="block text-sm">

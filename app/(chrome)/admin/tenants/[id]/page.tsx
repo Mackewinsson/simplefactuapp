@@ -24,6 +24,7 @@ import { TenantDetailForms } from "@/app/(chrome)/admin/tenants/TenantDetailForm
 import { TenantKeysAndCert } from "@/app/(chrome)/admin/tenants/TenantKeysAndCert";
 import { TenantWebhookForm } from "@/app/(chrome)/admin/tenants/TenantWebhookForm";
 import { TenantEmailPrefsForm } from "@/app/(chrome)/admin/tenants/TenantEmailPrefsForm";
+import { CreateTenantForm } from "@/app/(chrome)/admin/tenants/CreateTenantForm";
 
 const INVOICE_PAGE_SIZE = 20;
 
@@ -420,7 +421,7 @@ export default async function AdminTenantDetailPage({
       {/* Sub-tenants / Managed NIFs (RP hierarchy) */}
       {(t.id.startsWith("rp_") || (subtenants && subtenants.subtenants.length > 0)) && (
         <section className="panel-premium rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-outline-soft/60 pb-3">
+          <div className="flex flex-wrap items-center justify-between border-b border-outline-soft/60 pb-3 gap-3">
             <div>
               <h2 className="text-base font-extrabold text-fg font-display">
                 Estructura Jerárquica — NIFs Emisores Gestionados ({subtenants?.subtenants.length ?? 0})
@@ -429,9 +430,15 @@ export default async function AdminTenantDetailPage({
                 Empresas y autónomos dependientes de esta cuenta gestoría titular.
               </p>
             </div>
-            <span className="text-xs font-mono text-accent font-bold bg-accent/15 px-2.5 py-1 rounded-full border border-accent/25">
-              Pay-Per-NIF: {subtenants?.subtenants.filter(s => s.status === 'ACTIVE').length ?? 0} activos
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-accent font-bold bg-accent/15 px-2.5 py-1 rounded-full border border-accent/25">
+                Pay-Per-NIF: {subtenants?.subtenants.filter(s => s.status === 'ACTIVE').length ?? 0} activos
+              </span>
+              <CreateTenantForm
+                defaultParentTenantId={t.id}
+                buttonLabel="+ Alta NIF para esta Gestoría"
+              />
+            </div>
           </div>
 
           {subtenants && subtenants.subtenants.length > 0 ? (
