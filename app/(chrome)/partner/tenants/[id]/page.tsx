@@ -109,11 +109,80 @@ export default async function PartnerTenantDetailPage({
         </div>
       </div>
 
+      {/* Checklist & Onboarding Progress Card */}
+      <div className="panel-premium rounded-2xl p-6">
+        <h2 className="text-sm font-bold text-fg font-display tracking-tight mb-3">
+          Estado de Integración de este NIF Emisor
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="flex items-center gap-3 p-3 rounded-xl border border-success-outline/30 bg-success/10 text-success-foreground">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success-emphasis text-white font-bold text-xs">✓</span>
+            <div>
+              <p className="text-xs font-bold font-display">1. Datos Fiscales</p>
+              <p className="text-[11px] opacity-80 font-mono">{tenant.allowed_nif || "NIF Asignado"}</p>
+            </div>
+          </div>
+
+          <div className={`flex items-center gap-3 p-3 rounded-xl border ${hasCert ? "border-success-outline/30 bg-success/10 text-success-foreground" : "border-warning-outline/30 bg-warning/10 text-warning-foreground"}`}>
+            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bold text-xs ${hasCert ? "bg-success-emphasis text-white" : "bg-warning-emphasis text-white"}`}>
+              {hasCert ? "✓" : "2"}
+            </span>
+            <div>
+              <p className="text-xs font-bold font-display">2. Certificado PFX</p>
+              <p className="text-[11px] opacity-80">{hasCert ? "Cargado correctamente" : "Pendiente de subir"}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-xl border border-outline-soft bg-surface-muted/40 text-fg-muted">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-white font-bold text-xs">3</span>
+            <div>
+              <p className="text-xs font-bold font-display text-fg">3. Listo para Emitir</p>
+              <p className="text-[11px]">Vía Partner Key o Clave Dedicada</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Integration Code Snippet (Marca Blanca Guide) */}
+      <div className="panel-premium rounded-2xl p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-outline-soft/60 pb-3">
+          <div>
+            <h2 className="text-base font-bold text-fg font-display tracking-tight">
+              ¿Cómo emitir facturas para este NIF por API? (Marca Blanca)
+            </h2>
+            <p className="text-xs text-fg-muted">
+              Usa tu clave Partner principal enviando el identificador del tenant en la llamada.
+            </p>
+          </div>
+          <span className="text-[10px] font-mono font-bold bg-accent/15 text-accent px-2.5 py-1 rounded-full border border-accent/25">
+            REST API
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-xs font-semibold text-fg font-display">Ejemplo de llamada POST /v1/send-invoice:</p>
+          <pre className="p-4 rounded-xl bg-surface-dark font-mono text-xs text-fg-on-dark overflow-x-auto border border-outline-soft/40">
+{`curl -X POST "${process.env.NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL || "https://api.simplefactu.com/v1"}/send-invoice" \\
+  -H "x-api-key: $SU_CLAVE_PARTNER" \\
+  -H "x-idempotency-key: job-factura-${tenant.allowed_nif || tenant.id}-001" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "tenant_id": "${tenant.id}",
+    "factura": {
+      "NumSerieFactura": "F-2026-0001",
+      "FechaExpedicionFactura": "29-07-2026",
+      "ObligadoEmision": { "NIF": "${tenant.allowed_nif || "B12345678"}", "NombreRazon": "${tenant.name || "Empresa SL"}" }
+    }
+  }'`}
+          </pre>
+        </div>
+      </div>
+
       {/* Panels grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="panel-premium rounded-2xl p-6">
           <h2 className="text-base font-bold text-fg font-display tracking-tight border-b border-outline-soft/60 pb-2 mb-5">
-            Acciones
+            Acciones & Credenciales
           </h2>
           <PartnerSubtenantActions childId={tenant.id} status={tenant.status} />
         </section>

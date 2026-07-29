@@ -61,6 +61,13 @@ export function CreateSubtenantForm() {
             Identificador único para llamadas API y gestión (sólo letras, números y guiones).
           </span>
         </label>
+
+        <div className="rounded-xl border border-accent/20 bg-accent-muted/20 p-3.5 text-xs space-y-1">
+          <p className="font-bold text-fg font-display">💡 Nota de Integración Marca Blanca:</p>
+          <p className="text-fg-muted">
+            Podrás emitir facturas para este NIF directamente usando tu <strong>API Key Partner principal</strong>. Si necesitas una API Key dedicada propia para este cliente, podrás emitirla en 1 clic tras completar el alta.
+          </p>
+        </div>
       </div>
 
       {state && !state.ok ? (
