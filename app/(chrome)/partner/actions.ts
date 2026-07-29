@@ -31,12 +31,12 @@ export async function createSubtenantAction(
   if (!res.ok) {
     return {
       ok: false,
-      errors: [json.message || json.error || `Error ${res.status} al crear cliente`],
+      errors: [json.message || json.error || `Error ${res.status} al registrar NIF Emisor`],
     };
   }
 
   revalidatePath("/partner");
-  return { ok: true, message: `Cliente ${name || id} creado correctamente.` };
+  return { ok: true, message: `NIF Emisor ${name || id} registrado correctamente.` };
 }
 
 export async function updateSubtenantStatusAction(
@@ -59,7 +59,7 @@ export async function updateSubtenantStatusAction(
   revalidatePath(`/partner/tenants/${childId}`);
   return {
     ok: true,
-    message: status === "SUSPENDED" ? "Cliente suspendido." : "Cliente reactivado.",
+    message: status === "SUSPENDED" ? "NIF Emisor suspendido." : "NIF Emisor reactivado.",
   };
 }
 
@@ -69,7 +69,7 @@ export async function createSubtenantApiKeyFormAction(
 ): Promise<PartnerActionState> {
   const childId = String(formData.get("childId") ?? "").trim();
   if (!childId) {
-    return { ok: false, errors: ["Falta identificador del cliente."] };
+    return { ok: false, errors: ["Falta identificador del NIF Emisor."] };
   }
 
   const { userId } = await requirePartner();

@@ -126,7 +126,7 @@ export default async function AdminUsersPage({
                             </span>
                           ) : (
                             <span className="inline-flex items-center rounded-full bg-surface-hover px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-fg-subtle ring-1 ring-outline-soft">
-                              Cliente API
+                              NIF Emisor (API)
                             </span>
                           )}
                         </Link>
