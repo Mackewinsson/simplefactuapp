@@ -47,10 +47,21 @@ export default async function AdminUsersPage({
       : [],
   ]);
 
-  // Build lookup: tenantId → clerkUserId
+  // Build lookup: tenantId → clerkUserId & clerkUserId → paired tenant IDs
   const tenantToClerkId = new Map<string, string>();
-  vfAccounts.forEach((a) => tenantToClerkId.set(a.simplefactuTenantId, a.userId));
-  partnerAccounts.forEach((a) => tenantToClerkId.set(a.partnerTenantId, a.userId));
+  const clerkToTenants = new Map<string, { sfTenantId?: string; rpTenantId?: string }>();
+
+  vfAccounts.forEach((a) => {
+    tenantToClerkId.set(a.simplefactuTenantId, a.userId);
+    const curr = clerkToTenants.get(a.userId) || {};
+    clerkToTenants.set(a.userId, { ...curr, sfTenantId: a.simplefactuTenantId });
+  });
+
+  partnerAccounts.forEach((a) => {
+    tenantToClerkId.set(a.partnerTenantId, a.userId);
+    const curr = clerkToTenants.get(a.userId) || {};
+    clerkToTenants.set(a.userId, { ...curr, rpTenantId: a.partnerTenantId });
+  });
 
   // Fetch Clerk users in a single batch (only for matched accounts)
   const clerkUserIds = Array.from(
@@ -117,6 +128,13 @@ export default async function AdminUsersPage({
                   const isGestoria = t.id.startsWith("rp_") || clerk?.role === "partner";
                   const hasCert = !!t.has_certificate;
 
+                  const pairInfo = clerkId ? clerkToTenants.get(clerkId) : null;
+                  const pairedTenantId = pairInfo
+                    ? t.id.startsWith("rp_")
+                      ? pairInfo.sfTenantId
+                      : pairInfo.rpTenantId
+                    : null;
+
                   return (
                     <tr
                       key={t.id}
@@ -154,6 +172,14 @@ export default async function AdminUsersPage({
                             <div>
                               <p className="font-extrabold text-fg font-display">{clerk!.name ?? t.name ?? "—"}</p>
                               <p className="text-xs text-fg-muted font-sans mt-0.5">{clerk!.email ?? "—"}</p>
+                              {pairedTenantId && pairedTenantId !== t.id && (
+                                <div className="mt-1.5 inline-flex items-center gap-1 rounded bg-surface-muted px-2 py-0.5 text-[10px] font-sans border border-outline-soft/70">
+                                  <span className="text-fg-subtle font-medium">🔗 Misma cuenta:</span>
+                                  <span className="font-mono font-bold text-accent">
+                                    {pairedTenantId.startsWith("rp_") ? "Gestoría (rp_...)" : "Autónomo (sf_...)"}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           ) : (
                             <p className="font-extrabold text-fg font-display">{t.name ?? "—"}</p>

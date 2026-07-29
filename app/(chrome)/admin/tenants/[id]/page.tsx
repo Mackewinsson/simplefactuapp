@@ -107,15 +107,42 @@ export default async function AdminTenantDetailPage({
 
   let clerkUserId: string | null = null;
   let clerkUserRole: string | null = null;
-  const account = await prisma.userVerifactuAccount.findFirst({
-    where: { simplefactuTenantId: tenantId },
-    select: { userId: true },
-  });
-  if (account) {
-    clerkUserId = account.userId;
+  let pairedTenantId: string | null = null;
+
+  const [vfAcc, partnerAcc] = await Promise.all([
+    prisma.userVerifactuAccount.findFirst({
+      where: { simplefactuTenantId: tenantId },
+      select: { userId: true },
+    }),
+    prisma.userPartnerAccount.findFirst({
+      where: { partnerTenantId: tenantId },
+      select: { userId: true },
+    }),
+  ]);
+
+  clerkUserId = vfAcc?.userId ?? partnerAcc?.userId ?? null;
+
+  if (clerkUserId) {
+    const [pairedVf, pairedPartner] = await Promise.all([
+      prisma.userVerifactuAccount.findUnique({
+        where: { userId: clerkUserId },
+        select: { simplefactuTenantId: true },
+      }),
+      prisma.userPartnerAccount.findUnique({
+        where: { userId: clerkUserId },
+        select: { partnerTenantId: true },
+      }),
+    ]);
+
+    if (tenantId.startsWith("rp_")) {
+      pairedTenantId = pairedVf?.simplefactuTenantId ?? null;
+    } else {
+      pairedTenantId = pairedPartner?.partnerTenantId ?? null;
+    }
+
     try {
       const api = await clerkClient();
-      const user = await api.users.getUser(account.userId);
+      const user = await api.users.getUser(clerkUserId);
       const meta = user.publicMetadata as Record<string, unknown>;
       clerkUserRole = (meta?.role as string) ?? null;
     } catch {
@@ -147,6 +174,23 @@ export default async function AdminTenantDetailPage({
           </Link>
           <h1 className="mt-2 text-xl font-semibold text-fg">Tenant: {t.id}</h1>
           {t.name && <p className="text-sm text-fg-muted">{t.name}</p>}
+
+          {/* Paired Account Banner */}
+          {pairedTenantId && pairedTenantId !== tenantId && (
+            <div className="mt-2.5 rounded-xl border border-outline-soft/80 bg-surface-muted/65 p-3 text-xs font-display flex flex-wrap items-center gap-2">
+              <span className="font-bold text-fg">🔗 Misma Cuenta Clerk:</span>
+              <span className="text-fg-muted">
+                Este usuario dispone de perfil doble. Ver su cuenta{" "}
+              </span>
+              <Link
+                href={`/admin/tenants/${encodeURIComponent(pairedTenantId)}`}
+                className="font-mono font-extrabold text-accent hover:underline bg-accent/15 px-2 py-0.5 rounded border border-accent/25"
+              >
+                {pairedTenantId.startsWith("rp_") ? `Gestoría (${pairedTenantId})` : `Autónomo (${pairedTenantId})`} ➔
+              </Link>
+            </div>
+          )}
+
           {t.parent_tenant_id && (
             <div className="mt-2 rounded-xl border border-accent/20 bg-accent-muted/20 p-3 text-xs font-display flex items-center gap-2">
               <span className="font-semibold text-fg-muted">Jerarquía:</span>
