@@ -1,23 +1,21 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
+import { requireAppUser } from "@/lib/auth/app-user";
 import { VerifactuSettingsForm } from "./VerifactuSettingsForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function VerifactuSettingsPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { sessionUserId, userId } = await requireAppUser();
 
   let account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
   let provisionError: string | null = null;
   if (!account) {
     try {
-      await ensureVerifactuApiKey(userId);
+      await ensureVerifactuApiKey(sessionUserId);
       account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
     } catch (e) {
       provisionError = formatVerifactuActionError(e);
@@ -31,7 +29,7 @@ export default async function VerifactuSettingsPage() {
   let certExpiresWithin30Days = false;
   let certNif: string | null = null;
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,

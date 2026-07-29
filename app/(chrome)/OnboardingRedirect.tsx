@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { getAdminImpersonatedTenant } from "@/lib/auth/admin-impersonate";
 import { getOnboardingStatus, isOnboardingExemptPath } from "@/lib/verifactu/onboarding-status";
 
 /**
@@ -9,6 +10,9 @@ import { getOnboardingStatus, isOnboardingExemptPath } from "@/lib/verifactu/onb
 export async function OnboardingRedirect() {
   const { userId } = await auth();
   if (!userId) return null;
+
+  // Don't force onboarding while an admin is viewing another tenant.
+  if (await getAdminImpersonatedTenant(userId)) return null;
 
   const h = await headers();
   const pathname = h.get("x-pathname") || "";

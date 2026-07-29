@@ -3,6 +3,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { encryptSecret, decryptSecret } from "@/lib/verifactu/crypto";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
+import { getAdminImpersonatedTenant } from "@/lib/auth/admin-impersonate";
 
 /**
  * Best-effort lookup of the user's primary email from Clerk. Returns null on
@@ -109,8 +110,41 @@ async function provisionTenantAndKey(
  * or when the existing key is genuinely revoked (401). The user-managed issuer profile
  * (issuerNif, issuerLegalName) is preserved across key rotations and is NEVER wiped just
  * because the upstream API is briefly unreachable.
+ *
+ * When an admin is impersonating a tenant (`sf_*` or a mapped autónomo tenant), returns
+ * that tenant's API key instead of provisioning against the admin's own account.
  */
 export async function ensureVerifactuApiKey(userId: string): Promise<{ apiKey: string; tenantId: string }> {
+  const imp = await getAdminImpersonatedTenant(userId);
+  if (imp?.tenantId && !imp.tenantId.startsWith("rp_")) {
+    const impRow = await prisma.userVerifactuAccount.findFirst({
+      where: { simplefactuTenantId: imp.tenantId },
+    });
+    if (impRow) {
+      return {
+        tenantId: impRow.simplefactuTenantId,
+        apiKey: decryptSecret(impRow.apiKeyEncrypted),
+      };
+    }
+    const keyRes = await adminFetch("/admin/api-keys", {
+      method: "POST",
+      body: JSON.stringify({
+        tenantId: imp.tenantId,
+        name: "Admin Impersonation Key",
+        scopes: [...BFF_KEY_SCOPES],
+      }),
+    });
+    if (keyRes.ok) {
+      const body = (await keyRes.json()) as { apiKey?: { key?: string } };
+      if (body.apiKey?.key) {
+        return { tenantId: imp.tenantId, apiKey: body.apiKey.key };
+      }
+    }
+    throw new Error(
+      `No se pudo obtener API key para impersonar ${imp.tenantId}`
+    );
+  }
+
   const existing = await prisma.userVerifactuAccount.findUnique({ where: { userId } });
 
   if (existing) {

@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { extractSerie } from "@/lib/simplefactu/invoice-series";
 import { registrationStatusBadge } from "@/lib/simplefactu/aeat-status-ui";
+import { requireAppUser } from "@/lib/auth/app-user";
 import { InvoiceViewTabs, type InvoiceVista } from "./InvoiceViewTabs";
 
 const PAGE_SIZE = 50;
@@ -57,8 +56,7 @@ export default async function InvoicesPage({
     vista?: string;
   }>;
 }) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { userId } = await requireAppUser();
 
   const sp = await searchParams;
   const q = sp.q?.trim() || undefined;

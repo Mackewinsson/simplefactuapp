@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { buildSendInvoicePayload } from "@/lib/simplefactu/build-send-invoice-payload";
@@ -58,8 +58,9 @@ async function pollUntilTerminal(
 }
 
 export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, message: "Debes iniciar sesión." };
+  const { sessionUserId, userId } = actor;
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
@@ -81,7 +82,7 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
   }
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
@@ -161,8 +162,9 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
 }
 
 export async function resyncVerifactuQrAction(invoiceId: string): Promise<SendVerifactuResult> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, message: "Debes iniciar sesión." };
+  const { sessionUserId, userId } = actor;
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
@@ -176,7 +178,7 @@ export async function resyncVerifactuQrAction(invoiceId: string): Promise<SendVe
   }
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
@@ -194,8 +196,9 @@ export async function resyncVerifactuQrAction(invoiceId: string): Promise<SendVe
 }
 
 export async function refreshVerifactuJobAction(invoiceId: string): Promise<SendVerifactuResult> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, message: "Debes iniciar sesión." };
+  const { sessionUserId, userId } = actor;
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
@@ -221,7 +224,7 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
   }
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
@@ -241,8 +244,9 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
 }
 
 export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<SendVerifactuResult> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, message: "Debes iniciar sesión." };
+  const { sessionUserId, userId } = actor;
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
@@ -281,7 +285,7 @@ export async function cancelInvoiceVerifactuAction(invoiceId: string): Promise<S
   }
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
@@ -402,8 +406,9 @@ export async function issueCorrectionAction(
   invoiceId: string,
   options: IssueCorrectionOptions
 ): Promise<IssueCorrectionResult> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, message: "Debes iniciar sesión." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, message: "Debes iniciar sesión." };
+  const { userId } = actor;
 
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },

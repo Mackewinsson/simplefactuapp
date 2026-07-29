@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { prisma } from "@/lib/prisma";
 import { parseDecimalToCents } from "@/lib/money";
 import {
@@ -17,8 +18,9 @@ export async function createInvoiceAction(
   _prev: CreateInvoiceState,
   formData: FormData
 ): Promise<CreateInvoiceState> {
-  const { userId } = await auth();
-  if (!userId) return { errors: ["Debes iniciar sesión para crear una factura."] };
+  const actor = await getAppUserIds();
+  if (!actor) return { errors: ["Debes iniciar sesión para crear una factura."] };
+  const { userId } = actor;
 
   const user = await currentUser();
 

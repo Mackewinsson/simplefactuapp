@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { revalidatePath } from "next/cache";
 import { z } from "@/lib/zod-es";
 import { prisma } from "@/lib/prisma";
@@ -68,8 +68,9 @@ const customerSelect = {
 } as const;
 
 export async function getCustomersAction(): Promise<{ ok: boolean; customers: CustomerRow[] }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, customers: [] };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, customers: [] };
+  const { userId } = actor;
 
   const customers = await prisma.customer.findMany({
     where: { userId },
@@ -89,8 +90,9 @@ export async function createCustomerAction(data: {
   codigoPais?: string;
   foreignId?: string;
 }): Promise<{ ok: boolean; customer?: CustomerRow; error?: string }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, error: "Sesión requerida." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, error: "Sesión requerida." };
+  const { userId } = actor;
 
   const parsed = customerSchema.safeParse(data);
   if (!parsed.success) {
@@ -134,8 +136,9 @@ export async function updateCustomerAction(
     foreignId?: string;
   }
 ): Promise<{ ok: boolean; error?: string }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, error: "Sesión requerida." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, error: "Sesión requerida." };
+  const { userId } = actor;
 
   const parsed = customerSchema.safeParse(data);
   if (!parsed.success) {
@@ -166,8 +169,9 @@ export async function updateCustomerAction(
 }
 
 export async function deleteCustomerAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, error: "Sesión requerida." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, error: "Sesión requerida." };
+  const { userId } = actor;
 
   await prisma.customer.deleteMany({ where: { id, userId } });
   revalidatePath("/customers");

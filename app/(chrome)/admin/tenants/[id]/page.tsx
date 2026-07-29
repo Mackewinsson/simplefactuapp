@@ -25,6 +25,7 @@ import { TenantKeysAndCert } from "@/app/(chrome)/admin/tenants/TenantKeysAndCer
 import { TenantWebhookForm } from "@/app/(chrome)/admin/tenants/TenantWebhookForm";
 import { TenantEmailPrefsForm } from "@/app/(chrome)/admin/tenants/TenantEmailPrefsForm";
 import { CreateTenantForm } from "@/app/(chrome)/admin/tenants/CreateTenantForm";
+import { ImpersonateButton } from "@/components/admin/ImpersonateButton";
 
 const INVOICE_PAGE_SIZE = 20;
 
@@ -216,12 +217,15 @@ export default async function AdminTenantDetailPage({
             </p>
           )}
         </div>
-        <Link
-          href={`/admin/jobs?tenant_id=${encodeURIComponent(tenantId)}`}
-          className="rounded border border-outline-soft bg-surface px-3 py-1.5 text-sm text-accent hover:bg-surface-hover hover:underline"
-        >
-          Ver jobs de este tenant →
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <ImpersonateButton tenantId={t.id} tenantName={t.name} />
+          <Link
+            href={`/admin/jobs?tenant_id=${encodeURIComponent(tenantId)}`}
+            className="rounded border border-outline-soft bg-surface px-3 py-1.5 text-sm text-accent hover:bg-surface-hover hover:underline"
+          >
+            Ver jobs de este tenant →
+          </Link>
+        </div>
       </div>
 
       {/* Role management (only for web users with a Clerk account) */}

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
 import { encryptSecret, decryptSecret } from "@/lib/verifactu/crypto";
+import { getAdminImpersonatedTenant } from "@/lib/auth/admin-impersonate";
 
 export const PARTNER_KEY_SCOPES = ["partner:tenants:read", "partner:tenants:write"] as const;
 
@@ -62,11 +63,44 @@ async function provisionPartnerTenantAndKey(userId: string): Promise<{
 
 /**
  * Returns decrypted partner API key for BFF calls to /partner/*.
+ * When an admin is impersonating an `rp_*` tenant, returns that tenant's key
+ * (from Neon mapping, or a short-lived admin-minted key).
  */
 export async function ensurePartnerApiKey(userId: string): Promise<{
   partnerTenantId: string;
   apiKey: string;
 }> {
+  const imp = await getAdminImpersonatedTenant(userId);
+  if (imp?.tenantId?.startsWith("rp_")) {
+    const impTargetId = imp.tenantId;
+    const impRow = await prisma.userPartnerAccount.findFirst({
+      where: { partnerTenantId: impTargetId },
+    });
+    if (impRow) {
+      return {
+        partnerTenantId: impRow.partnerTenantId,
+        apiKey: decryptSecret(impRow.apiKeyEncrypted),
+      };
+    }
+    const keyRes = await adminFetch("/admin/api-keys", {
+      method: "POST",
+      body: JSON.stringify({
+        tenantId: impTargetId,
+        name: "Admin Impersonation Key",
+        scopes: [...PARTNER_KEY_SCOPES],
+      }),
+    });
+    if (keyRes.ok) {
+      const keyJson = (await keyRes.json()) as { apiKey?: { key?: string } };
+      if (keyJson.apiKey?.key) {
+        return { partnerTenantId: impTargetId, apiKey: keyJson.apiKey.key };
+      }
+    }
+    throw new Error(
+      `No se pudo obtener API key de partner para impersonar ${impTargetId}`
+    );
+  }
+
   const existing = await prisma.userPartnerAccount.findUnique({ where: { userId } });
   if (existing) {
     return {

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { notFound } from "next/navigation";
+import { requireAppUser } from "@/lib/auth/app-user";
 import { fetchInvoiceRecordById } from "@/lib/simplefactu/invoice-records";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import {
@@ -23,8 +23,7 @@ export default async function InvoiceRecordDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { sessionUserId } = await requireAppUser();
 
   const { id } = await params;
 
@@ -32,7 +31,7 @@ export default async function InvoiceRecordDetailPage({
   let loadError: string | null = null;
 
   try {
-    record = await fetchInvoiceRecordById(userId, id);
+    record = await fetchInvoiceRecordById(sessionUserId, id);
   } catch (e) {
     const msg = formatVerifactuActionError(e);
     if (msg.includes("404") || msg.toLowerCase().includes("not found")) {

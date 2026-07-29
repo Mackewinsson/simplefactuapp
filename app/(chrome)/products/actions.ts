@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { revalidatePath } from "next/cache";
 import { z } from "@/lib/zod-es";
 import { prisma } from "@/lib/prisma";
@@ -24,8 +24,9 @@ export type ProductRow = {
 };
 
 export async function getProductsAction(): Promise<{ ok: boolean; products: ProductRow[] }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, products: [] };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, products: [] };
+  const { userId } = actor;
 
   const products = await prisma.product.findMany({
     where: { userId },
@@ -45,8 +46,9 @@ export async function getProductsAction(): Promise<{ ok: boolean; products: Prod
 export async function createProductAction(
   data: { description: string; unitPrice: string; tipoImpositivo?: string; claveRegimen?: string; calificacion?: string }
 ): Promise<{ ok: boolean; product?: ProductRow; error?: string }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, error: "Sesión requerida." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, error: "Sesión requerida." };
+  const { userId } = actor;
 
   const parsed = productSchema.safeParse(data);
   if (!parsed.success) {
@@ -84,8 +86,9 @@ export async function updateProductAction(
   id: string,
   data: { description: string; unitPrice: string; tipoImpositivo?: string; claveRegimen?: string; calificacion?: string }
 ): Promise<{ ok: boolean; error?: string }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, error: "Sesión requerida." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, error: "Sesión requerida." };
+  const { userId } = actor;
 
   const parsed = productSchema.safeParse(data);
   if (!parsed.success) {
@@ -113,8 +116,9 @@ export async function updateProductAction(
 }
 
 export async function deleteProductAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, error: "Sesión requerida." };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, error: "Sesión requerida." };
+  const { userId } = actor;
 
   await prisma.product.deleteMany({ where: { id, userId } });
   revalidatePath("/products");

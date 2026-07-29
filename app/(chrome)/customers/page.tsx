@@ -1,11 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireAppUser } from "@/lib/auth/app-user";
 import { CustomerCatalog } from "./CustomerCatalog";
 
 export default async function CustomersPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { userId } = await requireAppUser();
 
   const customers = await prisma.customer.findMany({
     where: { userId },

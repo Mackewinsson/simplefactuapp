@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import QRCode from "qrcode";
-import { notFound, redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { notFound } from "next/navigation";
+import { requireAppUser } from "@/lib/auth/app-user";
 import { AeatCancellationStatus, AeatJobStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
@@ -56,8 +56,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { userId } = await requireAppUser();
 
   const { id } = await params;
   const invoice = await prisma.invoice.findUnique({

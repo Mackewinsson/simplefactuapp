@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
 import { NewInvoiceForm } from "./NewInvoiceForm";
 import { VerifactuReadinessBanner } from "./VerifactuReadinessBanner";
 import { prisma } from "@/lib/prisma";
 import { extractSerie } from "@/lib/simplefactu/invoice-series";
 import { getVerifactuReadiness } from "@/lib/verifactu/readiness";
+import { requireAppUser } from "@/lib/auth/app-user";
 
 export default async function NewInvoicePage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { sessionUserId, userId } = await requireAppUser();
 
   const user = await currentUser();
 
@@ -23,7 +22,7 @@ export default async function NewInvoicePage() {
     ...new Set(invoiceNumbers.map((i) => extractSerie(i.number))),
   ];
 
-  const readiness = await getVerifactuReadiness(userId);
+  const readiness = await getVerifactuReadiness(sessionUserId);
 
   return (
     <div>

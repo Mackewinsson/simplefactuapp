@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { verifactuQrDataUrl } from "@/lib/verifactu/qr-image";
+import { requireAppUser } from "@/lib/auth/app-user";
 import { VerifactuSendPanel } from "./VerifactuSendPanel";
 
 type Props = {
@@ -12,8 +12,7 @@ type Props = {
 };
 
 export default async function InvoiceDetailPage({ params, searchParams }: Props) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { userId } = await requireAppUser();
 
   const { id } = await params;
   const sp = await searchParams;

@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { fetchInvoiceRecords } from "@/lib/simplefactu/invoice-records";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import {
@@ -10,6 +8,7 @@ import {
   invoiceRecordTipoLabel,
 } from "@/lib/simplefactu/invoice-record-labels";
 import { statusBadgeClass } from "@/lib/ui/status-badge";
+import { requireAppUser } from "@/lib/auth/app-user";
 
 export const dynamic = "force-dynamic";
 
@@ -67,8 +66,7 @@ export default async function InvoiceRecordsPage({
     page?: string;
   }>;
 }) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const { sessionUserId } = await requireAppUser();
 
   const sp = await searchParams;
   const from = sp.from?.trim() || undefined;
@@ -83,7 +81,7 @@ export default async function InvoiceRecordsPage({
   let loadError: string | null = null;
 
   try {
-    data = await fetchInvoiceRecords(userId, {
+    data = await fetchInvoiceRecords(sessionUserId, {
       from,
       to,
       serie,

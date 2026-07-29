@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { prisma } from "@/lib/prisma";
 import { listTenants } from "@/lib/simplefactu/admin-server";
 import { CreateTenantForm } from "../tenants/CreateTenantForm";
+import { ImpersonateButton } from "@/components/admin/ImpersonateButton";
 
 const PAGE_SIZE = 50;
 
@@ -118,6 +119,7 @@ export default async function AdminUsersPage({
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Plan</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Estado</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Certificado</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Soporte</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-soft/40 font-medium">
@@ -266,6 +268,15 @@ export default async function AdminUsersPage({
                             </span>
                           )}
                         </Link>
+                      </td>
+
+                      {/* Soporte / impersonación */}
+                      <td className="px-5 py-4">
+                        <ImpersonateButton
+                          tenantId={t.id}
+                          tenantName={clerk?.name ?? t.name}
+                          compact
+                        />
                       </td>
                     </tr>
                   );

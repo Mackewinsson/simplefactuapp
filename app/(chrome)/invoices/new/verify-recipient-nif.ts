@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
 import { formatSimplefactuHttpError } from "@/lib/simplefactu/api-errors";
@@ -30,8 +30,8 @@ export async function verifyRecipientNif(
   nif: string,
   nombre: string
 ): Promise<VerifyRecipientNifResult> {
-  const { userId } = await auth();
-  if (!userId) {
+  const actor = await getAppUserIds();
+  if (!actor) {
     return { kind: "error", error: "Debes iniciar sesión." };
   }
 
@@ -45,7 +45,7 @@ export async function verifyRecipientNif(
   }
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(actor.sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,

@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { NextResponse } from "next/server";
 import {
   fetchInvoiceRecordsForExport,
@@ -9,10 +9,11 @@ import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  const { userId } = await auth();
-  if (!userId) {
+  const actor = await getAppUserIds();
+  if (!actor) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const { sessionUserId } = actor;
 
   const url = new URL(req.url);
   const from = url.searchParams.get("from")?.trim() || undefined;
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
     tipoParam === "ALTA" || tipoParam === "ANULACION" ? tipoParam : undefined;
 
   try {
-    const rows = await fetchInvoiceRecordsForExport(userId, { from, to, serie, tipo });
+    const rows = await fetchInvoiceRecordsForExport(sessionUserId, { from, to, serie, tipo });
     const csv = invoiceRecordsToCsv(rows);
     const stamp = new Date().toISOString().slice(0, 10);
     return new NextResponse(csv, {

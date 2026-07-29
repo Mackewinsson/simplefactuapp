@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@clerk/nextjs/server";
+import { getAppUserIds } from "@/lib/auth/app-user";
 import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
@@ -20,8 +20,9 @@ export async function saveIssuerProfileAction(
   _prev: VerifactuSettingsState | null,
   formData: FormData
 ): Promise<VerifactuSettingsState> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const { sessionUserId, userId } = actor;
 
   const issuerNif = String(formData.get("issuerNif") ?? "").trim();
   const issuerLegalName = String(formData.get("issuerLegalName") ?? "").trim();
@@ -31,7 +32,7 @@ export async function saveIssuerProfileAction(
 
   let tenantId: string;
   try {
-    ({ tenantId } = await ensureVerifactuApiKey(userId));
+    ({ tenantId } = await ensureVerifactuApiKey(sessionUserId));
   } catch (e) {
     return { ok: false, errors: [formatVerifactuActionError(e)] };
   }
@@ -70,8 +71,9 @@ export async function uploadCertificateAction(
   _prev: VerifactuSettingsState | null,
   formData: FormData
 ): Promise<VerifactuSettingsState> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const { sessionUserId, userId } = actor;
 
   const file = formData.get("pfxFile");
   const passphrase = String(formData.get("pfxPassphrase") ?? "");
@@ -87,7 +89,7 @@ export async function uploadCertificateAction(
 
   let res: Response;
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
@@ -194,11 +196,12 @@ export async function uploadCertificateAction(
 export async function deleteCertificateAction(
   _prev: VerifactuSettingsState | null
 ): Promise<VerifactuSettingsState> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const { sessionUserId, userId } = actor;
 
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
@@ -235,8 +238,9 @@ export async function verifyNifAction(
   _prev: VerifactuSettingsState | null,
   formData: FormData
 ): Promise<VerifactuSettingsState> {
-  const { userId } = await auth();
-  if (!userId) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const actor = await getAppUserIds();
+  if (!actor) return { ok: false, errors: ["Debes iniciar sesión."] };
+  const { sessionUserId, userId } = actor;
 
   const nif = String(formData.get("verifyNif") ?? "").trim();
   const nombre = String(formData.get("verifyNombre") ?? "").trim();
@@ -250,7 +254,7 @@ export async function verifyNifAction(
   let res: Response;
   let json: Record<string, unknown>;
   try {
-    const { apiKey } = await ensureVerifactuApiKey(userId);
+    const { apiKey } = await ensureVerifactuApiKey(sessionUserId);
     const client = createSimplefactuClient({
       baseUrl: getSimplefactuBaseUrl(),
       apiKey,
