@@ -64,6 +64,8 @@ export async function adminJson<T>(path: string, init: RequestInit = {}): Promis
     if (res.status === 401) {
       msg =
         "simplefactu rechazó la clave de administración (401). SIMPLEFACTU_ADMIN_KEY debe coincidir con ADMIN_KEY del API en el mismo entorno.";
+    } else if (res.status === 429) {
+      msg = "Límite de peticiones de administración alcanzado (429 Rate limit). Por favor espera un momento y vuelve a cargar.";
     }
     throw new SimplefactuAdminError(msg || `HTTP ${res.status}`, res.status, body);
   }
