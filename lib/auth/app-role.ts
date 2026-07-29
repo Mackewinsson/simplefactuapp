@@ -51,8 +51,8 @@ export async function getNavLinks(
 
   if (partner && !admin) {
     return [
-      { href: "/partner", label: "Consola integrador" },
-      { href: "/docs", label: "Documentación" },
+      { href: "/partner", label: "Consola Gestoría & Multi-NIF" },
+      { href: "/docs", label: "Documentación API" },
     ];
   }
 
@@ -72,7 +72,7 @@ export async function getNavLinks(
   if (partner) {
     links.push({
       href: "/partner",
-      label: "Consola integrador",
+      label: "Consola Gestoría & Multi-NIF",
       badge: "accent",
     });
   }
