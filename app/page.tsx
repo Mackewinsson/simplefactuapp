@@ -65,9 +65,14 @@ const homepageJsonLd = {
   ],
 };
 
+import { getDefaultAppRedirect } from "@/lib/auth/app-role";
+
 export default async function PublicHomePage() {
   const { userId } = await auth();
-  if (userId) redirect("/invoices");
+  if (userId) {
+    const target = await getDefaultAppRedirect(userId);
+    redirect(target);
+  }
 
   return (
     <>

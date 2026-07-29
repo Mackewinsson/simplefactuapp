@@ -51,8 +51,8 @@ export async function getNavLinks(
 
   if (partner && !admin) {
     return [
-      { href: "/partner", label: "Consola Gestoría & Multi-NIF" },
-      { href: "/docs", label: "Documentación API" },
+      { href: "/partner", label: "Consola integrador" },
+      { href: "/docs", label: "Documentación" },
     ];
   }
 
@@ -72,7 +72,7 @@ export async function getNavLinks(
   if (partner) {
     links.push({
       href: "/partner",
-      label: "Consola Gestoría & Multi-NIF",
+      label: "Consola integrador",
       badge: "accent",
     });
   }
@@ -86,4 +86,30 @@ export async function getNavLinks(
   }
 
   return links;
+}
+
+/**
+ * Determine default landing route for a logged-in user based on their role.
+ * - partner-only (Gestoría / B2B): /partner
+ * - admin (Plataforma Operador): /admin
+ * - user (Autónomo / Pyme Web): /invoices
+ */
+export async function getDefaultAppRedirect(userId: string): Promise<string> {
+  const forced = devForceRole();
+  let admin: boolean;
+  let partner: boolean;
+
+  if (forced) {
+    admin = forced === "admin";
+    partner = forced === "partner";
+  } else {
+    [admin, partner] = await Promise.all([
+      isUserAdmin(userId),
+      isUserPartner(userId),
+    ]);
+  }
+
+  if (partner && !admin) return "/partner";
+  if (admin) return "/admin";
+  return "/invoices";
 }
