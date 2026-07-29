@@ -2,6 +2,7 @@ import "server-only";
 
 import { isUserAdmin } from "@/lib/auth/admin";
 import { isUserPartner } from "@/lib/auth/partner";
+import { getAdminPreviewRole } from "@/lib/auth/admin-preview";
 
 export type AppRole = "admin" | "partner" | "user";
 
@@ -47,6 +48,31 @@ export async function getNavLinks(
       isUserAdmin(userId),
       isUserPartner(userId),
     ]);
+  }
+
+  // Admin role preview override
+  if (admin) {
+    const preview = await getAdminPreviewRole(userId);
+    if (preview === "partner") {
+      return [
+        { href: "/partner", label: "Consola integrador" },
+        { href: "/docs", label: "Documentación" },
+      ];
+    }
+    if (preview === "user") {
+      const userLinks: NavLink[] = [
+        { href: "/", label: "Inicio" },
+        { href: "/invoices", label: "Facturas" },
+        { href: "/customers", label: "Clientes" },
+        { href: "/products", label: "Productos" },
+        { href: "/settings/verifactu", label: "Ajustes AEAT" },
+        { href: "/docs", label: "Documentación" },
+      ];
+      if (options.billingEnabled) {
+        userLinks.push({ href: "/settings/billing", label: "Plan" });
+      }
+      return userLinks;
+    }
   }
 
   if (partner && !admin) {
@@ -109,7 +135,13 @@ export async function getDefaultAppRedirect(userId: string): Promise<string> {
     ]);
   }
 
+  if (admin) {
+    const preview = await getAdminPreviewRole(userId);
+    if (preview === "partner") return "/partner";
+    if (preview === "user") return "/invoices";
+    return "/admin";
+  }
+
   if (partner && !admin) return "/partner";
-  if (admin) return "/admin";
   return "/invoices";
 }

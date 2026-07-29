@@ -1,0 +1,35 @@
+"use server";
+
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { isUserAdmin } from "@/lib/auth/admin";
+import { PREVIEW_COOKIE_NAME } from "./admin-preview";
+import type { AppRole } from "./app-role";
+
+export async function setAdminPreviewRoleAction(role: AppRole | "clear") {
+  const { userId } = await auth();
+  if (!userId) return;
+
+  const isAdmin = await isUserAdmin(userId);
+  if (!isAdmin) return;
+
+  const cookieStore = await cookies();
+
+  if (role === "clear" || role === "admin") {
+    cookieStore.delete(PREVIEW_COOKIE_NAME);
+    redirect("/admin");
+  } else {
+    cookieStore.set(PREVIEW_COOKIE_NAME, role, {
+      path: "/",
+      maxAge: 60 * 60 * 24, // 24 hours
+      sameSite: "lax",
+    });
+
+    if (role === "partner") {
+      redirect("/partner");
+    } else {
+      redirect("/invoices");
+    }
+  }
+}
