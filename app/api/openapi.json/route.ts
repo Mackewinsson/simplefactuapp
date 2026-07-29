@@ -14,6 +14,16 @@ import { rewriteOpenApiServers } from "@/lib/docs/rewrite-openapi-servers";
  */
 export const revalidate = 3600;
 
+function buildOpenApiUpstreamCandidates(baseUrl: string): string[] {
+  const normalized = baseUrl.replace(/\/$/, "");
+  const root = normalized.replace(/\/v1$/i, "");
+  const candidates = [`${normalized}/openapi.json`];
+  if (root !== normalized) {
+    candidates.push(`${root}/openapi.json`);
+  }
+  return candidates;
+}
+
 export async function GET() {
   let baseUrl: string;
   try {
@@ -28,32 +38,47 @@ export async function GET() {
     );
   }
 
-  const upstream = `${baseUrl}/openapi.json`;
+  const upstreamCandidates = buildOpenApiUpstreamCandidates(baseUrl);
 
-  let res: Response;
-  try {
-    res = await fetch(upstream, {
-      headers: { Accept: "application/json" },
-      next: { revalidate: 3600 },
-    });
-  } catch (err) {
+  let res: Response | null = null;
+  let upstream = upstreamCandidates[0] ?? `${baseUrl}/openapi.json`;
+  let lastError: unknown;
+
+  for (const candidate of upstreamCandidates) {
+    upstream = candidate;
+    try {
+      const attempt = await fetch(candidate, {
+        headers: { Accept: "application/json" },
+        next: { revalidate: 3600 },
+      });
+      if (attempt.ok) {
+        res = attempt;
+        break;
+      }
+      if (attempt.status === 404) {
+        continue;
+      }
+      return NextResponse.json(
+        {
+          error: "upstream_error",
+          upstream: candidate,
+          status: attempt.status,
+          statusText: attempt.statusText,
+        },
+        { status: 502 }
+      );
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  if (!res) {
     return NextResponse.json(
       {
         error: "upstream_unreachable",
-        upstream,
-        message: err instanceof Error ? err.message : String(err),
-      },
-      { status: 502 }
-    );
-  }
-
-  if (!res.ok) {
-    return NextResponse.json(
-      {
-        error: "upstream_error",
-        upstream,
-        status: res.status,
-        statusText: res.statusText,
+        upstream: upstreamCandidates.join(", "),
+        message:
+          lastError instanceof Error ? lastError.message : "OpenAPI spec not found",
       },
       { status: 502 }
     );
