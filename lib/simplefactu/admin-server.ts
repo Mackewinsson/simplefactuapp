@@ -121,6 +121,15 @@ export type CertificateMetaResponse = {
   hasCertificate: boolean;
   createdAt: string | null;
   updatedAt: string | null;
+  certificate?: {
+    nif?: string | null;
+    commonName?: string | null;
+    notAfter?: string | null;
+    daysUntilExpiry?: number | null;
+    expiresWithin30Days?: boolean;
+    valid?: boolean;
+    code?: string;
+  } | null;
 };
 
 export async function getDiagnostics(): Promise<AdminDiagnostics> {

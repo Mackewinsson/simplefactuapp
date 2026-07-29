@@ -183,18 +183,82 @@ export default async function AdminTenantDetailPage({
       )}
 
       {/* Certificate summary */}
-      <section className="rounded-lg border border-outline-soft bg-surface p-4">
-        <h2 className="mb-2 text-sm font-semibold text-fg">Certificado (resumen)</h2>
+      <section className="rounded-lg border border-outline-soft bg-surface p-4 space-y-2">
+        <h2 className="text-sm font-semibold text-fg">Certificado (resumen)</h2>
         {cert ? (
-          <dl className="text-sm text-fg-muted">
+          <dl className="grid grid-cols-1 gap-2 text-sm text-fg-muted sm:grid-cols-2">
             <div>
               <dt className="inline text-fg-subtle">Tiene certificado:</dt>{" "}
-              <dd className="inline">{cert.hasCertificate ? "Sí" : "No"}</dd>
+              <dd className="inline font-medium">
+                {cert.hasCertificate ? (
+                  <span className="inline-flex items-center rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-bold text-success-foreground">
+                    ✓ Sí
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-full bg-surface-hover px-2 py-0.5 text-[11px] font-medium text-fg-subtle ring-1 ring-outline-soft">
+                    No
+                  </span>
+                )}
+              </dd>
             </div>
+
+            {cert.certificate?.nif ? (
+              <div>
+                <dt className="inline text-fg-subtle">NIF Certificado:</dt>{" "}
+                <dd className="inline font-mono font-bold text-fg">{cert.certificate.nif}</dd>
+              </div>
+            ) : null}
+
+            {cert.certificate?.commonName ? (
+              <div className="sm:col-span-2">
+                <dt className="inline text-fg-subtle">Titular / Razón Social:</dt>{" "}
+                <dd className="inline font-medium text-fg">{cert.certificate.commonName}</dd>
+              </div>
+            ) : null}
+
+            {cert.certificate?.notAfter ? (
+              <div>
+                <dt className="inline text-fg-subtle">Caducidad:</dt>{" "}
+                <dd className="inline font-medium text-fg">
+                  {new Date(cert.certificate.notAfter).toLocaleDateString("es-ES")}
+                  {typeof cert.certificate.daysUntilExpiry === "number" ? (
+                    <span
+                      className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                        cert.certificate.daysUntilExpiry < 0
+                          ? "bg-danger/15 text-danger-foreground"
+                          : cert.certificate.expiresWithin30Days
+                          ? "bg-warning/20 text-warning-deeper"
+                          : "bg-surface-hover text-fg-subtle"
+                      }`}
+                    >
+                      {cert.certificate.daysUntilExpiry < 0
+                        ? "Expirado"
+                        : `${cert.certificate.daysUntilExpiry} días`}
+                    </span>
+                  ) : null}
+                </dd>
+              </div>
+            ) : null}
+
+            {typeof cert.certificate?.valid === "boolean" ? (
+              <div>
+                <dt className="inline text-fg-subtle">Validez:</dt>{" "}
+                <dd className="inline font-medium">
+                  {cert.certificate.valid ? (
+                    <span className="text-success-foreground font-semibold">Válido</span>
+                  ) : (
+                    <span className="text-danger-foreground font-semibold">
+                      Inválido ({cert.certificate.code ?? "Error"})
+                    </span>
+                  )}
+                </dd>
+              </div>
+            ) : null}
+
             {cert.updatedAt ? (
               <div>
-                <dt className="inline text-fg-subtle">Actualizado:</dt>{" "}
-                <dd className="inline">{cert.updatedAt}</dd>
+                <dt className="inline text-fg-subtle">Última actualización:</dt>{" "}
+                <dd className="inline font-mono text-xs">{cert.updatedAt}</dd>
               </div>
             ) : null}
           </dl>
