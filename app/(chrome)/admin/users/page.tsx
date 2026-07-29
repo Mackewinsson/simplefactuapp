@@ -89,6 +89,7 @@ export default async function AdminUsersPage({
                 <tr>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tipo</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Nombre / Email</th>
+                  <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">NIF Emisor</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Tenant ID</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Rol</th>
                   <th scope="col" className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-fg-subtle">Plan</th>
@@ -101,6 +102,7 @@ export default async function AdminUsersPage({
                   const clerkId = tenantToClerkId.get(t.id);
                   const clerk = clerkId ? clerkById.get(clerkId) : null;
                   const isWebUser = !!clerk;
+                  const isGestoria = t.id.startsWith("rp_") || clerk?.role === "partner";
                   const hasCert = !!t.has_certificate;
 
                   return (
@@ -114,7 +116,11 @@ export default async function AdminUsersPage({
                           href={`/admin/tenants/${encodeURIComponent(t.id)}`}
                           className="block -mx-5 px-5 -my-4 py-4"
                         >
-                          {isWebUser ? (
+                          {isGestoria ? (
+                            <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-accent border border-accent/30">
+                              Gestoría / API
+                            </span>
+                          ) : isWebUser ? (
                             <span className="inline-flex items-center rounded-full bg-accent-muted px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-accent-foreground-muted ring-1 ring-accent-outline/20">
                               Usuario web
                             </span>
@@ -134,12 +140,22 @@ export default async function AdminUsersPage({
                         >
                           {isWebUser ? (
                             <div>
-                              <p className="font-extrabold text-fg font-display">{clerk!.name ?? "—"}</p>
+                              <p className="font-extrabold text-fg font-display">{clerk!.name ?? t.name ?? "—"}</p>
                               <p className="text-xs text-fg-muted font-sans mt-0.5">{clerk!.email ?? "—"}</p>
                             </div>
                           ) : (
                             <p className="font-extrabold text-fg font-display">{t.name ?? "—"}</p>
                           )}
+                        </Link>
+                      </td>
+
+                      {/* NIF Emisor */}
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/tenants/${encodeURIComponent(t.id)}`}
+                          className="block -mx-5 px-5 -my-4 py-4 font-mono text-[12px] text-fg font-semibold"
+                        >
+                          {t.allowed_nif || "—"}
                         </Link>
                       </td>
 

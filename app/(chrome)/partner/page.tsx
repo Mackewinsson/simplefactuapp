@@ -10,7 +10,7 @@ export default async function PartnerHomePage() {
   try {
     subtenants = await listPartnerSubtenants(userId);
   } catch (e: unknown) {
-    err = e instanceof Error ? e.message : "Error al cargar clientes";
+    err = e instanceof Error ? e.message : "Error al cargar NIFs emisores";
   }
 
   const active = subtenants.filter((t) => t.status === "ACTIVE");
@@ -22,14 +22,14 @@ export default async function PartnerHomePage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-fg font-display">
-            Consola de integrador
+            Consola de Integración & Gestoría
           </h1>
           <p className="mt-1 text-sm text-fg-muted font-display font-medium">
-            Clientes vinculados a tu cuenta, certificados y envíos AEAT.
+            NIFs emisores gestionados bajo tu cuenta, certificados digitales y facturación AEAT.
           </p>
         </div>
         <Link href="/partner/tenants/new" className="btn btn-md btn-accent">
-          + Agregar cliente
+          + Alta de NIF Emisor
         </Link>
       </div>
 
@@ -41,16 +41,16 @@ export default async function PartnerHomePage() {
 
       {/* KPI cards */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Total clientes" value={subtenants.length} delay={0} />
-        <KpiCard label="Activos" value={active.length} accent="success" delay={1} />
+        <KpiCard label="NIFs Emisores Total" value={subtenants.length} delay={0} />
+        <KpiCard label="NIFs Activos" value={active.length} accent="success" delay={1} />
         <KpiCard
-          label="Suspendidos"
+          label="NIFs Suspendidos"
           value={suspended.length}
           accent={suspended.length > 0 ? "danger" : undefined}
           delay={2}
         />
         <KpiCard
-          label="Sin certificado"
+          label="Certificado Pendiente"
           value={noCert.length}
           accent={noCert.length > 0 ? "warning" : undefined}
           delay={3}
@@ -74,14 +74,13 @@ export default async function PartnerHomePage() {
             />
           </svg>
           <p className="text-base font-bold text-fg mb-1 font-display">
-            Aún no tienes clientes vinculados
+            Aún no tienes NIFs emisores vinculados
           </p>
           <p className="text-sm text-fg-muted mb-5 font-medium">
-            Agrega tu primer cliente para gestionar sus facturas y envíos a la
-            AEAT desde esta consola.
+            Da de alta tu primer NIF o empresa cliente para gestionar sus facturas y certificados ante la AEAT desde esta consola.
           </p>
           <Link href="/partner/tenants/new" className="btn btn-md btn-accent">
-            Agregar cliente
+            Alta de NIF Emisor
           </Link>
         </div>
       )}
@@ -90,15 +89,15 @@ export default async function PartnerHomePage() {
       {subtenants.length > 0 && (
         <div>
           <h2 className="text-lg font-bold text-fg font-display tracking-tight mb-4">
-            Clientes ({subtenants.length})
+            NIFs Emisores Gestionados ({subtenants.length})
           </h2>
           <div className="overflow-x-auto rounded-2xl border border-outline-soft/80 bg-surface/50 backdrop-blur-md shadow-sm overflow-hidden">
             <table className="w-full min-w-[640px] text-left text-sm font-sans">
               <thead className="border-b border-outline-soft/80 bg-surface-muted/65 text-fg-subtle">
                 <tr>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">ID</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">Nombre</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">NIF</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">ID Empresa</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">Nombre / Razón Social</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">NIF Emisor</th>
                   <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">Estado</th>
                   <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider">Certificado</th>
                 </tr>

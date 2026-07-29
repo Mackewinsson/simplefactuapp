@@ -18,23 +18,23 @@ export function CreateSubtenantForm() {
       <div className="space-y-4">
         <label className="block">
           <span className="text-sm font-semibold text-fg font-display">
-            NIF del cliente <span className="text-danger-emphasis">*</span>
+            NIF Emisor <span className="text-danger-emphasis">*</span>
           </span>
           <input
             type="text"
             name="allowedNif"
             required
-            placeholder="12345678Z"
+            placeholder="B12345678"
             className="input mt-1.5 font-mono uppercase"
           />
           <span className="mt-1 block text-xs text-fg-subtle">
-            Debe coincidir con el titular del certificado que subas después.
+            NIF del emisor de facturas (debe coincidir con el certificado PFX que subas después).
           </span>
         </label>
 
         <label className="block">
           <span className="text-sm font-semibold text-fg font-display">
-            Nombre o razón social <span className="text-danger-emphasis">*</span>
+            Nombre / Razón Social <span className="text-danger-emphasis">*</span>
           </span>
           <input
             type="text"
@@ -47,18 +47,18 @@ export function CreateSubtenantForm() {
 
         <label className="block">
           <span className="text-sm font-semibold text-fg font-display">
-            Identificador interno <span className="text-danger-emphasis">*</span>
+            ID Empresa / Tenant <span className="text-danger-emphasis">*</span>
           </span>
           <input
             type="text"
             name="id"
             required
-            placeholder="garcia_lopez"
+            placeholder="garcia_lopez_sl"
             pattern="[a-zA-Z0-9_\-]+"
             className="input mt-1.5 font-mono"
           />
           <span className="mt-1 block text-xs text-fg-subtle">
-            Código único para identificar al cliente en el sistema (letras, números, guiones).
+            Identificador único para llamadas API y gestión (sólo letras, números y guiones).
           </span>
         </label>
       </div>
@@ -82,7 +82,7 @@ export function CreateSubtenantForm() {
           disabled={pending}
           className="btn btn-md btn-primary"
         >
-          {pending ? "Creando…" : "Agregar cliente"}
+          {pending ? "Registrando…" : "Registrar NIF Emisor"}
         </button>
         <Link href="/partner" className="text-sm font-semibold text-fg-muted hover:text-fg font-display transition-colors">
           Cancelar
