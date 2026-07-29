@@ -24,7 +24,10 @@ export function PartnerHierarchyTree({
 }: PartnerHierarchyTreeProps) {
   const [activeTab, setActiveTab] = useState<"tree" | "grid">("tree");
 
-  const activeCount = subtenants.filter((s) => s.status === "ACTIVE").length;
+  // Health Metrics
+  const readyCount = subtenants.filter((s) => s.status === "ACTIVE" && !!s.has_certificate).length;
+  const pendingCertCount = subtenants.filter((s) => s.status === "ACTIVE" && !s.has_certificate).length;
+  const suspendedCount = subtenants.filter((s) => s.status !== "ACTIVE").length;
 
   return (
     <div className="panel-premium rounded-3xl p-6 sm:p-8 space-y-6 overflow-hidden">
@@ -32,13 +35,13 @@ export function PartnerHierarchyTree({
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-outline-soft/60 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+            <span className="h-2.5 w-2.5 rounded-full bg-accent animate-pulse" />
             <h2 className="text-xl font-extrabold tracking-tight text-fg font-display">
               Mapa de Estructura Multi-NIF
             </h2>
           </div>
           <p className="mt-1 text-xs text-fg-muted font-medium">
-            Visualización jerárquica de tu cuenta titular y NIFs emisores gestionados.
+            Visualización en tiempo real del estado de emisión y certificados de tus NIFs gestionados.
           </p>
         </div>
 
@@ -79,9 +82,9 @@ export function PartnerHierarchyTree({
         <div className="py-2 space-y-8">
           {/* Root Node (Partner Account) */}
           <div className="flex justify-center">
-            <div className="relative group max-w-sm w-full rounded-2xl border-2 border-accent/40 bg-surface/90 p-4 shadow-md backdrop-blur-md transition-all hover:border-accent hover:shadow-lg">
+            <div className="relative group max-w-md w-full rounded-2xl border-2 border-accent/40 bg-surface/90 p-5 shadow-md backdrop-blur-md transition-all hover:border-accent hover:shadow-lg">
               <div className="flex items-center justify-between gap-3 mb-2">
-                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                   Cuenta Titular (Padre)
                 </span>
@@ -89,12 +92,34 @@ export function PartnerHierarchyTree({
                   {partnerId}
                 </span>
               </div>
+
               <p className="text-base font-extrabold text-fg font-display">
                 {partnerName}
               </p>
-              <div className="mt-3 flex items-center justify-between text-xs text-fg-muted font-medium border-t border-outline-soft/40 pt-2.5">
-                <span>NIFs gestionados: <strong className="text-fg">{subtenants.length}</strong></span>
-                <span>Activos: <strong className="text-success-emphasis">{activeCount}</strong></span>
+
+              {/* Health Bar (Semáforo de Salud) */}
+              <div className="mt-4 pt-3 border-t border-outline-soft/40 space-y-2">
+                <div className="flex items-center justify-between text-xs font-display font-semibold">
+                  <span className="text-fg-muted">Salud global de emisión:</span>
+                  <span className="font-mono text-fg-subtle">{readyCount}/{subtenants.length} listos</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-[11px] font-medium text-fg-muted">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-success-emphasis" />
+                    <strong>{readyCount}</strong> Listos AEAT
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-warning-emphasis" />
+                    <strong>{pendingCertCount}</strong> Falta Cert.
+                  </span>
+                  {suspendedCount > 0 && (
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-full bg-danger-emphasis" />
+                      <strong>{suspendedCount}</strong> Suspendidos
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -118,12 +143,20 @@ export function PartnerHierarchyTree({
                 {subtenants.map((node) => {
                   const isActive = node.status === "ACTIVE";
                   const hasCert = !!node.has_certificate;
+                  const isReady = isActive && hasCert;
                   const href = `/partner/tenants/${encodeURIComponent(node.id)}`;
+
+                  // Dynamic card border & background accent based on readiness
+                  const borderStyle = isReady
+                    ? "border-success-outline/40 bg-surface/90 hover:border-success-emphasis hover:shadow-success/5"
+                    : !hasCert && isActive
+                    ? "border-warning-outline/50 bg-warning/5 hover:border-warning-emphasis hover:shadow-warning/5"
+                    : "border-danger-outline/40 bg-danger/5 hover:border-danger-emphasis";
 
                   return (
                     <div
                       key={node.id}
-                      className="relative flex flex-col justify-between rounded-2xl border border-outline-soft/80 bg-surface-muted/40 p-4 transition-all duration-200 hover:bg-surface-hover/80 hover:border-accent/50 hover:shadow-md group"
+                      className={`relative flex flex-col justify-between rounded-2xl border p-4.5 transition-all duration-200 hover:shadow-md group ${borderStyle}`}
                     >
                       <div>
                         {/* Top Badge Row */}
@@ -131,15 +164,20 @@ export function PartnerHierarchyTree({
                           <span className="font-mono text-[11px] font-bold text-accent">
                             {node.allowed_nif ? `NIF: ${node.allowed_nif}` : "Sin NIF"}
                           </span>
-                          <span
-                            className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                              isActive
-                                ? "bg-success/15 text-success-emphasis border border-success-outline/30"
-                                : "bg-danger/15 text-danger-emphasis border border-danger-outline/30"
-                            }`}
-                          >
-                            {isActive ? "Activo" : "Suspendido"}
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[9px] font-mono font-bold text-fg-subtle bg-surface-muted px-1.5 py-0.5 rounded border border-outline-soft/40">
+                              NIF Facturable
+                            </span>
+                            <span
+                              className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                isActive
+                                  ? "bg-success/15 text-success-emphasis border border-success-outline/30"
+                                  : "bg-danger/15 text-danger-emphasis border border-danger-outline/30"
+                              }`}
+                            >
+                              {isActive ? "Activo" : "Suspendido"}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Name */}
@@ -156,9 +194,11 @@ export function PartnerHierarchyTree({
 
                       {/* Footer Info & Action */}
                       <div className="mt-4 pt-3 border-t border-outline-soft/40 flex items-center justify-between text-xs">
-                        <span className="inline-flex items-center gap-1 text-[11px] text-fg-muted font-medium">
-                          <span className={`h-1.5 w-1.5 rounded-full ${hasCert ? "bg-success-emphasis" : "bg-warning-emphasis"}`} />
-                          {hasCert ? "Certificado OK" : "Certificado Pendiente"}
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${
+                          hasCert ? "text-success-emphasis" : "text-warning-emphasis font-bold"
+                        }`}>
+                          <span className={`h-2 w-2 rounded-full ${hasCert ? "bg-success-emphasis" : "bg-warning-emphasis animate-ping"}`} />
+                          {hasCert ? "Listo AEAT" : "Falta Certificado PFX"}
                         </span>
                         <Link
                           href={href}
@@ -170,6 +210,23 @@ export function PartnerHierarchyTree({
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Legend Footer */}
+              <div className="mt-6 pt-4 border-t border-outline-soft/40 flex flex-wrap items-center justify-center gap-4 text-xs text-fg-muted font-medium">
+                <span className="font-bold font-display text-fg">Leyenda de estados:</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-success-emphasis" />
+                  Verde: Listo para emitir a la AEAT
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-warning-emphasis" />
+                  Naranja: Requiere subir certificado PFX
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-danger-emphasis" />
+                  Rojo: Cuenta suspendida
+                </span>
               </div>
             </div>
           ) : (
