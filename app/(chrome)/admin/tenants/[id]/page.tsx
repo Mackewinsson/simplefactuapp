@@ -147,17 +147,24 @@ export default async function AdminTenantDetailPage({
           <h1 className="mt-2 text-xl font-semibold text-fg">Tenant: {t.id}</h1>
           {t.name && <p className="text-sm text-fg-muted">{t.name}</p>}
           {t.parent_tenant_id && (
-            <p className="mt-1 text-xs text-fg-subtle">
-              Tenant padre:{" "}
-              <Link
-                href={`/admin/tenants/${encodeURIComponent(t.parent_tenant_id)}`}
-                className="font-mono text-accent hover:underline"
-              >
-                {t.parent_tenant_id}
-              </Link>
-            </p>
+            <div className="mt-2 rounded-xl border border-accent/20 bg-accent-muted/20 p-3 text-xs font-display flex items-center gap-2">
+              <span className="font-semibold text-fg-muted">Jerarquía:</span>
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-accent bg-accent/15 px-2 py-0.5 rounded border border-accent/25">
+                Cuenta Gestoría Padre:
+                <Link
+                  href={`/admin/tenants/${encodeURIComponent(t.parent_tenant_id)}`}
+                  className="hover:underline ml-1"
+                >
+                  {t.parent_tenant_id}
+                </Link>
+              </span>
+              <span className="text-fg-subtle font-bold">➔</span>
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-fg bg-surface px-2 py-0.5 rounded border border-outline-soft">
+                NIF Emisor: {t.allowed_nif || t.id}
+              </span>
+            </div>
           )}
-          {t.allowed_nif && (
+          {t.allowed_nif && !t.parent_tenant_id && (
             <p className="mt-1 text-xs text-fg-subtle">
               NIF autorizado:{" "}
               <span className="font-mono font-medium text-warning-deeper">{t.allowed_nif}</span>
@@ -410,54 +417,69 @@ export default async function AdminTenantDetailPage({
       {/* Email prefs */}
       <TenantEmailPrefsForm tenantId={tenantId} initial={emailPrefs} />
 
-      {/* Sub-tenants (RP hierarchy) */}
+      {/* Sub-tenants / Managed NIFs (RP hierarchy) */}
       {subtenants && subtenants.subtenants.length > 0 && (
-        <section className="rounded-lg border border-outline-soft bg-surface p-4">
-          <h2 className="mb-3 text-sm font-semibold text-fg">
-            Sub-tenants ({subtenants.subtenants.length})
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-xs">
-              <thead className="border-b border-outline-soft bg-surface-hover text-[10px] uppercase text-fg-subtle">
-                <tr>
-                  <th className="px-2 py-2">ID</th>
-                  <th className="px-2 py-2">Nombre</th>
-                  <th className="px-2 py-2">NIF autorizado</th>
-                  <th className="px-2 py-2">Plan</th>
-                  <th className="px-2 py-2">Estado</th>
-                  <th className="px-2 py-2">Cert.</th>
-                  <th className="px-2 py-2">Creado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subtenants.subtenants.map((s) => (
-                  <tr key={s.id} className="border-b border-outline-soft hover:bg-surface-hover">
-                    <td className="px-2 py-2 font-mono">
-                      <Link
-                        href={`/admin/tenants/${encodeURIComponent(s.id)}`}
-                        className="text-accent hover:underline"
-                      >
-                        {s.id}
-                      </Link>
-                    </td>
-                    <td className="px-2 py-2 text-fg-muted">{s.name ?? "—"}</td>
-                    <td className="px-2 py-2 font-mono font-medium text-warning-deeper">
-                      {s.allowed_nif ?? <span className="text-fg-subtle font-normal">Sin restricción</span>}
-                    </td>
-                    <td className="px-2 py-2 text-fg-muted">{s.plan_id}</td>
-                    <td className="px-2 py-2">
-                      <span className={s.status === "ACTIVE" ? "text-success-foreground" : "text-warning-deeper"}>
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="px-2 py-2 text-fg-muted">
-                      {s.has_certificate ? "✓" : "—"}
-                    </td>
-                    <td className="whitespace-nowrap px-2 py-2 text-fg-muted">{s.created_at}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <section className="panel-premium rounded-2xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-outline-soft/60 pb-3">
+            <div>
+              <h2 className="text-base font-extrabold text-fg font-display">
+                NIFs Emisores Gestionados ({subtenants.subtenants.length})
+              </h2>
+              <p className="text-xs text-fg-muted font-medium">
+                Empresas y autónomos dependientes de esta cuenta gestoría titular.
+              </p>
+            </div>
+            <span className="text-xs font-mono text-accent font-bold bg-accent/15 px-2.5 py-1 rounded-full border border-accent/25">
+              Pay-Per-NIF: {subtenants.subtenants.filter(s => s.status === 'ACTIVE').length} activos
+            </span>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 pt-2">
+            {subtenants.subtenants.map((s) => {
+              const isActive = s.status === "ACTIVE";
+              const hasCert = !!s.has_certificate;
+              return (
+                <div
+                  key={s.id}
+                  className="rounded-xl border border-outline-soft/80 bg-surface/80 p-4 space-y-2 hover:border-accent/50 transition-all hover:shadow-md"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs font-bold text-accent">
+                      {s.allowed_nif ? `NIF: ${s.allowed_nif}` : "Sin NIF"}
+                    </span>
+                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                      isActive ? "bg-success/15 text-success-emphasis border border-success-outline/30" : "bg-danger/15 text-danger-emphasis border border-danger-outline/30"
+                    }`}>
+                      {s.status}
+                    </span>
+                  </div>
+
+                  <Link
+                    href={`/admin/tenants/${encodeURIComponent(s.id)}`}
+                    className="font-extrabold text-fg font-display text-sm hover:text-accent transition-colors block truncate"
+                  >
+                    {s.name || s.id}
+                  </Link>
+
+                  <p className="font-mono text-[11px] text-fg-subtle truncate">
+                    ID: {s.id}
+                  </p>
+
+                  <div className="pt-2 border-t border-outline-soft/40 flex items-center justify-between text-xs">
+                    <span className="inline-flex items-center gap-1 text-[11px] text-fg-muted">
+                      <span className={`h-1.5 w-1.5 rounded-full ${hasCert ? "bg-success-emphasis" : "bg-warning-emphasis"}`} />
+                      {hasCert ? "Certificado OK" : "Sin cert"}
+                    </span>
+                    <Link
+                      href={`/admin/tenants/${encodeURIComponent(s.id)}`}
+                      className="font-bold text-accent text-xs hover:underline"
+                    >
+                      Ficha →
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
