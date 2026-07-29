@@ -418,69 +418,80 @@ export default async function AdminTenantDetailPage({
       <TenantEmailPrefsForm tenantId={tenantId} initial={emailPrefs} />
 
       {/* Sub-tenants / Managed NIFs (RP hierarchy) */}
-      {subtenants && subtenants.subtenants.length > 0 && (
+      {(t.id.startsWith("rp_") || (subtenants && subtenants.subtenants.length > 0)) && (
         <section className="panel-premium rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-outline-soft/60 pb-3">
             <div>
               <h2 className="text-base font-extrabold text-fg font-display">
-                NIFs Emisores Gestionados ({subtenants.subtenants.length})
+                Estructura Jerárquica — NIFs Emisores Gestionados ({subtenants?.subtenants.length ?? 0})
               </h2>
               <p className="text-xs text-fg-muted font-medium">
                 Empresas y autónomos dependientes de esta cuenta gestoría titular.
               </p>
             </div>
             <span className="text-xs font-mono text-accent font-bold bg-accent/15 px-2.5 py-1 rounded-full border border-accent/25">
-              Pay-Per-NIF: {subtenants.subtenants.filter(s => s.status === 'ACTIVE').length} activos
+              Pay-Per-NIF: {subtenants?.subtenants.filter(s => s.status === 'ACTIVE').length ?? 0} activos
             </span>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 pt-2">
-            {subtenants.subtenants.map((s) => {
-              const isActive = s.status === "ACTIVE";
-              const hasCert = !!s.has_certificate;
-              return (
-                <div
-                  key={s.id}
-                  className="rounded-xl border border-outline-soft/80 bg-surface/80 p-4 space-y-2 hover:border-accent/50 transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-xs font-bold text-accent">
-                      {s.allowed_nif ? `NIF: ${s.allowed_nif}` : "Sin NIF"}
-                    </span>
-                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                      isActive ? "bg-success/15 text-success-emphasis border border-success-outline/30" : "bg-danger/15 text-danger-emphasis border border-danger-outline/30"
-                    }`}>
-                      {s.status}
-                    </span>
-                  </div>
-
-                  <Link
-                    href={`/admin/tenants/${encodeURIComponent(s.id)}`}
-                    className="font-extrabold text-fg font-display text-sm hover:text-accent transition-colors block truncate"
+          {subtenants && subtenants.subtenants.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 pt-2">
+              {subtenants.subtenants.map((s) => {
+                const isActive = s.status === "ACTIVE";
+                const hasCert = !!s.has_certificate;
+                return (
+                  <div
+                    key={s.id}
+                    className="rounded-xl border border-outline-soft/80 bg-surface/80 p-4 space-y-2 hover:border-accent/50 transition-all hover:shadow-md"
                   >
-                    {s.name || s.id}
-                  </Link>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs font-bold text-accent">
+                        {s.allowed_nif ? `NIF: ${s.allowed_nif}` : "Sin NIF"}
+                      </span>
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        isActive ? "bg-success/15 text-success-emphasis border border-success-outline/30" : "bg-danger/15 text-danger-emphasis border border-danger-outline/30"
+                      }`}>
+                        {s.status}
+                      </span>
+                    </div>
 
-                  <p className="font-mono text-[11px] text-fg-subtle truncate">
-                    ID: {s.id}
-                  </p>
-
-                  <div className="pt-2 border-t border-outline-soft/40 flex items-center justify-between text-xs">
-                    <span className="inline-flex items-center gap-1 text-[11px] text-fg-muted">
-                      <span className={`h-1.5 w-1.5 rounded-full ${hasCert ? "bg-success-emphasis" : "bg-warning-emphasis"}`} />
-                      {hasCert ? "Certificado OK" : "Sin cert"}
-                    </span>
                     <Link
                       href={`/admin/tenants/${encodeURIComponent(s.id)}`}
-                      className="font-bold text-accent text-xs hover:underline"
+                      className="font-extrabold text-fg font-display text-sm hover:text-accent transition-colors block truncate"
                     >
-                      Ficha →
+                      {s.name || s.id}
                     </Link>
+
+                    <p className="font-mono text-[11px] text-fg-subtle truncate">
+                      ID: {s.id}
+                    </p>
+
+                    <div className="pt-2 border-t border-outline-soft/40 flex items-center justify-between text-xs">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-fg-muted">
+                        <span className={`h-1.5 w-1.5 rounded-full ${hasCert ? "bg-success-emphasis" : "bg-warning-emphasis"}`} />
+                        {hasCert ? "Certificado OK" : "Sin cert"}
+                      </span>
+                      <Link
+                        href={`/admin/tenants/${encodeURIComponent(s.id)}`}
+                        className="font-bold text-accent text-xs hover:underline"
+                      >
+                        Ficha →
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-6 text-center rounded-xl bg-surface-muted/30 border border-dashed border-outline-soft">
+              <p className="text-sm font-bold text-fg font-display">
+                Esta cuenta de Gestoría / Integrador no tiene NIFs emisores registrados todavía.
+              </p>
+              <p className="text-xs text-fg-muted mt-1 font-medium">
+                Los NIFs creados desde la consola /partner o vía la API /partner/tenants aparecerán en este árbol.
+              </p>
+            </div>
+          )}
         </section>
       )}
 
