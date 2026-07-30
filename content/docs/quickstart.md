@@ -6,6 +6,8 @@ description: Envía tu primera factura a AEAT con curl en menos de 5 minutos.
 Esta guía te lleva paso a paso desde cero hasta recibir un CSV de AEAT.
 Si algunos términos (huella, encadenamiento, primer registro) te suenan a chino, lee antes los [Conceptos clave](/docs/concepts) — son 3 minutos y lo harán todo mucho más claro.
 
+Para el diccionario completo de campos (obligatorios, opcionales y “auto si se omiten”), ve a [Envío de facturas](/docs/envio-facturas).
+
 ## Antes de empezar
 
 Necesitas dos cosas:
@@ -24,56 +26,11 @@ export NIF="B12345678"                              # tu NIF como emisor
 export NOMBRE="ACME SL"                             # tu nombre o razón social
 ```
 
-## Paso 2 — Calcular la huella
+## Paso 2 — Enviar la factura
 
-**¿Qué es esto?** La huella es un hash SHA-256 de los datos principales de la factura.
-AEAT la comprueba para verificar que nadie ha modificado los datos en tránsito.
-Para la **primera factura** de una serie no hay huella anterior — eso se indica con `primerRegistro: true`.
+El servidor puede generar por ti la **huella**, el timestamp y el encadenamiento si los omites. Para la primera factura de una serie basta con el cuerpo de negocio + `sistemaInformatico`.
 
-> Si quieres entender por qué existe y cómo funciona la cadena, lee [Conceptos clave → Huella](/docs/concepts#huella-sha-256).
-
-El script calcula la huella a partir del importe y otros datos, y también genera el timestamp con zona horaria que AEAT requiere:
-
-```bash
-read HUELLA TIMESTAMP < <(node -e "
-  const c = require('crypto');
-
-  // Formato AEAT: eliminar el segundo decimal si es cero
-  // 210.00 → 210.0  |  21.15 → 21.15
-  const fmt = v => Number(v).toFixed(2).replace(/\.00$/, '.0');
-
-  // Timestamp ISO 8601 con zona horaria, sin milisegundos
-  const ts = new Date().toISOString()
-    .replace('Z', '+00:00')
-    .replace(/\.\d{3}/, '');
-
-  // Cadena canónica: campos separados por & en orden fijo
-  const cadena = [
-    'IDEmisorFactura=$NIF',
-    'NumSerieFactura=2026/F-001',
-    'FechaExpedicionFactura=\$(date +%d-%m-%Y)',
-    'TipoFactura=F1',
-    'CuotaTotal=' + fmt(21),       // IVA total
-    'ImporteTotal=' + fmt(121),    // total con IVA
-    'Huella=',                     // vacío porque es primerRegistro
-    'FechaHoraHusoGenRegistro=' + ts,
-  ].join('&');
-
-  const h = c.createHash('sha256').update(cadena, 'utf8').digest('hex').toUpperCase();
-  process.stdout.write(h + ' ' + ts);
-")
-```
-
-Comprueba que tienes los valores:
-
-```bash
-echo "Huella:    $HUELLA"
-echo "Timestamp: $TIMESTAMP"
-```
-
-## Paso 3 — Enviar la factura
-
-Ahora enviamos la factura. Fíjate en los campos comentados — son los más importantes para entender el cuerpo:
+> **`x-idempotency-key`:** genera un UUID **tú** (p. ej. `uuidgen` o `crypto.randomUUID()`). Factura nueva → UUID nuevo. Si la red falla y reintentas el **mismo** body → reutiliza el mismo UUID. Detalle en [Autenticación → Idempotencia](/docs/authentication#idempotencia).
 
 ```bash
 curl -s -X POST "$API_BASE/send-invoice" \
@@ -94,11 +51,6 @@ curl -s -X POST "$API_BASE/send-invoice" \
 
     \"cuotaTotal\": 21.00,
     \"total\": 121.00,
-
-    \"primerRegistro\": true,
-    \"huella\": \"$HUELLA\",
-    \"tipoHuella\": \"01\",
-    \"fechaHoraHusoGenRegistro\": \"$TIMESTAMP\",
 
     \"detalles\": [{
       \"clave\": \"01\",
@@ -121,24 +73,24 @@ curl -s -X POST "$API_BASE/send-invoice" \
   }"
 ```
 
-**Campos clave del cuerpo de la petición:**
+**Campos del ejemplo:**
 
 | Campo | Qué es |
 |-------|--------|
-| `nif` / `nombre` | Tu NIF y nombre como emisor de la factura |
-| `numSerie` | Número de factura — debe ser único por serie |
-| `tipoFactura` | `F1` = factura normal; `R1`–`R5` = rectificativas |
-| `descripcion` | Texto libre que describe la operación (obligatorio por ley) |
-| `destNif` / `destNombre` | NIF y nombre de tu cliente |
-| `cuotaTotal` | Suma del IVA de todos los detalles |
-| `total` | Base + IVA total |
-| `primerRegistro` | `true` solo en la primera factura de la serie; `false` en todas las demás |
-| `huella` | La que calculaste en el paso anterior |
-| `detalles` | Desglose del IVA — `clave 01` = régimen general; `calif S1` = operación sujeta y no exenta |
-| `sistemaInformatico` | Identifica el software que emite la factura (requerido por AEAT) |
-| `x-idempotency-key` | UUID único por intento — protege contra envíos duplicados si la red falla |
+| `nif` / `nombre` | Tu NIF y nombre como emisor |
+| `numSerie` | Número de factura — único por serie |
+| `fecha` | Fecha de expedición `DD-MM-YYYY` |
+| `tipoFactura` | `F1` = factura normal; `F2`–`F5` y `R1`–`R5` según caso |
+| `descripcion` | Texto de la operación (obligatorio) |
+| `destNif` / `destNombre` | Cliente (excepto F2; ver [Envío de facturas](/docs/envio-facturas)) |
+| `cuotaTotal` / `total` | IVA repercutido y total factura |
+| `detalles` | Desglose IVA — `clave 01` régimen general; `calif S1` sujeta no exenta |
+| `sistemaInformatico` | Identifica tu software ante AEAT |
+| `x-idempotency-key` | UUID que generas tú (cabecera, no body) |
 
-La respuesta inmediata es `202 Aceptado` con un job en cola:
+No hace falta enviar `huella`, `tipoHuella`, `fechaHoraHusoGenRegistro`, `primerRegistro` ni `encadenamiento` en el camino feliz: el servidor los completa.
+
+La respuesta inmediata es `202` con un job en cola:
 
 ```json
 {
@@ -148,9 +100,9 @@ La respuesta inmediata es `202 Aceptado` con un job en cola:
 }
 ```
 
-Esto es normal — el envío a AEAT es asíncrono para no bloquearte si AEAT tarda o tiene problemas.
+Esto es normal — el envío a AEAT es asíncrono.
 
-## Paso 4 — Consultar el resultado
+## Paso 3 — Consultar el resultado
 
 Guarda el `jobId` y consúltalo hasta que cambie a `SUCCEEDED` o `FAILED`:
 
@@ -177,35 +129,54 @@ Cuando llega a `SUCCEEDED`:
 }
 ```
 
-`csv` es el código de verificación oficial de AEAT para esa factura.
-`qrText` es la URL que debes codificar como QR e imprimir en el PDF (obligatorio por el art. 25 del RD 1007/2023).
+`csv` es el código de verificación oficial de AEAT.
+`qrText` es la URL que debes codificar como QR e imprimir en el PDF (art. 25 del RD 1007/2023).
 
 En producción, haz polling cada 2–5 segundos con backoff. Típicamente el job se resuelve en menos de 3 segundos.
 
-## Paso 5 — Segunda factura y siguientes
+## Paso 4 — Segunda factura y siguientes
 
-A partir de la segunda factura, `primerRegistro` es `false` y debes pasar la huella de la factura anterior:
+Para la siguiente factura de la misma serie, cambia `numSerie` (p. ej. `2026/F-002`), genera un **nuevo** `x-idempotency-key` y vuelve a llamar con el mismo estilo de cuerpo (sin huella manual). El servidor enlaza con la última huella de la cadena.
+
+Si prefieres controlar el encadenamiento a mano, puedes enviar `primerRegistro` / `encadenamiento` / `huella` — ver [Envío de facturas](/docs/envio-facturas#huella-y-encadenamiento) y [Conceptos](/docs/concepts).
+
+## Apéndice — Calcular la huella a mano (opcional)
+
+Solo si tu integración necesita generar la huella en cliente. En el camino feliz **no** hace falta.
+
+> Detalle del formato: [Conceptos → Huella](/docs/concepts#huella-sha-256).
 
 ```bash
-# La huella de la factura anterior la guardas cuando recibes SUCCEEDED
-HUELLA_ANTERIOR="910204E9..."   # huella de la factura 2026/F-001
-
-# En el body:
-# "primerRegistro": false,
-# "encadenamiento": {
-#   "registroAnterior": {
-#     "idEmisorFactura": "$NIF",
-#     "numSerieFactura": "2026/F-001",
-#     "fechaExpedicionFactura": "DD-MM-YYYY",
-#     "huella": "$HUELLA_ANTERIOR"
-#   }
-# }
+read HUELLA TIMESTAMP < <(node -e "
+  const c = require('crypto');
+  const fmt = v => Number(v).toFixed(2).replace(/\.00$/, '.0');
+  const ts = new Date().toISOString()
+    .replace('Z', '+00:00')
+    .replace(/\.\d{3}/, '');
+  const nif = process.env.NIF;
+  const fecha = new Date().toLocaleDateString('es-ES', {
+    day: '2-digit', month: '2-digit', year: 'numeric'
+  }).replace(/\\//g, '-');
+  const cadena = [
+    'IDEmisorFactura=' + nif,
+    'NumSerieFactura=2026/F-001',
+    'FechaExpedicionFactura=' + fecha,
+    'TipoFactura=F1',
+    'CuotaTotal=' + fmt(21),
+    'ImporteTotal=' + fmt(121),
+    'Huella=',
+    'FechaHoraHusoGenRegistro=' + ts,
+  ].join('&');
+  const h = c.createHash('sha256').update(cadena, 'utf8').digest('hex').toUpperCase();
+  process.stdout.write(h + ' ' + ts);
+")
 ```
 
-La cadena canónica para calcular la nueva huella también cambia: el campo `Huella=` ya no va vacío, sino que lleva `$HUELLA_ANTERIOR`.
+Si envías huella a mano, debes enviar **los tres** juntos: `huella`, `tipoHuella` (`01`) y `fechaHoraHusoGenRegistro`.
 
 ## ¿Qué sigue?
 
-- [Manejo de errores](/docs/error-codes) — los errores más frecuentes de AEAT y cómo resolverlos
-- [Autenticación](/docs/authentication) — cómo rotar la API key y subir el certificado vía API
-- [Referencia API](/docs/api-reference) — todos los campos y endpoints con esquemas completos
+- [Envío de facturas](/docs/envio-facturas) — diccionario de campos del body
+- [Manejo de errores](/docs/error-codes) — errores frecuentes de AEAT
+- [Autenticación](/docs/authentication) — API key, certificado e idempotencia
+- [Referencia API](/docs/api-reference) — OpenAPI interactiva (`POST /send-invoice`)

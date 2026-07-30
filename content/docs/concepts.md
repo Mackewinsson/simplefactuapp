@@ -13,9 +13,9 @@ La ley detrás es el RD 1007/2023 y la orden ministerial OM HAC/1177/2024.
 
 ## Huella (SHA-256)
 
-Cuando emites una factura, tienes que calcular un **hash SHA-256 de los datos principales** de esa factura (importe, NIF, número, fecha, tipo…) y enviarlo junto con la factura.
+Cada factura lleva un **hash SHA-256 de los datos principales** (importe, NIF, número, fecha, tipo…) llamado huella. Hacienda lo recalcula: si no coincide → error `2000`.
 
-¿Por qué? Porque Hacienda también calcula ese hash por su cuenta. Si los dos coinciden, la factura no ha sido manipulada. Si no coinciden → error `2000`.
+En la práctica, **puedes omitir** `huella`, `tipoHuella` y `fechaHoraHusoGenRegistro` y el servidor los genera por ti. Solo necesitas calcularlos a mano si tu ERP ya lo hace o quieres depurar un `2000`.
 
 ```
 Datos de tu factura  →  hash SHA-256  →  "huella"  →  se incluye en el envío
@@ -52,19 +52,21 @@ Factura 2  →  (huella₁ + datos₂)  →  huella₂
 Factura 3  →  (huella₂ + datos₃)  →  huella₃
 ```
 
-Nosotros llevamos el rastro por ti. Lo único que tienes que hacer es pasarnos la huella de la factura anterior en el campo `encadenamiento.registroAnterior` de cada envío (excepto en el primero, donde usas `primerRegistro: true`).
+Nosotros llevamos el rastro por ti. En el camino feliz **puedes omitir** `encadenamiento` y `primerRegistro`: el servidor usa la última huella persistida (o marca primer registro si la cadena está vacía).
+
+Si controlas la cadena a mano: pasa `encadenamiento.registroAnterior` en cada envío (excepto el primero, con `primerRegistro: true`).
 
 ## Primer registro (`primerRegistro: true`)
 
-La primera factura de una cadena nueva no tiene "factura anterior", así que en vez de pasar una huella anterior se envía `primerRegistro: true`.
+La primera factura de una cadena nueva no tiene "factura anterior". Puedes omitir el campo (el servidor lo infiere) o enviar `primerRegistro: true` explícitamente.
 
 ```
-primerRegistro: true   →  no hay huella anterior, es la primera de la cadena
-primerRegistro: false  →  DEBES pasar la huella de la factura anterior
+primerRegistro omitido / true   →  no hay huella anterior, es la primera de la cadena
+primerRegistro: false           →  hace falta enlace a la factura anterior (tuyo o auto)
 ```
 
 Si mandas `primerRegistro: true` y la cadena ya tiene facturas → error `409 ChainStateError` («la cadena ya existe»).
-Si mandas `primerRegistro: false` sin la huella correcta → error `409 ChainContinuityError`.
+Si mandas `primerRegistro: false` sin la huella correcta (y sin auto-relleno posible) → error `409 ChainContinuityError`.
 
 ## CSV (Código Seguro de Verificación)
 
@@ -78,6 +80,6 @@ Con el CSV y la URL de verificación, cualquiera puede comprobar en la web de la
 
 AEAT exige identificar qué software emitió la factura. Cada envío incluye un bloque que describe tu programa (nombre, NIF, versión).
 
-En la práctica: copia el bloque de ejemplo del [Inicio rápido](/docs/quickstart#paso-3--enviar-la-factura) y ajusta `nombreRazon`, `nif` y `version` con los tuyos. No necesitas cambiar nada más para empezar.
+En la práctica: copia el bloque de ejemplo del [Inicio rápido](/docs/quickstart#paso-2--enviar-la-factura) y ajusta `nombreRazon`, `nif` y `version` con los tuyos. No necesitas cambiar nada más para empezar.
 
 Con esto claro, el [Inicio rápido](/docs/quickstart) debería tener mucho más sentido.

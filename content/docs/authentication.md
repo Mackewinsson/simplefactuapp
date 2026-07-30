@@ -96,7 +96,28 @@ Luego sube `cert-modern.p12` con cualquiera de las opciones anteriores.
 
 `POST /send-invoice` y `POST /cancel-invoice` requieren la cabecera `x-idempotency-key`.
 
-**¿Para qué sirve?** Imagina que envías una factura, la red falla antes de recibir la respuesta y no sabes si llegó. Con la misma `x-idempotency-key`, puedes reenviar la petición con seguridad: si el job ya existe, devolvemos el mismo resultado sin crear un duplicado ni reenviar nada a AEAT.
+### ¿Qué valor hay que pasar?
+
+**Tú generas la clave** antes de llamar a la API. Recomendamos un **UUID** (cualquier string único de hasta **128 caracteres** vale):
+
+```bash
+# macOS / Linux
+uuidgen
+# → 550E8400-E29B-41D4-A716-446655440000
+
+# Node.js
+node -e "console.log(crypto.randomUUID())"
+```
+
+```http
+x-idempotency-key: 550e8400-e29b-41d4-a716-446655440000
+```
+
+Nosotros **no** podemos inventarla en el servidor: si la red falla y reintentas, solo tú sabes que la segunda llamada es el mismo envío. Si el servidor creara un UUID nuevo en cada HTTP, el reintento crearía un job duplicado.
+
+### ¿Para qué sirve?
+
+Imagina que envías una factura, la red falla antes de recibir la respuesta y no sabes si llegó. Con la misma `x-idempotency-key` y el **mismo cuerpo**, puedes reenviar con seguridad: si el job ya existe, devolvemos el mismo resultado sin crear un duplicado ni reenviar nada a AEAT.
 
 ```
 Primera llamada   →  job creado, 202 PENDING  (jobId: abc)
@@ -104,10 +125,18 @@ Red falla
 Segunda llamada   →  mismo jobId abc, mismo estado  (sin duplicado)
 ```
 
-Regla: usa un **UUID diferente por cada factura nueva**. Reutiliza el mismo UUID solo si estás reintentando exactamente la misma factura por un error de red.
+### Reglas
 
-Si envías la misma clave con un cuerpo distinto (factura diferente) recibes `409 Idempotency conflict` — es una protección para evitar que confundas dos facturas.
+| Situación | Qué hacer |
+|-----------|-----------|
+| Factura **nueva** | UUID **nuevo** |
+| Reintento por timeout / red (mismo JSON) | **Misma** clave |
+| Factura distinta | UUID nuevo — nunca reutilices la clave de otra factura |
+
+Si envías la misma clave con un cuerpo distinto recibes `409 Idempotency conflict` — ver [Errores](/docs/error-codes#errores-409--los-más-comunes-en-integración).
+
+Estados que puedes ver al reutilizar la clave: `PENDING` / `PROCESSING` → `202` con el job actual; `SUCCEEDED` → se reenvía el resultado guardado; `DEAD` → error (no se reintenta solo).
 
 ## Rate limits
 
-Cada cuenta tiene límites por endpoint. Si los superas, recibes `429 Demasiadas solicitudes` con la cabecera `Retry-After` indicando cuántos segundos esperar antes del próximo intento.
+Cada cuenta tiene límites por endpoint. Si los superas, recibes `429 Demasiadas solicitudes` con la cabecera `Retry-After` indicando cuántos segundos esperar antes del próximo intento. Los umbrales concretos por ruta están en la [Referencia API](/docs/api-reference) (OpenAPI).

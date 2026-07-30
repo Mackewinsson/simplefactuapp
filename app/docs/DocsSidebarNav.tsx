@@ -19,22 +19,6 @@ export function DocsSidebarNav({ pages, rootSlug }: Props) {
 
   return (
     <aside className="order-2 md:order-1 md:sticky md:top-20 space-y-6">
-      {/* Spotlight Mock Search Input */}
-      <div className="relative group">
-        <svg className="absolute left-3.5 top-3 h-4 w-4 text-fg-subtle group-focus-within:text-accent transition-colors" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          type="text"
-          placeholder="Buscar documentación..."
-          className="w-full pl-9 pr-12 py-2 text-xs rounded-xl border border-outline bg-surface/50 backdrop-blur-sm placeholder:text-fg-subtle focus:border-accent-outline focus:outline-none focus:ring-2 focus:ring-accent-outline/10 transition-all font-sans font-medium"
-          readOnly
-        />
-        <kbd className="absolute right-2.5 top-2.5 hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-outline-soft bg-surface-muted text-[9px] font-black text-fg-subtle select-none shadow-sm pointer-events-none">
-          <span>⌘</span>K
-        </kbd>
-      </div>
-
       <div>
         <h2 className="mb-2.5 px-2 text-[10px] font-black uppercase tracking-wider text-fg-subtle">
           Guías y tutoriales

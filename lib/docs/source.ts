@@ -8,15 +8,17 @@ import {
 } from "@/lib/branding";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import remarkHtml from "remark-html";
+import remarkRehype from "remark-rehype";
+import rehypeSlug from "rehype-slug";
+import rehypeStringify from "rehype-stringify";
 
 /**
  * Lightweight Markdown loader for /docs.
  *
  * Each .md file under content/docs is a documentation page. Frontmatter
  * fields (title, description) are surfaced via getDocMeta; the body is
- * compiled with remark + GFM and returned as raw HTML for the page to
- * render with Tailwind's typography prose classes.
+ * compiled with remark + GFM + rehype-slug (heading ids for anchors) and
+ * returned as raw HTML for the page to render with Tailwind's typography.
  *
  * Sidebar order is controlled by content/docs/meta.json → pages.
  */
@@ -28,10 +30,17 @@ export type DocFrontmatter = {
   description?: string;
 };
 
+export type DocTocItem = {
+  id: string;
+  text: string;
+  level: 2 | 3;
+};
+
 export type DocPage = {
   slug: string;
   frontmatter: DocFrontmatter;
   html: string;
+  toc: DocTocItem[];
 };
 
 export type DocMeta = {
@@ -59,6 +68,20 @@ function fileForSlug(slug: string): string | null {
   return resolved;
 }
 
+/** Extract h2/h3 TOC from HTML that already has id attributes (rehype-slug). */
+export function extractToc(html: string): DocTocItem[] {
+  const items: DocTocItem[] = [];
+  const re = /<h([23])\s+id="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(html)) !== null) {
+    const level = Number(match[1]) as 2 | 3;
+    const id = match[2];
+    const text = match[3].replace(/<[^>]+>/g, "").trim();
+    if (id && text) items.push({ id, text, level });
+  }
+  return items;
+}
+
 export async function getDocPage(slug: string | undefined): Promise<DocPage | null> {
   const realSlug = slug && slug.length > 0 ? slug : ROOT_SLUG;
   const file = fileForSlug(realSlug);
@@ -66,9 +89,15 @@ export async function getDocPage(slug: string | undefined): Promise<DocPage | nu
   const raw = fs.readFileSync(file, "utf8");
   const { data, content } = matter(raw);
 
-  const processed = await remark().use(remarkGfm).use(remarkHtml).process(content);
+  const processed = await remark()
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeSlug)
+    .use(rehypeStringify)
+    .process(content);
 
   const html = String(processed).replaceAll("{{APP_DISPLAY_NAME}}", APP_DISPLAY_NAME);
+  const toc = extractToc(html);
 
   const title =
     realSlug === ROOT_SLUG
@@ -90,6 +119,7 @@ export async function getDocPage(slug: string | undefined): Promise<DocPage | nu
       description,
     },
     html,
+    toc,
   };
 }
 

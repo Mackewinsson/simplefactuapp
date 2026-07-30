@@ -1,3 +1,12 @@
 {
-  "pages": ["index", "concepts", "quickstart", "authentication", "error-codes", "monitorizacion"]
+  "pages": [
+    "index",
+    "concepts",
+    "quickstart",
+    "envio-facturas",
+    "authentication",
+    "error-codes",
+    "gestoria",
+    "monitorizacion"
+  ]
 }

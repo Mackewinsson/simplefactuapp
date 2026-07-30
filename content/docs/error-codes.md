@@ -32,19 +32,19 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 
 **Causa:** la huella que pasaste en `encadenamiento.registroAnterior.huella` no coincide con la última huella que tenemos registrada para esa cadena.
 
-**Solución:** la respuesta incluye `expectedHuella` — es exactamente la huella que debes usar en el siguiente envío. Cópiala y úsala en `encadenamiento.registroAnterior.huella`.
+**Solución:** la respuesta incluye `expectedHuella` — es exactamente la huella que debes usar. Cópiala en `encadenamiento.registroAnterior.huella`, **o omite** `encadenamiento` para que el servidor use la última huella de la cadena.
 
 ### `ChainStateError` — la cadena ya existe
 
 **Causa:** enviaste `primerRegistro: true` pero la cadena ya tiene facturas registradas.
 
-**Solución:** cambia a `primerRegistro: false` y usa la huella de la última factura aceptada por AEAT en `encadenamiento.registroAnterior.huella`. Si no la tienes guardada, escríbenos con el `requestId` y te la facilitamos.
+**Solución:** omite `primerRegistro` (el servidor infiere el estado) o envía `primerRegistro: false`. Si controlas la cadena a mano, usa la huella de la última factura aceptada. Si no la tienes, omite `encadenamiento` para auto-relleno, o escríbenos con el `requestId`.
 
 ### `Idempotency conflict`
 
 **Causa:** reutilizaste una `x-idempotency-key` con un cuerpo diferente (factura distinta).
 
-**Solución:** genera un UUID nuevo para cada factura nueva. La misma clave solo debe reutilizarse si estás reintentando exactamente la misma petición.
+**Solución:** genera un UUID nuevo para cada factura nueva (`uuidgen` / `crypto.randomUUID()`). La misma clave solo debe reutilizarse si estás reintentando exactamente la misma petición (mismo body) tras un fallo de red. Ver [Autenticación → Idempotencia](/docs/authentication#idempotencia).
 
 ## Errores AEAT (dentro del job)
 
