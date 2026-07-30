@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ApiReferenceReact } from "@scalar/api-reference-react";
 import "@scalar/api-reference-react/style.css";
+import { DOCS_API_SEND_INVOICE_HASH } from "@/lib/docs/api-reference-links";
 import { useLocalizeScalarUi } from "@/lib/docs/localize-scalar-ui";
 
 export type ScalarServerEntry = { url: string; description?: string };
@@ -20,6 +21,10 @@ export type ScalarServerEntry = { url: string; description?: string };
  * `#tag/{Tag}/{METHOD}{path}` e.g. `#tag/Facturas/POST/send-invoice`
  * Keep `generateTagSlug` / `generateOperationSlug` in sync with
  * `lib/docs/api-reference-links.ts`.
+ *
+ * Visiting `/docs/api-reference` with no hash lands on POST /send-invoice so
+ * the primary Test Request is one click away (Scalar has no “open client”
+ * config flag).
  */
 export function ApiReferenceClient({
   specUrl,
@@ -31,8 +36,20 @@ export function ApiReferenceClient({
   const containerRef = useRef<HTMLDivElement>(null);
   useLocalizeScalarUi(containerRef);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash) return;
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}${DOCS_API_SEND_INVOICE_HASH}`
+    );
+    // Nudge Scalar to pick up the hash after mount (hashchange is enough for most builds).
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+  }, []);
+
   return (
-    <div ref={containerRef} className="-mx-4 md:-mx-8">
+    <div ref={containerRef} className="min-w-0 [&_.scalar-app]:min-w-0">
       <ApiReferenceReact
         configuration={{
           url: specUrl,
@@ -43,6 +60,7 @@ export function ApiReferenceClient({
           // with the rest of /docs (Fumadocs default theme).
           theme: "default",
           hideClientButton: false,
+          defaultOpenFirstTag: true,
           // Stable hashes for guide deep-links (see api-reference-links.ts).
           generateTagSlug: (tag) => tag.name ?? "tag",
           generateOperationSlug: (operation) =>
