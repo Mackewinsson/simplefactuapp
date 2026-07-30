@@ -177,6 +177,8 @@ Si envías huella a mano, debes enviar **los tres** juntos: `huella`, `tipoHuell
 ## ¿Qué sigue?
 
 - [Envío de facturas](/docs/envio-facturas) — diccionario de campos del body
+- [Anulación de facturas](/docs/cancelacion-facturas) — `POST /cancel-invoice`
 - [Manejo de errores](/docs/error-codes) — errores frecuentes de AEAT
 - [Autenticación](/docs/authentication) — API key, certificado e idempotencia
-- [Referencia API](/docs/api-reference) — OpenAPI interactiva (`POST /send-invoice`)
+- [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice) — OpenAPI (`POST /send-invoice`)
+- [Changelog](/docs/changelog) — qué cambió si ya tenías una integración

@@ -3,7 +3,7 @@ title: Envío de facturas
 description: Diccionario de campos de POST /send-invoice — cabeceras, body, qué es obligatorio y qué genera el servidor.
 ---
 
-Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso con curl, usa el [Inicio rápido](/docs/quickstart). Esquema completo e interactivo: [Referencia API](/docs/api-reference) (operación **Registra una factura** / `POST /send-invoice`).
+Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso con curl, usa el [Inicio rápido](/docs/quickstart). Esquema completo e interactivo: [Referencia API — POST /send-invoice](/docs/api-reference#tag/Facturas/POST/send-invoice).
 
 ## Cabeceras
 
@@ -86,7 +86,7 @@ Conceptos: [Huella](/docs/concepts#huella-sha-256), [Encadenamiento](/docs/conce
 
 ## Campos avanzados (AEAT)
 
-Rectificativas (`tipoRectificativa`, `importeRectificacion`, `facturasRectificadas`), subsanación, tercero, `macrodato`, `cupon`, `fechaFinVeriFactu`, etc. están documentados con reglas AEAT en la [Referencia API](/docs/api-reference).
+Rectificativas (`tipoRectificativa`, `importeRectificacion`, `facturasRectificadas`), subsanación, tercero, `macrodato`, `cupon`, `fechaFinVeriFactu`, etc. están documentados con reglas AEAT en la [Referencia API — POST /send-invoice](/docs/api-reference#tag/Facturas/POST/send-invoice).
 
 ## Respuesta 202
 

@@ -4,9 +4,11 @@
     "concepts",
     "quickstart",
     "envio-facturas",
+    "cancelacion-facturas",
     "authentication",
     "error-codes",
     "gestoria",
+    "changelog",
     "monitorizacion"
   ]
 }

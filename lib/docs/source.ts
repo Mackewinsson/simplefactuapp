@@ -156,3 +156,17 @@ export function listDocSlugs(): string[] {
   const { pages } = readMeta();
   return pages.filter((slug) => slug !== ROOT_SLUG);
 }
+
+/** Prev/next neighbors in sidebar order (meta.json). */
+export function getDocNeighbors(slug: string): {
+  prev: DocMeta | null;
+  next: DocMeta | null;
+} {
+  const pages = listDocs();
+  const idx = pages.findIndex((p) => p.slug === slug);
+  if (idx < 0) return { prev: null, next: null };
+  return {
+    prev: idx > 0 ? pages[idx - 1]! : null,
+    next: idx < pages.length - 1 ? pages[idx + 1]! : null,
+  };
+}

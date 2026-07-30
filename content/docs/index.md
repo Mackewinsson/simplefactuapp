@@ -22,14 +22,18 @@ Tu sistema   →   GET /jobs/:jobId  ←  SUCCEEDED + resultado
 
 Cuando el job llega a `SUCCEEDED` tienes el **CSV** (código de verificación de AEAT) y el **QR** que debes imprimir en la factura. Todo lo demás — huellas, encadenamiento, firma SOAP, reintentos — lo gestionamos nosotros.
 
+> ¿Actualizaste la integración? Ver [Changelog](/docs/changelog).
+
 ## Por dónde empezar
 
 1. **[Conceptos clave](/docs/concepts)** — qué es una huella, el encadenamiento, el CSV y el primer registro. Lee esto si es tu primera vez con Veri·Factu.
 2. **[Inicio rápido](/docs/quickstart)** — emite tu primera factura con `curl` en menos de 5 minutos.
 3. **[Envío de facturas](/docs/envio-facturas)** — diccionario de campos de `POST /send-invoice` (incl. `x-idempotency-key`).
-4. **[Autenticación](/docs/authentication)** — API key, certificado e idempotencia.
-5. **[Gestoría](/docs/gestoria)** — panel y API para asesorías con varios autónomos.
-6. **[Referencia API](/docs/api-reference)** — especificación OpenAPI interactiva de todos los endpoints.
+4. **[Anulación de facturas](/docs/cancelacion-facturas)** — diccionario de `POST /cancel-invoice`.
+5. **[Autenticación](/docs/authentication)** — API key, certificado e idempotencia.
+6. **[Gestoría](/docs/gestoria)** — panel y API para asesorías con varios autónomos.
+7. **[Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice)** — OpenAPI interactiva (`POST /send-invoice`).
+8. **[Changelog](/docs/changelog)** — qué cambió respecto a integraciones antiguas.
 
 ## ¿Cómo accedo?
 

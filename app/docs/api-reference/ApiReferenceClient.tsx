@@ -15,6 +15,11 @@ export type ScalarServerEntry = { url: string; description?: string };
  * `scalarServers` is passed from the server page so Scalar's "Try it" / server
  * selector uses the public API URL even when the proxied spec still mentions
  * localhost from upstream.
+ *
+ * Deep-link hashes (guides → this page) use:
+ * `#tag/{Tag}/{METHOD}{path}` e.g. `#tag/Facturas/POST/send-invoice`
+ * Keep `generateTagSlug` / `generateOperationSlug` in sync with
+ * `lib/docs/api-reference-links.ts`.
  */
 export function ApiReferenceClient({
   specUrl,
@@ -38,6 +43,10 @@ export function ApiReferenceClient({
           // with the rest of /docs (Fumadocs default theme).
           theme: "default",
           hideClientButton: false,
+          // Stable hashes for guide deep-links (see api-reference-links.ts).
+          generateTagSlug: (tag) => tag.name ?? "tag",
+          generateOperationSlug: (operation) =>
+            `${String(operation.method).toUpperCase()}${operation.path}`,
           // Default to Shell/curl, which generates correct code for all endpoints.
           defaultHttpClient: {
             targetKey: "shell",
