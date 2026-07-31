@@ -69,7 +69,7 @@ Cuando AEAT rechaza una factura, el job puede pasar a `FAILED` (reintento progra
 | `2000` | Registro | Huella incorrecta | El mensaje de error incluye la cadena canónica que AEAT calculó — úsala para depurar el formato de tus importes (ver abajo) |
 | `4102` | Envío | XML no cumple el esquema XSD | Falta un campo obligatorio; el más común es `PrimerRegistro` cuando `primerRegistro: true` |
 | `4104` | Envío | NIF del emisor no identificado | Tu NIF no está dado de alta o está mal escrito |
-| `4109` | Envío | NIF del `sistemaInformatico` incorrecto | El NIF en el bloque `sistemaInformatico` no existe en AEAT; usa el tuyo real |
+| `4109` | Envío | NIF del `sistemaInformatico` incorrecto | Con el camino normal (SIF Simple\*Factu) no deberías verlo: contacta soporte. Si tienes `clientSifEnabled`, el NIF del bloque que envías debe existir en AEAT |
 | `4116` | Envío | NIF del obligado de emisión incorrecto | El campo `nif` del body no existe en AEAT |
 
 ### Desglose (`detalles`) — validación 400 antes de AEAT

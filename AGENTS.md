@@ -142,9 +142,9 @@ Si `SIMPLEFACTU_ADMIN_KEY` ≠ `ADMIN_KEY` del VPS → `401 Invalid x-admin-key`
 | `SIMPLEFACTU_ADMIN_FETCH_TIMEOUT_MS` | No | Timeout de `adminFetch` (default 30000) |
 | **Cifrado y Veri\*Factu** | | |
 | `VERIFACTU_ENCRYPTION_KEY` | No | `lib/verifactu/crypto.ts` — API keys de usuario en Prisma |
-| `VERIFACTU_SI_NOMBRE_RAZON`, `VERIFACTU_SI_NIF` | No | `build-send-invoice-payload.ts` — override emisor SIF |
-| `VERIFACTU_SI_NOMBRE`, `VERIFACTU_SI_ID`, `VERIFACTU_SI_VERSION` | No | Bloque `sistemaInformatico` en envío |
-| `VERIFACTU_SI_SOLO_VERI`, `VERIFACTU_SI_MULTI_OT`, `VERIFACTU_SI_IND_MULTI_OT` | No | Flags SIF (`S`/`N`) |
+| `VERIFACTU_SI_NOMBRE_RAZON`, `VERIFACTU_SI_NIF` | No | Legacy / unused for default path — API stamps platform SIF (`PLATFORM_SI_*` en simplefactu) |
+| `VERIFACTU_SI_NOMBRE`, `VERIFACTU_SI_ID`, `VERIFACTU_SI_VERSION` | No | Idem (solo relevante si se reactivara envío SI desde el BFF) |
+| `VERIFACTU_SI_SOLO_VERI`, `VERIFACTU_SI_MULTI_OT`, `VERIFACTU_SI_IND_MULTI_OT` | No | Idem |
 | **Admin panel (Clerk)** | | |
 | `ADMIN_CLERK_USER_IDS` | No | `middleware.ts` + `lib/auth/admin.ts` — allowlist opcional `/admin` |
 | **Partner / gestoría** | | |

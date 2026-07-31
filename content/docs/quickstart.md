@@ -28,7 +28,7 @@ Producción: `https://api.simplefactu.com/v1` (misma ruta, otra clave).
 
 Sustituye `vf_...`, el NIF y el nombre por los tuyos (NIF **real** del titular del certificado FNMT; AEAT no acepta NIFs inventados).
 
-El servidor genera la **huella**, el timestamp, el encadenamiento y el bloque **sistema informático (SIF)** de Simple\*Factu si los omites. Solo envías los datos de negocio de la factura.
+El servidor genera la **huella**, el timestamp, el encadenamiento y el **sistema informático (SIF)**. Solo envías los datos de negocio de la factura (emisor, importes, desglose, destinatario).
 
 > **`x-idempotency-key`:** genera un UUID **tú** (p. ej. `uuidgen`). Factura nueva → UUID nuevo. Si la red falla y reintentas el **mismo** JSON → reutiliza el mismo UUID. [Idempotencia](/docs/authentication#idempotencia).
 

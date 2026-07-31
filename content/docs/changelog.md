@@ -5,6 +5,13 @@ description: Cambios relevantes del contrato API para integradores ERP.
 
 Entradas breves orientadas a quien ya tenía una integración antigua. Para el diccionario actual: [Envío de facturas](/docs/envio-facturas).
 
+## 2026-07 — `sistemaInformatico` opcional (SIF de plataforma)
+
+- **Cambio:** en el camino feliz **no envíes** `sistemaInformatico`. La API lo inyecta (Simple\*Factu = SIF).
+- Certificado + `nif` emisor = siguen siendo del obligado tributario.
+- Modo excepcional: admin puede activar `clientSifEnabled` en el tenant → entonces el cliente debe enviar el bloque.
+- Guías actualizadas: [Inicio rápido](/docs/quickstart), [Envío](/docs/envio-facturas), [Anulación](/docs/cancelacion-facturas), [Conceptos](/docs/concepts).
+
 ## 2026-07 — Documentación ERP: recorrido completo y consistencia
 
 ### Guías nuevas / reordenadas
@@ -46,6 +53,7 @@ Entradas breves orientadas a quien ya tenía una integración antigua. Para el d
 
 - **`huella`**, **`tipoHuella`** y **`fechaHoraHusoGenRegistro`**: si omites **los tres**, el servidor los genera (cadena canónica AEAT + SHA-256). Si envías uno, envía los tres.
 - **`primerRegistro`** y **`encadenamiento`**: opcionales; el servidor infiere el estado desde `chain_registry`.
+- **`sistemaInformatico`**: omitir en el camino feliz; la API inyecta el SIF de plataforma (ver entrada 2026-07 arriba). Solo obligatorio con `clientSifEnabled`.
 
 Camino feliz: [Inicio rápido](/docs/quickstart).
 

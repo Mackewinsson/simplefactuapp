@@ -80,14 +80,10 @@ Con el CSV y la URL de verificación, cualquiera puede comprobar en la web de la
 
 ## Sistema informático (`sistemaInformatico`)
 
-AEAT exige identificar qué software (SIF) generó el registro. Por defecto **Simple\*Factu** lo rellena en el servidor: no hace falta enviarlo en el JSON.
+AEAT exige identificar qué software (SIF) generó el registro. **En Simple\*Factu no lo envías en el JSON**: la API lo rellena con el SIF de plataforma. Tú solo envías datos de negocio + certificado del emisor.
 
-Solo si tu tenant tiene activado el modo “SIF del cliente” debes enviar el bloque (nombre, NIF del fabricante, versión, flags OT). Detalle: [Envío de facturas → Sistema informático](/docs/envio-facturas#sistema-informático-sistemainformatico).
+**OT** = obligado tributario (el NIF emisor de la factura). No confundir con el fabricante del SIF.
 
-**OT** = obligado tributario (el NIF emisor). Tres flags `S`/`N` (solo relevantes si envías el bloque tú):
-
-- `tipoUsoPosibleSoloVerifactu` — capacidad del producto (¿solo Veri\*Factu?).
-- `tipoUsoPosibleMultiOT` — ¿el software **puede** facturar para varios OT?
-- `indicadorMultiplesOT` — ¿**esta instalación** factura para varios OT?
+El modo excepcional “SIF del cliente” (`clientSifEnabled`) solo lo activa soporte/admin si tu ERP es el fabricante certificado. Detalle: [Envío de facturas → Sistema informático](/docs/envio-facturas#sistema-informático-sistemainformatico).
 
 Con esto claro, el [Inicio rápido](/docs/quickstart) debería tener mucho más sentido.

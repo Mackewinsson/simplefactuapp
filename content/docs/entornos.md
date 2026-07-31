@@ -24,7 +24,7 @@ OpenAPI en vivo: `GET {base-sin-v1}/openapi.json`. En el portal: [Referencia API
 
 AEAT valida NIFs **reales** incluso en preproducción. No existen NIFs ficticios de prueba.
 
-- Usa el **NIF del titular del certificado** FNMT como emisor (`nif` y, normalmente, `sistemaInformatico.nif`).
+- Usa el **NIF del titular del certificado** FNMT como emisor (`nif` del body). El bloque `sistemaInformatico` **no lo envías**: lo rellena Simple\*Factu.
 - Destinatario de prueba habitual: `Q2826004J` (FNMT-RCM), si aplica a tu caso.
 - En QA y producción cada cuenta **debe** tener su propio PFX (`REQUIRE_TENANT_CERTIFICATE=true`).
 

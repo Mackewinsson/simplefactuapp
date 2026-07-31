@@ -22,7 +22,7 @@ Tu sistema   →   GET /v1/jobs/:jobId  (consulta periódica)
               ← SUCCEEDED + CSV + URL de verificación + QR
 ```
 
-Cuando el trabajo llega a `SUCCEEDED` tienes el **CSV** (código de verificación de AEAT) y el **QR** que debes imprimir en la factura. Todo lo demás — huellas, encadenamiento, firma SOAP, reintentos — lo gestionamos nosotros.
+Cuando el trabajo llega a `SUCCEEDED` tienes el **CSV** (código de verificación de AEAT) y el **QR** que debes imprimir en la factura. Todo lo demás — huellas, encadenamiento, sistema informático (SIF), firma SOAP, reintentos — lo gestionamos nosotros.
 
 > ¿Actualizaste la integración? Ver [Registro de cambios](/docs/changelog).
 

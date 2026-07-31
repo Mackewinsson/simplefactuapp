@@ -32,6 +32,9 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 | `descripcion` | Sí | Descripción de la operación (1–500 caracteres). |
 | `fechaOperacion` | No | `DD-MM-YYYY`. No puede ser posterior a `fecha` salvo claves de régimen 14/15 (AEAT 1146). |
 | `refExterna` | No | Referencia libre del ERP (máx. 60). Omitir si no usas referencia propia. |
+| `sistemaInformatico` | No* | **Omitir.** Simple\*Factu rellena el SIF. Solo obligatorio con `clientSifEnabled` (modo excepcional). |
+
+\*En el camino feliz no envíes este objeto.
 
 ## Destinatario
 
@@ -39,7 +42,7 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 |-------|-------------|-------------|
 | `destNombre` | Casi siempre | Nombre o razón social del cliente. |
 | `destNif` | XOR con `destIdOtro` | NIF español del destinatario. |
-| `destIdOtro` | XOR con `destNif` | Identificador no NIF (`codigoPais`, `idType`, `id`) — mismas reglas que en sistema informático. |
+| `destIdOtro` | XOR con `destNif` | Identificador no NIF (`codigoPais`, `idType`, `id`). |
 
 **Excepción F2:** factura simplificada sin identificación de destinatario — **no** envíes `destNif` / `destNombre` / `destIdOtro` (AEAT 1190). Hay límite de importe (€3000).
 
@@ -76,9 +79,11 @@ Ejemplos:
 
 ## Sistema informático (`sistemaInformatico`)
 
-Por defecto **no lo envías**: Simple\*Factu es el SIF y la API rellena el bloque ante AEAT.
+**No lo envíes** en el caso normal. Simple\*Factu es el SIF: la API rellena el bloque ante AEAT con la identidad de plataforma. Tu certificado y el `nif` emisor siguen siendo los del obligado tributario.
 
-Solo es obligatorio si soporte/admin activa **modo SIF del cliente** (`clientSifEnabled`) en tu tenant: entonces debes enviar el bloque completo (tu software es el fabricante). Detalle de campos en ese caso:
+\*Si envías el objeto sin tener el modo cliente activo, la API **lo ignora** (salvo `numeroInstalacion` si lo traes) y sigue usando el SIF de plataforma.
+
+Solo aplica si soporte o un operador activa en tu tenant el modo **SIF del cliente** (`clientSifEnabled`): entonces sí debes enviar el objeto completo (tu software es el fabricante y necesitas declaración responsable propia):
 
 | Campo | Notas |
 |-------|-------|
@@ -91,8 +96,6 @@ Solo es obligatorio si soporte/admin activa **modo SIF del cliente** (`clientSif
 | `tipoUsoPosibleSoloVerifactu` | Capacidad del **producto**: `S` = solo Veri\*Factu; `N` = admite otros modos. |
 | `tipoUsoPosibleMultiOT` | Capacidad multi–**obligado tributario (OT)**: `S` = admite varios OT; `N` = un solo OT. |
 | `indicadorMultiplesOT` | Uso de **esta instalación**: `S` = factura para varios OT; `N` = solo uno. |
-
-Con el modo por defecto (SIF Simple\*Factu) puedes omitir todo el objeto.
 
 ## Huella y encadenamiento
 

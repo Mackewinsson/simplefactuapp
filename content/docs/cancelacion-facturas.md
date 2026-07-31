@@ -26,13 +26,13 @@ Guía de referencia para `POST /v1/cancel-invoice`. Esquema interactivo: [Refere
 |-------|-------------|-------------|
 | `nif` / `nombre` | Sí | Emisor (obligado a emitir). |
 | `facturaAnulada` | Sí | Factura a anular: `idEmisorFacturaAnulada`, `numSerieFacturaAnulada`, `fechaExpedicionFacturaAnulada` (`DD-MM-YYYY`). |
-| `sistemaInformatico` | No* | Por defecto lo rellena Simple\*Factu. Obligatorio solo con `clientSifEnabled`. |
+| `sistemaInformatico` | No | **Omitir.** Lo rellena Simple\*Factu. Solo obligatorio con `clientSifEnabled`. |
 | `huella` + `tipoHuella` + `fechaHoraHusoGenRegistro` | No* | Si omites los tres, el servidor los genera. |
 | `sinRegistroAnterior` | No | `"S"` si no hay registro previo en la cadena. Si se omite, el servidor lo infiere. |
 | `encadenamiento.registroAnterior` | No | Si hace falta y se omite, el servidor usa la última huella de la cadena. |
 | `rechazoPrevio` | No | `S` / `N` (default `N`). |
 
-\*Recomendado omitir huella en integraciones nuevas.
+\*Recomendado omitir huella y `sistemaInformatico` en integraciones nuevas.
 
 ## Ejemplo mínimo (auto-huella)
 
