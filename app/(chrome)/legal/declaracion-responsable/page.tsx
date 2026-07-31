@@ -190,7 +190,7 @@ export default function DeclaracionResponsablePage() {
           registro rompe la cadena y es detectada automáticamente.
         </li>
         <li>
-          <strong>Ledger append-only:</strong> Los registros de facturación
+          <strong>Historial solo altas (inmutable):</strong> Los registros de facturación
           (altas y anulaciones) se persisten en una tabla de base de datos cuya
           capa de aplicación no expone operaciones de modificación ni borrado.
           Las correcciones se modelan emitiendo nuevas facturas rectificativas

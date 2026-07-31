@@ -17,11 +17,11 @@ const AEAT_STATUSES: { value: string; label: string }[] = [
   { value: "NOT_SENT", label: "No enviada" },
   { value: "PENDING", label: "Pendiente" },
   { value: "SUCCEEDED", label: "Aceptada" },
-  { value: "FAILED", label: "Fallida" },
-  { value: "DEAD", label: "Muerta" },
+  { value: "FAILED", label: "Reintentando…" },
+  { value: "DEAD", label: "Sin reintento" },
 ];
 
-/** Estados mostrados en la vista Verifactu (excluye «no enviada»). */
+/** Estados mostrados en la vista Veri*Factu (excluye «no enviada»). */
 const AEAT_STATUSES_VERIFACTU = AEAT_STATUSES.filter((s) => s.value !== "NOT_SENT");
 
 function buildListHref(params: {

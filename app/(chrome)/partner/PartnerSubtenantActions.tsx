@@ -54,14 +54,14 @@ export function PartnerSubtenantActions({
       </div>
 
       <div className="rounded-xl border border-outline-soft/60 bg-surface/80 p-4 space-y-3">
-        <h3 className="text-sm font-bold text-fg font-display">API key del cliente</h3>
+        <h3 className="text-sm font-bold text-fg font-display">Clave API del cliente</h3>
         <p className="text-xs text-fg-muted">
           Para integraciones directas con simplefactu (envío de facturas, certificado, etc.).
         </p>
         <form action={keyAction}>
           <input type="hidden" name="childId" value={childId} />
           <button type="submit" disabled={keyPending} className="btn btn-sm btn-primary">
-            {keyPending ? "Generando…" : "Generar API key"}
+            {keyPending ? "Generando…" : "Generar clave API"}
           </button>
         </form>
         {keyState && !keyState.ok ? (

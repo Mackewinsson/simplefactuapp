@@ -18,6 +18,17 @@ const EXACT_LABELS_ES: Record<string, string> = {
   Tenant: "Cuenta",
   "API Reference": "Referencia API",
   Quickstart: "Inicio rápido",
+  "Try it": "Probar",
+  Send: "Enviar",
+  Authentication: "Autenticación",
+  Responses: "Respuestas",
+  Request: "Petición",
+  Path: "Ruta",
+  Query: "Consulta",
+  Headers: "Cabeceras",
+  Body: "Cuerpo",
+  Examples: "Ejemplos",
+  Servers: "Servidores",
 };
 
 function translateTextNodes(root: HTMLElement): void {

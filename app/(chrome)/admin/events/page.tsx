@@ -78,7 +78,7 @@ export default async function AdminEventsPage({
           <div>
             <h1 className="text-3.5xl font-black tracking-tight text-fg">Eventos SIF</h1>
             <p className="mt-1.5 text-sm text-fg-muted font-sans font-medium">
-              Libro de registro inmutable para la auditoría de seguridad del Sistema de Información de Facturación (Verifactu).
+              Libro de registro inmutable para la auditoría de seguridad del Sistema de Información de Facturación (Veri*Factu).
             </p>
           </div>
           <Link

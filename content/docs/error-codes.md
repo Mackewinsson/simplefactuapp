@@ -12,19 +12,19 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 | `400 Solicitud incorrecta` | Validación fallida (campo faltante, formato incorrecto) | Lee el campo `details` en la respuesta — indica qué campo falla y por qué |
 | `401 No autorizado` | API key ausente o inválida | Comprueba el header `x-api-key` y que la clave no esté revocada |
 | `402 Pago requerido` | Límite de plan alcanzado | Consulta `GET /me/plan` — ver [Plan y uso](/docs/plan-y-uso); escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) para ampliar |
-| `403 Prohibido` | Scope insuficiente o tenant suspendido | Comprueba que tu API key tiene el scope necesario para ese endpoint |
+| `403 Prohibido` | Permiso (scope) insuficiente o cuenta suspendida | Comprueba que tu API key tiene el permiso (scope) necesario para ese endpoint |
 | `409 Conflicto` | Conflicto de encadenamiento o idempotencia | Lee la sección de errores 409 más abajo |
 | `422 Entidad no procesable` | Certificado obligatorio, NIF no autorizado o cert ≠ `allowed_nif` | Ver sección **422** más abajo |
 | `429 Demasiadas solicitudes` | Límite de tasa superado | Espera `Retry-After` segundos e inténtalo de nuevo |
-| `502 Puerta de enlace incorrecta` | AEAT devolvió un error o no respondió | El job se reintentará automáticamente con backoff; espera o consulta el estado |
+| `502 Puerta de enlace incorrecta` | AEAT devolvió un error o no respondió | El job se reintentará automáticamente con espera creciente; espera o consulta el estado |
 | `504 Tiempo de espera agotado` | Timeout antes de recibir respuesta | La petición puede que haya llegado; usa la misma `x-idempotency-key` para reintentar sin duplicar |
 
 ## Errores 422
 
 | `details.code` / `code` | Cuándo | Qué hacer |
 |-------------------------|--------|-----------|
-| `tenant_certificate_required` | QA/prod sin PFX en el tenant | Sube el certificado con `POST /me/certificate` — [Autenticación](/docs/authentication#certificado-digital-aeat) |
-| `allowed_nif_mismatch` | El `nif` del body no coincide con el NIF autorizado del sub-tenant | Usa el NIF fijado al crear el autónomo (gestoría) |
+| `tenant_certificate_required` | QA/prod sin PFX en la cuenta | Sube el certificado con `POST /me/certificate` — [Autenticación](/docs/authentication#certificado-digital-aeat) |
+| `allowed_nif_mismatch` | El `nif` del body no coincide con el NIF autorizado del cuenta hija | Usa el NIF fijado al crear el autónomo (gestoría) |
 | `cert_nif_mismatch` | El PFX subido no corresponde al `allowed_nif` | Sube el certificado del mismo titular |
 | `wrong_passphrase` | Contraseña del PFX incorrecta | Revisa la passphrase del `.p12`/`.pfx` |
 | `malformed` | El archivo no es un PKCS#12 válido | Comprueba que es `.p12`/`.pfx`, no PEM suelto |
@@ -116,8 +116,8 @@ Para resolverlo:
 
 | Estado | ¿Terminal? | Qué hacer |
 |--------|------------|-----------|
-| `FAILED` | No | El worker reintentará con backoff. Sigue el polling. |
-| `DEAD` | Sí | Agotó reintentos. Corrige la causa y emite nueva factura / rectificativa; no reutilices el mismo job. |
+| `FAILED` | No | El proceso en segundo plano reintentará con espera creciente. Sigue consultando el estado. |
+| `DEAD` | Sí | Agotó reintentos. Corrige la causa y emite nueva factura / rectificativa; no reutilices el mismo trabajo. |
 | `SUCCEEDED` | Sí | Lee `result.qrInfo` (CSV + QR). |
 
 ## Cada respuesta incluye un `requestId`

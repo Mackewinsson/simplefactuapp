@@ -18,7 +18,7 @@ export function CustomerCatalog({ customers }: Props) {
         <div>
           <h1 className="text-3.5xl font-black tracking-tight text-fg">Clientes</h1>
           <p className="mt-1.5 font-sans text-sm font-medium text-fg-muted">
-            Gestiona tu cartera de destinatarios reutilizables en facturas Verifactu.
+            Gestiona tu cartera de destinatarios reutilizables en facturas Veri*Factu.
           </p>
         </div>
         <button type="button" onClick={() => setShowCreate(true)} className="btn btn-lg btn-primary shrink-0">

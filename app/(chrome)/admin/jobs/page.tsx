@@ -52,7 +52,7 @@ export default async function AdminJobsPage({
         </Link>
         <h1 className="text-3.5xl font-black tracking-tight text-fg">Trabajos AEAT (Jobs)</h1>
         <p className="mt-1.5 text-sm text-fg-muted font-sans font-medium">
-          Control de envíos asíncronos Verifactu, reintentos y estados de comunicación con la Agencia Tributaria.
+          Control de envíos asíncronos Veri*Factu, reintentos y estados de comunicación con la Agencia Tributaria.
         </p>
       </div>
 

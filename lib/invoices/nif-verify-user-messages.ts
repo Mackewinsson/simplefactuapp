@@ -18,7 +18,7 @@ export const NIF_VERIFY_NEED_BOTH_USER =
   "Escribe el NIF/CIF y el nombre o razón social para poder comprobarlos con Hacienda.";
 
 export const NIF_VERIFY_PERMISSION_USER =
-  "Tu cuenta no puede consultar datos en Hacienda. Revisa Ajustes → Verifactu o vuelve a conectar la integración.";
+  "Tu cuenta no puede consultar datos en Hacienda. Revisa Ajustes → Veri*Factu o vuelve a conectar la integración.";
 
 export const NIF_VERIFY_SERVICE_USER =
   "No se ha podido completar la comprobación con Hacienda. Inténtalo de nuevo en unos minutos.";

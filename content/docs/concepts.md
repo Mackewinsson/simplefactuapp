@@ -1,14 +1,14 @@
 ---
 title: Conceptos clave
-description: Veri·Factu, huella, encadenamiento, CSV y primer registro explicados sin tecnicismos.
+description: Veri*Factu, huella, encadenamiento, CSV y primer registro explicados sin tecnicismos.
 ---
 
 Antes de enviar tu primera factura conviene entender cinco conceptos que aparecen en todos lados.
 No tienes que memorizar la normativa — solo entender por qué existe cada pieza.
 
-## Veri·Factu en una frase
+## Veri*Factu en una frase
 
-Veri·Factu es el sistema que obliga a los programas de facturación a **enviar cada factura a Hacienda (AEAT) en tiempo real**, de forma que no pueda modificarse después.
+Veri*Factu es el sistema que obliga a los programas de facturación a **enviar cada factura a Hacienda (AEAT) en tiempo real**, de forma que no pueda modificarse después.
 La ley detrás es el RD 1007/2023 y la orden ministerial OM HAC/1177/2024.
 
 > AEAT valida NIFs **reales** también en preproducción/QA. No uses NIFs inventados; el emisor suele ser el NIF del titular del certificado FNMT. Ver [Entornos](/docs/entornos).

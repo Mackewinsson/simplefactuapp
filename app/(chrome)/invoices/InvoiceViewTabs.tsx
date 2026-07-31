@@ -26,8 +26,8 @@ export function InvoiceViewTabs({
     <div className="mb-5">
       <p className="mb-2 text-xs leading-snug text-fg-subtle sm:text-sm">
         {current === "sin-enviar"
-          ? "Facturas creadas que aún no se han enviado a Verifactu."
-          : "Envíos o registros en curso con el servicio Verifactu (pendiente, aceptada, fallida…)."}
+          ? "Facturas creadas que aún no se han enviado a Veri*Factu."
+          : "Envíos o registros en curso con el servicio Veri*Factu (pendiente, aceptada, fallida…)."}
       </p>
       <div
         className="flex w-full gap-1 rounded-lg bg-surface-muted p-1 sm:inline-flex sm:w-auto"
@@ -40,7 +40,7 @@ export function InvoiceViewTabs({
           aria-selected={current === "verifactu"}
           className={tabClass(current === "verifactu")}
         >
-          Verifactu
+          Veri*Factu
           <span className="ml-1.5 inline-flex items-center rounded-full bg-surface-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none text-fg-subtle ring-1 ring-outline-soft">
             {verifactuCount}
           </span>

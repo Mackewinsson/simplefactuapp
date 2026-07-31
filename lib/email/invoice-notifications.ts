@@ -108,7 +108,7 @@ export async function sendInvoiceAcceptedEmail(params: InvoiceEmailParams): Prom
       Factura registrada ✓
     </h1>
     <p style="margin:0 0 8px;font-size:15px;color:#3f3f46;">
-      Tu factura <strong>${params.invoiceNumber}</strong> ha sido aceptada por Hacienda (AEAT) a través de Veri·Factu.
+      Tu factura <strong>${params.invoiceNumber}</strong> ha sido aceptada por Hacienda (AEAT) a través de Veri*Factu.
     </p>
     ${csvLine}
   `);

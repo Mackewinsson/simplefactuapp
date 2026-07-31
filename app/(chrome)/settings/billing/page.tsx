@@ -196,7 +196,7 @@ export default async function BillingPage() {
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
             <UsageBar label="Peticiones API" used={usage.requests} max={plan.maxRequestsPerMonth} pct={requestsPct} />
             <UsageBar
-              label="Facturas registradas Verifactu"
+              label="Facturas registradas Veri*Factu"
               used={usage.invoices}
               max={plan.maxInvoicesPerMonth}
               pct={invoicesPct}
@@ -238,7 +238,7 @@ export default async function BillingPage() {
                     <strong>{proPlan.maxRequestsPerMonth.toLocaleString("es-ES")}</strong> peticiones API / mes
                   </li>
                   <li>
-                    <strong>{proPlan.maxInvoicesPerMonth.toLocaleString("es-ES")}</strong> facturas Verifactu /
+                    <strong>{proPlan.maxInvoicesPerMonth.toLocaleString("es-ES")}</strong> facturas Veri*Factu /
                     mes
                   </li>
                   <li>Soporte técnico prioritario por email</li>
@@ -266,7 +266,7 @@ export default async function BillingPage() {
                   </li>
                   <li>
                     <strong>{enterprisePlan.maxInvoicesPerMonth.toLocaleString("es-ES")}</strong> facturas
-                    Verifactu / mes
+                    Veri*Factu / mes
                   </li>
                   <li>Soporte dedicado y activación manual</li>
                 </ul>

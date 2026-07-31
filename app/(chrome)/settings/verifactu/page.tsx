@@ -78,12 +78,12 @@ export default async function VerifactuSettingsPage() {
             ← Volver
           </Link>
         </div>
-        <h1 className="mb-2 text-2xl font-semibold">Verifactu (AEAT)</h1>
+        <h1 className="mb-2 text-2xl font-semibold">Veri*Factu (AEAT)</h1>
         <div className="rounded border border-warning-outline bg-warning p-4 text-sm text-warning-deeper">
-          <p className="font-medium">No se pudo preparar tu cuenta de Verifactu</p>
+          <p className="font-medium">No se pudo preparar tu cuenta de Veri*Factu</p>
           <p className="mt-2 text-warning-foreground">{provisionError ?? "Intenta de nuevo cuando el API esté disponible."}</p>
           <p className="mt-3 text-warning-deep">
-            Comprueba que el servicio de registro Verifactu está disponible y vuelve a cargar esta página. Si el
+            Comprueba que el servicio de registro Veri*Factu está disponible y vuelve a cargar esta página. Si el
             problema continúa, contacta con soporte.
           </p>
         </div>
@@ -98,7 +98,7 @@ export default async function VerifactuSettingsPage() {
           ← Volver
         </Link>
       </div>
-      <h1 className="mb-8 text-2xl font-semibold">Verifactu (AEAT)</h1>
+      <h1 className="mb-8 text-2xl font-semibold">Veri*Factu (AEAT)</h1>
       <VerifactuSettingsForm
         initialIssuerNif={account.issuerNif ?? ""}
         initialIssuerLegalName={account.issuerLegalName ?? ""}

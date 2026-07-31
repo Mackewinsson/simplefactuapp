@@ -52,7 +52,7 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 
 ## Desglose (`detalles`)
 
-Array de 1–12 líneas. En OpenAPI solo `base` aparece como `required` incondicional; el **runtime** exige además coherencia AEAT (igual que en la [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice)):
+Array de 1–12 líneas. En OpenAPI solo `base` aparece como `required` incondicional; en tiempo de ejecución el servidor exige además coherencia AEAT (igual que en la [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice)):
 
 | Campo | Notas |
 |-------|-------|

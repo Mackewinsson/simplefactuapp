@@ -14,7 +14,7 @@ curl -s "$API_BASE/me/usage?months=12" -H "x-api-key: $API_KEY"
 
 OpenAPI: [GET /me/plan](/docs/api-reference#tag/Facturación/GET/me/plan).
 
-`GET /me/plan` incluye el plan actual, contadores del mes y `status` del tenant (`ACTIVE` / `SUSPENDED`).
+`GET /me/plan` incluye el plan actual, contadores del mes y `status` de la cuenta (`ACTIVE` / `SUSPENDED`).
 
 ## HTTP 402
 
@@ -23,6 +23,6 @@ Cuando la facturación de límites está activa en el API (`BILLING_ENABLED`), s
 - Revisa `GET /me/plan` para ver límites y uso.
 - El **checkout** no está en esta API (no existe `POST /me/upgrade`). Los autónomos de la app web usan [Ajustes → Facturación](/settings/billing) (Lemon Squeezy). Los integradores ERP escriben a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) para ampliar plan.
 
-## Tenant suspendido
+## Cuenta suspendida
 
-Un tenant `SUSPENDED` recibe **403** en operaciones de escritura. Contacta soporte si crees que es un error.
+Una cuenta `SUSPENDED` recibe **403** en operaciones de escritura. Contacta soporte si crees que es un error.

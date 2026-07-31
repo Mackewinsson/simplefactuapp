@@ -120,7 +120,7 @@ export default async function PublicHomePage() {
           {/* Compliance pill */}
           <div className="mb-8 flex w-fit max-w-full items-start gap-2 rounded-xl border border-outline-soft/80 bg-surface-muted/65 px-3 py-1.5 text-xs font-semibold text-fg-subtle font-display shadow-sm">
             <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent animate-pulse" />
-            <span>Compatible con Veri·Factu — RD&nbsp;1007/2023&nbsp;·&nbsp;OM&nbsp;HAC/1177/2024</span>
+            <span>Compatible con Veri*Factu — RD&nbsp;1007/2023&nbsp;·&nbsp;OM&nbsp;HAC/1177/2024</span>
           </div>
 
           <HeroTabs />
@@ -210,7 +210,7 @@ export default async function PublicHomePage() {
       <footer className="relative z-10 border-t border-outline-soft/80 bg-surface/75 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <span>
-            Simple·Factu &mdash; Servicio compatible con Veri·Factu (AEAT)
+            Simple*Factu &mdash; Servicio compatible con Veri*Factu (AEAT)
           </span>
           <nav className="flex flex-wrap gap-x-4 gap-y-1">
             <Link href="/blog" className="hover:text-fg">Blog</Link>

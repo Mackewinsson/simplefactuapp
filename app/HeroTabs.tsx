@@ -19,7 +19,7 @@ const CONTENT: Record<
   }
 > = {
   autonomos: {
-    headline: "Cumple Veri·Factu. Sin coste.",
+    headline: "Cumple Veri*Factu. Sin coste.",
     sub: "Factura, envía a Hacienda y guarda el CSV en segundos. Huellas, encadenamiento y firma SOAP gestionados por nosotros — en el plan gratuito.",
     bullets: [
       "Alta en minutos con tu certificado FNMT",
@@ -37,17 +37,17 @@ const CONTENT: Record<
     note: "Sin tarjeta · Sin permanencia · Gratis",
   },
   empresas: {
-    headline: "API Veri·Factu lista para integrar.",
-    sub: "REST con idempotencia, jobs asíncronos y firma mTLS por tenant. Tu sistema sigue emitiendo; nosotros hablamos con AEAT.",
+    headline: "API Veri*Factu lista para integrar.",
+    sub: "API REST con idempotencia, trabajos asíncronos y firma mTLS por cuenta. Tu sistema sigue emitiendo; nosotros hablamos con AEAT.",
     bullets: [
-      "POST /send-invoice, polling de jobs y webhooks salientes",
-      "Multi-tenant con certificado por empresa",
-      "OpenAPI público, jobs async y métricas por tenant",
+      "POST /send-invoice, consulta de trabajos y webhooks salientes",
+      "Multicuenta con certificado por empresa",
+      "OpenAPI público, trabajos asíncronos y métricas por cuenta",
     ],
     trust: [
-      "Backoff exponencial y watchdog — ningún job se queda atascado",
+      "Reintentos con espera creciente y vigilancia — ningún trabajo se queda atascado",
       "Encadenamiento SHA-256 por instalación según RD 1007/2023",
-      "Registro append-only: trazabilidad completa para auditoría",
+      "Registro inmutable: trazabilidad completa para auditoría",
       "mTLS con AEAT — idempotencia garantizada por clave única de envío",
     ],
     cta: { label: "Ver referencia API", href: "/docs/api-reference" },

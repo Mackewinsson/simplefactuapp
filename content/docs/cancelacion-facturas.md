@@ -66,4 +66,4 @@ curl -s -X POST "$API_BASE/cancel-invoice" \
 
 Ver [Códigos de error](/docs/error-codes). Conflictos de cadena: `409` (`ChainContinuityError` / `ChainStateError`).
 
-Alternativa al polling: [Webhooks](/docs/webhooks) (`invoice.succeeded` / `invoice.failed`).
+Alternativa a la consulta periódica: [Webhooks](/docs/webhooks) (`invoice.succeeded` / `invoice.failed`).

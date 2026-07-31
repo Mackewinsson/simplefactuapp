@@ -205,7 +205,7 @@ export default async function ArticlePage({ params }: Props) {
         <footer className="border-t border-outline-soft bg-surface">
           <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <span>
-              Simple·Factu — Servicio compatible con Veri·Factu (AEAT)
+              Simple*Factu — Servicio compatible con Veri*Factu (AEAT)
             </span>
             <nav className="flex flex-wrap gap-x-4 gap-y-1">
               <Link href="/" className="hover:text-fg">

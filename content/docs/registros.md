@@ -1,9 +1,9 @@
 ---
 title: Registros AEAT
-description: Ledger append-only de altas y anulaciones aceptadas (GET /me/invoice-records).
+description: Historial inmutable de altas y anulaciones aceptadas por AEAT (GET /me/invoice-records).
 ---
 
-Cada alta o anulación aceptada por AEAT (`Correcto` / `ParcialmenteCorrecto`) se guarda en un registro **append-only**: huella, CSV, payload enviado y respuesta SOAP.
+Cada alta o anulación aceptada por AEAT (`Correcto` / `ParcialmenteCorrecto`) se guarda en un registro **solo altas (inmutable)**: huella, CSV, payload enviado y respuesta SOAP.
 
 ## Listado
 

@@ -1,5 +1,5 @@
 /**
- * Human-readable labels and list badges for AEAT / Verifactu job states.
+ * Human-readable labels and list badges for AEAT / Veri*Factu job states.
  */
 
 import { statusBadgeClass } from "@/lib/ui/status-badge";
@@ -73,19 +73,19 @@ export function registrationStatusBadge(
   }
 }
 
-/** Longer copy for invoice detail / Verifactu panel. */
+/** Longer copy for invoice detail / Veri*Factu panel. */
 export function registrationStatusDetailLabel(status: string): string {
   switch (status) {
     case "NOT_SENT":
-      return "Borrador — aún no enviada a Verifactu";
+      return "Borrador — aún no enviada a Veri*Factu";
     case "PENDING":
-      return "En cola o enviándose a Verifactu…";
+      return "En cola o enviándose a Veri*Factu…";
     case "PROCESSING":
       return "Procesándose en el servidor AEAT…";
     case "SUCCEEDED":
-      return "Registrada correctamente en Verifactu";
+      return "Registrada correctamente en Veri*Factu";
     case "SUCCEEDED_WARN":
-      return "Aceptada con advertencias en Verifactu (revisa el detalle)";
+      return "Aceptada con advertencias en Veri*Factu (revisa el detalle)";
     case "FAILED":
       return "Reintento automático en curso…";
     case "DEAD":
@@ -102,7 +102,7 @@ export function cancellationStatusDetailLabel(status: string): string {
     case "PENDING":
       return "Anulación en curso…";
     case "SUCCEEDED":
-      return "Anulada en Verifactu";
+      return "Anulada en Veri*Factu";
     case "FAILED":
       return "Reintento automático de anulación…";
     case "DEAD":

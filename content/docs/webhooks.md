@@ -1,9 +1,9 @@
 ---
 title: Webhooks
-description: Notificaciones firmadas cuando un job de factura llega a SUCCEEDED o DEAD.
+description: Notificaciones firmadas cuando un trabajo de factura llega a SUCCEEDED o DEAD.
 ---
 
-El servidor puede avisar a tu URL cuando un job de `send-invoice` / `cancel-invoice` alcanza un estado **terminal** (`SUCCEEDED` o `DEAD`). Así reduces el polling continuo (sigue siendo recomendable reconciliar con `GET /jobs/:id` o [registros](/docs/registros)).
+El servidor puede avisar a tu URL cuando un job de `send-invoice` / `cancel-invoice` alcanza un estado **terminal** (`SUCCEEDED` o `DEAD`). Así reduces la consulta periódica continua (sigue siendo recomendable reconciliar con `GET /jobs/:id` o [registros](/docs/registros)).
 
 > La [Referencia API](/docs/api-reference) (Scalar) **no** incluye la configuración de webhooks (es admin). El contrato completo está también en [INTEGRATION.md](https://github.com/Mackewinsson/simplefactu/blob/main/docs/INTEGRATION.md#webhooks-salientes).
 
@@ -29,7 +29,7 @@ Para integradores sin `ADMIN_KEY`: pide a [soporte@simplefactu.com](mailto:sopor
 | Evento | Cuándo | Payload extra |
 |--------|--------|---------------|
 | `invoice.succeeded` | Job aceptado por AEAT | `jobId`, `type`, `numSerie`, `csv?`, `huella?`, `qrText?` |
-| `invoice.failed` | Job marcado `DEAD` | `jobId`, `type`, `numSerie?`, `lastError` |
+| `invoice.failed` | Trabajo marcado `DEAD` | `jobId`, `type`, `numSerie?`, `lastError` |
 
 Ejemplo:
 

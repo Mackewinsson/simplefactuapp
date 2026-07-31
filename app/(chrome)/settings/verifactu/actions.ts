@@ -183,9 +183,9 @@ export async function uploadCertificateAction(
 
   const normalizedFromLegacy = json.certificate?.normalizedFromLegacy === true;
 
-  let successMsg = "Certificado subido a Verifactu.";
+  let successMsg = "Certificado subido a Veri*Factu.";
   if (normalizedFromLegacy) {
-    successMsg = "Certificado subido y convertido automáticamente al formato compatible con Verifactu.";
+    successMsg = "Certificado subido y convertido automáticamente al formato compatible con Veri*Factu.";
   } else if (json.warnings && json.warnings.length) {
     successMsg = `Certificado subido. Aviso: ${json.warnings.join(" ")}`;
   }

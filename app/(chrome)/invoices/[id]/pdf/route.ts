@@ -67,7 +67,7 @@ export async function GET(
 
   if (invoice.aeatStatus !== AeatJobStatus.SUCCEEDED) {
     return new NextResponse(
-      "El PDF está disponible cuando la factura se ha registrado correctamente en Verifactu (AEAT).",
+      "El PDF está disponible cuando la factura se ha registrado correctamente en Veri*Factu (AEAT).",
       { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } }
     );
   }
@@ -80,7 +80,7 @@ export async function GET(
   const issuerNif = (account?.issuerNif || "").trim();
   if (!issuerName) {
     return new NextResponse(
-      "Configura la razón social del emisor en Ajustes → Verifactu antes de descargar el PDF.",
+      "Configura la razón social del emisor en Ajustes → Veri*Factu antes de descargar el PDF.",
       { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } }
     );
   }
@@ -130,7 +130,7 @@ export async function GET(
   };
 
   /* ── 1. Header ──────────────────────────────────────── */
-  // Left: fiscal issuer (Verifactu profile); Right: invoice reference block
+  // Left: fiscal issuer (Veri*Factu profile); Right: invoice reference block
   const isCancelled =
     invoice.aeatCancellationStatus === AeatCancellationStatus.SUCCEEDED;
 
@@ -261,7 +261,7 @@ export async function GET(
 
   y -= GAP_MD;
 
-  /* ── 4b. Verifactu (AEAT) ───────────────────────────── */
+  /* ── 4b. Veri*Factu (AEAT) ───────────────────────────── */
   const hasAeatSubmission = !!(invoice.aeatCsv?.trim() || invoice.aeatStatus === "SUCCEEDED");
   const qrPayload = hasAeatSubmission ? invoice.aeatQrText?.trim() || null : null;
   if (invoice.aeatCsv || qrPayload) {

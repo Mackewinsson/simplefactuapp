@@ -5,7 +5,7 @@ export default function DashboardPage() {
     <div>
       <h1 className="mb-2 text-2xl font-semibold">Bienvenido</h1>
       <p className="mb-6 text-fg-muted">
-        Crea y gestiona tus facturas con Verifactu.
+        Crea y gestiona tus facturas con Veri*Factu.
       </p>
       <ul className="flex flex-col gap-2">
         <li>

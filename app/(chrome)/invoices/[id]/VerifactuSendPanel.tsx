@@ -291,7 +291,7 @@ export function VerifactuSendPanel({
 
   return (
     <div className="rounded border border-outline-soft bg-surface p-4">
-      <h2 className="text-sm font-semibold text-fg">Verifactu (AEAT)</h2>
+      <h2 className="text-sm font-semibold text-fg">Veri*Factu (AEAT)</h2>
 
       {isRegistered ? (
         <div
@@ -307,7 +307,7 @@ export function VerifactuSendPanel({
               : "Factura registrada en AEAT"}
           </p>
           <p className={`mt-1 text-sm ${partialSuccess ? "text-warning-deep" : "text-success-emphasis"}`}>
-            La factura <span className="font-mono">{invoiceNumber}</span> está en Verifactu.
+            La factura <span className="font-mono">{invoiceNumber}</span> está en Veri*Factu.
             Guarda el CSV y descarga el PDF con el QR de verificación.
           </p>
           <dl className="mt-4 grid gap-3 text-sm">
@@ -429,8 +429,8 @@ export function VerifactuSendPanel({
             {pending
               ? "Procesando…"
               : isRetry
-                ? "Reintentar envío a Verifactu"
-                : "Enviar a Verifactu"}
+                ? "Reintentar envío a Veri*Factu"
+                : "Enviar a Veri*Factu"}
           </button>
         ) : null}
         {canRefresh ? (
@@ -461,7 +461,7 @@ export function VerifactuSendPanel({
             disabled={pending}
             className="btn btn-sm btn-danger"
           >
-            Anular en Verifactu
+            Anular en Veri*Factu
           </button>
         ) : null}
       </div>
@@ -482,7 +482,7 @@ export function VerifactuSendPanel({
             className="w-full max-w-md rounded-lg border border-outline-soft bg-surface p-5 shadow-xl animate-[modal-enter_150ms_ease-out]"
           >
             <h3 id="verifactu-send-title" className="text-base font-semibold text-fg">
-              {isRetry ? "¿Reintentar el envío a Verifactu?" : "¿Enviar a Verifactu?"}
+              {isRetry ? "¿Reintentar el envío a Veri*Factu?" : "¿Enviar a Veri*Factu?"}
             </h3>
             <p className="mt-2 text-sm text-fg-muted">
               La factura <span className="font-mono">{invoiceNumber}</span> quedará registrada ante AEAT.
@@ -531,7 +531,7 @@ export function VerifactuSendPanel({
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <h3 id="verifactu-cancel-title" className="text-base font-semibold text-fg">
-                ¿Anular esta factura en Verifactu?
+                ¿Anular esta factura en Veri*Factu?
               </h3>
               <button
                 type="button"

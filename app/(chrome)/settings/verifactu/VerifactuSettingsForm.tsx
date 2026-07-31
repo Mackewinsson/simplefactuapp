@@ -44,7 +44,7 @@ export function VerifactuSettingsForm({
       <section className="panel-premium rounded-2xl p-6 md:p-8 animate-fade-in-up">
         <h2 className="text-xl font-bold text-fg font-display tracking-tight">Emisor (obligado emisión)</h2>
         <p className="mt-1 text-sm text-fg-muted">
-          Debe coincidir con tu certificado y el alta en AEAT. Se usa en cada factura enviada a Verifactu.
+          Debe coincidir con tu certificado y el alta en AEAT. Se usa en cada factura enviada a Veri*Factu.
         </p>
         {issuerState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-danger-foreground font-medium bg-danger/50 p-3 rounded-lg border border-danger-outline/50">
@@ -234,7 +234,7 @@ export function VerifactuSettingsForm({
         <p className="mt-1 text-sm text-fg-muted">
           Comprueba si el nombre o la razón social coinciden con el que tiene registrado Hacienda para un
           NIF o CIF español. Es opcional. Si falla la consulta, revisa también en Ajustes que la integración
-          Verifactu esté bien conectada.
+          Veri*Factu esté bien conectada.
         </p>
         {vnifState?.ok === false ? (
           <ul className="mt-3 list-inside list-disc text-sm text-danger-foreground font-medium bg-danger/50 p-3 rounded-lg border border-danger-outline/50">

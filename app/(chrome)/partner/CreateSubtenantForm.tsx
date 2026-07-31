@@ -48,7 +48,7 @@ export function CreateSubtenantForm() {
 
         <label className="block">
           <span className="text-sm font-semibold text-fg font-display">
-            ID Empresa / Tenant <span className="text-danger-emphasis">*</span>
+            ID empresa / cuenta <span className="text-danger-emphasis">*</span>
           </span>
           <input
             type="text"
@@ -64,11 +64,12 @@ export function CreateSubtenantForm() {
         </label>
 
         <div className="rounded-xl border border-accent/20 bg-accent-muted/20 p-3.5 text-xs space-y-1">
-          <p className="font-bold text-fg font-display">Integración API</p>
+          <p className="font-bold text-fg font-display">Integración con la API</p>
           <p className="text-fg-muted">
             Tras el alta: sube el certificado del autónomo y genera una{" "}
-            <strong>API key del hijo</strong> para <code className="font-mono">POST /send-invoice</code>.
-            La clave partner solo gestiona sub-tenants; no envía facturas. Detalle en{" "}
+            <strong>clave API del autónomo</strong> para{" "}
+            <code className="font-mono">POST /send-invoice</code>. La clave de gestoría solo
+            gestiona cuentas hijas; no envía facturas. Detalle en{" "}
             <Link href="/docs/gestoria" className="link-accent">
               Gestoría
             </Link>

@@ -1,31 +1,31 @@
 ---
-title: Changelog
+title: Registro de cambios
 description: Cambios relevantes del contrato API para integradores ERP.
 ---
 
 Entradas breves orientadas a quien ya tenía una integración antigua. Para el diccionario actual: [Envío de facturas](/docs/envio-facturas).
 
-## 2026-07 — Documentación ERP: journey completo y consistencia
+## 2026-07 — Documentación ERP: recorrido completo y consistencia
 
 ### Guías nuevas / reordenadas
 
 - [Entornos](/docs/entornos) — QA vs prod, prefijo `/v1`, NIFs reales.
 - [Verificar NIF](/docs/verificar-nif), [Registros AEAT](/docs/registros), [Webhooks](/docs/webhooks), [Plan y uso](/docs/plan-y-uso).
-- Checklist go-live y soporte en [índice](/docs) (`soporte@simplefactu.com`).
+- Lista de comprobación para producción y soporte en [índice](/docs) (`soporte@simplefactu.com`).
 
 ### Clarificaciones de contrato (sin cambio de runtime API)
 
-- Polling: estados terminales = `SUCCEEDED` | `DEAD` (`FAILED` reintenta).
-- Scopes: `GET /invoices/lookup` → `invoices:read`; `POST /verify-nif` → `nif:read`.
+- Consulta de estado: estados terminales = `SUCCEEDED` | `DEAD` (`FAILED` reintenta).
+- Permisos (scopes): `GET /invoices/lookup` → `invoices:read`; `POST /verify-nif` → `nif:read`.
 - No existe `POST /me/upgrade` en el API; cobro en la app (Lemon Squeezy).
 - HTTP **422** documentado (`tenant_certificate_required`, `allowed_nif_mismatch`, `cert_nif_mismatch`, códigos de subida de PFX).
-- Scalar no lista `/admin` ni setup de webhooks; ver guías + [INTEGRATION.md](https://github.com/Mackewinsson/simplefactu/blob/main/docs/INTEGRATION.md).
+- Scalar no lista `/admin` ni configuración de webhooks; ver guías + [INTEGRATION.md](https://github.com/Mackewinsson/simplefactu/blob/main/docs/INTEGRATION.md).
 
-### Frontend alineado con el contrato
+### Aplicación web alineada con el contrato
 
-- Panel partner: ejemplo curl con **API key del autónomo** (no partner) y body real de `send-invoice`.
-- App: jobs en `FAILED` siguen en polling / “reintento automático”; solo `DEAD` es fallo definitivo.
-- Sitemap y deep-links Scalar para NIF, registros, plan y jobs.
+- Panel de gestoría: ejemplo curl con **API key del autónomo** (no la de gestoría) y body real de `send-invoice`.
+- App: trabajos en `FAILED` siguen en consulta periódica / “reintento automático”; solo `DEAD` es fallo definitivo.
+- Sitemap y enlaces profundos de Scalar para NIF, registros, plan y jobs.
 
 ## 2026-07 — Contrato OpenAPI alineado + flags SIF en XML
 
@@ -57,6 +57,6 @@ Detalle: [Autenticación → Idempotencia](/docs/authentication#idempotencia).
 
 ### Referencia
 
-- Body de alta: [Envío de facturas](/docs/envio-facturas)
-- Body de anulación: [Anulación de facturas](/docs/cancelacion-facturas)
+- Cuerpo de alta: [Envío de facturas](/docs/envio-facturas)
+- Cuerpo de anulación: [Anulación de facturas](/docs/cancelacion-facturas)
 - OpenAPI: [Referencia API — POST /send-invoice](/docs/api-reference#tag/Facturas/POST/send-invoice)

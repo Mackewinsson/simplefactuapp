@@ -51,7 +51,7 @@ export default async function OnboardingPage() {
     <div className="mx-auto max-w-2xl font-display animate-fade-in-up space-y-8">
       <div>
         <h1 className="text-3.5xl font-black tracking-tight bg-gradient-to-r from-fg via-fg to-accent bg-clip-text text-transparent font-display">
-          Configura Verifactu
+          Configura Veri*Factu
         </h1>
         <p className="mt-2.5 text-sm text-fg-muted leading-relaxed font-sans font-medium">
           Cuatro pasos para emitir facturas con registro en AEAT. Puedes
@@ -74,7 +74,7 @@ export default async function OnboardingPage() {
               </time>
               . Renueva el PFX en{" "}
               <Link href="/settings/verifactu" className="font-bold underline hover:text-warning-deeper text-warning-deep">
-                Ajustes Verifactu
+                Ajustes Veri*Factu
               </Link>{" "}
               para no interrumpir los envíos.
             </p>
@@ -155,7 +155,7 @@ export default async function OnboardingPage() {
                     {step.id === "cert" &&
                       "Certificado digital .pfx para firmar el envío SOAP a AEAT (solo en servidor)."}
                     {step.id === "invoice" &&
-                      "Al menos una factura con estado Correcto en AEAT (envío Verifactu)."}
+                      "Al menos una factura con estado Correcto en AEAT (envío Veri*Factu)."}
                   </p>
                   {step.optional ? (
                     <span className="mt-2.5 inline-block rounded-md bg-surface-muted/65 px-2 py-0.5 text-[10px] font-bold text-fg-subtle border border-outline-soft/40">

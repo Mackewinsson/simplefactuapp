@@ -13,7 +13,7 @@ Para el diccionario completo de campos (obligatorios, opcionales y “auto si se
 Necesitas dos cosas:
 
 1. **API key** (`vf_...`) — para integradores ERP la emite el equipo de Simple\*Factu (no hay self-serve `/me/api-keys`). Escríbenos a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) indicando empresa, NIF emisor y si quieres **QA** o **producción**. Te enviamos la clave por canal seguro con los scopes necesarios. Detalle: [Autenticación](/docs/authentication).
-2. **Certificado digital AEAT** (`.pfx` / `.p12`) subido al tenant. Desde la app: *Ajustes → Veri·Factu*. Desde API: [Autenticación → Certificado](/docs/authentication#certificado-digital-aeat).
+2. **Certificado digital AEAT** (`.pfx` / `.p12`) subido a la cuenta. Desde la app: *Ajustes → Veri*Factu*. Desde API: [Autenticación → Certificado](/docs/authentication#certificado-digital-aeat).
 
 ## Paso 1 — Variables de entorno
 
@@ -27,7 +27,7 @@ export NIF="Z0706098A"
 export NOMBRE="NOMBRE TITULAR CERTIFICADO"
 ```
 
-> El valor `B12345678` que aparece en ejemplos genéricos de otras guías es un **placeholder**. En llamadas reales a AEAT (también en QA/preproducción) usa NIFs existentes en Hacienda.
+> El valor `B12345678` que aparece en ejemplos genéricos de otras guías es un **ejemplo ficticio**. En llamadas reales a AEAT (también en QA/preproducción) usa NIFs existentes en Hacienda.
 
 ## Paso 2 — Enviar la factura
 
@@ -109,7 +109,7 @@ Esto es normal — el envío a AEAT es asíncrono.
 
 Guarda el `jobId` y consúltalo hasta que el estado sea **terminal**: `SUCCEEDED` o `DEAD`.
 
-> **`FAILED` no es el final.** El worker reintenta con backoff. Sigue haciendo polling hasta `SUCCEEDED` o `DEAD`.
+> **`FAILED` no es el final.** El proceso en segundo plano reintenta con espera creciente. Sigue consultando el estado hasta `SUCCEEDED` o `DEAD`.
 
 ```bash
 JOB_ID="3e033807-17a0-4e1e-b1ba-7711d690fb3f"  # sustituye por el tuyo
@@ -137,7 +137,7 @@ Cuando llega a `SUCCEEDED`:
 `csv` es el código de verificación oficial de AEAT.
 `qrText` es la URL que debes codificar como QR e imprimir en el PDF (art. 25 del RD 1007/2023).
 
-En producción, haz polling cada 2–5 segundos con backoff. Típicamente el job se resuelve en menos de 3 segundos. Alternativa: [Webhooks](/docs/webhooks).
+En producción, consulta el estado cada 2–5 segundos con espera creciente. Típicamente el job se resuelve en menos de 3 segundos. Alternativa: [Webhooks](/docs/webhooks).
 
 ## Paso 4 — Segunda factura y siguientes
 
@@ -187,4 +187,4 @@ Si envías huella a mano, debes enviar **los tres** juntos: `huella`, `tipoHuell
 - [Manejo de errores](/docs/error-codes) — errores frecuentes de AEAT
 - [Autenticación](/docs/authentication) — API key, certificado e idempotencia
 - [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice) — OpenAPI (`POST /send-invoice`)
-- [Changelog](/docs/changelog) — qué cambió si ya tenías una integración
+- [Registro de cambios](/docs/changelog) — qué cambió si ya tenías una integración

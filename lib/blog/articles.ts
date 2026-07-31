@@ -456,7 +456,7 @@ rm /tmp/cert.pem</code></pre>
 
 <h2>¿Qué ocurre si la conexión falla?</h2>
 <p>
-  La conexión con la AEAT puede fallar puntualmente (mantenimiento, timeout, error de red). Un sistema bien diseñado como Simple*Factu gestiona esto con un <strong>sistema de jobs con reintentos y backoff exponencial</strong>: el registro se vuelve a intentar automáticamente (estado <code>FAILED</code> mientras reintenta) hasta 8 veces antes de marcarse como <code>DEAD</code> y notificar al operador. La factura queda registrada localmente desde el primer momento; el envío a la AEAT se completa en cuanto la conexión se restablece.
+  La conexión con la AEAT puede fallar puntualmente (mantenimiento, timeout, error de red). Un sistema bien diseñado como Simple*Factu gestiona esto con un <strong>sistema de trabajos con reintentos y espera creciente (backoff)</strong>: el registro se vuelve a intentar automáticamente (estado <code>FAILED</code> mientras reintenta) hasta 8 veces antes de marcarse como <code>DEAD</code> y notificar al operador. La factura queda registrada localmente desde el primer momento; el envío a la AEAT se completa en cuanto la conexión se restablece.
 </p>
 
 <h2>Entorno de preproducción para pruebas</h2>
@@ -1743,7 +1743,7 @@ rm /tmp/cert.pem</code></pre>
     <tr><td>Envío Veri*Factu</td><td>Sí (según plan)</td><td>Sí (todos los planes)</td></tr>
     <tr><td>Acceso API REST</td><td>Limitado</td><td>Sí, completo</td></tr>
     <tr><td>Ledger inmutable de registros AEAT</td><td>Básico</td><td>Completo con auditoría</td></tr>
-    <tr><td>Gestión de reintentos automáticos</td><td>Depende del plan</td><td>Sí, con backoff exponencial</td></tr>
+    <tr><td>Gestión de reintentos automáticos</td><td>Depende del plan</td><td>Sí, con espera creciente (backoff)</td></tr>
     <tr><td>Precio base</td><td>Desde ~7€/mes</td><td>Plan gratuito disponible</td></tr>
   </tbody>
 </table>
@@ -1884,7 +1884,7 @@ rm /tmp/cert.pem</code></pre>
   La arquitectura <em>Partner</em> de <strong>Simple*Factu</strong> está diseñada precisamente para despachos profesionales:
 </p>
 <ol>
-  <li><strong>Gestión de clientes (Multi-tenant):</strong> Da de alta a nuevos clientes en segundos desde una única consola de integrador.</li>
+  <li><strong>Gestión de clientes (multicuenta):</strong> Da de alta a nuevos clientes en segundos desde una única consola de integrador.</li>
   <li><strong>Certificados digitales centralizados:</strong> Custodia y gestiona los certificados FNMT (.pfx) de tus clientes. El sistema te avisa antes de que caduquen.</li>
   <li><strong>Contabilidad automatizada:</strong> Dado que todas las facturas de tus clientes pasan por el mismo sistema y se envían a la AEAT, exportar los registros para los modelos trimestrales (IVA, IRPF) se convierte en un proceso de un solo clic.</li>
 </ol>

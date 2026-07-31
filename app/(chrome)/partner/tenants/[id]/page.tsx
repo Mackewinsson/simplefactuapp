@@ -137,7 +137,7 @@ export default async function PartnerTenantDetailPage({
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-white font-bold text-xs">3</span>
             <div>
               <p className="text-xs font-bold font-display text-fg">3. Listo para Emitir</p>
-              <p className="text-[11px]">Vía Partner Key o Clave Dedicada</p>
+              <p className="text-[11px]">Con clave del autónomo (dedicada)</p>
             </div>
           </div>
         </div>
@@ -151,8 +151,8 @@ export default async function PartnerTenantDetailPage({
               ¿Cómo emitir facturas para este NIF por API?
             </h2>
             <p className="text-xs text-fg-muted mt-1">
-              La clave <strong>partner</strong> no envía facturas. Genera una{" "}
-              <strong>API key del autónomo</strong> (acciones a la derecha) y úsala en{" "}
+              La clave de <strong>gestoría</strong> no envía facturas. Genera una{" "}
+              <strong>clave API del autónomo</strong> (acciones a la derecha) y úsala en{" "}
               <code className="font-mono text-[11px]">x-api-key</code>. Guías:{" "}
               <Link href="/docs/gestoria" className="link-accent">
                 Gestoría
@@ -165,7 +165,7 @@ export default async function PartnerTenantDetailPage({
             </p>
           </div>
           <span className="shrink-0 text-[10px] font-mono font-bold bg-accent/15 text-accent px-2.5 py-1 rounded-full border border-accent/25">
-            REST API
+            API REST
           </span>
         </div>
 
@@ -180,7 +180,7 @@ export default async function PartnerTenantDetailPage({
           </p>
           <pre className="p-4 rounded-xl bg-surface-dark font-mono text-xs text-fg-on-dark overflow-x-auto border border-outline-soft/40">
 {`export API_BASE="${process.env.NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL || "https://api.simplefactu.com/v1"}"
-export API_KEY="vf_..."   # API key del AUTÓNOMO (no la partner)
+export API_KEY="vf_..."   # clave API del AUTÓNOMO (no la de gestoría)
 export NIF="${tenant.allowed_nif || "<NIF_AUTORIZADO>"}"
 export NOMBRE="${tenant.name || "Razón social"}"
 
@@ -217,7 +217,7 @@ curl -s -X POST "$API_BASE/send-invoice" \\
       \\"indicadorMultiplesOT\\": \\"N\\"
     }
   }"
-# → 202 + jobId; poll GET $API_BASE/jobs/:jobId hasta SUCCEEDED o DEAD`}
+# → 202 + jobId; consulta GET $API_BASE/jobs/:jobId hasta SUCCEEDED o DEAD`}
           </pre>
         </div>
       </div>
@@ -226,7 +226,7 @@ curl -s -X POST "$API_BASE/send-invoice" \\
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="panel-premium rounded-2xl p-6">
           <h2 className="text-base font-bold text-fg font-display tracking-tight border-b border-outline-soft/60 pb-2 mb-5">
-            Acciones & Credenciales
+            Acciones y credenciales
           </h2>
           <PartnerSubtenantActions childId={tenant.id} status={tenant.status} />
         </section>

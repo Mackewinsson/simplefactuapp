@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: APP_DISPLAY_NAME,
     template: `%s — ${APP_DISPLAY_NAME}`,
   },
-  description: "Cumple Veri·Factu sin tocar AEAT — facturación y API para autónomos y empresas. Huellas, encadenamiento y envío SOAP gestionados por nosotros.",
+  description: "Cumple Veri*Factu sin tocar AEAT — facturación y API para autónomos y empresas. Huellas, encadenamiento y envío SOAP gestionados por nosotros.",
   robots: siteRobots(),
   openGraph: {
     siteName: APP_DISPLAY_NAME,

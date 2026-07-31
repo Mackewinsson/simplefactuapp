@@ -9,8 +9,8 @@ No hay endpoint público de self-serve para crear tu propia clave (`/me/api-keys
 
 | Quién eres | Cómo se provisiona |
 |------------|-------------------|
-| **ERP / integrador** | Escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) (empresa, NIF emisor, QA o prod). Un operador crea el tenant (`POST /admin/tenants`) y la API key (`POST /admin/api-keys`) y te envía `vf_...` por canal seguro. |
-| **App web Simple\*Factu** | La app provisiona automáticamente un tenant `sf_<userId>` y guarda la clave cifrada en servidor (tú no la ves). |
+| **ERP / integrador** | Escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) (empresa, NIF emisor, QA o prod). Un operador crea la cuenta (`POST /admin/tenants`) y la API key (`POST /admin/api-keys`) y te envía `vf_...` por canal seguro. |
+| **App web Simple\*Factu** | La app provisiona automáticamente una cuenta `sf_<userId>` y guarda la clave cifrada en servidor (tú no la ves). |
 | **Gestoría** | Panel [`/partner`](/docs/gestoria) o API partner — claves de autónomos hijos. |
 
 La clave se muestra **una sola vez** al crearla. Guárdala en un gestor de secretos. Si la pierdes, pide una nueva a soporte (o, si eres operador de plataforma con `ADMIN_KEY`, crea otra y revoca la anterior). Los integradores ERP **no** necesitan ni deben recibir `ADMIN_KEY`.
@@ -25,21 +25,21 @@ También aceptamos `Authorization: Bearer vf_...` — ambos son equivalentes.
 
 **Nunca** incrustes la API key en el navegador. En apps web usa un BFF que conserve la clave en servidor.
 
-## Scopes
+## Permisos (scopes)
 
 Los scopes son los permisos de la clave. Cuando te emitamos la API key te asignamos los necesarios para tu caso de uso.
 
-| Scope | ¿Para qué sirve? |
+| Permiso (scope) | ¿Para qué sirve? |
 |-------|-----------------|
 | `invoices:write` | Enviar y anular facturas |
 | `invoices:read` | Consultar jobs, plan, uso, ledger y `GET /invoices/lookup` |
 | `nif:read` | `POST /verify-nif` |
 | `tenant:certificates:read` | Consultar si tienes certificado subido |
 | `tenant:certificates:write` | Subir o borrar tu certificado |
-| `partner:tenants:read` | Listar y consultar sub-tenants (gestoría) |
+| `partner:tenants:read` | Listar y consultar cuenta hijas (gestoría) |
 | `partner:tenants:write` | Crear autónomos, certificados y API keys de hijos |
 
-Si haces una llamada sin el scope correcto recibes `403 Prohibido`. Para un ERP típico: `invoices:write`, `invoices:read`, `nif:read`, `tenant:certificates:read`, `tenant:certificates:write`. Para gestorías, ver [Gestoría](/docs/gestoria).
+Si haces una llamada sin el permiso (scope) correcto recibes `403 Prohibido`. Para un ERP típico: `invoices:write`, `invoices:read`, `nif:read`, `tenant:certificates:read`, `tenant:certificates:write`. Para gestorías, ver [Gestoría](/docs/gestoria).
 
 ## Certificado digital AEAT
 
@@ -57,7 +57,7 @@ En entornos QA y producción, **cada tenant debe tener su propio certificado** (
 
 El endpoint `POST /v1/me/certificate` acepta el archivo en dos formatos según lo que te resulte más cómodo:
 
-**Opción A — JSON** (útil en integraciones server-to-server):
+**Opción A — JSON** (útil en integraciones servidor a servidor):
 
 ```bash
 PFX_B64=$(base64 -i mi-cert.p12 | tr -d '\n')
@@ -77,7 +77,7 @@ curl -X POST "$API_BASE/me/certificate" \
   -F "pfxPassphrase=MI_CONTRASEÑA"
 ```
 
-La respuesta correcta es `200 { "success": true }`. La operación es un **upsert** — si ya tenías un certificado, lo reemplaza.
+La respuesta correcta es `200 { "success": true }`. La operación es un **alta o sustitución** — si ya tenías un certificado, lo reemplaza.
 
 ### Certificados FNMT antiguos (formato RC2-40)
 
@@ -154,5 +154,5 @@ Cada cuenta tiene límites por endpoint. Si los superas, recibes `429 Demasiadas
 - [Entornos](/docs/entornos) — QA vs producción
 - [Verificar NIF](/docs/verificar-nif) — validar destinatario antes de enviar
 - [Inicio rápido](/docs/quickstart) — primera factura con curl
-- [Errores](/docs/error-codes) — 422, 409, jobs DEAD
-- [Webhooks](/docs/webhooks) — alternativa al polling
+- [Errores](/docs/error-codes) — 422, 409, trabajos DEAD
+- [Webhooks](/docs/webhooks) — alternativa a la consulta periódica

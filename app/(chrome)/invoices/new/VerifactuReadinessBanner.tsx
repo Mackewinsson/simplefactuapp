@@ -6,14 +6,14 @@ type Props = {
 };
 
 /**
- * Shown on /invoices/new when Verifactu is not fully configured.
+ * Shown on /invoices/new when Veri*Factu is not fully configured.
  * Prevents silent failures after submit when sendToAeat is checked.
  */
 export function VerifactuReadinessBanner({ readiness }: Props) {
   if (readiness.provisionError) {
     return (
       <div className="alert-danger mb-6">
-        <p className="font-medium">No se pudo conectar con Verifactu</p>
+        <p className="font-medium">No se pudo conectar con Veri*Factu</p>
         <p className="mt-2">{readiness.provisionError}</p>
         <p className="mt-3 text-fg-muted">
           Si acabas de desplegar, comprueba que{" "}
@@ -22,7 +22,7 @@ export function VerifactuReadinessBanner({ readiness }: Props) {
           mismo entorno.
         </p>
         <Link href="/settings/verifactu" className="mt-3 inline-block text-sm font-medium underline">
-          Ir a Ajustes → Verifactu
+          Ir a Ajustes → Veri*Factu
         </Link>
       </div>
     );
@@ -42,7 +42,7 @@ export function VerifactuReadinessBanner({ readiness }: Props) {
     <div className="alert-warning mb-6">
       <p className="font-medium">Antes de enviar a AEAT</p>
       <p className="mt-1 text-warning-deep">
-        Puedes guardar la factura en borrador, pero el envío a Verifactu fallará hasta completar:
+        Puedes guardar la factura en borrador, pero el envío a Veri*Factu fallará hasta completar:
       </p>
       <ul className="mt-2 list-inside list-disc">
         {missing.map((m) => (

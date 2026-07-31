@@ -200,7 +200,7 @@ export default async function InvoiceRecordsPage({
       {!loadError && data && data.rows.length === 0 ? (
         <p className="text-sm text-fg-muted">
           Aún no hay facturas registradas en Hacienda con estos filtros. Aparecerán aquí cuando
-          envíes una factura a Verifactu y Hacienda la acepte.
+          envíes una factura a Veri*Factu y Hacienda la acepte.
         </p>
       ) : null}
 
