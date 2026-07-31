@@ -18,6 +18,8 @@ Las mismas rutas existen **sin** `/v1` por compatibilidad (`POST /send-invoice`)
 
 OpenAPI en vivo: `GET {base-sin-v1}/openapi.json`. En el portal: [Referencia API](/docs/api-reference) (Scalar; no incluye rutas `/admin` ni configuración de webhooks).
 
+> **Try it en Scalar:** el servidor por defecto del portal suele apuntar a la API de **documentación/QA** (`SIMPLEFACTU_DOCS_API_BASE_URL` / `api.qa…`), no necesariamente a producción. Usa la clave del entorno correcto.
+
 ## Certificados y NIFs
 
 AEAT valida NIFs **reales** incluso en preproducción. No existen NIFs ficticios de prueba.

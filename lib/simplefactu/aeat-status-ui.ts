@@ -34,6 +34,7 @@ function registrationBadgeClassName(
     case "PROCESSING":
       return statusBadgeClass("warning");
     case "FAILED":
+      return statusBadgeClass("warning");
     case "DEAD":
       return statusBadgeClass("danger");
     case "NOT_SENT":
@@ -64,6 +65,7 @@ export function registrationStatusBadge(
     case "PROCESSING":
       return { label: "Enviando…", className: statusBadgeClass("warning") };
     case "FAILED":
+      return { label: "Reintentando…", className: statusBadgeClass("warning") };
     case "DEAD":
       return { label: "Error", className: statusBadgeClass("danger") };
     default:
@@ -85,7 +87,7 @@ export function registrationStatusDetailLabel(status: string): string {
     case "SUCCEEDED_WARN":
       return "Aceptada con advertencias en Verifactu (revisa el detalle)";
     case "FAILED":
-      return "Error al enviar (puedes reintentar)";
+      return "Reintento automático en curso…";
     case "DEAD":
       return "Rechazada — sin reintento automático";
     default:
@@ -102,7 +104,7 @@ export function cancellationStatusDetailLabel(status: string): string {
     case "SUCCEEDED":
       return "Anulada en Verifactu";
     case "FAILED":
-      return "Error al anular (puedes reintentar)";
+      return "Reintento automático de anulación…";
     case "DEAD":
       return "Anulación rechazada — sin reintento automático";
     default:
@@ -122,8 +124,8 @@ export function cancellationStatusBadgeClass(status: string): string {
     case "SUCCEEDED":
       return statusBadgeClass("success");
     case "PENDING":
-      return statusBadgeClass("warning");
     case "FAILED":
+      return statusBadgeClass("warning");
     case "DEAD":
       return statusBadgeClass("danger");
     case "NONE":

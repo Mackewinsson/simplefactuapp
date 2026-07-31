@@ -30,7 +30,7 @@ const CONTENT: Record<
       "Tus facturas no se pierden aunque Hacienda esté caída — reintentos automáticos",
       "Cada envío queda firmado y registrado. No hay forma de borrarlo.",
       "Conexión directa y cifrada con la AEAT — tu certificado nunca sale de nuestros servidores",
-      "Recibes un email cuando AEAT acepta o rechaza cada factura",
+      "Puedes recibir avisos por email cuando AEAT acepta o rechaza una factura",
     ],
     cta: { label: "Crear cuenta — es gratis", href: "/sign-up" },
     ctaSecondary: { label: "Ver documentación", href: "/docs" },
@@ -42,7 +42,7 @@ const CONTENT: Record<
     bullets: [
       "POST /send-invoice, polling de jobs y webhooks salientes",
       "Multi-tenant con certificado por empresa",
-      "OpenAPI completo, panel admin y métricas por tenant",
+      "OpenAPI público, jobs async y métricas por tenant",
     ],
     trust: [
       "Backoff exponencial y watchdog — ningún job se queda atascado",

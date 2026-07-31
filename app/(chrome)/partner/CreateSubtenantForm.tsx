@@ -24,11 +24,12 @@ export function CreateSubtenantForm() {
             type="text"
             name="allowedNif"
             required
-            placeholder="B12345678"
+            placeholder="ej. B12345678"
             className="input mt-1.5 font-mono uppercase"
           />
           <span className="mt-1 block text-xs text-fg-subtle">
-            NIF del emisor de facturas (debe coincidir con el certificado PFX que subas después).
+            NIF <strong>real</strong> del titular del certificado FNMT (AEAT no acepta NIFs
+            inventados). Debe coincidir con el PFX que subas después.
           </span>
         </label>
 
@@ -63,9 +64,15 @@ export function CreateSubtenantForm() {
         </label>
 
         <div className="rounded-xl border border-accent/20 bg-accent-muted/20 p-3.5 text-xs space-y-1">
-          <p className="font-bold text-fg font-display">💡 Nota de Integración Marca Blanca:</p>
+          <p className="font-bold text-fg font-display">Integración API</p>
           <p className="text-fg-muted">
-            Podrás emitir facturas para este NIF directamente usando tu <strong>API Key Partner principal</strong>. Si necesitas una API Key dedicada propia para este cliente, podrás emitirla en 1 clic tras completar el alta.
+            Tras el alta: sube el certificado del autónomo y genera una{" "}
+            <strong>API key del hijo</strong> para <code className="font-mono">POST /send-invoice</code>.
+            La clave partner solo gestiona sub-tenants; no envía facturas. Detalle en{" "}
+            <Link href="/docs/gestoria" className="link-accent">
+              Gestoría
+            </Link>
+            .
           </p>
         </div>
       </div>

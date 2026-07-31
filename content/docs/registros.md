@@ -7,7 +7,7 @@ Cada alta o anulación aceptada por AEAT (`Correcto` / `ParcialmenteCorrecto`) s
 
 ## Listado
 
-`GET /v1/me/invoice-records` — scope `invoices:read`.
+`GET /v1/me/invoice-records` — scope `invoices:read`. Esquema: [Referencia API — GET /me/invoice-records](/docs/api-reference#tag/Facturas/GET/me/invoice-records).
 
 | Query | Descripción |
 |-------|-------------|

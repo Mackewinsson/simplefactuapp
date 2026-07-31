@@ -12,6 +12,8 @@ curl -s "$API_BASE/me/plan" -H "x-api-key: $API_KEY"
 curl -s "$API_BASE/me/usage?months=12" -H "x-api-key: $API_KEY"
 ```
 
+OpenAPI: [GET /me/plan](/docs/api-reference#tag/Facturación/GET/me/plan).
+
 `GET /me/plan` incluye el plan actual, contadores del mes y `status` del tenant (`ACTIVE` / `SUSPENDED`).
 
 ## HTTP 402

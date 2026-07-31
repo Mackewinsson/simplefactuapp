@@ -64,7 +64,12 @@ export function VerifactuSendPanel({
   const sendConfirmRef = useRef<HTMLDivElement>(null);
   const cancelConfirmRef = useRef<HTMLDivElement>(null);
 
-  const canSendNow = aeatStatus !== "SUCCEEDED" && aeatStatus !== "PENDING";
+  // Allow a new send only when not already accepted and not mid-flight (incl. FAILED retries).
+  const canSendNow =
+    aeatStatus !== "SUCCEEDED" &&
+    aeatStatus !== "PENDING" &&
+    aeatStatus !== "PROCESSING" &&
+    aeatStatus !== "FAILED";
 
   // Auto-trigger send when ?send=1 is present and invoice hasn't been sent yet
   useEffect(() => {
@@ -75,11 +80,16 @@ export function VerifactuSendPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sendPending = aeatStatus === "PENDING";
-  const cancelPending = aeatCancellationStatus === "PENDING";
-  const pollActive = sendPending || cancelPending;
+  const sendInFlight =
+    aeatStatus === "PENDING" ||
+    aeatStatus === "PROCESSING" ||
+    aeatStatus === "FAILED";
+  const cancelInFlight =
+    aeatCancellationStatus === "PENDING" ||
+    aeatCancellationStatus === "FAILED";
+  const pollActive = sendInFlight || cancelInFlight;
   const canSend = canSendNow;
-  const isRetry = aeatStatus === "FAILED";
+  const isRetry = aeatStatus === "DEAD";
   const uiStatus = resolveRegistrationUiStatus(aeatStatus, aeatEstadoEnvio);
   const canRefresh = pollActive;
   const canResyncQr =
@@ -94,8 +104,7 @@ export function VerifactuSendPanel({
     });
   }
 
-  // Auto-poll every 3 s while a job is PENDING. Stops when terminal or after
-  // 60 attempts (~3 min), at which point the manual button remains as fallback.
+  // Auto-poll while PENDING / PROCESSING / FAILED until SUCCEEDED or DEAD (or attempt cap).
   useEffect(() => {
     if (!pollActive) {
       setPolling(false);
@@ -238,7 +247,8 @@ export function VerifactuSendPanel({
   const canCancelAeat =
     aeatStatus === "SUCCEEDED" &&
     aeatCancellationStatus !== "SUCCEEDED" &&
-    aeatCancellationStatus !== "PENDING";
+    aeatCancellationStatus !== "PENDING" &&
+    aeatCancellationStatus !== "FAILED";
 
   const isRegistered = aeatStatus === "SUCCEEDED" && !!(aeatCsv?.trim());
   const partialSuccess = aeatEstadoEnvio === "ParcialmenteCorrecto";

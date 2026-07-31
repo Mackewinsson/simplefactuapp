@@ -144,8 +144,14 @@ export async function syncJobStatusToInvoice(
         void notifyByEmail(userId, (email) =>
           sendInvoiceFailedEmail({ to: email, invoiceNumber: invoice.number, errorMessage: err })
         );
+        return { ok: false, message: formatUserFacingError(err), terminal: true };
       }
-      return { ok: false, message: formatUserFacingError(err), terminal: true };
+      // FAILED: worker will retry — keep polling.
+      return {
+        ok: false,
+        message: `Reintento automático en curso: ${formatUserFacingError(err)}`,
+        terminal: false,
+      };
     }
     return {
       ok: true,
@@ -183,8 +189,13 @@ export async function syncJobStatusToInvoice(
         void notifyByEmail(userId, (email) =>
           sendCancellationFailedEmail({ to: email, invoiceNumber: invoice.number, errorMessage: err })
         );
+        return { ok: false, message: err, terminal: true };
     }
-    return { ok: false, message: err, terminal: true };
+    return {
+      ok: false,
+      message: `Reintento automático de anulación: ${err}`,
+      terminal: false,
+    };
   }
 
   return {

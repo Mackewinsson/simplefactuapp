@@ -143,37 +143,81 @@ export default async function PartnerTenantDetailPage({
         </div>
       </div>
 
-      {/* Integration Code Snippet (Marca Blanca Guide) */}
+      {/* Integration Code Snippet — child API key, not partner key */}
       <div className="panel-premium rounded-2xl p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-outline-soft/60 pb-3">
-          <div>
+        <div className="flex items-center justify-between border-b border-outline-soft/60 pb-3 gap-3">
+          <div className="min-w-0">
             <h2 className="text-base font-bold text-fg font-display tracking-tight">
-              ¿Cómo emitir facturas para este NIF por API? (Marca Blanca)
+              ¿Cómo emitir facturas para este NIF por API?
             </h2>
-            <p className="text-xs text-fg-muted">
-              Usa tu clave Partner principal enviando el identificador del tenant en la llamada.
+            <p className="text-xs text-fg-muted mt-1">
+              La clave <strong>partner</strong> no envía facturas. Genera una{" "}
+              <strong>API key del autónomo</strong> (acciones a la derecha) y úsala en{" "}
+              <code className="font-mono text-[11px]">x-api-key</code>. Guías:{" "}
+              <Link href="/docs/gestoria" className="link-accent">
+                Gestoría
+              </Link>{" "}
+              ·{" "}
+              <Link href="/docs/quickstart" className="link-accent">
+                Inicio rápido
+              </Link>
+              .
             </p>
           </div>
-          <span className="text-[10px] font-mono font-bold bg-accent/15 text-accent px-2.5 py-1 rounded-full border border-accent/25">
+          <span className="shrink-0 text-[10px] font-mono font-bold bg-accent/15 text-accent px-2.5 py-1 rounded-full border border-accent/25">
             REST API
           </span>
         </div>
 
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-fg font-display">Ejemplo de llamada POST /v1/send-invoice:</p>
+          {!tenant.allowed_nif ? (
+            <p className="text-xs text-warning-foreground font-medium rounded-lg border border-warning-outline/40 bg-warning px-3 py-2">
+              Define el NIF autorizado de este autónomo antes de emitir por API.
+            </p>
+          ) : null}
+          <p className="text-xs font-semibold text-fg font-display">
+            Ejemplo mínimo — <code className="font-mono">POST /v1/send-invoice</code>
+          </p>
           <pre className="p-4 rounded-xl bg-surface-dark font-mono text-xs text-fg-on-dark overflow-x-auto border border-outline-soft/40">
-{`curl -X POST "${process.env.NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL || "https://api.simplefactu.com/v1"}/send-invoice" \\
-  -H "x-api-key: $SU_CLAVE_PARTNER" \\
-  -H "x-idempotency-key: job-factura-${tenant.allowed_nif || tenant.id}-001" \\
+{`export API_BASE="${process.env.NEXT_PUBLIC_SIMPLEFACTU_API_BASE_URL || "https://api.simplefactu.com/v1"}"
+export API_KEY="vf_..."   # API key del AUTÓNOMO (no la partner)
+export NIF="${tenant.allowed_nif || "<NIF_AUTORIZADO>"}"
+export NOMBRE="${tenant.name || "Razón social"}"
+
+curl -s -X POST "$API_BASE/send-invoice" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "tenant_id": "${tenant.id}",
-    "factura": {
-      "NumSerieFactura": "F-2026-0001",
-      "FechaExpedicionFactura": "29-07-2026",
-      "ObligadoEmision": { "NIF": "${tenant.allowed_nif || "B12345678"}", "NombreRazon": "${tenant.name || "Empresa SL"}" }
+  -H "x-api-key: $API_KEY" \\
+  -H "x-idempotency-key: $(uuidgen)" \\
+  -d "{
+    \\"nif\\": \\"$NIF\\",
+    \\"nombre\\": \\"$NOMBRE\\",
+    \\"numSerie\\": \\"2026/F-001\\",
+    \\"fecha\\": \\"$(date +%d-%m-%Y)\\",
+    \\"tipoFactura\\": \\"F1\\",
+    \\"descripcion\\": \\"Servicios de consultoría\\",
+    \\"destNombre\\": \\"FNMT-RCM\\",
+    \\"destNif\\": \\"Q2826004J\\",
+    \\"cuotaTotal\\": 21.00,
+    \\"total\\": 121.00,
+    \\"detalles\\": [{
+      \\"clave\\": \\"01\\",
+      \\"calif\\": \\"S1\\",
+      \\"tipo\\": 21,
+      \\"base\\": 100.00,
+      \\"cuota\\": 21.00
+    }],
+    \\"sistemaInformatico\\": {
+      \\"nombreRazon\\": \\"$NOMBRE\\",
+      \\"nif\\": \\"$NIF\\",
+      \\"nombreSistemaInformatico\\": \\"MyERP\\",
+      \\"idSistemaInformatico\\": \\"01\\",
+      \\"version\\": \\"1.0.0\\",
+      \\"tipoUsoPosibleSoloVerifactu\\": \\"S\\",
+      \\"tipoUsoPosibleMultiOT\\": \\"N\\",
+      \\"indicadorMultiplesOT\\": \\"N\\"
     }
-  }'`}
+  }"
+# → 202 + jobId; poll GET $API_BASE/jobs/:jobId hasta SUCCEEDED o DEAD`}
           </pre>
         </div>
       </div>

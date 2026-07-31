@@ -209,12 +209,17 @@ export async function refreshVerifactuJobAction(invoiceId: string): Promise<Send
   let jobId: string | null = null;
 
   if (
-    invoice.aeatCancellationStatus === AeatCancellationStatus.PENDING &&
+    (invoice.aeatCancellationStatus === AeatCancellationStatus.PENDING ||
+      invoice.aeatCancellationStatus === AeatCancellationStatus.FAILED) &&
     invoice.aeatCancellationJobId
   ) {
     kind = "CANCEL_INVOICE";
     jobId = invoice.aeatCancellationJobId;
-  } else if (invoice.aeatStatus === AeatJobStatus.PENDING && invoice.aeatJobId) {
+  } else if (
+    (invoice.aeatStatus === AeatJobStatus.PENDING ||
+      invoice.aeatStatus === AeatJobStatus.FAILED) &&
+    invoice.aeatJobId
+  ) {
     kind = "SEND_INVOICE";
     jobId = invoice.aeatJobId;
   }

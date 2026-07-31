@@ -21,7 +21,7 @@ curl -s -X POST "$API_BASE/verify-nif" \
 
 Si el tenant tiene `allowed_nif` (sub-tenant de gestoría), el NIF consultado debe coincidir o recibirás **422** `allowed_nif_mismatch`.
 
-OpenAPI: [Referencia API](/docs/api-reference).
+OpenAPI: [POST /verify-nif](/docs/api-reference#tag/Verificación%20de%20NIF/POST/verify-nif) · [GET /invoices/lookup](/docs/api-reference#tag/Facturas/GET/invoices/lookup).
 
 ## Consultar factura en AEAT (`GET /invoices/lookup`)
 

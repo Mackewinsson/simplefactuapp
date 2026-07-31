@@ -13,13 +13,19 @@ Entradas breves orientadas a quien ya tenía una integración antigua. Para el d
 - [Verificar NIF](/docs/verificar-nif), [Registros AEAT](/docs/registros), [Webhooks](/docs/webhooks), [Plan y uso](/docs/plan-y-uso).
 - Checklist go-live y soporte en [índice](/docs) (`soporte@simplefactu.com`).
 
-### Clarificaciones de contrato (sin cambio de runtime)
+### Clarificaciones de contrato (sin cambio de runtime API)
 
 - Polling: estados terminales = `SUCCEEDED` | `DEAD` (`FAILED` reintenta).
 - Scopes: `GET /invoices/lookup` → `invoices:read`; `POST /verify-nif` → `nif:read`.
 - No existe `POST /me/upgrade` en el API; cobro en la app (Lemon Squeezy).
-- HTTP **422** documentado (`tenant_certificate_required`, `allowed_nif_mismatch`, `cert_nif_mismatch`).
+- HTTP **422** documentado (`tenant_certificate_required`, `allowed_nif_mismatch`, `cert_nif_mismatch`, códigos de subida de PFX).
 - Scalar no lista `/admin` ni setup de webhooks; ver guías + [INTEGRATION.md](https://github.com/Mackewinsson/simplefactu/blob/main/docs/INTEGRATION.md).
+
+### Frontend alineado con el contrato
+
+- Panel partner: ejemplo curl con **API key del autónomo** (no partner) y body real de `send-invoice`.
+- App: jobs en `FAILED` siguen en polling / “reintento automático”; solo `DEAD` es fallo definitivo.
+- Sitemap y deep-links Scalar para NIF, registros, plan y jobs.
 
 ## 2026-07 — Contrato OpenAPI alineado + flags SIF en XML
 

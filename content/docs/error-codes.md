@@ -21,11 +21,15 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 
 ## Errores 422
 
-| `details.code` | Cuándo | Qué hacer |
-|----------------|--------|-----------|
+| `details.code` / `code` | Cuándo | Qué hacer |
+|-------------------------|--------|-----------|
 | `tenant_certificate_required` | QA/prod sin PFX en el tenant | Sube el certificado con `POST /me/certificate` — [Autenticación](/docs/authentication#certificado-digital-aeat) |
 | `allowed_nif_mismatch` | El `nif` del body no coincide con el NIF autorizado del sub-tenant | Usa el NIF fijado al crear el autónomo (gestoría) |
 | `cert_nif_mismatch` | El PFX subido no corresponde al `allowed_nif` | Sube el certificado del mismo titular |
+| `wrong_passphrase` | Contraseña del PFX incorrecta | Revisa la passphrase del `.p12`/`.pfx` |
+| `malformed` | El archivo no es un PKCS#12 válido | Comprueba que es `.p12`/`.pfx`, no PEM suelto |
+| `legacy_rc2` | Certificado FNMT antiguo (RC2-40) que no se pudo normalizar | Convierte con OpenSSL legacy — [Autenticación](/docs/authentication#certificados-fnmt-antiguos-formato-rc2-40) |
+| `expired` | Certificado caducado | Renueva en la FNMT y vuelve a subir |
 
 ## Errores 409 — los más comunes en integración
 

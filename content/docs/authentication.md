@@ -148,3 +148,11 @@ Estados que puedes ver al reutilizar la clave: `PENDING` / `PROCESSING` → `202
 ## Rate limits
 
 Cada cuenta tiene límites por endpoint. Si los superas, recibes `429 Demasiadas solicitudes` con la cabecera `Retry-After` indicando cuántos segundos esperar antes del próximo intento. Los umbrales concretos por ruta están en la [Referencia API](/docs/api-reference) (OpenAPI).
+
+## ¿Qué sigue?
+
+- [Entornos](/docs/entornos) — QA vs producción
+- [Verificar NIF](/docs/verificar-nif) — validar destinatario antes de enviar
+- [Inicio rápido](/docs/quickstart) — primera factura con curl
+- [Errores](/docs/error-codes) — 422, 409, jobs DEAD
+- [Webhooks](/docs/webhooks) — alternativa al polling

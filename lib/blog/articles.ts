@@ -456,7 +456,7 @@ rm /tmp/cert.pem</code></pre>
 
 <h2>¿Qué ocurre si la conexión falla?</h2>
 <p>
-  La conexión con la AEAT puede fallar puntualmente (mantenimiento, timeout, error de red). Un sistema bien diseñado como Simple*Factu gestiona esto con un <strong>sistema de jobs con reintentos y backoff exponencial</strong>: el registro se vuelve a intentar automáticamente hasta 8 veces antes de marcarse como fallido y notificar al operador. La factura queda registrada localmente desde el primer momento; el envío a la AEAT se completa en cuanto la conexión se restablece.
+  La conexión con la AEAT puede fallar puntualmente (mantenimiento, timeout, error de red). Un sistema bien diseñado como Simple*Factu gestiona esto con un <strong>sistema de jobs con reintentos y backoff exponencial</strong>: el registro se vuelve a intentar automáticamente (estado <code>FAILED</code> mientras reintenta) hasta 8 veces antes de marcarse como <code>DEAD</code> y notificar al operador. La factura queda registrada localmente desde el primer momento; el envío a la AEAT se completa en cuanto la conexión se restablece.
 </p>
 
 <h2>Entorno de preproducción para pruebas</h2>
@@ -1022,7 +1022,7 @@ rm /tmp/cert.pem</code></pre>
 
 <h2>Simple*Factu: plan gratuito y planes de pago</h2>
 <p>
-  Simple*Factu ofrece un <strong>plan gratuito</strong> que incluye envío a Veri*Factu, CSV, QR en PDF y gestión de anulaciones hasta un límite mensual de facturas. Los planes de pago amplían ese límite y añaden funcionalidades como mayor historial, acceso API ilimitado y soporte prioritario.
+  Simple*Factu ofrece un <strong>plan gratuito</strong> que incluye envío a Veri*Factu, CSV, QR en PDF y gestión de anulaciones hasta un límite mensual de facturas. Los planes de pago amplían ese límite y añaden funcionalidades como mayor historial, acceso API con límites más altos y soporte prioritario.
 </p>
 <p>
   Para un autónomo que emite 10-20 facturas al mes, el plan gratuito suele ser suficiente. Para pymes con mayor volumen o con ERPs propios, los planes de pago o el acceso API son más adecuados.
@@ -1970,7 +1970,7 @@ rm /tmp/cert.pem</code></pre>
   <li><strong>Idempotencia y respuesta rápida:</strong> Cuando el usuario emite la factura, nuestro sistema calcula la huella digital y guarda el registro localmente. Devolvemos un código de éxito al usuario inmediatamente (HTTP 202 Accepted).</li>
   <li><strong>Cola de tareas (Jobs):</strong> La factura entra en una cola en estado <code>PENDING</code>.</li>
   <li><strong>Workers en segundo plano:</strong> Un proceso independiente toma la tarea y se encarga de enviarla a la API de la AEAT.</li>
-  <li><strong>Estrategia de Backoff Exponencial:</strong> Si la conexión falla (ej. error 503 Service Unavailable), el worker no satura la red. Reintenta a los 2 segundos, luego a los 4, 8, 16... garantizando que el mensaje se entrega cuando el servicio se restablece.</li>
+  <li><strong>Estrategia de Backoff Exponencial:</strong> Si la conexión falla (ej. error 503 Service Unavailable), el worker no satura la red. Reintenta a los 2 segundos, luego a los 4, 8, 16… (estado <code>FAILED</code> mientras reintenta). Solo tras agotar intentos el job pasa a <code>DEAD</code> (terminal). <code>SUCCEEDED</code> y <code>DEAD</code> son los estados finales; no dejes de consultar el job solo porque veas <code>FAILED</code>.</li>
 </ol>
 
 <h2>Beneficios de delegar la integración</h2>
