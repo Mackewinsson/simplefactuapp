@@ -59,6 +59,22 @@ Cuando AEAT rechaza una factura, el job pasa a `FAILED` o `DEAD` y el resultado 
 | `4109` | Envío | NIF del `sistemaInformatico` incorrecto | El NIF en el bloque `sistemaInformatico` no existe en AEAT; usa el tuyo real |
 | `4116` | Envío | NIF del obligado de emisión incorrecto | El campo `nif` del body no existe en AEAT |
 
+### Desglose (`detalles`) — validación 400 antes de AEAT
+
+Si el body solo lleva `base` (u omite `clave` / `calif`), la API responde **400** con `details[]` (no llega a Hacienda). Códigos AEAT de referencia en el mensaje:
+
+| Código | Qué falla | Qué hacer |
+|--------|-----------|-----------|
+| `1195` | Falta `calif` y `causaExencion` | Envía **uno** de los dos |
+| `1196` | Ambos `calif` y `causaExencion` | Solo uno (XOR) |
+| `1198` | `calif=S2` con tipo/cuota ≠ 0 | Pon `tipo` y `cuota` a `0` |
+| `1208` | `calif=S1` sin tipo/cuota | Añade `tipo` y `cuota` (salvo `baseImponibleACoste`) |
+| `1237` / `1238` | N1/N2 o exenta con tipo/cuota/recargo | Omite esos campos |
+| `1281` / `1284` | Recargo mal usado | Solo con `S1` y ambos campos de recargo juntos |
+| — | Falta `clave` en IVA/IGIC | Añade `clave` (p. ej. `"01"`) si `impuesto` omitido/`01`/`03` |
+
+Guía: [Envío de facturas → Desglose](/docs/envio-facturas#desglose-detalles).
+
 ### Depurar el error `2000` (huella incorrecta)
 
 Este error casi siempre viene de un problema de **formato de importes**. AEAT incluye en el mensaje de error la cadena canónica que ELLOS calcularon. Compara con la tuya:

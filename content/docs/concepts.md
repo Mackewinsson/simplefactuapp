@@ -80,6 +80,12 @@ Con el CSV y la URL de verificación, cualquiera puede comprobar en la web de la
 
 AEAT exige identificar qué software emitió la factura. Cada envío incluye un bloque que describe tu programa (nombre, NIF, versión).
 
-En la práctica: copia el bloque de ejemplo del [Inicio rápido](/docs/quickstart#paso-2--enviar-la-factura) y ajusta `nombreRazon`, `nif` y `version` con los tuyos. No necesitas cambiar nada más para empezar.
+**OT** = obligado tributario (el NIF emisor). Tres flags `S`/`N`:
+
+- `tipoUsoPosibleSoloVerifactu` — capacidad del producto (¿solo Veri\*Factu?).
+- `tipoUsoPosibleMultiOT` — ¿el software **puede** facturar para varios OT?
+- `indicadorMultiplesOT` — ¿**esta instalación** factura para varios OT?
+
+Para empezar (un autónomo / un emisor): copia el bloque del [Inicio rápido](/docs/quickstart#paso-2--enviar-la-factura) con `SoloVerifactu=S`, `MultiOT=N`, `indicadorMultiplesOT=N` y ajusta `nombreRazon`, `nif` y `version`. Diccionario completo: [Envío de facturas → Sistema informático](/docs/envio-facturas#sistema-informático-sistemainformatico).
 
 Con esto claro, el [Inicio rápido](/docs/quickstart) debería tener mucho más sentido.

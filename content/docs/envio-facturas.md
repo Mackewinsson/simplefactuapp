@@ -31,7 +31,7 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 | `tipoFactura` | Sí | `F1`–`F5` o `R1`–`R5`. |
 | `descripcion` | Sí | Descripción de la operación (1–500 caracteres). |
 | `fechaOperacion` | No | `DD-MM-YYYY`. No puede ser posterior a `fecha` salvo claves de régimen 14/15 (AEAT 1146). |
-| `refExterna` | No | Referencia libre del ERP (máx. 60). |
+| `refExterna` | No | Referencia libre del ERP (máx. 60). Omitir si no usas referencia propia. |
 
 ## Destinatario
 
@@ -52,31 +52,51 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 
 ## Desglose (`detalles`)
 
-Array de 1–12 líneas. Cada línea:
+Array de 1–12 líneas. En OpenAPI solo `base` aparece como `required` incondicional; el **runtime** exige además coherencia AEAT (igual que en la [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice)):
 
 | Campo | Notas |
 |-------|-------|
 | `base` | Siempre obligatorio. |
-| `clave` | Clave de régimen (`01` = general). Obligatorio para IVA/IGIC. |
-| `calif` | `S1` / `S2` / `N1` / `N2` — excluyente con `causaExencion`. |
-| `causaExencion` | `E1`–`E6` — operación exenta; no enviar `tipo`/`cuota`. |
-| `tipo` / `cuota` | Tipo impositivo y cuota; obligatorios con `calif=S1` (salvo casos especiales). |
+| `clave` | Clave de régimen (2 dígitos). **Obligatoria** si `impuesto` se omite, es `01` (IVA) o `03` (IGIC). Opcional para IPSI (`02`) / Otros (`05`). |
+| `calif` **o** `causaExencion` | **Uno de los dos** (XOR; AEAT 1195/1196). No ambos; no ninguno. |
+| `calif` | `S1` / `S2` / `N1` / `N2`. |
+| `causaExencion` | `E1`–`E6` — operación exenta; **no** enviar `tipo` / `cuota` / recargo (1238). |
+| `tipo` / `cuota` | Con `calif=S1` (sin `baseImponibleACoste`): obligatorios (1208). Con `S2`: deben ser `0` (1198). Con `N1`/`N2`: omitir (1237). |
 | `impuesto` | Opcional; default IVA (`01`). |
+| Recargo | Solo con `calif=S1`; `tipoRecargoEquivalencia` y `cuotaRecargoEquivalencia` juntos (1281/1284). |
+| `baseImponibleACoste` | Solo con `clave=06` o `impuesto` `02`/`05` (1257). |
 
-Ejemplo sujeta: `{ "clave": "01", "calif": "S1", "tipo": 21, "base": 100, "cuota": 21 }`.  
-Ejemplo exenta: `{ "clave": "01", "causaExencion": "E1", "base": 200 }`.
+Ejemplos:
+
+```json
+{ "clave": "01", "calif": "S1", "tipo": 21, "base": 100, "cuota": 21 }
+{ "clave": "01", "causaExencion": "E1", "base": 200 }
+{ "clave": "01", "calif": "N1", "base": 1000 }
+```
 
 ## Sistema informático (`sistemaInformatico`)
 
-Obligatorio. Identifica el software ante AEAT (`nombreRazon`, `nif` o `idOtro`, `nombreSistemaInformatico`, `idSistemaInformatico`, `version`, y los tres flags `tipoUsoPosibleSoloVerifactu` / `tipoUsoPosibleMultiOT` / `indicadorMultiplesOT`).
+Obligatorio. Identifica el software (SIF) ante AEAT.
 
-`numeroInstalacion` es opcional: si lo omites, el servidor lo genera y lo reutiliza para esa instalación.
+| Campo | Notas |
+|-------|-------|
+| `nombreRazon` | Fabricante / titular del SIF. |
+| `nif` **u** `idOtro` | Excluyentes; uno de los dos. |
+| `nombreSistemaInformatico` | Nombre comercial (máx. 30). |
+| `idSistemaInformatico` | Exactamente **2** caracteres `[A-Z0-9]` (p. ej. `"01"`). Forma la clave de instalación `{NIF}\|{idSistema}\|{NIF fabricante}`. **Si cambia**, nuevo `numeroInstalacion` y cadena distinta. |
+| `version` | Versión del software. |
+| `numeroInstalacion` | Opcional; si lo omites, el servidor lo genera. |
+| `tipoUsoPosibleSoloVerifactu` | Capacidad del **producto**: `S` = solo Veri\*Factu; `N` = admite otros modos. Se emite en el XML. |
+| `tipoUsoPosibleMultiOT` | Capacidad multi–**obligado tributario (OT)**: `S` = el software admite varios OT; `N` = un solo OT. |
+| `indicadorMultiplesOT` | Uso de **esta instalación**: `S` = factura para varios OT; `N` = solo uno. Puede ser `N` aunque MultiOT sea `S`. |
+
+Autónomo / un solo emisor (típico): `SoloVerifactu=S`, `MultiOT=N`, `indicadorMultiplesOT=N`.
 
 ## Huella y encadenamiento
 
 | Campo | Obligatorio | Comportamiento |
 |-------|-------------|----------------|
-| `huella` + `tipoHuella` + `fechaHoraHusoGenRegistro` | No* | Si omites **los tres**, el servidor los genera (cadena canónica AEAT + SHA-256). Si envías uno, envía los tres. |
+| `huella` + `tipoHuella` + `fechaHoraHusoGenRegistro` | No* | Si omites **los tres**, el servidor los genera. Si envías uno, envía los tres (si no → **400**). |
 | `primerRegistro` | No | Si se omite, se infiere desde `chain_registry`. |
 | `encadenamiento.registroAnterior` | No | Si hace falta y se omite, el servidor usa la última huella de la cadena. |
 
@@ -84,9 +104,21 @@ Obligatorio. Identifica el software ante AEAT (`nombreRazon`, `nif` o `idOtro`, 
 
 Conceptos: [Huella](/docs/concepts#huella-sha-256), [Encadenamiento](/docs/concepts#encadenamiento), [Primer registro](/docs/concepts#primer-registro-primerregistro-true).
 
-## Campos avanzados (AEAT)
+## Campos avanzados (opt-in)
 
-Rectificativas (`tipoRectificativa`, `importeRectificacion`, `facturasRectificadas`), subsanación, tercero, `macrodato`, `cupon`, `fechaFinVeriFactu`, etc. están documentados con reglas AEAT en la [Referencia API — POST /send-invoice](/docs/api-reference#tag/Facturas/POST/send-invoice).
+Omitir en el caso normal. Solo cuando aplica:
+
+| Campo | Cuándo |
+|-------|--------|
+| `cupon` | Solo facturas con cupones promocionales (`S`/`N`). |
+| `emitidaPorTerceroODestinatario` | `T` = tercero (requiere bloque `tercero`); `D` = autofactura (sin `tercero`). |
+| `tercero` | Solo si el flag es `T`. |
+| `macrodato` | Solo importes ≥ ±100M €. |
+| `fechaFinVeriFactu` | Solo al salir del régimen Veri\*Factu (`31-12-YYYY`). |
+| `subsanacion` / `rechazoPrevio` | Solo reenvíos / rechazos previos AEAT. |
+| Rectificativas | `tipoRectificativa`, `importeRectificacion`, `facturasRectificadas` cuando `tipoFactura` es `R1`–`R5`. |
+
+Detalle de reglas AEAT: [Referencia API — POST /send-invoice](/docs/api-reference#tag/Facturas/POST/send-invoice).
 
 ## Respuesta 202
 

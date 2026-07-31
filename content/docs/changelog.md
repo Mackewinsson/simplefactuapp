@@ -5,6 +5,19 @@ description: Cambios relevantes del contrato API para integradores ERP.
 
 Entradas breves orientadas a quien ya tenía una integración antigua. Para el diccionario actual: [Envío de facturas](/docs/envio-facturas).
 
+## 2026-07 — Contrato OpenAPI alineado + flags SIF en XML
+
+### Documentación (Scalar / guías)
+
+- **`detalles`**: OpenAPI deja claro que solo `base` es `required` incondicional; el texto lista las reglas runtime (`clave` IVA/IGIC, XOR `calif`/`causaExencion`, S1/S2/N1/exenta).
+- Campos opt-in (`cupon`, tercero, `macrodato`, …): documentados como “omitir en el caso normal”.
+- Triada huella: omitir las tres o enviar las tres (parcial → 400), en cada property.
+- `sistemaInformatico`: significado de OT, `idSistemaInformatico` (2 chars) y diferencia MultiOT vs indicador.
+
+### Comportamiento
+
+- Los flags `tipoUsoPosibleSoloVerifactu`, `tipoUsoPosibleMultiOT` e `indicadorMultiplesOT` del body **se emiten en el XML AEAT** (antes el XML fijaba `S`/`S`/`S` ignorando el body). Valores típicos autónomo: `S` / `N` / `N`.
+
 ## 2026-07 — Huella automática e idempotencia
 
 ### Qué puedes omitir ahora
