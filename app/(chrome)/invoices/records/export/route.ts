@@ -1,9 +1,7 @@
 import { getAppUserIds } from "@/lib/auth/app-user";
 import { NextResponse } from "next/server";
-import {
-  fetchInvoiceRecordsForExport,
-  invoiceRecordsToCsv,
-} from "@/lib/simplefactu/invoice-records-csv";
+import { invoiceRecordsToCsv } from "@/lib/simplefactu/invoice-records-csv";
+import { fetchInvoiceRecordsForExport } from "@/lib/simplefactu/invoice-records-export";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 
 export const dynamic = "force-dynamic";

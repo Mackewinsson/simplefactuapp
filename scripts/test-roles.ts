@@ -5,7 +5,7 @@
  * here rather than importing it (tsx triggers the server-only guard).
  */
 import assert from "node:assert/strict";
-import { isOnboardingExemptPath } from "../lib/verifactu/onboarding-status";
+import { isOnboardingExemptPath } from "../lib/verifactu/onboarding-paths";
 
 const tests: Array<{ name: string; fn: () => void }> = [];
 function test(name: string, fn: () => void) {

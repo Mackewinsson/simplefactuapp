@@ -91,17 +91,4 @@ export async function getOnboardingStatus(userId: string): Promise<OnboardingSta
   };
 }
 
-/** Paths that stay reachable while onboarding is incomplete. */
-export function isOnboardingExemptPath(pathname: string): boolean {
-  return (
-    pathname.startsWith("/onboarding") ||
-    pathname.startsWith("/settings") ||
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/partner") ||
-    pathname.startsWith("/legal") ||
-    pathname.startsWith("/admin-access-denied") ||
-    pathname.startsWith("/partner-access-denied") ||
-    pathname === "/sign-in" ||
-    pathname === "/sign-up"
-  );
-}
+export { isOnboardingExemptPath } from "@/lib/verifactu/onboarding-paths";
