@@ -3,19 +3,27 @@ title: Autenticación
 description: Cómo obtener tu API key, qué scopes necesitas y cómo subir tu certificado digital AEAT.
 ---
 
-## API key
+## Cómo obtienes una API key
 
-Cada llamada a la API necesita un header de autenticación:
+No hay endpoint público de self-serve para crear tu propia clave (`/me/api-keys` **no** está implementado).
+
+| Quién eres | Cómo se provisiona |
+|------------|-------------------|
+| **ERP / integrador** | Escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) (empresa, NIF emisor, QA o prod). Un operador crea el tenant (`POST /admin/tenants`) y la API key (`POST /admin/api-keys`) y te envía `vf_...` por canal seguro. |
+| **App web Simple\*Factu** | La app provisiona automáticamente un tenant `sf_<userId>` y guarda la clave cifrada en servidor (tú no la ves). |
+| **Gestoría** | Panel [`/partner`](/docs/gestoria) o API partner — claves de autónomos hijos. |
+
+La clave se muestra **una sola vez** al crearla. Guárdala en un gestor de secretos. Si la pierdes, pide una nueva a soporte (o, si eres operador de plataforma con `ADMIN_KEY`, crea otra y revoca la anterior). Los integradores ERP **no** necesitan ni deben recibir `ADMIN_KEY`.
+
+## API key en cada petición
 
 ```http
 x-api-key: vf_xxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-También aceptamos `Authorization: Bearer vf_...` si prefieres el formato Bearer estándar — ambos son equivalentes.
+También aceptamos `Authorization: Bearer vf_...` — ambos son equivalentes.
 
-Las API keys se emiten desde el panel admin. Si eres integrador externo, contáctanos y te la enviamos por canal seguro.
-
-> **Importante:** la clave solo se muestra una vez al crearla. Guárdala de inmediato en un gestor de secretos (variable de entorno o almacén de secretos). Si la pierdes, crea una nueva y revoca la anterior con `POST /admin/api-keys/:id/revoke`.
+**Nunca** incrustes la API key en el navegador. En apps web usa un BFF que conserve la clave en servidor.
 
 ## Scopes
 
@@ -24,14 +32,14 @@ Los scopes son los permisos de la clave. Cuando te emitamos la API key te asigna
 | Scope | ¿Para qué sirve? |
 |-------|-----------------|
 | `invoices:write` | Enviar y anular facturas |
-| `invoices:read` | Consultar jobs, plan, uso y facturación |
-| `nif:read` | Verificar si un NIF existe en AEAT |
+| `invoices:read` | Consultar jobs, plan, uso, ledger y `GET /invoices/lookup` |
+| `nif:read` | `POST /verify-nif` |
 | `tenant:certificates:read` | Consultar si tienes certificado subido |
 | `tenant:certificates:write` | Subir o borrar tu certificado |
 | `partner:tenants:read` | Listar y consultar sub-tenants (gestoría) |
 | `partner:tenants:write` | Crear autónomos, certificados y API keys de hijos |
 
-Si haces una llamada sin el scope correcto recibes `403 Prohibido`. Para un BFF completo (app web autónomo), la clave necesita los scopes de facturación y certificado. Para gestorías, ver [Gestoría](/docs/gestoria).
+Si haces una llamada sin el scope correcto recibes `403 Prohibido`. Para un ERP típico: `invoices:write`, `invoices:read`, `nif:read`, `tenant:certificates:read`, `tenant:certificates:write`. Para gestorías, ver [Gestoría](/docs/gestoria).
 
 ## Certificado digital AEAT
 
@@ -73,7 +81,7 @@ La respuesta correcta es `200 { "success": true }`. La operación es un **upsert
 
 ### Certificados FNMT antiguos (formato RC2-40)
 
-Los certificados emitidos por la FNMT antes de ~2023 usan un formato de cifrado antiguo (RC2-40) incompatible con OpenSSL 3, que es lo que usa Node.js 18+.
+Los certificados emitidos por la FNMT antes de ~2023 usan un formato de cifrado antiguo (RC2-40) incompatible con OpenSSL 3 (Node.js 18+).
 
 **Síntoma:** `Error: Unsupported PKCS12 PFX data`.
 

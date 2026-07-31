@@ -18,7 +18,7 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 ## Flujo async
 
 1. `POST /send-invoice` → `202` con `{ jobId, status: "PENDING" }`.
-2. `GET /jobs/:jobId` hasta `SUCCEEDED`, `FAILED` o `DEAD`.
+2. `GET /jobs/:jobId` hasta **`SUCCEEDED` o `DEAD`** (`FAILED` = reintento en curso; no dejes de hacer poll).
 
 ## Emisor e identificación de la factura
 
@@ -116,7 +116,19 @@ Omitir en el caso normal. Solo cuando aplica:
 | `macrodato` | Solo importes ≥ ±100M €. |
 | `fechaFinVeriFactu` | Solo al salir del régimen Veri\*Factu (`31-12-YYYY`). |
 | `subsanacion` / `rechazoPrevio` | Solo reenvíos / rechazos previos AEAT. |
-| Rectificativas | `tipoRectificativa`, `importeRectificacion`, `facturasRectificadas` cuando `tipoFactura` es `R1`–`R5`. |
+
+### Rectificativas (`R1`–`R5`)
+
+Cuando `tipoFactura` es `R1`–`R5`:
+
+| Campo | Regla |
+|-------|--------|
+| `tipoRectificativa` | Obligatorio: `S` (sustitución) o `I` (por diferencias). Prohibido fuera de R1–R5. |
+| `facturasRectificadas` | Factura(s) que se rectifican (`idEmisorFactura`, `numSerieFactura`, `fechaExpedicionFactura`). |
+| `importeRectificacion` | Obligatorio si `tipoRectificativa=S` (importes **originales**). Prohibido si `I`. |
+
+- **`S`:** el `Desglose` lleva la **diferencia**; `importeRectificacion` con base/cuota originales.
+- **`I`:** el `Desglose` lleva los importes **corregidos totales**; no envíes `importeRectificacion`.
 
 Detalle de reglas AEAT: [Referencia API — POST /send-invoice](/docs/api-reference#tag/Facturas/POST/send-invoice).
 

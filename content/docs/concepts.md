@@ -11,6 +11,8 @@ No tienes que memorizar la normativa — solo entender por qué existe cada piez
 Veri·Factu es el sistema que obliga a los programas de facturación a **enviar cada factura a Hacienda (AEAT) en tiempo real**, de forma que no pueda modificarse después.
 La ley detrás es el RD 1007/2023 y la orden ministerial OM HAC/1177/2024.
 
+> AEAT valida NIFs **reales** también en preproducción/QA. No uses NIFs inventados; el emisor suele ser el NIF del titular del certificado FNMT. Ver [Entornos](/docs/entornos).
+
 ## Huella (SHA-256)
 
 Cada factura lleva un **hash SHA-256 de los datos principales** (importe, NIF, número, fecha, tipo…) llamado huella. Hacienda lo recalcula: si no coincide → error `2000`.

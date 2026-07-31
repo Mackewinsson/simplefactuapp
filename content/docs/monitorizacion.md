@@ -1,49 +1,30 @@
 ---
-title: Monitorización y alertas
-description: Comprobar que el API está vivo y recibir avisos cuando un envío AEAT queda en DEAD.
+title: Jobs DEAD y disponibilidad
+description: Qué hacer si un envío queda en DEAD, y sondas públicas /health y /ready.
 ---
 
-# Monitorización y alertas
+## Si una factura queda en DEAD
 
-## Para usuarios del panel
+`DEAD` significa que el sistema agotó los reintentos y AEAT **no** aceptó el registro (o no se pudo completar).
 
-Si una factura queda en estado **DEAD** en Verifactu, abre la factura y usa **Emitir corrección** o contacta con soporte. El equipo recibe alertas automáticas cuando el entorno está bien configurado.
+1. Lee `lastError` en `GET /jobs/:jobId` — ver [Errores](/docs/error-codes).
+2. Corrige la causa (NIF, desglose, etc.).
+3. Emite una factura nueva o rectificativa; no reutilices el mismo job.
+4. Escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) con `jobId` y `requestId` si el fallo fue transitorio.
 
-## Para operadores (VPS + panel /admin)
+Usuarios de la app web: abre la factura y usa **Emitir corrección** o contacta soporte.
 
-### Sonda de disponibilidad
+## Sondas públicas (integradores y ops)
 
-El API expone sin autenticación:
+Sin autenticación:
 
 | URL | Uso |
 |-----|-----|
-| `GET /health` | Proceso vivo (200 aunque la DB falle) |
-| `GET /ready` | DB + migraciones + worker + cola — **usa esta en Upptime / UptimeRobot** |
+| `GET /health` | Proceso vivo |
+| `GET /ready` | DB + migraciones + worker + cola — recomendada para uptime checks |
 
-Configura una sonda cada 5 minutos contra `https://api.simplefactu.com/ready` (o el host QA equivalente).
+Ejemplos: `https://api.qa.simplefactu.com/ready`, `https://api.simplefactu.com/ready`.
 
-Plantilla gratuita: [Upptime](https://github.com/upptime/upptime) — pasos en el `docs/RUNBOOK.md` del repositorio **simplefactu**.
+## Solo operadores de plataforma
 
-### Alertas cuando un job queda DEAD
-
-En `/opt/simplefactu/deploy/.env` del VPS:
-
-```env
-EMAILS_ENABLED=true
-RESEND_API_KEY=re_...
-RESEND_FROM_EMAIL=no-reply@simplefactu.com
-DEAD_JOB_NOTIFY_EMAIL=ops@tudominio.com
-# opcional: DEAD_JOB_NOTIFY_SLACK_URL=...
-```
-
-Sin al menos un `DEAD_JOB_NOTIFY_*`, los jobs DEAD solo aparecen en logs.
-
-### Comprobar desde el panel
-
-En **Admin → Inicio** o **Admin → Sistema** verás:
-
-- Estado de `GET /ready`
-- Contador de jobs **DEAD**
-- Si `EMAILS_ENABLED`, `RESEND_API_KEY` y canales `DEAD_JOB_NOTIFY_*` están activos en el API
-
-Estos flags los devuelve `GET /admin/diagnostics` (requiere `SIMPLEFACTU_ADMIN_KEY` correcta).
+Configuración de alertas email/Slack (`DEAD_JOB_NOTIFY_*`, Resend), panel `/admin` y Upptime: ver [docs/RUNBOOK.md](https://github.com/Mackewinsson/simplefactu/blob/main/docs/RUNBOOK.md) en el repositorio del API. Los integradores ERP **no** configuran el `.env` del VPS.

@@ -5,6 +5,22 @@ description: Cambios relevantes del contrato API para integradores ERP.
 
 Entradas breves orientadas a quien ya tenía una integración antigua. Para el diccionario actual: [Envío de facturas](/docs/envio-facturas).
 
+## 2026-07 — Documentación ERP: journey completo y consistencia
+
+### Guías nuevas / reordenadas
+
+- [Entornos](/docs/entornos) — QA vs prod, prefijo `/v1`, NIFs reales.
+- [Verificar NIF](/docs/verificar-nif), [Registros AEAT](/docs/registros), [Webhooks](/docs/webhooks), [Plan y uso](/docs/plan-y-uso).
+- Checklist go-live y soporte en [índice](/docs) (`soporte@simplefactu.com`).
+
+### Clarificaciones de contrato (sin cambio de runtime)
+
+- Polling: estados terminales = `SUCCEEDED` | `DEAD` (`FAILED` reintenta).
+- Scopes: `GET /invoices/lookup` → `invoices:read`; `POST /verify-nif` → `nif:read`.
+- No existe `POST /me/upgrade` en el API; cobro en la app (Lemon Squeezy).
+- HTTP **422** documentado (`tenant_certificate_required`, `allowed_nif_mismatch`, `cert_nif_mismatch`).
+- Scalar no lista `/admin` ni setup de webhooks; ver guías + [INTEGRATION.md](https://github.com/Mackewinsson/simplefactu/blob/main/docs/INTEGRATION.md).
+
 ## 2026-07 — Contrato OpenAPI alineado + flags SIF en XML
 
 ### Documentación (Scalar / guías)

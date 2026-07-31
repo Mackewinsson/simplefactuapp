@@ -18,7 +18,7 @@ Guía de referencia para `POST /v1/cancel-invoice`. Esquema interactivo: [Refere
 ## Flujo async
 
 1. `POST /cancel-invoice` → `202` con `{ jobId, status: "PENDING" }`.
-2. `GET /jobs/:jobId` hasta `SUCCEEDED`, `FAILED` o `DEAD`.
+2. `GET /jobs/:jobId` hasta **`SUCCEEDED` o `DEAD`** (`FAILED` = reintento en curso).
 
 ## Cuerpo
 

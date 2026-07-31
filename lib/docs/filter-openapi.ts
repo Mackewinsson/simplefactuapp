@@ -9,7 +9,7 @@
 const HIDDEN_PATH_PREFIXES = ["/admin", "/webhooks"];
 
 const PUBLIC_DESCRIPTION_SUFFIX =
-  "\n\nLos endpoints administrativos quedan fuera de este portal.";
+  "\n\nLos endpoints administrativos (`/admin/*`) y la configuración de webhooks salientes quedan fuera de este portal. Guías: https://simplefactu.com/docs/webhooks y https://github.com/Mackewinsson/simplefactu/blob/main/docs/INTEGRATION.md";
 
 /** Etiquetas legacy en inglés del spec upstream → nombres públicos en español. */
 const TAG_ALIASES: Record<string, string> = {

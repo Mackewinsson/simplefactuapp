@@ -11,12 +11,21 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 |--------|--------|-----------|
 | `400 Solicitud incorrecta` | Validación fallida (campo faltante, formato incorrecto) | Lee el campo `details` en la respuesta — indica qué campo falla y por qué |
 | `401 No autorizado` | API key ausente o inválida | Comprueba el header `x-api-key` y que la clave no esté revocada |
-| `402 Pago requerido` | Límite de plan alcanzado | Revisa tu plan en `/me/plan`; escríbenos para ampliar |
+| `402 Pago requerido` | Límite de plan alcanzado | Consulta `GET /me/plan` — ver [Plan y uso](/docs/plan-y-uso); escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) para ampliar |
 | `403 Prohibido` | Scope insuficiente o tenant suspendido | Comprueba que tu API key tiene el scope necesario para ese endpoint |
 | `409 Conflicto` | Conflicto de encadenamiento o idempotencia | Lee la sección de errores 409 más abajo |
+| `422 Entidad no procesable` | Certificado obligatorio, NIF no autorizado o cert ≠ `allowed_nif` | Ver sección **422** más abajo |
 | `429 Demasiadas solicitudes` | Límite de tasa superado | Espera `Retry-After` segundos e inténtalo de nuevo |
 | `502 Puerta de enlace incorrecta` | AEAT devolvió un error o no respondió | El job se reintentará automáticamente con backoff; espera o consulta el estado |
 | `504 Tiempo de espera agotado` | Timeout antes de recibir respuesta | La petición puede que haya llegado; usa la misma `x-idempotency-key` para reintentar sin duplicar |
+
+## Errores 422
+
+| `details.code` | Cuándo | Qué hacer |
+|----------------|--------|-----------|
+| `tenant_certificate_required` | QA/prod sin PFX en el tenant | Sube el certificado con `POST /me/certificate` — [Autenticación](/docs/authentication#certificado-digital-aeat) |
+| `allowed_nif_mismatch` | El `nif` del body no coincide con el NIF autorizado del sub-tenant | Usa el NIF fijado al crear el autónomo (gestoría) |
+| `cert_nif_mismatch` | El PFX subido no corresponde al `allowed_nif` | Sube el certificado del mismo titular |
 
 ## Errores 409 — los más comunes en integración
 
@@ -48,7 +57,7 @@ Estos errores los devolvemos nosotros antes de llegar a AEAT:
 
 ## Errores AEAT (dentro del job)
 
-Cuando AEAT rechaza una factura, el job pasa a `FAILED` o `DEAD` y el resultado incluye el código de error original. Estos son los más frecuentes:
+Cuando AEAT rechaza una factura, el job puede pasar a `FAILED` (reintento programado) o `DEAD` (agotados los intentos) y el resultado incluye el código de error original. Estos son los más frecuentes:
 
 | Código | Nivel | Qué significa | Qué hacer |
 |--------|-------|---------------|-----------|
@@ -97,8 +106,16 @@ Para resolverlo:
 1. Lee `lastError` en el resultado del job (`GET /jobs/:jobId`) para entender el motivo.
 2. Corrige el problema en tu sistema (NIF incorrecto, formato de importe, etc.).
 3. **No puedes reenviar la misma factura** con el mismo `numSerie` una vez que AEAT la ha rechazado definitivamente. Debes emitir una **factura rectificativa** (tipo `R1`–`R5`) que corrija la original.
-4. Si el job llegó a `DEAD` por un error transitorio (timeout de AEAT, red), puedes pedir un reintento manual desde el panel admin o escribiéndonos.
+4. Si el job llegó a `DEAD` por un error transitorio (timeout de AEAT, red), escribe a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) con el `jobId` / `requestId` para un reintento manual (operadores: `POST /admin/jobs/:jobId/retry` solo si el estado es `FAILED`).
+
+## `FAILED` frente a `DEAD`
+
+| Estado | ¿Terminal? | Qué hacer |
+|--------|------------|-----------|
+| `FAILED` | No | El worker reintentará con backoff. Sigue el polling. |
+| `DEAD` | Sí | Agotó reintentos. Corrige la causa y emite nueva factura / rectificativa; no reutilices el mismo job. |
+| `SUCCEEDED` | Sí | Lee `result.qrInfo` (CSV + QR). |
 
 ## Cada respuesta incluye un `requestId`
 
-Guárdalo siempre que algo falle. Con ese UUID podemos ver la traza completa del envío, el XML que se envió a AEAT y la respuesta exacta. Es la información más útil que puedes darnos para soporte.
+Guárdalo siempre que algo falle. Con ese UUID podemos ver la traza completa del envío, el XML que se envió a AEAT y la respuesta exacta. Escríbenos a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) con el `requestId`.

@@ -3,27 +3,19 @@ title: Consola de integrador (gestoría / B2B)
 description: Cómo las gestorías e integradores B2B gestionan varios autónomos en Simple*Factu sin la clave de administración global.
 ---
 
-## Roles de la plataforma
-
-| Rol | Quién | Panel UI | Tenant API | Cómo se asigna |
-|-----|-------|----------|------------|----------------|
-| **Autónomo** | Usuario final | `/invoices`, `/settings/verifactu` | `sf_<userId>` | Sin role en Clerk (por defecto) |
-| **Integrador B2B / gestoría** | Asesoría, ERP, integradores | `/partner` — Consola integrador | `rp_<userId>` | `publicMetadata.role = "partner"` o `PARTNER_CLERK_USER_IDS` |
-| **Operador plataforma** | Personal simplefactu | `/admin` — Operación plataforma | `SIMPLEFACTU_ADMIN_KEY` | `publicMetadata.role = "admin"` o `ADMIN_CLERK_USER_IDS` |
-
-Un autónomo **nunca** ve panel de administración. Un integrador ve su consola de autónomos pero no accede al admin global. Un operador puede tener ambos roles si necesita también gestionar clientes como integrador.
-
-## ¿Para quién es la consola de integrador?
+## ¿Para quién es?
 
 Si eres una **gestoría, asesoría o empresa integradora B2B** que da de alta y monitoriza facturas de varios clientes (autónomos), usa la consola de integrador en la app (`/partner`) o la API partner directamente.
 
 Cada autónomo tiene su propio tenant en el API, su certificado y su NIF autorizado (`allowed_nif`).
 
-## Acceso a la consola
+## Acceso a la consola (producto)
 
-1. Tu usuario Clerk debe tener rol partner: `publicMetadata.role = "partner"` en el dashboard de Clerk, **o** tu `userId` en `PARTNER_CLERK_USER_IDS` (variable del servidor en Vercel).
-2. Tras iniciar sesión verás el enlace **Consola integrador** en la navegación (con badge azul).
+1. Solicita acceso partner a [soporte@simplefactu.com](mailto:soporte@simplefactu.com) (o usa el alta que te indiquemos).
+2. Tras iniciar sesión verás el enlace **Consola integrador** en la navegación.
 3. La primera visita provisiona automáticamente tu tenant de integrador (`rp_<tu userId>`) y una API key partner (solo servidor; no se muestra en el navegador).
+
+> **Nota para operadores de la plataforma:** el rol partner en Clerk se asigna con `publicMetadata.role = "partner"` o la allowlist `PARTNER_CLERK_USER_IDS`. Eso lo configura el equipo Simple\*Factu, no el cliente final.
 
 ## Qué puedes hacer en `/partner`
 
@@ -45,17 +37,25 @@ Si prefieres tu propio software en lugar del panel web:
 
 La clave partner **no** envía facturas: para eso emites una API key por autónomo y el autónomo (o su ERP) llama a `POST /send-invoice`.
 
+Flujo típico HTTP:
+
+1. `POST /partner/tenants` con `allowedNif` del autónomo.
+2. Subir certificado del hijo (`…/certificate`).
+3. Crear API key del hijo (`…/api-keys`) con scopes de facturación.
+4. El ERP del autónomo llama `POST /v1/send-invoice` con esa clave.
+
 ## Certificado y NIF
 
 - Al crear un autónomo defines el **NIF autorizado**.
-- El certificado que subas debe ser del **mismo titular** (mismo NIF).
-- En QA y producción el API exige certificado por tenant (`REQUIRE_TENANT_CERTIFICATE`); no hay certificado compartido de plataforma.
+- El certificado que subas debe ser del **mismo titular** (mismo NIF) — si no, **422** `cert_nif_mismatch`.
+- El `nif` en `send-invoice` debe coincidir con `allowed_nif` — si no, **422** `allowed_nif_mismatch`.
+- En QA y producción el API exige certificado por tenant (`REQUIRE_TENANT_CERTIFICATE`).
 
 ## Diferencia con el panel de operación (admin)
 
 | | Consola integrador (`/partner`) | Operación plataforma (`/admin`) |
 |--|--------------------------------|--------------------------------|
 | Quién | Gestorías e integradores B2B | Personal de la plataforma |
-| Clave API | Partner scopes en tenant `rp_*` | `SIMPLEFACTU_ADMIN_KEY` |
+| Clave API | Partner scopes en tenant `rp_*` | `SIMPLEFACTU_ADMIN_KEY` / `ADMIN_KEY` |
 | Alcance | Solo tus autónomos hijos | Todos los tenants del sistema |
 | Cuándo se necesita | Gestionar clientes y sus envíos | Monitorizar jobs, métricas, auditoría global |
