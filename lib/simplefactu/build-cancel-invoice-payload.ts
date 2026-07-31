@@ -1,8 +1,9 @@
 import type { Invoice, UserVerifactuAccount } from "@prisma/client";
-import { readSiFromEnv, toDdMmYyyy } from "./build-send-invoice-payload";
+import { toDdMmYyyy } from "./build-send-invoice-payload";
 
 /**
- * Body for POST /cancel-invoice. Omits huella fields so the API generates them.
+ * Body for POST /cancel-invoice. Omits huella and sistemaInformatico so the API
+ * generates them (platform SIF unless tenant clientSifEnabled).
  */
 export function buildCancelInvoicePayload(
   invoice: Invoice,
@@ -16,8 +17,6 @@ export function buildCancelInvoicePayload(
     );
   }
 
-  const si = readSiFromEnv({ issuerNif, issuerLegalName: issuerName });
-
   return {
     nif: issuerNif,
     nombre: issuerName,
@@ -25,16 +24,6 @@ export function buildCancelInvoicePayload(
       idEmisorFacturaAnulada: issuerNif,
       numSerieFacturaAnulada: invoice.number,
       fechaExpedicionFacturaAnulada: toDdMmYyyy(invoice.issueDate),
-    },
-    sistemaInformatico: {
-      nombreRazon: si.nombreRazon,
-      nif: si.nif,
-      nombreSistemaInformatico: si.nombreSistemaInformatico,
-      idSistemaInformatico: si.idSistemaInformatico,
-      version: si.version,
-      tipoUsoPosibleSoloVerifactu: si.tipoUsoPosibleSoloVerifactu,
-      tipoUsoPosibleMultiOT: si.tipoUsoPosibleMultiOT,
-      indicadorMultiplesOT: si.indicadorMultiplesOT,
     },
     rechazoPrevio: "N",
   };

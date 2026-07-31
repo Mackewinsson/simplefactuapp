@@ -205,19 +205,10 @@ curl -s -X POST "$API_BASE/send-invoice" \\
       \\"tipo\\": 21,
       \\"base\\": 100.00,
       \\"cuota\\": 21.00
-    }],
-    \\"sistemaInformatico\\": {
-      \\"nombreRazon\\": \\"$NOMBRE\\",
-      \\"nif\\": \\"$NIF\\",
-      \\"nombreSistemaInformatico\\": \\"MyERP\\",
-      \\"idSistemaInformatico\\": \\"01\\",
-      \\"version\\": \\"1.0.0\\",
-      \\"tipoUsoPosibleSoloVerifactu\\": \\"S\\",
-      \\"tipoUsoPosibleMultiOT\\": \\"N\\",
-      \\"indicadorMultiplesOT\\": \\"N\\"
-    }
+    }]
   }"
-# → 202 + jobId; consulta GET $API_BASE/jobs/:jobId hasta SUCCEEDED o DEAD`}
+# → 202 + jobId; consulta GET $API_BASE/jobs/:jobId hasta SUCCEEDED o DEAD
+# (sistemaInformatico lo rellena Simple*Factu por defecto)`}
           </pre>
         </div>
       </div>

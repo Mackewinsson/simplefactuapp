@@ -26,7 +26,7 @@ Guía de referencia para `POST /v1/cancel-invoice`. Esquema interactivo: [Refere
 |-------|-------------|-------------|
 | `nif` / `nombre` | Sí | Emisor (obligado a emitir). |
 | `facturaAnulada` | Sí | Factura a anular: `idEmisorFacturaAnulada`, `numSerieFacturaAnulada`, `fechaExpedicionFacturaAnulada` (`DD-MM-YYYY`). |
-| `sistemaInformatico` | Sí | Mismo bloque que en el alta (identifica el SIF). |
+| `sistemaInformatico` | No* | Por defecto lo rellena Simple\*Factu. Obligatorio solo con `clientSifEnabled`. |
 | `huella` + `tipoHuella` + `fechaHoraHusoGenRegistro` | No* | Si omites los tres, el servidor los genera. |
 | `sinRegistroAnterior` | No | `"S"` si no hay registro previo en la cadena. Si se omite, el servidor lo infiere. |
 | `encadenamiento.registroAnterior` | No | Si hace falta y se omite, el servidor usa la última huella de la cadena. |
@@ -48,16 +48,6 @@ curl -s -X POST "$API_BASE/cancel-invoice" \
       \"idEmisorFacturaAnulada\": \"$NIF\",
       \"numSerieFacturaAnulada\": \"2026/F-001\",
       \"fechaExpedicionFacturaAnulada\": \"15-01-2026\"
-    },
-    \"sistemaInformatico\": {
-      \"nombreRazon\": \"$NOMBRE\",
-      \"nif\": \"$NIF\",
-      \"nombreSistemaInformatico\": \"MyERP\",
-      \"idSistemaInformatico\": \"01\",
-      \"version\": \"1.0.0\",
-      \"tipoUsoPosibleSoloVerifactu\": \"S\",
-      \"tipoUsoPosibleMultiOT\": \"N\",
-      \"indicadorMultiplesOT\": \"N\"
     }
   }"
 ```

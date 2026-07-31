@@ -76,7 +76,9 @@ Ejemplos:
 
 ## Sistema informático (`sistemaInformatico`)
 
-Obligatorio. Identifica el software (SIF) ante AEAT.
+Por defecto **no lo envías**: Simple\*Factu es el SIF y la API rellena el bloque ante AEAT.
+
+Solo es obligatorio si soporte/admin activa **modo SIF del cliente** (`clientSifEnabled`) en tu tenant: entonces debes enviar el bloque completo (tu software es el fabricante). Detalle de campos en ese caso:
 
 | Campo | Notas |
 |-------|-------|
@@ -86,11 +88,11 @@ Obligatorio. Identifica el software (SIF) ante AEAT.
 | `idSistemaInformatico` | Exactamente **2** caracteres `[A-Z0-9]` (p. ej. `"01"`). Forma la clave de instalación `{NIF}\|{idSistema}\|{NIF fabricante}`. **Si cambia**, nuevo `numeroInstalacion` y cadena distinta. |
 | `version` | Versión del software. |
 | `numeroInstalacion` | Opcional; si lo omites, el servidor lo genera. |
-| `tipoUsoPosibleSoloVerifactu` | Capacidad del **producto**: `S` = solo Veri\*Factu; `N` = admite otros modos. Se emite en el XML. |
-| `tipoUsoPosibleMultiOT` | Capacidad multi–**obligado tributario (OT)**: `S` = el software admite varios OT; `N` = un solo OT. |
-| `indicadorMultiplesOT` | Uso de **esta instalación**: `S` = factura para varios OT; `N` = solo uno. Puede ser `N` aunque MultiOT sea `S`. |
+| `tipoUsoPosibleSoloVerifactu` | Capacidad del **producto**: `S` = solo Veri\*Factu; `N` = admite otros modos. |
+| `tipoUsoPosibleMultiOT` | Capacidad multi–**obligado tributario (OT)**: `S` = admite varios OT; `N` = un solo OT. |
+| `indicadorMultiplesOT` | Uso de **esta instalación**: `S` = factura para varios OT; `N` = solo uno. |
 
-Autónomo / un solo emisor (típico): `SoloVerifactu=S`, `MultiOT=N`, `indicadorMultiplesOT=N`.
+Con el modo por defecto (SIF Simple\*Factu) puedes omitir todo el objeto.
 
 ## Huella y encadenamiento
 

@@ -109,6 +109,8 @@ export type AdminTenant = {
   parent_tenant_id?: string | null;
   /** If set, this tenant may ONLY emit invoices for this NIF */
   allowed_nif?: string | null;
+  /** 1 = client must send sistemaInformatico (BYO SIF); 0 = platform stamps SIF */
+  client_sif_enabled?: number | boolean;
 };
 
 export type ListTenantsResponse = {
@@ -174,7 +176,13 @@ export async function postCreateTenant(body: {
 
 export async function patchTenant(
   id: string,
-  body: { name?: string; planId?: string; status?: string; allowedNif?: string | null }
+  body: {
+    name?: string;
+    planId?: string;
+    status?: string;
+    allowedNif?: string | null;
+    clientSifEnabled?: boolean;
+  }
 ): Promise<{ success: boolean; tenant: AdminTenant }> {
   return adminJson(`/admin/tenants/${encodeURIComponent(id)}`, {
     method: "PATCH",

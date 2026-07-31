@@ -199,8 +199,6 @@ export function buildSendInvoicePayload(
     destNif = n;
   }
 
-  const si = readSiFromEnv({ issuerNif, issuerLegalName: issuerName });
-
   const cuotaTotal = formatImporte(invoice.taxCents / 100);
   const total = formatImporte(invoice.totalCents / 100);
 
@@ -250,15 +248,6 @@ export function buildSendInvoicePayload(
     cuotaTotal,
     total,
     detalles,
-    sistemaInformatico: {
-      nombreRazon: si.nombreRazon,
-      nif: si.nif,
-      nombreSistemaInformatico: si.nombreSistemaInformatico,
-      idSistemaInformatico: si.idSistemaInformatico,
-      version: si.version,
-      tipoUsoPosibleSoloVerifactu: si.tipoUsoPosibleSoloVerifactu,
-      tipoUsoPosibleMultiOT: si.tipoUsoPosibleMultiOT,
-      indicadorMultiplesOT: si.indicadorMultiplesOT,
-    },
+    // sistemaInformatico omitted: API stamps platform SIF unless tenant has clientSifEnabled
   };
 }

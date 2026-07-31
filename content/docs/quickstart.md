@@ -28,7 +28,7 @@ Producción: `https://api.simplefactu.com/v1` (misma ruta, otra clave).
 
 Sustituye `vf_...`, el NIF y el nombre por los tuyos (NIF **real** del titular del certificado FNMT; AEAT no acepta NIFs inventados).
 
-El servidor puede generar la **huella**, el timestamp y el encadenamiento si los omites. Para la primera factura de una serie basta el cuerpo de negocio + `sistemaInformatico`.
+El servidor genera la **huella**, el timestamp, el encadenamiento y el bloque **sistema informático (SIF)** de Simple\*Factu si los omites. Solo envías los datos de negocio de la factura.
 
 > **`x-idempotency-key`:** genera un UUID **tú** (p. ej. `uuidgen`). Factura nueva → UUID nuevo. Si la red falla y reintentas el **mismo** JSON → reutiliza el mismo UUID. [Idempotencia](/docs/authentication#idempotencia).
 
@@ -54,23 +54,13 @@ curl -s -X POST "https://api.qa.simplefactu.com/v1/send-invoice" \
       "tipo": 21,
       "base": 100.00,
       "cuota": 21.00
-    }],
-    "sistemaInformatico": {
-      "nombreRazon": "NOMBRE TITULAR CERTIFICADO",
-      "nif": "Z0706098A",
-      "nombreSistemaInformatico": "MyERP",
-      "idSistemaInformatico": "01",
-      "version": "1.0.0",
-      "tipoUsoPosibleSoloVerifactu": "S",
-      "tipoUsoPosibleMultiOT": "N",
-      "indicadorMultiplesOT": "N"
-    }
+    }]
   }'
 ```
 
 | Campo | Qué es |
 |-------|--------|
-| `nif` / `nombre` | Emisor |
+| `nif` / `nombre` | Emisor (obligado tributario) |
 | `numSerie` | Número de factura (único en la serie) |
 | `fecha` | Expedición `DD-MM-YYYY` |
 | `tipoFactura` | `F1` = factura normal |
@@ -78,9 +68,8 @@ curl -s -X POST "https://api.qa.simplefactu.com/v1/send-invoice" \
 | `destNif` / `destNombre` | Cliente |
 | `cuotaTotal` / `total` | IVA y total |
 | `detalles` | Desglose IVA |
-| `sistemaInformatico` | Identifica tu software ante AEAT |
 
-No hace falta enviar `huella`, `tipoHuella`, `fechaHoraHusoGenRegistro`, `primerRegistro` ni `encadenamiento` en el camino feliz.
+No hace falta enviar `sistemaInformatico`, `huella`, `tipoHuella`, `fechaHoraHusoGenRegistro`, `primerRegistro` ni `encadenamiento` en el camino feliz.
 
 Respuesta inmediata **`202`** (encolado):
 

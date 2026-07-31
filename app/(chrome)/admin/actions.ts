@@ -115,13 +115,24 @@ export async function adminPatchTenantAction(
   const status = formData.get("status")?.toString()?.trim() ?? "";
   // allowedNif: empty string means "clear the restriction" (send null); absent means "don't touch"
   const allowedNifRaw = formData.get("allowedNif");
+  const clientSifRaw = formData.get("clientSifEnabled");
   try {
-    const body: { name?: string; planId?: string; status?: string; allowedNif?: string | null } = {};
+    const body: {
+      name?: string;
+      planId?: string;
+      status?: string;
+      allowedNif?: string | null;
+      clientSifEnabled?: boolean;
+    } = {};
     if (name !== "") body.name = name;
     if (planId) body.planId = planId;
     if (status) body.status = status;
     if (allowedNifRaw !== null) {
       body.allowedNif = allowedNifRaw.toString().trim() || null;
+    }
+    if (clientSifRaw !== null) {
+      const v = clientSifRaw.toString().trim().toLowerCase();
+      body.clientSifEnabled = v === "true" || v === "1";
     }
     await patchTenant(tenantId, body);
     await logAdminAction({

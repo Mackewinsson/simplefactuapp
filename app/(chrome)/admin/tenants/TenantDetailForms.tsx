@@ -78,6 +78,21 @@ export function TenantDetailForms({ tenant }: { tenant: AdminTenant }) {
               para eliminar la restricción.
             </span>
           </label>
+          <label className="block text-sm">
+            <span className="text-fg-muted">Sistema informático (SIF)</span>
+            <select
+              name="clientSifEnabled"
+              defaultValue={Boolean(Number(tenant.client_sif_enabled)) ? "true" : "false"}
+              className="mt-1 w-full rounded border border-outline px-3 py-2 text-sm"
+            >
+              <option value="false">Plataforma (Simple\*Factu rellena sistemaInformatico)</option>
+              <option value="true">Cliente (debe enviar sistemaInformatico)</option>
+            </select>
+            <span className="mt-1 block text-xs text-fg-subtle">
+              Por defecto la API inyecta el SIF de Simple\*Factu. Activa “Cliente” solo si ese
+              integrador es el fabricante del SIF y tiene su propia declaración responsable.
+            </span>
+          </label>
           <button
             type="submit"
             disabled={patchPending}
