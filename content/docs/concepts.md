@@ -88,6 +88,6 @@ AEAT exige identificar qué software emitió la factura. Cada envío incluye un 
 - `tipoUsoPosibleMultiOT` — ¿el software **puede** facturar para varios OT?
 - `indicadorMultiplesOT` — ¿**esta instalación** factura para varios OT?
 
-Para empezar (un autónomo / un emisor): copia el bloque del [Inicio rápido](/docs/quickstart#paso-2--enviar-la-factura) con `SoloVerifactu=S`, `MultiOT=N`, `indicadorMultiplesOT=N` y ajusta `nombreRazon`, `nif` y `version`. Diccionario completo: [Envío de facturas → Sistema informático](/docs/envio-facturas#sistema-informático-sistemainformatico).
+Para empezar (un autónomo / un emisor): copia el bloque del [Inicio rápido](/docs/quickstart#paso-1--enviar-la-factura) con `SoloVerifactu=S`, `MultiOT=N`, `indicadorMultiplesOT=N` y ajusta `nombreRazon`, `nif` y `version`. Diccionario completo: [Envío de facturas → Sistema informático](/docs/envio-facturas#sistema-informático-sistemainformatico).
 
 Con esto claro, el [Inicio rápido](/docs/quickstart) debería tener mucho más sentido.

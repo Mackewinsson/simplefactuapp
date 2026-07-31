@@ -4,7 +4,9 @@ Nombre del producto en la interfaz: edita `APP_DISPLAY_NAME` en [`lib/branding.t
 
 App web de facturación con envío **Veri\*Factu** (AEAT): alta de facturas, certificado digital, seguimiento de jobs, archivo de registros AEAT, panel de gestoría y panel de operación. Next.js 15, TypeScript, Prisma, Postgres (Neon), Clerk.
 
-## Inicio rápido
+## Arranque local (desarrolladores de esta app)
+
+> Esto es solo para **contribuir al código** de simplefactuapp. Si eres un **ERP / cliente** y quieres emitir facturas por API, usa la guía pública: [Inicio rápido](https://simplefactu.com/docs/quickstart) (API alojada; no hace falta clonar este repo).
 
 ```bash
 pnpm i
@@ -15,7 +17,7 @@ pnpm prisma migrate deploy
 pnpm dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). Opcional: `pnpm prisma db seed`.
+Abre [http://localhost:3001](http://localhost:3001) (o el puerto que indique la consola). Opcional: `pnpm prisma db seed`.
 
 ## Alcance
 

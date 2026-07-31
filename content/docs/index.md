@@ -39,7 +39,7 @@ Cuando el trabajo llega a `SUCCEEDED` tienes el **CSV** (código de verificació
 
 1. **[Conceptos clave](/docs/concepts)** — qué es una huella, el encadenamiento, el CSV y el primer registro.
 2. **[Entornos](/docs/entornos)** — QA vs producción, base URL `/v1`.
-3. **[Inicio rápido](/docs/quickstart)** — emite tu primera factura con `curl`.
+3. **[Inicio rápido](/docs/quickstart)** — primera factura con `curl` contra la API alojada (sin instalar nada).
 4. **[Envío de facturas](/docs/envio-facturas)** — diccionario de campos de `POST /send-invoice`.
 5. **[Anulación de facturas](/docs/cancelacion-facturas)** — diccionario de `POST /cancel-invoice`.
 6. **[Autenticación](/docs/authentication)** — API key, certificado e idempotencia.

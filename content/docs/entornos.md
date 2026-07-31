@@ -18,7 +18,7 @@ Las mismas rutas existen **sin** `/v1` por compatibilidad (`POST /send-invoice`)
 
 OpenAPI en vivo: `GET {base-sin-v1}/openapi.json`. En el portal: [Referencia API](/docs/api-reference) (Scalar; no incluye rutas `/admin` ni configuración de webhooks).
 
-> **Probar en Scalar:** el servidor por defecto del portal suele apuntar a la API de **documentación/QA** (`SIMPLEFACTU_DOCS_API_BASE_URL` / `api.qa…`), no necesariamente a producción. Usa la clave del entorno correcto.
+> **Probar en Scalar:** el selector de servidor del portal suele apuntar a **QA** (`api.qa…`). Usa la API key del mismo entorno. No es una instalación local: es la API pública alojada.
 
 ## Certificados y NIFs
 
