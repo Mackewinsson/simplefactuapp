@@ -212,4 +212,50 @@ assert.equal(sendF2.facturaSinIdentifDestinatarioArt61d, "S");
 assert.equal(sendF2.destNif, undefined);
 assert.equal(sendF2.destNombre, undefined);
 
+// Multi-line items with different VAT rates and discounts grouped correctly
+const item21: InvoiceItem = {
+  id: "it21",
+  invoiceId: "inv_multi",
+  description: "Producto A (21%)",
+  quantity: 2,
+  unitPriceCents: 5000,
+  discountCents: 1000, // base = 10000 - 1000 = 9000 -> 90.00
+  discountConcept: "Promo",
+  lineTotalCents: 9000,
+  claveRegimen: "01",
+  calificacion: "S1",
+  tipoImpositivo: "21.0",
+};
+
+const item10: InvoiceItem = {
+  id: "it10",
+  invoiceId: "inv_multi",
+  description: "Producto B (10%)",
+  quantity: 1,
+  unitPriceCents: 4000,
+  discountCents: 0,
+  discountConcept: null,
+  lineTotalCents: 4000,
+  claveRegimen: "01",
+  calificacion: "S1",
+  tipoImpositivo: "10.0",
+};
+
+const invoiceMulti: Invoice & { items: InvoiceItem[] } = {
+  ...invoiceBase,
+  id: "inv_multi",
+  number: "2026/F-MULTI",
+  subtotalCents: 13000,
+  taxCents: 2290, // 9000 * 0.21 = 1890; 4000 * 0.10 = 400
+  totalCents: 15290,
+  items: [item21, item10],
+};
+
+const sendMulti = buildSendInvoicePayload(invoiceMulti, accountBase);
+assert.equal(sendMulti.numSerie, "2026/F-MULTI");
+const detallesMulti = sendMulti.detalles as Record<string, unknown>[];
+assert.equal(detallesMulti.length, 2);
+assert.deepEqual(detallesMulti[0], { clave: "01", calif: "S1", tipo: 21, base: 90, cuota: 18.9 });
+assert.deepEqual(detallesMulti[1], { clave: "01", calif: "S1", tipo: 10, base: 40, cuota: 4 });
+
 console.log("test-verifactu-payloads: OK");

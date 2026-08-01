@@ -22,7 +22,12 @@
     "test:validation": "tsx scripts/test-create-invoice-validation.ts",
     "test:roles": "tsx scripts/test-roles.ts",
     "test:billing": "tsx scripts/test-lemon-squeezy-billing.ts",
-    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles && npm run test:billing",
+    "test:job-sync": "tsx scripts/test-job-sync.ts",
+    "test:crypto": "tsx scripts/test-verifactu-crypto.ts",
+    "test:lemon-webhook": "tsx scripts/test-lemon-webhook.ts",
+    "test:cert-upload": "tsx scripts/test-cert-upload.ts",
+    "test:provision": "tsx scripts/test-provision.ts",
+    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles && npm run test:billing && npm run test:job-sync && npm run test:crypto && npm run test:lemon-webhook && npm run test:cert-upload && npm run test:provision",
     "prepare": "node -e \"if(!process.env.CI && !process.env.DOCKER_BUILD){require('child_process').execSync('husky',{stdio:'inherit'})}\" || true"
   },
   "lint-staged": {
