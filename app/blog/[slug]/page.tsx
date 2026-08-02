@@ -43,28 +43,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+import {
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+} from "@/lib/seo/schema";
+
 function jsonLd(article: ReturnType<typeof getArticle>) {
   if (!article) return null;
-  const url = canonicalUrl(`/blog/${article.slug}`);
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
+  const articleSchema = buildArticleSchema({
+    title: article.title,
     description: article.seoDescription,
+    slug: article.slug,
     datePublished: article.date,
-    author: {
-      "@type": "Person",
-      name: "Mackewinsson Palencia",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Simple*Factu",
-      url: getSiteUrl(),
-    },
-    url,
-    inLanguage: "es",
-    keywords: article.tags.join(", "),
-  };
+  });
+
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Inicio", url: "/" },
+    { name: "Blog", url: "/blog" },
+    { name: article.title, url: `/blog/${article.slug}` },
+  ]);
+
+  return [articleSchema, breadcrumbSchema];
 }
 
 const sorted = [...articles].sort(
