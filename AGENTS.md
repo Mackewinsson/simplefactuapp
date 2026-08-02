@@ -16,6 +16,17 @@
 10. [Tests y scripts](#tests-y-scripts)
 11. [Despliegue](#despliegue)
 
+## ⚠️ Regla Obligatoria para Agentes IA (Mandatory Pre-Commit Rule)
+
+**ANTES DE REALIZAR CUALQUIER COMMIT O DESPLIEGUE**:
+Los agentes IA **DEBEN OBLIGATORIAMENTE** ejecutar la verificación completa de tests y el build del proyecto antes de confirmar cambios.
+
+- **Comandos de Verificación en simplefactuapp**:
+  - `pnpm check && pnpm build` (o `npm run check && npm run build`).
+- **Instrucciones Estrictas**:
+  1. **NUNCA** realizar `git commit` ni `git push` si existen errores de linter, tipos (TypeScript), tests fallidos o errores en la compilación del paquete de producción.
+  2. Si la verificación detecta fallos, el agente debe corregir la causa raíz del error y **volver a ejecutar la verificación** hasta obtener un resultado 100% limpio antes de proceder con el commit o despliegue.
+
 ---
 
 ## Repositorios relacionados
