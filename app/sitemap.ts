@@ -25,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/docs/monitorizacion`, lastModified: staticLastMod, changeFrequency: "monthly", priority: 0.4 },
     { url: `${base}/docs/api-reference`, lastModified: staticLastMod, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/blog`, lastModified: staticLastMod, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/herramientas/validador-qr-verifactu`, lastModified: staticLastMod, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/legal/aviso-legal`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/legal/privacidad`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/legal/terminos`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },

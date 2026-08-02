@@ -28,6 +28,9 @@ export function Footer() {
           <span>Servicio compatible con Veri*Factu (AEAT)</span>
         </div>
         <nav className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link href="/herramientas/validador-qr-verifactu" className="font-semibold text-brand hover:underline">
+            Validador QR Veri*Factu
+          </Link>
           <Link href="/legal/aviso-legal" className="hover:text-fg">
             Aviso legal
           </Link>

@@ -49,17 +49,35 @@ export const viewport: Viewport = {
  * that need it. Public surfaces with their own chrome (`/docs`, `/sign-in`,
  * `/sign-up`) skip it, which keeps `/docs/[slug]` statically prerenderable.
  */
+import {
+  buildOrganizationSchema,
+  buildSoftwareApplicationSchema,
+} from "@/lib/seo/schema";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const globalSchemas = [
+    buildOrganizationSchema(),
+    buildSoftwareApplicationSchema(),
+  ];
+
   return (
     <ClerkProvider localization={esES}>
       <html
         lang="es"
         className={`${GeistSans.variable} ${GeistMono.variable} ${plusJakartaSans.variable}`}
       >
+        <head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(globalSchemas),
+            }}
+          />
+        </head>
         <body className="flex min-h-screen flex-col bg-surface font-sans text-fg antialiased">
           {children}
         </body>
