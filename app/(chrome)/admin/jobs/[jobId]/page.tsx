@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getAdminJob, getAeatConsulta, SimplefactuAdminError } from "@/lib/simplefactu/admin-server";
 import { RetryJobButton } from "./RetryJobButton";
+import { AdminIssueCorrectionButton } from "./AdminIssueCorrectionButton";
 
 export default async function AdminJobDetailPage({
   params,
@@ -48,7 +49,6 @@ export default async function AdminJobDetailPage({
   const previewJson =
     preview !== undefined ? JSON.stringify(preview, null, 2).slice(0, 12000) : null;
 
-  // Parse payload to extract AEAT consulta params
   let consultaNif: string | null = null;
   let consultaNumSerie: string | null = null;
   let consultaFecha: string | null = null;
@@ -59,14 +59,20 @@ export default async function AdminJobDetailPage({
       consultaNif = String(invoice.nif ?? "");
       consultaNumSerie = String(invoice.numSerie ?? invoice.num_serie ?? "");
       consultaFecha = String(invoice.fecha ?? "");
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
   }
 
   let consulta: Awaited<ReturnType<typeof getAeatConsulta>> | null = null;
   let consultaErr: string | null = null;
   if (showConsulta && consultaNif && consultaNumSerie && consultaFecha) {
     try {
-      consulta = await getAeatConsulta({ nif: consultaNif, numSerie: consultaNumSerie, fecha: consultaFecha });
+      consulta = await getAeatConsulta({
+        nif: consultaNif,
+        numSerie: consultaNumSerie,
+        fecha: consultaFecha,
+      });
     } catch (e: unknown) {
       consultaErr = e instanceof Error ? e.message : "Error al consultar AEAT";
     }
@@ -88,6 +94,13 @@ export default async function AdminJobDetailPage({
               className="text-accent hover:underline"
             >
               {j.tenant_id}
+            </Link>
+            {" · "}
+            <Link
+              href={`/admin/support?q=${encodeURIComponent(j.tenant_id)}`}
+              className="text-accent hover:underline"
+            >
+              Hub soporte
             </Link>
           </dd>
         </div>
@@ -124,7 +137,15 @@ export default async function AdminJobDetailPage({
         </section>
       ) : null}
 
-      <RetryJobButton jobId={j.id} status={j.status} />
+      <div className="flex flex-wrap items-start gap-3">
+        <RetryJobButton jobId={j.id} status={j.status} />
+        <AdminIssueCorrectionButton
+          jobId={j.id}
+          jobType={j.type}
+          jobStatus={j.status}
+          originalNumSerie={consultaNumSerie ?? ""}
+        />
+      </div>
 
       {data.result ? (
         <section>
@@ -143,7 +164,6 @@ export default async function AdminJobDetailPage({
         <p className="text-sm text-fg-subtle">Sin fila en job_results.</p>
       )}
 
-      {/* AEAT Consulta */}
       <section className="rounded-lg border border-outline-soft bg-surface p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-fg">Consulta AEAT</h2>
@@ -157,7 +177,9 @@ export default async function AdminJobDetailPage({
           )}
         </div>
         {!consultaNif ? (
-          <p className="mt-2 text-xs text-fg-subtle">Sin datos de factura disponibles en el payload.</p>
+          <p className="mt-2 text-xs text-fg-subtle">
+            Sin datos de factura disponibles en el payload.
+          </p>
         ) : showConsulta ? (
           consultaErr ? (
             <p className="mt-2 text-sm text-danger-foreground">{consultaErr}</p>
