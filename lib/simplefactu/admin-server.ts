@@ -111,6 +111,9 @@ export type AdminTenant = {
   allowed_nif?: string | null;
   /** 1 = client must send sistemaInformatico (BYO SIF); 0 = platform stamps SIF */
   client_sif_enabled?: number | boolean;
+  /** 1 = maintenance mode on */
+  maintenance_mode?: number | boolean;
+  notification_email?: string | null;
 };
 
 export type ListTenantsResponse = {
@@ -140,12 +143,17 @@ export async function getDiagnostics(): Promise<AdminDiagnostics> {
   return adminJson<AdminDiagnostics>("/admin/diagnostics", { method: "GET" });
 }
 
-export async function listTenants(limit: number, offset: number): Promise<ListTenantsResponse> {
-  const q = new URLSearchParams({
+export async function listTenants(
+  limit: number,
+  offset: number,
+  q?: string
+): Promise<ListTenantsResponse> {
+  const params = new URLSearchParams({
     limit: String(limit),
     offset: String(offset),
   });
-  return adminJson<ListTenantsResponse>(`/admin/tenants?${q}`, { method: "GET" });
+  if (q?.trim()) params.set("q", q.trim());
+  return adminJson<ListTenantsResponse>(`/admin/tenants?${params}`, { method: "GET" });
 }
 
 export async function getTenant(id: string): Promise<{ success: boolean; tenant: AdminTenant }> {
@@ -309,7 +317,8 @@ export async function getRateLimitConfig(): Promise<RateLimitConfigResponse> {
 
 export type AdminMetricsResponse = {
   success: boolean;
-  tenantId: string;
+  tenantId: string | null;
+  scope?: "global" | "tenant";
   from: string;
   to: string;
   metrics: unknown;
@@ -468,10 +477,14 @@ export async function getTenantWebhook(tenantId: string): Promise<AdminWebhookCo
 export async function patchTenantWebhook(
   tenantId: string,
   body: { webhookUrl?: string | null; webhookSecret?: string | null }
-): Promise<{ success: boolean; message?: string }> {
+): Promise<{ success: boolean; message?: string; webhookUrl?: string | null; hasSecret?: boolean }> {
+  // API contract uses `url` / `secret`; keep UI field names in the form layer.
+  const apiBody: { url?: string | null; secret?: string | null } = {};
+  if (body.webhookUrl !== undefined) apiBody.url = body.webhookUrl;
+  if (body.webhookSecret !== undefined) apiBody.secret = body.webhookSecret;
   return adminJson(`/admin/tenants/${encodeURIComponent(tenantId)}/webhook`, {
     method: "PATCH",
-    body: JSON.stringify(body),
+    body: JSON.stringify(apiBody),
   });
 }
 
@@ -481,8 +494,8 @@ export type AdminEmailPrefs = {
   success: boolean;
   tenantId: string;
   notificationEmail: string | null;
-  notifyOnDeadJobs: boolean;
-  notifyOnCertExpiry: boolean;
+  emailOnSuccess: boolean;
+  emailOnFailure: boolean;
 };
 
 export async function getTenantEmailPrefs(tenantId: string): Promise<AdminEmailPrefs> {
@@ -494,8 +507,17 @@ export async function getTenantEmailPrefs(tenantId: string): Promise<AdminEmailP
 
 export async function patchTenantEmailPrefs(
   tenantId: string,
-  body: { notificationEmail?: string | null; notifyOnDeadJobs?: boolean; notifyOnCertExpiry?: boolean }
-): Promise<{ success: boolean; message?: string }> {
+  body: {
+    notificationEmail?: string | null;
+    onSuccess?: boolean;
+    onFailure?: boolean;
+  }
+): Promise<{
+  success: boolean;
+  notificationEmail?: string | null;
+  emailOnSuccess?: boolean;
+  emailOnFailure?: boolean;
+}> {
   return adminJson(`/admin/tenants/${encodeURIComponent(tenantId)}/email-prefs`, {
     method: "PATCH",
     body: JSON.stringify(body),
@@ -634,4 +656,82 @@ export async function verifyEventsChain(tenantId?: string): Promise<EventsChainV
 export async function getAdminMetricsGlobal(from: string, to: string): Promise<AdminMetricsResponse> {
   const q = new URLSearchParams({ from, to });
   return adminJson<AdminMetricsResponse>(`/admin/metrics?${q}`, { method: "GET" });
+}
+
+// --- Operational status ---
+
+export type AdminOpsStatus = {
+  success: boolean;
+  database?: { type?: string; connected?: boolean };
+  worker?: { enabled?: boolean; interval?: number };
+  jobs?: {
+    byStatus?: Record<string, number>;
+    pendingFailedLastHour?: number;
+    stuck?: number;
+  };
+  flags?: {
+    readOnlyMode?: boolean;
+    disableAeatSend?: boolean;
+  };
+  timestamp?: string;
+};
+
+export async function getAdminOpsStatus(): Promise<AdminOpsStatus> {
+  return adminJson<AdminOpsStatus>("/admin/status", { method: "GET" });
+}
+
+// --- Certificates expiring ---
+
+export type ExpiringCertificate = {
+  tenantId: string;
+  notAfter: string | null;
+  daysUntilExpiry: number;
+  expiresWithin30Days?: boolean;
+  nif: string | null;
+  commonName: string | null;
+  valid?: boolean;
+  code?: string | null;
+  updatedAt?: string;
+};
+
+export type ExpiringCertificatesResponse = {
+  success: boolean;
+  days: number;
+  count: number;
+  certificates: ExpiringCertificate[];
+};
+
+export async function getExpiringCertificates(days = 30): Promise<ExpiringCertificatesResponse> {
+  const q = new URLSearchParams({ days: String(days) });
+  return adminJson<ExpiringCertificatesResponse>(`/admin/certificates/expiring?${q}`, {
+    method: "GET",
+  });
+}
+
+// --- Issue correction (admin job shortcut) ---
+
+export async function postIssueCorrection(
+  jobId: string,
+  body: {
+    tipoFactura: string;
+    numSerie: string;
+    tipoRectificativa?: "S" | "I";
+    importeRectificacion?: {
+      baseRectificada: number;
+      cuotaRectificada: number;
+      cuotaRecargoRectificado?: number;
+    };
+    overrides?: Record<string, unknown>;
+  }
+): Promise<{
+  success: boolean;
+  originalJobId?: string;
+  correctionJobId?: string;
+  status?: string;
+  message?: string;
+}> {
+  return adminJson(`/admin/jobs/${encodeURIComponent(jobId)}/issue-correction`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }

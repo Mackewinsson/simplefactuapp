@@ -20,7 +20,9 @@ export function TenantEmailPrefsForm({
     <section className="rounded-lg border border-outline-soft bg-surface p-4">
       <h2 className="mb-1 text-sm font-semibold text-fg">Notificaciones por email</h2>
       <p className="mb-3 text-xs text-fg-muted">
-        Alertas enviadas directamente al tenant (requiere <code className="rounded bg-surface-muted px-0.5">EMAILS_ENABLED</code> en el API).
+        Alertas al tenant (requiere <code className="rounded bg-surface-muted px-0.5">EMAILS_ENABLED</code> en
+        el API). <code className="rounded bg-surface-muted px-0.5">onSuccess</code> = cada factura OK;{" "}
+        <code className="rounded bg-surface-muted px-0.5">onFailure</code> = jobs DEAD.
       </p>
 
       <form action={formAction} className="space-y-3">
@@ -39,20 +41,20 @@ export function TenantEmailPrefsForm({
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              name="notifyOnDeadJobs"
-              defaultChecked={initial?.notifyOnDeadJobs ?? false}
+              name="onSuccess"
+              defaultChecked={initial?.emailOnSuccess ?? false}
               className="rounded"
             />
-            <span className="text-fg-muted">Alertar cuando un job quede DEAD</span>
+            <span className="text-fg-muted">Email en cada factura SUCCEEDED (onSuccess)</span>
           </label>
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              name="notifyOnCertExpiry"
-              defaultChecked={initial?.notifyOnCertExpiry ?? false}
+              name="onFailure"
+              defaultChecked={initial?.emailOnFailure ?? true}
               className="rounded"
             />
-            <span className="text-fg-muted">Alertar cuando el certificado esté próximo a expirar</span>
+            <span className="text-fg-muted">Email cuando un job quede DEAD (onFailure)</span>
           </label>
         </div>
         <button

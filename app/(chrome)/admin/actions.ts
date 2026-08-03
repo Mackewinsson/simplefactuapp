@@ -16,6 +16,7 @@ import {
   deleteTenantCertificate,
   patchTenantWebhook,
   patchTenantEmailPrefs,
+  postIssueCorrection,
   SimplefactuAdminError,
 } from "@/lib/simplefactu/admin-server";
 import { BFF_KEY_SCOPES } from "@/lib/verifactu/provision";
@@ -175,11 +176,23 @@ export async function adminMaintenanceOffAction(_prev: ActionState, formData: Fo
     await logAdminAction({ userId, action: "tenant.maintenance_off", target: tenantId });
     revalidatePath("/admin/tenants");
     revalidatePath(`/admin/tenants/${tenantId}`);
+    revalidatePath("/admin/support");
     return { ok: true, message: "Maintenance desactivado." };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";
     return { ok: false, error: msg };
   }
+}
+
+/** Form-action wrappers (no useActionState prev arg) for support hub. */
+export async function adminReactivateTenantFormAction(formData: FormData): Promise<void> {
+  await adminPatchTenantAction(null, formData);
+  const tenantId = formData.get("tenantId")?.toString()?.trim();
+  if (tenantId) revalidatePath(`/admin/support`);
+}
+
+export async function adminMaintenanceOffFormAction(formData: FormData): Promise<void> {
+  await adminMaintenanceOffAction(null, formData);
 }
 
 export async function adminRetryJobAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -302,10 +315,10 @@ export async function adminPatchEmailPrefsAction(_prev: ActionState, formData: F
   const tenantId = formData.get("tenantId")?.toString()?.trim();
   if (!tenantId) return { ok: false, error: "Falta tenantId" };
   const notificationEmail = formData.get("notificationEmail")?.toString()?.trim() || null;
-  const notifyOnDeadJobs = formData.get("notifyOnDeadJobs") === "on";
-  const notifyOnCertExpiry = formData.get("notifyOnCertExpiry") === "on";
+  const onSuccess = formData.get("onSuccess") === "on";
+  const onFailure = formData.get("onFailure") === "on";
   try {
-    await patchTenantEmailPrefs(tenantId, { notificationEmail, notifyOnDeadJobs, notifyOnCertExpiry });
+    await patchTenantEmailPrefs(tenantId, { notificationEmail, onSuccess, onFailure });
     await logAdminAction({ userId, action: "tenant.email_prefs.patch", target: tenantId });
     revalidatePath(`/admin/tenants/${encodeURIComponent(tenantId)}`);
     return { ok: true, message: "Preferencias de notificación actualizadas." };
@@ -375,5 +388,51 @@ export async function adminSetUserRoleAction(
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error al actualizar rol";
     return { ok: false, error: msg };
+  }
+}
+
+export async function adminIssueCorrectionAction(input: {
+  jobId: string;
+  tipoFactura: string;
+  numSerie: string;
+  tipoRectificativa: "S" | "I";
+  importeRectificacion?: {
+    baseRectificada: number;
+    cuotaRectificada: number;
+    cuotaRecargoRectificado?: number;
+  };
+}): Promise<{ ok: true; message: string; correctionJobId?: string } | { ok: false; message: string }> {
+  const { userId } = await requireAdmin();
+  const jobId = input.jobId?.trim();
+  if (!jobId) return { ok: false, message: "Falta jobId" };
+  try {
+    const r = await postIssueCorrection(jobId, {
+      tipoFactura: input.tipoFactura,
+      numSerie: input.numSerie.trim(),
+      tipoRectificativa: input.tipoRectificativa,
+      importeRectificacion: input.importeRectificacion,
+    });
+    await logAdminAction({
+      userId,
+      action: "job.issue_correction",
+      target: jobId,
+      metadata: {
+        tipoFactura: input.tipoFactura,
+        numSerie: input.numSerie,
+        correctionJobId: r.correctionJobId,
+      },
+    });
+    revalidatePath(`/admin/jobs/${encodeURIComponent(jobId)}`);
+    revalidatePath("/admin/jobs");
+    return {
+      ok: true,
+      message: r.correctionJobId
+        ? `Rectificativa encolada: ${r.correctionJobId}`
+        : r.message ?? "Rectificativa encolada.",
+      correctionJobId: r.correctionJobId,
+    };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Error";
+    return { ok: false, message: msg };
   }
 }
