@@ -1563,6 +1563,10 @@ rm /tmp/cert.pem</code></pre>
     seoDescription:
       "Cómo integrar Veri*Factu con Odoo: módulos disponibles, opciones de conector API y qué comprobar para garantizar el cumplimiento con el RD 1007/2023.",
     content: `
+<p>
+  <strong>¿Integras Odoo?</strong> Guía comercial y técnica del conector API (OCA vs REST) en
+  <a href="/integraciones/odoo-verifactu">Integración Odoo Veri*Factu</a>.
+</p>
 <h2>Odoo y Veri*Factu: la situación actual</h2>
 <p>
   Odoo es uno de los ERP más usados por pymes en España. La integración con Veri*Factu no viene de fábrica en todas las versiones: depende de la versión de Odoo, del módulo de facturación que uses y del proveedor que lo haya desarrollado.
@@ -1627,6 +1631,10 @@ rm /tmp/cert.pem</code></pre>
     seoDescription:
       "FactuSOL y Veri*Factu: compatibilidad, qué versión necesitas, cómo verificar que cumple el RD 1007/2023 y opciones de migración si tu versión no es conforme.",
     content: `
+<p>
+  <strong>¿Necesitas API?</strong> Si buscas integrar FactuSOL (o un ERP similar) con Veri*Factu vía REST — sin SOAP ni mTLS — ve a la
+  <a href="/integraciones/factusol-verifactu">landing API FactuSOL Veri*Factu</a>.
+</p>
 <h2>FactuSOL y la adaptación a Veri*Factu</h2>
 <p>
   FactuSOL (de Software DELSOL) es uno de los programas de gestión empresarial y facturación más populares en España, en parte por ofrecer una versión gratuita funcional. Ante la entrada en vigor de Veri*Factu, Software DELSOL ha trabajado en adaptar sus productos para cumplir el RD 1007/2023.
@@ -1687,6 +1695,10 @@ rm /tmp/cert.pem</code></pre>
     seoDescription:
       "ContaSimple vs Simple*Factu para Veri*Factu: diferencias, casos de uso y cuál elegir según el tipo de negocio y necesidades de integración con la AEAT.",
     content: `
+<p>
+  <strong>¿Buscas ContaSimple API?</strong> Si necesitas una API REST completa para Veri*Factu (automatización, webhooks, ERP), consulta la
+  <a href="/integraciones/contasimple-verifactu">landing ContaSimple API Veri*Factu</a>.
+</p>
 <h2>ContaSimple y Simple*Factu: dos productos distintos</h2>
 <p>
   Antes de cualquier comparativa: <strong>ContaSimple y Simple*Factu son productos completamente distintos</strong> de empresas distintas. No hay relación entre ellos. La similitud en los nombres puede generar confusión en búsquedas.
