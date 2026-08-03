@@ -11,17 +11,17 @@ import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl, getSiteUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
-  title: "Simple*Factu — Veri*Factu para autónomos y pymes",
+  title: "Simple*Factu — API y software Veri*Factu (AEAT)",
   description:
-    "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
+    "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
   robots: publicRobots,
   alternates: {
     canonical: canonicalUrl("/"),
   },
   openGraph: {
-    title: "Simple*Factu — Veri*Factu para autónomos y pymes",
+    title: "Simple*Factu — API y software Veri*Factu (AEAT)",
     description:
-      "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
+      "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
     url: canonicalUrl("/"),
     siteName: "Simple*Factu",
     locale: "es_ES",
@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Simple*Factu — Veri*Factu para autónomos y pymes",
+    title: "Simple*Factu — API y software Veri*Factu (AEAT)",
     description:
-      "Cumple Veri*Factu sin tocar AEAT: facturación, certificado digital, envío a Hacienda y PDF con QR. Para autónomos, pymes y gestorías.",
+      "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
   },
 };
 
@@ -86,6 +86,12 @@ export default async function PublicHomePage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <BrandWordmark />
           <nav className="flex items-center gap-1 font-display">
+            <Link
+              href="/integraciones"
+              className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
+            >
+              Integraciones
+            </Link>
             <Link
               href="/blog"
               className="hidden rounded px-3 py-1.5 text-sm text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg sm:inline-flex"
@@ -213,6 +219,7 @@ export default async function PublicHomePage() {
             Simple*Factu &mdash; Servicio compatible con Veri*Factu (AEAT)
           </span>
           <nav className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/integraciones" className="hover:text-fg">Integraciones</Link>
             <Link href="/blog" className="hover:text-fg">Blog</Link>
             <Link href="/docs" className="hover:text-fg">Documentación</Link>
             <Link href="/docs/api-reference" className="hover:text-fg">Referencia API</Link>

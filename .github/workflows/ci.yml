@@ -1,10 +1,18 @@
 name: CI
 
+# On pushes to main/develop: runs lint + typecheck + build.
+# Vercel automatically deploys to Production when main is updated
+# (no extra step needed here). For branches, Vercel creates a Preview deployment.
+# On semver tags (v*): Vercel Production deployment is triggered automatically
+# via the Vercel GitHub integration, which watches all pushes to main.
+
 on:
   push:
     branches:
       - main
       - develop
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
