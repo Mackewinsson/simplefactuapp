@@ -5,6 +5,7 @@ import { HeaderUserArea } from "../HeaderUserArea";
 import { Footer } from "../Footer";
 import { OnboardingBanner } from "../OnboardingBanner";
 import { OnboardingRedirect } from "./OnboardingRedirect";
+import { WelcomeRedirect } from "./WelcomeRedirect";
 import { AdminPreviewBannerWrapper } from "@/components/admin/AdminPreviewBannerWrapper";
 
 /**
@@ -34,6 +35,7 @@ export default function ChromeLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <OnboardingBanner />
+      <WelcomeRedirect />
       <OnboardingRedirect />
       <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 py-8 animate-fade-in-up">
         {children}

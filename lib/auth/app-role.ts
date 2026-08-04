@@ -82,6 +82,17 @@ export async function getNavLinks(
     ];
   }
 
+  // Pending integrator (awaiting production approval): limited nav.
+  if (!forced) {
+    const { isPendingIntegrator } = await import("@/lib/auth/account-type");
+    if (await isPendingIntegrator(userId)) {
+      return [
+        { href: "/partner/activation", label: "Activación" },
+        { href: "/docs", label: "Documentación" },
+      ];
+    }
+  }
+
   const links: NavLink[] = [
     { href: "/", label: "Inicio" },
     { href: "/invoices", label: "Facturas" },
@@ -118,6 +129,7 @@ export async function getNavLinks(
  * Determine default landing route for a logged-in user based on their role.
  * - partner-only (Gestoría / B2B): /partner
  * - admin (Plataforma Operador): /admin
+ * - pending integrator (prod, awaiting approval): /partner/activation
  * - user (Autónomo / Pyme Web): /invoices
  */
 export async function getDefaultAppRedirect(userId: string): Promise<string> {
@@ -143,5 +155,16 @@ export async function getDefaultAppRedirect(userId: string): Promise<string> {
   }
 
   if (partner && !admin) return "/partner";
+
+  // Avoid circular import of account-type helpers at module top for nav-only paths;
+  // lazy import keeps getNavLinks free of activation logic.
+  const { isPendingIntegrator, getUserAccountType, shouldSkipWelcome } = await import(
+    "@/lib/auth/account-type"
+  );
+  if (await isPendingIntegrator(userId)) return "/partner/activation";
+  if (!(await shouldSkipWelcome(userId)) && !(await getUserAccountType(userId))) {
+    return "/welcome";
+  }
+
   return "/invoices";
 }

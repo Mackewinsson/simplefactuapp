@@ -174,6 +174,32 @@ model AdminActionLog {
   @@map("admin_action_logs")
 }
 
+enum ActivationRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Integrator requests production access after sandbox testing (admin approves).
+model ActivationRequest {
+  id           String                   @id @default(cuid())
+  userId       String
+  email        String
+  companyName  String
+  nif          String
+  message      String?                  @db.Text
+  status       ActivationRequestStatus  @default(PENDING)
+  createdAt    DateTime                 @default(now())
+  decidedAt    DateTime?
+  decidedBy    String?
+  decisionNote String?                  @db.Text
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("activation_requests")
+}
+
 /// Lemon Squeezy subscription state (source of truth for billing UI).
 model Subscription {
   userId              String    @id

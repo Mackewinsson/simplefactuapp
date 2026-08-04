@@ -1,11 +1,27 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { requirePartner } from "@/lib/auth/partner";
 import { PartnerNav } from "./PartnerNav";
 import { privatePageMetadata } from "@/lib/seo/robots";
 
 export const metadata: Metadata = privatePageMetadata;
 
+async function isActivationPath(): Promise<boolean> {
+  const h = await headers();
+  const pathname = h.get("x-pathname") || "";
+  return pathname === "/partner/activation" || pathname.startsWith("/partner/activation/");
+}
+
 export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
+  // /partner/activation must be reachable before partner role is granted.
+  if (await isActivationPath()) {
+    const { userId } = await auth();
+    if (!userId) redirect("/sign-in");
+    return <div className="animate-fade-in-up">{children}</div>;
+  }
+
   await requirePartner();
 
   return (
