@@ -48,6 +48,10 @@ export async function requirePartner(): Promise<{ userId: string }> {
   ]);
 
   if (!isPartner && !isAdmin) {
+    const { isPendingIntegrator } = await import("@/lib/auth/account-type");
+    if (await isPendingIntegrator(userId)) {
+      redirect("/partner/activation");
+    }
     redirect("/partner-access-denied");
   }
   return { userId };

@@ -2,6 +2,7 @@
 export function isOnboardingExemptPath(pathname: string): boolean {
   return (
     pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/welcome") ||
     pathname.startsWith("/settings") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/partner") ||

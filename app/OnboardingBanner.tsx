@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { isPendingIntegrator } from "@/lib/auth/account-type";
 import { getOnboardingStatus } from "@/lib/verifactu/onboarding-status";
 import { OnboardingBannerDismissWrapper } from "./OnboardingBannerDismissWrapper";
 
@@ -10,6 +11,8 @@ import { OnboardingBannerDismissWrapper } from "./OnboardingBannerDismissWrapper
 export async function OnboardingBanner() {
   const { userId } = await auth();
   if (!userId) return null;
+
+  if (await isPendingIntegrator(userId)) return null;
 
   try {
     const status = await getOnboardingStatus(userId);
