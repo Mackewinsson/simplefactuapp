@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { isPendingIntegrator } from "@/lib/auth/account-type";
+import {
+  getUserAccountType,
+  isPendingIntegrator,
+  needsAccountTypeSelection,
+} from "@/lib/auth/account-type";
 import { getOnboardingStatus } from "@/lib/verifactu/onboarding-status";
 import { OnboardingBannerDismissWrapper } from "./OnboardingBannerDismissWrapper";
 
@@ -13,6 +17,10 @@ export async function OnboardingBanner() {
   if (!userId) return null;
 
   if (await isPendingIntegrator(userId)) return null;
+  // Don't provision / flash autónomo onboarding before account type is chosen.
+  if (await needsAccountTypeSelection(userId)) return null;
+  const accountType = await getUserAccountType(userId);
+  if (accountType === "integrator") return null;
 
   try {
     const status = await getOnboardingStatus(userId);
