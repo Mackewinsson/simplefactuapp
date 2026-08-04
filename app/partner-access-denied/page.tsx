@@ -1,8 +1,25 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
+import { getUserAccountType } from "@/lib/auth/account-type";
 
 export default async function PartnerAccessDeniedPage() {
   const { userId } = await auth();
+  const accountType = userId ? await getUserAccountType(userId) : null;
+
+  if (accountType === "integrator") {
+    return (
+      <div className="mx-auto max-w-lg space-y-4">
+        <h1 className="text-xl font-semibold text-fg">Activación de producción pendiente</h1>
+        <p className="text-sm text-fg-muted">
+          Tu cuenta de integrador aún no tiene acceso a la consola de producción.
+          Prueba primero en sandbox y solicita la activación.
+        </p>
+        <Link href="/partner/activation" className="btn btn-primary inline-flex">
+          Ir a activación →
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-lg space-y-4">
@@ -15,12 +32,14 @@ export default async function PartnerAccessDeniedPage() {
         <p className="font-medium text-fg">Cómo habilitar el acceso</p>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>
-            Añade tu ID de Clerk a{" "}
-            <code className="text-xs">PARTNER_CLERK_USER_IDS</code> en Vercel o{" "}
-            <code className="text-xs">.env.local</code>.
+            Si eres integrador API, completa el flujo en{" "}
+            <Link href="/partner/activation" className="text-accent underline-offset-2 hover:underline">
+              /partner/activation
+            </Link>
+            .
           </li>
           <li>
-            O asigna{" "}
+            O pide a un operador que te asigne{" "}
             <code className="text-xs">publicMetadata.role = &quot;partner&quot;</code> en Clerk.
           </li>
         </ul>

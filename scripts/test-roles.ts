@@ -97,6 +97,10 @@ test("onboarding exempt: auth paths", () => {
 test("onboarding exempt: /onboarding paths", () => {
   assert.equal(isOnboardingExemptPath("/onboarding"), true);
   assert.equal(isOnboardingExemptPath("/onboarding/step-2"), true);
+
+  // Welcome (account type picker)
+  assert.equal(isOnboardingExemptPath("/welcome"), true);
+  assert.equal(isOnboardingExemptPath("/welcome/"), true);
 });
 
 test("onboarding exempt: /legal paths", () => {

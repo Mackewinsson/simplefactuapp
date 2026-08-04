@@ -55,7 +55,20 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 
 ## Desglose (`detalles`)
 
-Array de 1–12 líneas. En OpenAPI solo `base` aparece como `required` incondicional; en tiempo de ejecución el servidor exige además coherencia AEAT (igual que en la [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice)):
+Array de **1–12 líneas**. Cada línea debe indicar el **tipo de operación fiscal**; no basta con enviar solo `base`.
+
+### Campos obligatorios por caso
+
+| Caso | Qué enviar (obligatorio) | No enviar |
+|------|--------------------------|-----------|
+| **IVA sujeta (habitual)** | `base`, `clave`, `calif: "S1"`, `tipo`, `cuota` | — |
+| **Exenta** | `base`, `clave`, `causaExencion` (`E1`–`E6`) | `tipo`, `cuota`, recargo |
+| **No sujeta** | `base`, `clave`, `calif: "N1"` o `"N2"` | `tipo`, `cuota`, recargo |
+| **Inversión SP** | `base`, `clave`, `calif: "S2"`, `tipo: 0`, `cuota: 0` | recargo |
+
+En la [Referencia API](/docs/api-reference#tag/Facturas/POST/send-invoice), el desplegable de cada línea de `detalles` muestra estos cuatro esquemas con los campos marcados como **required**.
+
+### Detalle de campos
 
 | Campo | Notas |
 |-------|-------|
@@ -69,10 +82,23 @@ Array de 1–12 líneas. En OpenAPI solo `base` aparece como `required` incondic
 | Recargo | Solo con `calif=S1`; `tipoRecargoEquivalencia` y `cuotaRecargoEquivalencia` juntos (1281/1284). |
 | `baseImponibleACoste` | Solo con `clave=06` o `impuesto` `02`/`05` (1257). |
 
-Ejemplos:
+### Ejemplos
+
+**IVA al 21 % (caso habitual):**
 
 ```json
 { "clave": "01", "calif": "S1", "tipo": 21, "base": 100, "cuota": 21 }
+```
+
+**Anticipo F2 con IVA (como el de vuestro integrador):**
+
+```json
+{ "clave": "01", "calif": "S1", "tipo": 21, "base": 0.83, "cuota": 0.1735 }
+```
+
+**Exenta / no sujeta:**
+
+```json
 { "clave": "01", "causaExencion": "E1", "base": 200 }
 { "clave": "01", "calif": "N1", "base": 1000 }
 ```

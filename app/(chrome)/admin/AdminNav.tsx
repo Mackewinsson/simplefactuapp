@@ -9,6 +9,7 @@ export function AdminNav() {
   const links = [
     { href: "/admin", label: "Inicio", exact: true },
     { href: "/admin/users", label: "Usuarios" },
+    { href: "/admin/requests", label: "Solicitudes" },
     { href: "/admin/jobs", label: "Jobs AEAT" },
     { href: "/admin/system", label: "Sistema" },
     { href: "/admin/support", label: "Soporte" },
