@@ -47,8 +47,11 @@ export async function getUserAccountType(userId: string): Promise<AccountType | 
 }
 
 /**
- * Legacy users (pre-welcome flow) and admins/partners skip /welcome.
- * New users without accountType must pick one.
+ * Admins/partners and users who already chose accountType skip /welcome.
+ * Legacy users (pre-welcome) skip only if they already used the app
+ * (issuer profile or any invoice) — NOT merely because a Verifactu row
+ * exists: Clerk webhook / lazy provision creates that on signup and would
+ * otherwise bounce new users off /welcome immediately.
  */
 export async function shouldSkipWelcome(userId: string): Promise<boolean> {
   const [admin, partner, accountType] = await Promise.all([
@@ -63,7 +66,7 @@ export async function shouldSkipWelcome(userId: string): Promise<boolean> {
   const [verifactu, invoice] = await Promise.all([
     prisma.userVerifactuAccount.findUnique({
       where: { userId },
-      select: { userId: true },
+      select: { issuerNif: true, issuerLegalName: true },
     }),
     prisma.invoice.findFirst({
       where: { userId },
@@ -71,7 +74,17 @@ export async function shouldSkipWelcome(userId: string): Promise<boolean> {
     }),
   ]);
 
-  return Boolean(verifactu || invoice);
+  const hasIssuerProfile = Boolean(
+    verifactu?.issuerNif?.trim() && verifactu?.issuerLegalName?.trim()
+  );
+  return Boolean(hasIssuerProfile || invoice);
+}
+
+/**
+ * True when the user must still pick autónomo vs integrador.
+ */
+export async function needsAccountTypeSelection(userId: string): Promise<boolean> {
+  return !(await shouldSkipWelcome(userId));
 }
 
 /**
