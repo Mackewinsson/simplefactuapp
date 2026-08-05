@@ -1,6 +1,12 @@
 import type { MetadataRoute } from "next";
-import { articles } from "@/lib/blog/articles";
+import {
+  articles,
+  CORNERSTONE_SLUGS,
+  getArticleLastModified,
+} from "@/lib/blog/articles";
 import { getSiteUrl } from "@/lib/seo/site-url";
+
+const CORNERSTONE = new Set<string>(CORNERSTONE_SLUGS);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
@@ -40,12 +46,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/legal/accesibilidad`, lastModified: staticLastMod, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const blogRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${base}/blog/${article.slug}`,
-    lastModified: new Date(article.date),
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+  const blogRoutes: MetadataRoute.Sitemap = articles.map((article) => {
+    const isCornerstone = CORNERSTONE.has(article.slug);
+    return {
+      url: `${base}/blog/${article.slug}`,
+      lastModified: new Date(getArticleLastModified(article)),
+      changeFrequency: isCornerstone ? "weekly" : "monthly",
+      priority: isCornerstone ? 0.9 : 0.7,
+    };
+  });
 
   return [...staticRoutes, ...blogRoutes];
 }

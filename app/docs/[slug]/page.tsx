@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { docsBrowserPageTitle } from "@/lib/branding";
+import { absoluteTitle, docsBrowserPageTitle } from "@/lib/branding";
 import { getDocPage, listDocSlugs } from "@/lib/docs/source";
 import { DocBody } from "../DocBody";
 import { publicRobots } from "@/lib/seo/robots";
@@ -31,7 +31,7 @@ export async function generateMetadata({
   const page = await getDocPage(slug);
   if (!page) return { title: "No encontrado" };
   return {
-    title: docsBrowserPageTitle(page.frontmatter.title),
+    title: absoluteTitle(docsBrowserPageTitle(page.frontmatter.title)),
     description: page.frontmatter.description,
     robots: publicRobots,
     alternates: { canonical: canonicalUrl(`/docs/${slug}`) },

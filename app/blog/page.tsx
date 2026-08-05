@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { articles, formatArticleDate } from "@/lib/blog/articles";
+import { absoluteTitle } from "@/lib/branding";
+import {
+  articles,
+  formatArticleDate,
+  getCornerstoneArticles,
+} from "@/lib/blog/articles";
 import { BrandWordmark } from "../BrandWordmark";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
-  title: "Blog sobre Veri*Factu y facturación electrónica — Simple*Factu",
+  title: absoluteTitle("Blog Veri*Factu: guías de facturación electrónica"),
   description:
-    "Artículos, guías y tutoriales sobre Veri*Factu, facturación electrónica, obligaciones fiscales para autónomos y pymes en España.",
+    "Guías prácticas sobre Veri*Factu: certificado FNMT, primera factura a la AEAT, plazos legales y software compatible para autónomos y pymes en España.",
   robots: publicRobots,
   alternates: {
     canonical: canonicalUrl("/blog"),
@@ -27,6 +32,8 @@ export const metadata: Metadata = {
 const sorted = [...articles].sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
 );
+
+const cornerstone = getCornerstoneArticles();
 
 export default function BlogPage() {
   return (
@@ -66,6 +73,39 @@ export default function BlogPage() {
           la AEAT, obligaciones fiscales y herramientas de facturación.
         </p>
 
+        {cornerstone.length > 0 && (
+          <section className="mb-12 rounded-xl border border-outline-soft bg-surface-muted p-5">
+            <h2 className="mb-1 text-base font-semibold text-fg">
+              Empieza por aquí
+            </h2>
+            <p className="mb-4 text-sm text-fg-muted">
+              El recorrido completo, de la normativa a tu primera factura
+              enviada a la AEAT.
+            </p>
+            <ol className="space-y-2">
+              {cornerstone.map((article, index) => (
+                <li key={article.slug} className="flex gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-0.5 text-xs font-semibold tabular-nums text-fg-subtle"
+                  >
+                    {index + 1}.
+                  </span>
+                  <Link
+                    href={`/blog/${article.slug}`}
+                    className="text-sm font-medium text-fg hover:text-brand"
+                  >
+                    {article.title}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        <h2 className="mb-6 text-base font-semibold text-fg">
+          Todos los artículos
+        </h2>
         <ol className="space-y-6" reversed>
           {sorted.map((article) => (
             <li key={article.slug}>
@@ -83,9 +123,9 @@ export default function BlogPage() {
                   </span>
                 </div>
                 <Link href={`/blog/${article.slug}`} className="block">
-                  <h2 className="mb-2 text-lg font-semibold text-fg group-hover:text-brand">
+                  <h3 className="mb-2 text-lg font-semibold text-fg group-hover:text-brand">
                     {article.title}
-                  </h2>
+                  </h3>
                   <p className="text-sm text-fg-muted">{article.excerpt}</p>
                 </Link>
                 <div className="mt-3 flex flex-wrap gap-1.5">

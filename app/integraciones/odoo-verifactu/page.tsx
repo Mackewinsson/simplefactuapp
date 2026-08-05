@@ -4,13 +4,14 @@ import {
   buildIntegrationJsonLd,
   getIntegrationPage,
 } from "@/lib/seo/integration-pages";
+import { absoluteTitle } from "@/lib/branding";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl } from "@/lib/seo/site-url";
 
 const page = getIntegrationPage("odoo-verifactu")!;
 
 export const metadata: Metadata = {
-  title: page.metaTitle,
+  title: absoluteTitle(page.metaTitle),
   description: page.metaDescription,
   robots: publicRobots,
   alternates: { canonical: canonicalUrl(page.path) },

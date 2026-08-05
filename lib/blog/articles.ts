@@ -1,11 +1,24 @@
+import type { FAQItem } from "@/lib/seo/schema";
+
 export interface Article {
   slug: string;
   title: string;
   excerpt: string;
   date: string; // ISO YYYY-MM-DD
+  /** ISO YYYY-MM-DD. Drives dateModified + sitemap lastModified when present. */
+  updated?: string;
   readingMinutes: number;
   tags: string[];
   seoDescription: string;
+  /**
+   * SERP `<title>`. Used verbatim (no brand suffix) so it stays under ~60
+   * characters and Google renders it instead of rewriting it.
+   */
+  seoTitle?: string;
+  /** Rendered on the page and emitted as FAQPage structured data. */
+  faqs?: FAQItem[];
+  /** Topical cluster links. Overrides the chronological prev/next navigation. */
+  relatedSlugs?: string[];
   content: string; // HTML string
 }
 
@@ -16,10 +29,17 @@ export const articles: Article[] = [
     excerpt:
       "El sistema Veri*Factu de la AEAT obliga a los programas de facturación a enviar cada registro en tiempo real. Te explicamos qué significa, quién está obligado y cómo afecta a tu día a día.",
     date: "2026-05-15",
+    updated: "2026-08-05",
     readingMinutes: 6,
     tags: ["verifactu", "autonomos", "facturacion-electronica"],
+    seoTitle: "Qué es Veri*Factu: guía para autónomos y pymes 2026",
     seoDescription:
       "Guía completa sobre Veri*Factu 2026: qué es, quién está obligado, plazos y cómo cumplir con el RD 1007/2023 y la OM HAC/1177/2024 desde tu programa de facturación.",
+    relatedSlugs: [
+      "certificado-digital-fnmt-verifactu",
+      "primera-factura-electronica-aeat-verifactu",
+      "factusol-verifactu-compatibilidad-migracion",
+    ],
     content: `
 <h2>¿Qué es Veri*Factu?</h2>
 <p>
@@ -76,7 +96,26 @@ export const articles: Article[] = [
   Sí. Para enviar facturas a través de Veri*Factu necesitas un <strong>certificado digital PKCS#12 (.pfx o .p12)</strong> emitido por la FNMT u otra entidad reconocida. Es el mismo certificado que usas para otros trámites con la AEAT.
 </p>
 <p>
+  Cómo solicitarlo, exportarlo al formato correcto y resolver los errores más frecuentes está detallado en la guía del
+  <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para facturas</a>.
+</p>
+<p>
   Simple*Factu almacena tu certificado cifrado con AES-256-GCM. Nunca sale del servidor en texto claro.
+</p>
+
+<h2>¿Y mi programa de facturación actual?</h2>
+<p>
+  La obligación recae sobre el software: debe ser un <strong>sistema informático de facturación (SIF) conforme</strong> capaz de generar la huella encadenada y remitir el registro. Antes de cambiar de herramienta, comprueba si la tuya ya se ha adaptado:
+</p>
+<ul>
+  <li><a href="/blog/factusol-verifactu-compatibilidad-migracion">FactuSOL y Veri*Factu</a>: qué versión necesitas y cómo migrar.</li>
+  <li><a href="/blog/contasimple-verifactu-diferencias-cuando-usar-cada-uno">ContaSimple y Veri*Factu</a>: diferencias y cuándo usar cada uno.</li>
+  <li><a href="/blog/odoo-verifactu-integracion-modulos-cumplimiento">Odoo y Veri*Factu</a>: módulos OCA e integración por API.</li>
+</ul>
+<p>
+  Y si prefieres empezar por el final, la guía de
+  <a href="/blog/primera-factura-electronica-aeat-verifactu">tu primera factura electrónica a la AEAT</a>
+  recorre el flujo completo de principio a fin.
 </p>
 
 <h2>Resumen</h2>
@@ -88,13 +127,14 @@ export const articles: Article[] = [
   {
     slug: "obligados-verifactu-quien-afecta-cuando",
     title: "¿Quién está obligado a Veri*Factu y desde cuándo?",
+    seoTitle: "¿Quién está obligado a Veri*Factu? Fechas y excepciones",
     excerpt:
       "No todos los empresarios se enfrentan a los mismos plazos. Descubre si estás en el SII, si eres REAGI, o si Veri*Factu te aplica directamente, y cuándo tienes que tenerlo operativo.",
     date: "2026-05-10",
     readingMinutes: 4,
     tags: ["verifactu", "obligados", "plazos"],
     seoDescription:
-      "¿Estás obligado a Veri*Factu? Consulta los plazos del RD 1007/2023: autónomos, pymes, SII, REAGI y excepciones. Todo lo que necesitas saber antes del 1 de enero de 2026.",
+      "¿Estás obligado a Veri*Factu? Plazos del RD 1007/2023 para autónomos y pymes, quién queda fuera por el SII o el régimen de módulos, y desde qué fecha te aplica.",
     content: `
 <h2>El mapa de obligados</h2>
 <p>
@@ -148,20 +188,78 @@ export const articles: Article[] = [
     slug: "primera-factura-electronica-aeat-verifactu",
     title: "Cómo enviar tu primera factura electrónica a la AEAT con Veri*Factu",
     excerpt:
-      "Paso a paso: desde obtener el certificado FNMT hasta ver el CSV en el PDF de tu factura. Sin tecnicismos innecesarios.",
+      "Paso a paso: desde configurar tu programa de facturación hasta ver el CSV y el QR en el PDF de tu factura. Sin tecnicismos innecesarios.",
     date: "2026-05-05",
-    readingMinutes: 5,
-    tags: ["verifactu", "tutorial", "facturacion-electronica", "fnmt"],
+    updated: "2026-08-05",
+    readingMinutes: 9,
+    tags: ["verifactu", "tutorial", "facturacion-electronica", "aeat"],
+    seoTitle: "Factura FNMT y Veri*Factu: primera factura a la AEAT",
     seoDescription:
-      "Tutorial paso a paso para enviar tu primera factura a la AEAT con Veri*Factu: certificado FNMT, configuración del software y verificación del CSV. Guía para autónomos.",
+      "Factura FNMT con certificado digital: cómo emitir y enviar tu primera factura electrónica a la AEAT (CSV, QR, errores). Guía Veri*Factu paso a paso.",
+    relatedSlugs: [
+      "certificado-digital-fnmt-verifactu",
+      "verifactu-para-autonomos-pasos-certificado-primera-factura",
+      "error-frustrante-facturacion-aeat-timeouts",
+    ],
+    faqs: [
+      {
+        question: "¿Qué necesito para enviar mi primera factura electrónica a la AEAT?",
+        answer:
+          "Tres cosas: un programa de facturación conforme al RD 1007/2023, un certificado digital en formato .pfx o .p12 cuyo NIF coincida con el del emisor, y los datos fiscales del cliente (nombre y NIF). No hace falta darse de alta en ningún registro previo de la AEAT ni solicitar autorización.",
+      },
+      {
+        question: "¿Hay que comunicar a la AEAT que empiezas a usar Veri*Factu?",
+        answer:
+          "No hay un trámite de alta previo. El primer registro de facturación que tu software remite es, en la práctica, tu incorporación al sistema. Sí conviene guardar la declaración responsable del fabricante del software, que acredita que el programa cumple los requisitos técnicos.",
+      },
+      {
+        question: "¿Cuánto tarda la AEAT en responder a un envío Veri*Factu?",
+        answer:
+          "Habitualmente entre 1 y 5 segundos. El servicio admite lotes y responde con un estado global (Correcto, ParcialmenteCorrecto o Incorrecto) más el detalle por registro. Si la AEAT no responde, el envío debe reintentarse: la normativa exige remitir el registro, no que se acepte al primer intento.",
+      },
+      {
+        question: "¿Qué es el CSV que devuelve la AEAT en una factura?",
+        answer:
+          "El CSV (Código Seguro de Verificación) es el identificador que la Agencia Tributaria asigna al registro de facturación aceptado. Se imprime en el PDF de la factura junto al código QR y permite que tu cliente compruebe en la sede electrónica de la AEAT que esa factura fue efectivamente declarada.",
+      },
+      {
+        question: "¿Qué pasa si mi primera factura la rechaza la AEAT?",
+        answer:
+          "El registro no queda anotado y debes corregir el dato que provocó el error y reenviarlo. Los rechazos más comunes en el primer envío son el NIF del emisor distinto al del certificado (error 4116), la huella mal calculada por el formato de los importes (error 2000) y campos obligatorios ausentes en el XML (error 4102).",
+      },
+      {
+        question: "¿Puedo seguir haciendo facturas en Word o Excel?",
+        answer:
+          "No para las operaciones sujetas a la obligación. Desde la entrada en vigor del RD 1007/2023, las facturas deben generarse con un sistema informático de facturación conforme que produzca el registro encadenado con huella SHA-256. Una plantilla de Word o Excel no cumple los requisitos de inalterabilidad y trazabilidad.",
+      },
+    ],
     content: `
 <h2>Lo que necesitas antes de empezar</h2>
 <ol>
-  <li><strong>Certificado digital FNMT</strong> en formato .pfx o .p12. Si solo tienes el .cer, necesitas el .pfx que incluye la clave privada. Solicitarlo en <a href="https://www.sede.fnmt.gob.es" target="_blank" rel="noreferrer">sede.fnmt.gob.es</a>.</li>
+  <li><strong>Un certificado digital</strong> en formato .pfx o .p12 (con clave privada). Si aún no lo tienes, empieza por la guía del <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para facturas</a>, que cubre solicitud, exportación y errores.</li>
   <li><strong>Contraseña del certificado</strong> que estableciste al exportarlo.</li>
   <li><strong>Tu NIF</strong>: debe coincidir exactamente con el del certificado. Extráelo con: <code>openssl pkcs12 -info -in certificado.p12 -passin pass:TU_PASS -noout</code></li>
-  <li><strong>Cuenta en Simple*Factu</strong> (o en el programa de facturación que uses).</li>
+  <li><strong>Los datos fiscales del cliente</strong>: nombre o razón social y NIF válido.</li>
+  <li><strong>Cuenta en Simple*Factu</strong> (o en el programa de facturación conforme que uses).</li>
 </ol>
+<p>
+  No necesitas ningún alta previa ante la Agencia Tributaria: <strong>no existe un trámite de registro en Veri*Factu</strong>. El primer envío correcto es tu incorporación efectiva al sistema.
+</p>
+
+<h2>Qué es exactamente lo que se envía a la AEAT</h2>
+<p>
+  Conviene entender la diferencia, porque genera mucha confusión: <strong>a la AEAT no le envías el PDF de la factura</strong>. Le envías un <em>registro de facturación</em>, que es un resumen estructurado con los datos fiscales relevantes:
+</p>
+<ul>
+  <li>NIF del emisor y del destinatario.</li>
+  <li>Serie, número y fecha de expedición.</li>
+  <li>Descripción de la operación, base imponible, tipo y cuota de IVA, y total.</li>
+  <li>La <strong>huella SHA-256</strong> del registro, encadenada con la huella del registro anterior.</li>
+  <li>La identificación del sistema informático de facturación (SIF) que lo genera.</li>
+</ul>
+<p>
+  La factura en sí — su diseño, su PDF, cómo se la haces llegar a tu cliente — sigue siendo asunto tuyo. Lo único que cambia es que ahora cada factura deja una anotación en Hacienda en el momento de emitirse.
+</p>
 
 <h2>Paso 1: Sube tu certificado</h2>
 <p>
@@ -218,18 +316,47 @@ rm /tmp/cert.pem</code></pre>
     <tr><td>4109</td><td>NIF fabricante SIF incorrecto</td><td>El NIF del sistema informático debe ser real</td></tr>
     <tr><td>2000</td><td>Huella incorrecta</td><td>Suele ser formato de importes; usa el CSV de error para depurar</td></tr>
     <tr><td>4102</td><td>XML no conforme al XSD</td><td>Falta un campo obligatorio en el XML</td></tr>
+    <tr><td>1100</td><td>Valor no permitido en un campo de tipo enumerado</td><td>Revisa clave de régimen y tipo de factura (F1, F2, R1…)</td></tr>
+    <tr><td>3000</td><td>Registro duplicado (misma serie y número)</td><td>Ya estaba anotado: consulta el registro antes de reenviar</td></tr>
   </tbody>
 </table>
-
-<h2>¡Listo!</h2>
 <p>
-  Una vez completados estos pasos, tienes tu primera factura registrada en Veri*Factu. A partir de aquí, cada nueva factura se encadena con la anterior automáticamente. No tienes que hacer nada más.
+  Si el problema no es de datos sino de conexión (timeouts, cortes intermitentes del servicio de la AEAT), el diagnóstico es distinto: lo cubrimos en
+  <a href="/blog/error-frustrante-facturacion-aeat-timeouts">errores comunes al conectar Veri*Factu con la AEAT</a>.
+</p>
+
+<h2>Qué hacer si te equivocas en una factura ya enviada</h2>
+<p>
+  Un registro remitido a la AEAT <strong>no se puede borrar ni editar</strong>: esa es precisamente la garantía de inalterabilidad que persigue la norma. Tienes dos vías:
+</p>
+<ul>
+  <li><strong>Anulación</strong>: si la factura nunca debió existir, se envía un registro de anulación que deja constancia de la baja, sin eliminar el original.</li>
+  <li><strong>Factura rectificativa</strong>: si hay que corregir importes o datos, se emite una factura rectificativa (tipo R1–R5) que referencia a la original.</li>
+</ul>
+<p>
+  En ambos casos, la cadena de huellas continúa: cada movimiento queda encadenado y auditable.
+</p>
+
+<h2>A partir de la segunda factura</h2>
+<p>
+  Lo bueno del primer envío es que solo se hace una vez. Con el certificado ya cargado y la serie iniciada, cada nueva factura se encadena automáticamente con la anterior y se remite sin intervención. Las únicas cosas que requerirán tu atención con el tiempo son:
+</p>
+<ul>
+  <li><strong>La caducidad del certificado</strong> (4 años en persona física, 2 en representante de persona jurídica).</li>
+  <li><strong>Los cambios de serie</strong>, que inician una cadena nueva marcada como primer registro.</li>
+  <li><strong>Los envíos en estado incorrecto</strong>, que conviene revisar periódicamente para que no se acumulen registros sin anotar.</li>
+</ul>
+<p>
+  Si quieres hacerlo sin montar SOAP ni mTLS a mano,
+  <a href="/sign-up">crea una cuenta gratis en Simple*Factu</a>
+  o vuelve a la <a href="/">página de inicio</a> para ver planes y documentación.
 </p>
     `.trim(),
   },
   {
     slug: "verifactu-vs-sii-diferencias",
     title: "Veri*Factu vs SII: diferencias clave que debes conocer",
+    seoTitle: "Veri*Factu vs SII: diferencias y cuál te aplica",
     excerpt:
       "Muchos autónomos confunden Veri*Factu con el SII. Son sistemas distintos con obligados distintos. Te explicamos cuál te aplica y por qué no puedes sustituir uno por otro.",
     date: "2026-04-28",
@@ -304,15 +431,85 @@ rm /tmp/cert.pem</code></pre>
   },
   {
     slug: "certificado-digital-fnmt-verifactu",
-    title: "Certificado digital FNMT para Veri*Factu: obtención y configuración",
+    title: "Certificado digital FNMT para facturas y Veri*Factu",
     excerpt:
-      "Todo lo que necesitas saber sobre el certificado FNMT para enviar facturas a la AEAT: cómo solicitarlo, exportarlo en formato .pfx y subirlo a tu programa de facturación.",
+      "Todo lo que necesitas saber sobre el certificado FNMT para emitir facturas y enviarlas a la AEAT: cómo solicitarlo, exportarlo en formato .pfx y configurarlo en tu programa de facturación.",
     date: "2026-04-20",
-    readingMinutes: 5,
-    tags: ["fnmt", "certificado-digital", "verifactu", "tutorial"],
+    updated: "2026-08-05",
+    readingMinutes: 11,
+    tags: ["fnmt", "certificado-digital", "verifactu", "facturas", "tutorial"],
+    seoTitle: "Descargar certificado FNMT para facturas (CERES)",
     seoDescription:
-      "Cómo obtener el certificado digital FNMT para Veri*Factu, exportarlo como .pfx y configurarlo en tu software de facturación. Guía paso a paso para autónomos 2026.",
+      "Cómo descargar el certificado digital FNMT/CERES (.pfx) para emitir facturas Veri*Factu: solicitud, exportación, renovación y errores frecuentes.",
+    relatedSlugs: [
+      "primera-factura-electronica-aeat-verifactu",
+      "verifactu-para-autonomos-pasos-certificado-primera-factura",
+      "que-es-verifactu-guia-autonomos-2026",
+    ],
+    faqs: [
+      {
+        question: "¿Se pueden hacer facturas con el certificado digital FNMT?",
+        answer:
+          "El certificado FNMT no emite facturas por sí mismo: no es un programa de facturación. Lo que hace es firmar e identificarte ante la AEAT cuando tu software envía cada registro de facturación por Veri*Factu. Necesitas las dos piezas: un programa de facturación conforme al RD 1007/2023 y el certificado FNMT en formato .pfx o .p12 cargado en él.",
+      },
+      {
+        question: "¿Qué certificado FNMT necesito si soy autónomo?",
+        answer:
+          "El certificado de Persona Física, asociado a tu DNI o NIE. Si facturas a través de una sociedad (SL o SA), necesitas el certificado de Representante de Persona Jurídica, asociado al CIF de la empresa. El NIF del certificado debe coincidir exactamente con el NIF del obligado tributario que emite la factura.",
+      },
+      {
+        question: "¿El certificado FNMT es gratis?",
+        answer:
+          "El certificado de Persona Física de la FNMT es gratuito. Los certificados de Representante de Persona Jurídica tienen un coste (unos 14 € + IVA en el momento de escribir esto, por 2 años) que se abona en el momento de la solicitud.",
+      },
+      {
+        question: "¿Cómo convierto mi certificado .cer en .pfx?",
+        answer:
+          "No se puede: un archivo .cer contiene solo la parte pública del certificado. El .pfx (o .p12) incluye además la clave privada, y solo puede generarse exportándolo desde el almacén del equipo o navegador donde se instaló originalmente el certificado. Si perdiste ese equipo, tendrás que volver a solicitar el certificado a la FNMT.",
+      },
+      {
+        question: "¿Por qué mi certificado FNMT da el error «Unsupported PKCS12 PFX data»?",
+        answer:
+          "Porque el archivo usa el cifrado antiguo RC2-40-CBC, que OpenSSL 3 (y por tanto Node.js 18 o superior) ya no admite. Se resuelve reexportando el certificado con OpenSSL usando el flag -legacy para leerlo y volviéndolo a empaquetar con AES-256.",
+      },
+      {
+        question: "¿Cada cuánto caduca el certificado FNMT?",
+        answer:
+          "Los certificados FNMT de Persona Física caducan a los 4 años y los de Representante de Persona Jurídica a los 2 años. Cuando caduca, tu software deja de poder enviar facturas a la AEAT: renuévalo con antelación y vuelve a subir el .pfx nuevo a tu programa de facturación.",
+      },
+    ],
     content: `
+<h2>Resumen rápido</h2>
+<p>
+  El <strong>certificado digital FNMT no crea facturas</strong>: es la llave que acredita tu identidad ante la Agencia Tributaria. Para facturar con Veri*Factu necesitas dos cosas:
+</p>
+<ol>
+  <li>Un <strong>programa de facturación conforme</strong> al RD 1007/2023 que genere la huella SHA-256 y hable con la AEAT.</li>
+  <li>Un <strong>certificado FNMT en formato .pfx o .p12</strong> (con clave privada) cargado en ese programa.</li>
+</ol>
+<p>
+  El certificado se usa en cada envío para establecer la conexión mTLS con la AEAT y firmar el registro de facturación. Sin él, tu software no puede remitir nada.
+</p>
+<p>
+  La solicitud y descarga se hacen en el portal <strong>CERES de la FNMT</strong>
+  (<a href="https://www.sede.fnmt.gob.es/certificados" target="_blank" rel="noreferrer">sede.fnmt.gob.es/certificados</a>):
+  ahí eliges persona física o representante, generas la solicitud y, tras acreditar identidad, descargas el certificado al equipo.
+</p>
+
+<h2>¿Se pueden hacer facturas con el certificado FNMT?</h2>
+<p>
+  Es la duda más frecuente y conviene despejarla: <strong>no, el certificado FNMT por sí solo no sirve para emitir facturas</strong>. La FNMT no ofrece ninguna aplicación de facturación. Lo que el certificado permite es:
+</p>
+<ul>
+  <li><strong>Identificarte</strong> ante la sede electrónica de la AEAT y otras administraciones.</li>
+  <li><strong>Autenticar el envío</strong> de cada registro de facturación por Veri*Factu mediante mTLS.</li>
+  <li><strong>Firmar electrónicamente</strong> documentos y trámites tributarios.</li>
+</ul>
+<p>
+  Dicho de otro modo: la factura la crea tu programa de facturación, y el certificado FNMT es lo que hace que la AEAT acepte ese envío como tuyo. Si buscas el flujo completo, sigue la guía de
+  <a href="/blog/primera-factura-electronica-aeat-verifactu">cómo enviar tu primera factura electrónica a la AEAT</a>.
+</p>
+
 <h2>¿Qué certificado necesito para Veri*Factu?</h2>
 <p>
   Para enviar facturas a la AEAT a través de Veri*Factu necesitas un <strong>certificado digital de persona física o jurídica</strong> emitido por una entidad de certificación reconocida. El más habitual en España es el de la <strong>FNMT-RCM (Fábrica Nacional de Moneda y Timbre)</strong>.
@@ -320,31 +517,65 @@ rm /tmp/cert.pem</code></pre>
 <p>
   El formato requerido es <strong>PKCS#12 (.pfx o .p12)</strong>: un fichero que contiene tanto el certificado público como la clave privada, protegido por una contraseña.
 </p>
+<p>
+  Un archivo <code>.cer</code> o <code>.crt</code> <strong>no vale</strong>: solo contiene la parte pública. Si únicamente tienes el .cer, necesitas exportar el .pfx desde el equipo donde instalaste el certificado.
+</p>
 
 <h2>Tipos de certificado FNMT válidos</h2>
-<ul>
-  <li><strong>Certificado de Persona Física</strong>: para autónomos que facturan a título personal. Identificado por tu DNI/NIE.</li>
-  <li><strong>Certificado de Representante de Persona Jurídica</strong>: para administradores de SL/SA que facturan en nombre de la empresa. Identificado por el CIF de la empresa.</li>
-  <li><strong>Certificado de Sede Electrónica / Empleado Público</strong>: no válido para Veri*Factu comercial.</li>
-</ul>
+<table>
+  <thead>
+    <tr><th>Tipo de certificado</th><th>Para quién</th><th>NIF asociado</th><th>Validez</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Persona Física</td><td>Autónomos que facturan a título personal</td><td>Tu DNI / NIE</td><td>4 años</td></tr>
+    <tr><td>Representante de Persona Jurídica</td><td>Administradores de SL / SA</td><td>CIF de la empresa</td><td>2 años</td></tr>
+    <tr><td>Representante de Entidad sin Personalidad Jurídica</td><td>Comunidades de bienes, herencias yacentes</td><td>NIF de la entidad</td><td>2 años</td></tr>
+    <tr><td>Sede Electrónica / Empleado Público</td><td>Administraciones</td><td>—</td><td>No válido para Veri*Factu comercial</td></tr>
+  </tbody>
+</table>
+<p>
+  <strong>Regla de oro:</strong> el NIF del certificado debe coincidir exactamente con el NIF del emisor de la factura. Si facturas como SL pero subes tu certificado de persona física, la AEAT rechazará el envío con el error 4116.
+</p>
 
 <h2>Cómo obtener el certificado FNMT (persona física)</h2>
 <ol>
   <li>Accede a <a href="https://www.sede.fnmt.gob.es/certificados/persona-fisica" target="_blank" rel="noreferrer">sede.fnmt.gob.es</a> y solicita el certificado de Persona Física.</li>
-  <li>Anota el <strong>código de solicitud</strong> que recibes.</li>
-  <li>Acredita tu identidad en una oficina de la AEAT, Seguridad Social o ayuntamiento adherido (presencialmente con DNI).</li>
-  <li>Una vez acreditado, descarga e instala el certificado en el mismo navegador/dispositivo donde hiciste la solicitud.</li>
+  <li>Anota el <strong>código de solicitud</strong> que recibes por correo electrónico. Sin él no podrás descargar nada.</li>
+  <li>Acredita tu identidad. Tienes tres vías:
+    <ul>
+      <li><strong>Presencial</strong>: en una oficina de la AEAT, Seguridad Social o ayuntamiento adherido, con tu DNI y el código de solicitud.</li>
+      <li><strong>Vídeo-identificación</strong>: online, con coste, sin desplazarte.</li>
+      <li><strong>Con DNIe o Cl@ve PIN</strong>: si ya tienes DNI electrónico operativo, el proceso es íntegramente telemático.</li>
+    </ul>
+  </li>
+  <li>Descarga e instala el certificado <strong>en el mismo navegador y equipo</strong> donde hiciste la solicitud. Este punto es crítico: si cambias de equipo o borras el perfil del navegador antes de descargarlo, pierdes la solicitud.</li>
   <li>Exporta el certificado en formato .pfx desde el almacén del navegador (ver sección siguiente).</li>
+  <li><strong>Haz una copia de seguridad</strong> del .pfx en un lugar cifrado. Es irrecuperable si lo pierdes.</li>
 </ol>
 
 <h2>Cómo exportar el certificado a .pfx</h2>
-<h3>En Windows (desde el navegador Edge/IE o el almacén de certificados)</h3>
+<h3>En Windows (Edge, Chrome o el almacén de certificados)</h3>
 <ol>
   <li>Abre el <strong>Administrador de certificados</strong> (Win+R → <code>certmgr.msc</code>).</li>
-  <li>Ve a <em>Personal → Certificados</em>, localiza el tuyo y haz clic derecho → <em>Exportar</em>.</li>
-  <li>Elige <strong>Exportar la clave privada</strong> → siguiente.</li>
-  <li>Selecciona formato <strong>PKCS#12 (.pfx)</strong>, marca "Incluir todos los certificados" y establece una contraseña segura.</li>
+  <li>Ve a <em>Personal → Certificados</em>, localiza el tuyo y haz clic derecho → <em>Todas las tareas → Exportar</em>.</li>
+  <li>Elige <strong>Exportar la clave privada</strong> → siguiente. Si esta opción aparece deshabilitada, el certificado se instaló como no exportable y tendrás que volver a solicitarlo.</li>
+  <li>Selecciona formato <strong>PKCS#12 (.pfx)</strong>, marca "Incluir todos los certificados en la ruta de certificación" y establece una contraseña segura.</li>
   <li>Guarda el fichero .pfx.</li>
+</ol>
+
+<h3>En macOS (Acceso a Llaveros)</h3>
+<ol>
+  <li>Abre <strong>Acceso a Llaveros</strong> y selecciona la categoría <em>Mis certificados</em>.</li>
+  <li>Localiza tu certificado FNMT: debe mostrar un triángulo desplegable con la clave privada dentro. Si no lo tiene, solo tienes la parte pública.</li>
+  <li>Clic derecho → <em>Exportar «…»</em> y elige el formato <strong>Intercambio de información personal (.p12)</strong>.</li>
+  <li>Establece una contraseña para el archivo y confirma con la contraseña de tu llavero.</li>
+</ol>
+
+<h3>En Firefox (cualquier sistema operativo)</h3>
+<ol>
+  <li>Ve a <em>Ajustes → Privacidad y seguridad → Certificados → Ver certificados</em>.</li>
+  <li>En la pestaña <strong>Sus certificados</strong>, selecciona el certificado FNMT y pulsa <em>Hacer copia</em>.</li>
+  <li>Guarda el archivo con extensión <code>.p12</code> y establece una contraseña.</li>
 </ol>
 
 <h3>Certificados legacy (RC2-40-CBC) y OpenSSL 3</h3>
@@ -372,14 +603,62 @@ rm /tmp/cert.pem</code></pre>
 # Subject: ..., serialNumber=IDCES-Z0706098A, ...
 # Tu NIF es el valor tras "IDCES-"</code></pre>
 
-<h2>Subir el certificado a Simple*Factu</h2>
+<h2>Cómo emitir facturas con el certificado FNMT</h2>
 <p>
-  Una vez tienes el .pfx en formato moderno, sube en <strong>Ajustes → Veri*Factu → Certificado digital</strong>. El sistema lo almacena cifrado y lo usa automáticamente para cada envío a la AEAT. No necesitas volver a subirlo a menos que caduque o lo renueves.
+  Con el .pfx listo, el flujo real de facturación es este:
+</p>
+<ol>
+  <li><strong>Sube el certificado a tu programa de facturación.</strong> En Simple*Factu, en <strong>Ajustes → Veri*Factu → Certificado digital</strong>. El sistema lo almacena cifrado con AES-256-GCM y nunca lo devuelve en texto claro por ningún endpoint.</li>
+  <li><strong>Crea la factura</strong> con los datos del cliente, las líneas y el desglose de IVA.</li>
+  <li><strong>Envíala a Veri*Factu.</strong> Tu software calcula la huella SHA-256 encadenada con la factura anterior, construye el XML y abre la conexión mTLS con la AEAT usando tu certificado FNMT.</li>
+  <li><strong>Recibe el CSV</strong> (Código Seguro de Verificación) y el código QR que se incrustan en el PDF de la factura.</li>
+</ol>
+<p>
+  El certificado interviene únicamente en el paso 3, y una vez subido no vuelves a tocarlo hasta que caduque. El detalle completo del proceso está en la guía de
+  <a href="/blog/primera-factura-electronica-aeat-verifactu">tu primera factura electrónica a la AEAT</a>.
 </p>
 
-<h2>¿Cuándo caduca el certificado?</h2>
+<h2>Errores frecuentes con el certificado FNMT</h2>
+<table>
+  <thead>
+    <tr><th>Síntoma</th><th>Causa habitual</th><th>Solución</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>"Unsupported PKCS12 PFX data"</td><td>Certificado cifrado con RC2-40-CBC (anterior a ~2023)</td><td>Reexportar con OpenSSL usando <code>-legacy</code> y AES-256</td></tr>
+    <tr><td>"Mac verify error: invalid password"</td><td>Contraseña incorrecta o caracteres no ASCII</td><td>Reexportar el .pfx con una contraseña sin acentos ni eñes</td></tr>
+    <tr><td>Error AEAT 4116 — NIF emisor no reconocido</td><td>El NIF del certificado no coincide con el del emisor</td><td>Usar el certificado del titular real (persona física o representante)</td></tr>
+    <tr><td>No aparece "Exportar la clave privada"</td><td>El certificado se instaló como no exportable</td><td>Volver a solicitarlo a la FNMT y marcar la clave como exportable</td></tr>
+    <tr><td>Envíos que fallan desde una fecha concreta</td><td>Certificado caducado o revocado</td><td>Renovar en la sede de la FNMT y volver a subir el .pfx</td></tr>
+  </tbody>
+</table>
+
+<h2>Caducidad y renovación del certificado</h2>
 <p>
-  Los certificados FNMT de persona física tienen una validez de <strong>4 años</strong>. Recibirás un aviso por email antes de la caducidad para renovarlo. La renovación puede hacerse online desde el propio navegador si el certificado aún está vigente.
+  Los certificados FNMT de <strong>persona física caducan a los 4 años</strong> y los de <strong>representante de persona jurídica a los 2 años</strong>. Recibirás un aviso por email antes de la caducidad.
+</p>
+<p>
+  La renovación puede hacerse <strong>online desde el propio navegador si el certificado aún está vigente</strong> (la FNMT abre la ventana de renovación durante los 60 días previos a la caducidad). Si dejas que caduque, tendrás que repetir el proceso completo de solicitud y acreditación de identidad.
+</p>
+<p>
+  Un certificado caducado significa que <strong>tu software deja de poder enviar facturas a la AEAT</strong>. Los registros se quedan en cola y, si el retraso se prolonga, puedes incumplir la obligación de remisión. Marca la fecha de caducidad en tu calendario con dos meses de antelación.
+</p>
+
+<h2>FNMT frente a otras opciones de identificación</h2>
+<table>
+  <thead>
+    <tr><th>Método</th><th>Sirve para Veri*Factu</th><th>Por qué</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Certificado FNMT (.pfx / .p12)</td><td>Sí</td><td>Permite el mTLS máquina a máquina que exige la AEAT</td></tr>
+    <tr><td>Otras ACs reconocidas (Camerfirma, ANF, Izenpe…)</td><td>Sí</td><td>Válidos siempre que sean cualificados y exportables a PKCS#12</td></tr>
+    <tr><td>Cl@ve PIN</td><td>No</td><td>Es autenticación interactiva de usuario, no sirve para envíos automatizados</td></tr>
+    <tr><td>DNI electrónico (DNIe)</td><td>No</td><td>La clave privada vive en el chip y no puede exportarse a un servidor</td></tr>
+  </tbody>
+</table>
+<p>
+  Cuando tengas el .pfx listo,
+  <a href="/sign-up">empieza gratis en Simple*Factu</a>
+  o consulta la <a href="/">oferta y documentación</a> en la home.
 </p>
     `.trim(),
   },
@@ -387,13 +666,42 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-y-aeat-como-se-conecta-facturacion-hacienda",
     title: "Veri*Factu y AEAT: cómo se conecta tu facturación con Hacienda",
+    seoTitle: "Cómo se conecta Veri*Factu con la AEAT (flujo)",
     excerpt:
       "Cada factura que emites viaja en tiempo real a los servidores de la Agencia Tributaria. Te explicamos qué pasa técnicamente, qué datos recibe Hacienda y qué garantías ofrece el sistema para ti y tu cliente.",
     date: "2026-05-20",
+    updated: "2026-08-05",
     readingMinutes: 6,
     tags: ["verifactu", "aeat", "software-facturacion"],
     seoDescription:
-      "Cómo se conecta Veri*Factu con la AEAT: flujo técnico completo (certificado mTLS, XML SOAP, huella SHA-256, CSV) explicado para autónomos y pymes en 2026.",
+      "Así viaja tu factura a Hacienda: certificado mTLS, XML SOAP, huella SHA-256, CSV y QR. Flujo Veri*Factu–AEAT explicado sin tecnicismos innecesarios.",
+    relatedSlugs: [
+      "primera-factura-electronica-aeat-verifactu",
+      "certificado-digital-fnmt-verifactu",
+      "verifactu-agencia-tributaria-tramites-sede-electronica",
+    ],
+    faqs: [
+      {
+        question: "¿La AEAT recibe el PDF de mi factura?",
+        answer:
+          "No. Recibe el registro de facturación (metadatos fiscales, importes, descripción y huella SHA-256), no el PDF ni adjuntos. El diseño y el envío del documento al cliente siguen siendo tuyos.",
+      },
+      {
+        question: "¿Qué es el CSV que devuelve Hacienda?",
+        answer:
+          "El CSV (Código Seguro de Verificación) identifica el registro aceptado en los sistemas de la AEAT. Se imprime en el PDF junto al QR para que el receptor pueda verificar la factura en la sede electrónica.",
+      },
+      {
+        question: "¿Qué pasa si falla la conexión con la AEAT?",
+        answer:
+          "Un software conforme debe reintentar el envío. La factura queda registrada localmente; el registro se remite cuando el servicio de la AEAT vuelve a estar disponible. La obligación es remitir, no que acepte al primer intento.",
+      },
+      {
+        question: "¿Puedo probar sin consecuencias fiscales?",
+        answer:
+          "Sí. La AEAT ofrece un entorno de preproducción (prewww1.aeat.es) con el mismo certificado real pero sin efectos fiscales. Úsalo para validar certificado, huellas y XML antes de producción.",
+      },
+    ],
     content: `
 <h2>La idea detrás de la conexión</h2>
 <p>
@@ -471,11 +779,17 @@ rm /tmp/cert.pem</code></pre>
 <p>
   La conexión entre tu facturación y la AEAT es técnicamente sencilla: un mensaje XML firmado con tu certificado, que incluye una huella encadenada con la factura anterior. Lo que hace especial a Veri*Factu no es la tecnología, sino la consecuencia: <strong>cada factura queda registrada de forma inmutable en Hacienda en el momento de emitirla</strong>. Para la mayoría de autónomos y pymes, esto es transparente si el software está bien configurado.
 </p>
+<p>
+  Para ponerlo en marcha sin implementar SOAP a mano,
+  <a href="/sign-up">crea tu cuenta en Simple*Factu</a>
+  o empieza desde la <a href="/">home del producto</a>.
+</p>
     `.trim(),
   },
   {
     slug: "verifactu-entrada-en-vigor-calendario-obligaciones",
     title: "Veri*Factu: entrada en vigor y calendario de obligaciones",
+    seoTitle: "Veri*Factu: entrada en vigor y calendario 2026-2027",
     excerpt:
       "¿Cuándo empieza a ser obligatorio Veri*Factu? Las fechas clave, quién tiene más tiempo y qué ocurre si llegas tarde. Calendario completo actualizado a 2026.",
     date: "2026-05-20",
@@ -566,6 +880,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-es-obligatorio-quien-debe-cumplir-excepciones",
     title: "¿Es obligatorio Veri*Factu? Quién debe cumplir y excepciones",
+    seoTitle: "¿Es obligatorio Veri*Factu? Quién cumple y quién no",
     excerpt:
       "No todo el mundo está obligado a Veri*Factu de la misma forma. Descubre si te afecta, qué excepciones existen y qué pasa si tu actividad está exenta de IVA o en módulos.",
     date: "2026-05-20",
@@ -658,6 +973,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-2027-plazos-cambios-que-preparar",
     title: "Veri*Factu 2027: plazos, cambios y qué preparar",
+    seoTitle: "Veri*Factu 2027: plazos, cambios y qué preparar ya",
     excerpt:
       "No hay nuevas fechas anunciadas para 2027, pero Hacienda tendrá un año completo de registros acumulados. Qué esperar y cómo adelantarte.",
     date: "2026-05-20",
@@ -720,13 +1036,42 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-agencia-tributaria-tramites-sede-electronica",
     title: "Veri*Factu en la Agencia Tributaria: trámites, sede electrónica y enlaces útiles",
+    seoTitle: "Veri*Factu en la AEAT: validar QR, CSV y trámites",
     excerpt:
       "Dónde verificar una factura Veri*Factu, cómo acceder al validador QR de la AEAT y qué trámites puedes hacer desde la sede electrónica relacionados con Veri*Factu.",
     date: "2026-05-20",
-    readingMinutes: 4,
+    updated: "2026-08-05",
+    readingMinutes: 5,
     tags: ["verifactu", "aeat", "sede-electronica", "tramites"],
     seoDescription:
-      "Cómo usar la sede electrónica de la AEAT con Veri*Factu: validar facturas con el QR, acceder al historial de registros y trámites relacionados con el RD 1007/2023.",
+      "Trámites Veri*Factu en la sede electrónica de la AEAT: validar facturas con QR, CSV, VNIF y enlaces oficiales de preproducción y producción.",
+    relatedSlugs: [
+      "verifactu-y-aeat-como-se-conecta-facturacion-hacienda",
+      "primera-factura-electronica-aeat-verifactu",
+      "certificado-digital-fnmt-verifactu",
+    ],
+    faqs: [
+      {
+        question: "¿Necesito certificado para validar el QR de una factura?",
+        answer:
+          "No. El validador QR de la AEAT es público: con el QR del PDF o los datos de la factura (NIF, número, fecha e importe) cualquiera puede comprobar la autenticidad.",
+      },
+      {
+        question: "¿Puedo ver todas mis facturas Veri*Factu en la sede de la AEAT?",
+        answer:
+          "La AEAT no ofrece hoy un portal de consulta masiva para el contribuyente. Tu fuente de verdad es el ledger de tu programa de facturación (en Simple*Factu, GET /me/invoice-records).",
+      },
+      {
+        question: "¿Qué es el CSV de una factura Veri*Factu?",
+        answer:
+          "Es el Código Seguro de Verificación que la AEAT asigna al registro aceptado (formato A-XXXXXXXXXXXX). Identifica el alta en sus sistemas y conviene guardarlo con cada factura.",
+      },
+      {
+        question: "¿Qué pasa si la AEAT no está disponible?",
+        answer:
+          "Puede haber caídas puntuales. Un buen software reintenta automáticamente: la factura se genera igual y el envío se completa cuando vuelve la conexión.",
+      },
+    ],
     content: `
 <h2>La AEAT como registro central</h2>
 <p>
@@ -787,11 +1132,13 @@ rm /tmp/cert.pem</code></pre>
     <tr><td>SOAP producción</td><td><code>www1.agenciatributaria.gob.es/…/VerifactuSOAP</code></td><td>Envío de facturas reales</td></tr>
   </tbody>
 </table>
-
-<h2>Preguntas frecuentes sobre la sede</h2>
-<p><strong>¿Necesito certificado para validar el QR?</strong> No. El validador QR es público. Solo necesitas los datos de la factura (o escanear el QR).</p>
-<p><strong>¿Puedo ver todas mis facturas registradas en Veri*Factu?</strong> La AEAT no ofrece actualmente un portal de consulta masiva para el contribuyente. Tu fuente de verdad es el ledger de tu programa de facturación (Simple*Factu lo expone en <code>GET /me/invoice-records</code>).</p>
-<p><strong>¿Qué pasa si la AEAT no está disponible?</strong> El sistema tiene downtime ocasional. Un buen software gestiona esto con reintentos automáticos. La factura se genera igualmente; el envío se completa cuando la conexión se restablece.</p>
+<p>
+  Si quieres validar QRs sin ir a la sede, prueba también nuestra
+  <a href="/herramientas/validador-qr-verifactu">herramienta Validador QR Veri*Factu</a>.
+  Para emitir y enviar registros,
+  <a href="/sign-up">crea una cuenta gratis</a>
+  o vuelve a la <a href="/">home de Simple*Factu</a>.
+</p>
     `.trim(),
   },
 
@@ -799,6 +1146,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-aeat-descargar-software-requisitos-sif",
     title: "Veri*Factu AEAT: descargar software oficial y requisitos del SIF",
+    seoTitle: "Veri*Factu AEAT: software oficial y requisitos del SIF",
     excerpt:
       "¿Existe un software gratuito oficial de la AEAT para Veri*Factu? Qué requisitos debe cumplir cualquier programa, qué es el SIF y cómo elegir bien.",
     date: "2026-05-20",
@@ -881,10 +1229,17 @@ rm /tmp/cert.pem</code></pre>
     excerpt:
       "Guía práctica para el autónomo que empieza con Veri*Factu desde cero: qué certificado necesitas, cómo configurar el software y enviar la primera factura sin errores.",
     date: "2026-05-20",
+    updated: "2026-08-05",
     readingMinutes: 6,
     tags: ["verifactu", "autonomos", "certificado", "tutorial"],
+    seoTitle: "Veri*Factu para autónomos: guía práctica paso a paso",
     seoDescription:
-      "Veri*Factu para autónomos: guía paso a paso para obtener el certificado FNMT, configurar el software y emitir la primera factura con código QR y CSV de la AEAT.",
+      "Qué cambia para un autónomo con Veri*Factu: obligaciones, coste real, plazos y los tres pasos para tener el sistema funcionando sin cambiar tu forma de trabajar.",
+    relatedSlugs: [
+      "certificado-digital-fnmt-verifactu",
+      "primera-factura-electronica-aeat-verifactu",
+      "verifactu-gratis-software-planes-opciones",
+    ],
     content: `
 <h2>¿Qué necesita un autónomo para cumplir con Veri*Factu?</h2>
 <p>
@@ -894,6 +1249,11 @@ rm /tmp/cert.pem</code></pre>
 <h2>Paso 1: Obtener o localizar tu certificado digital</h2>
 <p>
   El certificado que ya usas para hacer trámites con la AEAT (presentar declaraciones, consultar notificaciones) sirve para Veri*Factu. Debe estar en formato <strong>.pfx o .p12</strong>, que incluye tanto el certificado como la clave privada. Si solo tienes el .cer o el .crt, necesitas el .pfx completo.
+</p>
+<p>
+  Aquí va el resumen. Si te atascas en algún punto, la guía específica del
+  <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para facturas</a>
+  cubre la exportación en Windows, macOS y Firefox, además de los errores más habituales.
 </p>
 <p><strong>Cómo obtenerlo si no lo tienes:</strong></p>
 <ol>
@@ -970,6 +1330,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-gratis-software-planes-opciones",
     title: "¿Hay Veri*Factu gratis? Software, planes y qué incluye cada opción",
+    seoTitle: "¿Hay Veri*Factu gratis? Opciones reales y qué incluyen",
     excerpt:
       "Comparativa de opciones de software Veri*Factu: qué es gratuito, qué tiene coste y qué debes mirar más allá del precio antes de elegir.",
     date: "2026-05-20",
@@ -1039,6 +1400,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-noticias-ultimas-novedades-hacienda",
     title: "Veri*Factu: noticias y últimas novedades de Hacienda (2026)",
+    seoTitle: "Veri*Factu: últimas noticias de Hacienda (2026)",
     excerpt:
       "Resumen de las novedades más importantes sobre Veri*Factu: cambios normativos, aclaraciones de la AEAT y lo que se espera para los próximos meses.",
     date: "2026-05-20",
@@ -1103,6 +1465,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "retraso-verifactu-que-ha-pasado-nuevas-fechas",
     title: "Retraso de Veri*Factu: qué ha pasado y nuevas fechas",
+    seoTitle: "Retraso de Veri*Factu: qué pasó y nuevas fechas",
     excerpt:
       "Veri*Factu acumuló varios aplazamientos desde su anuncio. Repaso de la historia de los retrasos, por qué ocurrieron y dónde estamos ahora.",
     date: "2026-05-20",
@@ -1182,6 +1545,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "hacienda-retrasa-verifactu-que-significa-para-tu-negocio",
     title: "Hacienda retrasa Veri*Factu: qué significó para tu negocio",
+    seoTitle: "Hacienda retrasa Veri*Factu: qué significa para ti",
     excerpt:
       "Los aplazamientos de Veri*Factu dieron más tiempo para prepararse, pero también generaron confusión. Qué aprender de esa historia y cómo usarla a tu favor ahora.",
     date: "2026-05-20",
@@ -1238,6 +1602,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "aplazamiento-verifactu-calendario-excepciones-sii",
     title: "Aplazamiento Veri*Factu: calendario, excepciones y relación con el SII",
+    seoTitle: "Aplazamiento Veri*Factu: calendario y excepciones",
     excerpt:
       "Repaso de todos los aplazamientos de Veri*Factu, quién quedó exento en cada fase y la diferencia entre Veri*Factu y el SII en términos de plazos.",
     date: "2026-05-20",
@@ -1309,6 +1674,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "facturacion-verifactu-requisitos-programa-facturacion",
     title: "Facturación con Veri*Factu: requisitos de tu programa de facturación",
+    seoTitle: "Requisitos Veri*Factu de tu programa de facturación",
     excerpt:
       "Qué debe hacer tu software de facturación para cumplir con Veri*Factu: desde la generación de la huella hasta el CSV en el PDF. Lista de comprobación.",
     date: "2026-05-20",
@@ -1395,6 +1761,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "sistema-verifactu-sif-que-debe-cumplir-tu-software",
     title: "Sistema Veri*Factu (SIF): qué debe cumplir tu software",
+    seoTitle: "Sistema Veri*Factu (SIF): qué debe cumplir tu software",
     excerpt:
       "El SIF es el nombre técnico de tu programa de facturación según el RD 1007/2023. Qué requisitos debe cumplir, cómo verificarlo y qué documentos pedir al fabricante.",
     date: "2026-05-20",
@@ -1479,17 +1846,27 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "que-es-el-verifactu-resumen-5-minutos",
     title: "Qué es el Veri*Factu: resumen en 5 minutos",
+    seoTitle: "Veri*Factu explicado en 5 minutos (resumen rápido)",
     excerpt:
       "Todo lo esencial sobre Veri*Factu en un solo artículo: qué es, quién está obligado, cómo funciona y qué necesitas para cumplir. Sin tecnicismos.",
     date: "2026-05-20",
     readingMinutes: 5,
     tags: ["verifactu", "resumen", "guia", "autonomos", "pymes"],
     seoDescription:
-      "Qué es Veri*Factu: resumen completo en 5 minutos. Definición, obligados, cómo funciona, plazos y qué necesitas para cumplir con la AEAT en 2026.",
+      "Veri*Factu explicado en 5 minutos: qué es, a quién afecta, cómo funciona y qué necesitas para cumplir con la AEAT. La versión corta, sin tecnicismos.",
+    relatedSlugs: [
+      "que-es-verifactu-guia-autonomos-2026",
+      "certificado-digital-fnmt-verifactu",
+      "primera-factura-electronica-aeat-verifactu",
+    ],
     content: `
 <h2>Veri*Factu en una frase</h2>
 <p>
   Veri*Factu es el sistema por el que <strong>tu programa de facturación envía cada factura a la Agencia Tributaria en tiempo real</strong>, con una firma criptográfica que hace imposible modificarla después sin que Hacienda lo detecte.
+</p>
+<p>
+  Esta es la versión corta. Si buscas el detalle normativo completo — artículos del RD 1007/2023, régimen sancionador y casuística — está en la
+  <a href="/blog/que-es-verifactu-guia-autonomos-2026">guía completa de Veri*Factu para autónomos y pymes</a>.
 </p>
 
 <h2>¿Por qué existe?</h2>
@@ -1555,6 +1932,12 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "odoo-verifactu-integracion-modulos-cumplimiento",
     title: "Odoo y Veri*Factu: integración, módulos y cumplimiento",
+    seoTitle: "Odoo y Veri*Factu: módulos OCA e integración por API",
+    relatedSlugs: [
+      "sistema-verifactu-sif-que-debe-cumplir-tu-software",
+      "factusol-verifactu-compatibilidad-migracion",
+      "error-frustrante-facturacion-aeat-timeouts",
+    ],
     excerpt:
       "Si usas Odoo como ERP, necesitas un módulo o conector que gestione el envío a Veri*Factu. Opciones disponibles, cómo funciona la integración y qué verificar.",
     date: "2026-05-20",
@@ -1626,10 +2009,44 @@ rm /tmp/cert.pem</code></pre>
     excerpt:
       "FactuSOL es uno de los programas de facturación gratuitos más usados en España. ¿Es compatible con Veri*Factu? Qué versión necesitas y cómo migrar si no lo es.",
     date: "2026-05-20",
-    readingMinutes: 4,
+    updated: "2026-08-05",
+    readingMinutes: 6,
     tags: ["verifactu", "factusol", "software", "migracion", "compatibilidad"],
+    seoTitle: "FactuSOL Veri*Factu: ¿compatible? Versión y migración",
     seoDescription:
-      "FactuSOL y Veri*Factu: compatibilidad, qué versión necesitas, cómo verificar que cumple el RD 1007/2023 y opciones de migración si tu versión no es conforme.",
+      "¿FactuSOL cumple Veri*Factu? Comprueba tu versión, pide la declaración responsable a DELSOL y migra o integra por API si tu edición no es conforme.",
+    relatedSlugs: [
+      "contasimple-verifactu-diferencias-cuando-usar-cada-uno",
+      "odoo-verifactu-integracion-modulos-cumplimiento",
+      "facturacion-verifactu-requisitos-programa-facturacion",
+    ],
+    faqs: [
+      {
+        question: "¿FactuSOL es compatible con Veri*Factu?",
+        answer:
+          "Software DELSOL ha adaptado FactuSOL al RD 1007/2023, pero la compatibilidad depende de la versión instalada: las versiones antiguas no incluyen el módulo de envío a la AEAT. Comprueba el número de versión en Ayuda → Acerca de y verifica que existe la sección de configuración del certificado digital y envío Veri*Factu.",
+      },
+      {
+        question: "¿La versión gratuita de FactuSOL cumple Veri*Factu?",
+        answer:
+          "Depende de la edición y del año de la versión que tengas instalada. La vía fiable no es asumirlo, sino solicitar a Software DELSOL la declaración responsable del artículo 8 del RD 1007/2023 para tu versión concreta: ese documento es lo que acredita el cumplimiento ante una inspección.",
+      },
+      {
+        question: "¿Qué es la declaración responsable y por qué debo pedirla?",
+        answer:
+          "Es el documento en el que el fabricante del software declara que su programa cumple los requisitos técnicos del RD 1007/2023. La responsabilidad de usar un sistema conforme es del obligado tributario, así que conviene guardar la declaración de la versión exacta que utilizas.",
+      },
+      {
+        question: "¿Puedo usar FactuSOL y enviar a Veri*Factu con otro sistema?",
+        answer:
+          "Sí. Puedes mantener FactuSOL como herramienta de gestión y delegar el envío de los registros de facturación en una API externa conforme. Es la vía habitual cuando la versión de FactuSOL no es compatible o cuando necesitas automatizar el flujo desde un ERP propio.",
+      },
+      {
+        question: "¿Qué pasa con las facturas emitidas antes de activar Veri*Factu?",
+        answer:
+          "No se pueden registrar retroactivamente de forma automática, porque el encadenamiento de huellas parte del primer registro remitido. Si tienes facturas sin registrar del periodo ya obligado, consulta con tu asesor fiscal la mejor forma de regularizar la situación.",
+      },
+    ],
     content: `
 <p>
   <strong>¿Necesitas API?</strong> Si buscas integrar FactuSOL (o un ERP similar) con Veri*Factu vía REST — sin SOAP ni mTLS — ve a la
@@ -1680,6 +2097,12 @@ rm /tmp/cert.pem</code></pre>
 <p>
   En cualquier migración, asegúrate de <strong>exportar el histórico de facturas</strong> de FactuSOL antes de cambiar de sistema. El historial de facturas es un documento contable obligatorio independientemente de Veri*Factu.
 </p>
+<p>
+  ¿Prefieres API en la nube sin instalación local?
+  <a href="/integraciones/factusol-verifactu">Ver integración FactuSOL → Veri*Factu</a>,
+  <a href="/sign-up">crear cuenta gratis</a>
+  o ir a la <a href="/">home de Simple*Factu</a>.
+</p>
     `.trim(),
   },
 
@@ -1687,13 +2110,42 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "contasimple-verifactu-diferencias-cuando-usar-cada-uno",
     title: "ContaSimple y Veri*Factu: diferencias y cuándo usar cada uno",
+    seoTitle: "Alternativa a ContaSimple para Veri*Factu (API)",
+    relatedSlugs: [
+      "factusol-verifactu-compatibilidad-migracion",
+      "verifactu-gratis-software-planes-opciones",
+      "facturacion-verifactu-requisitos-programa-facturacion",
+    ],
     excerpt:
       "ContaSimple es una herramienta de contabilidad y facturación para autónomos. ¿Es lo mismo que Simple*Factu? ¿Cuál cumple mejor con Veri*Factu para tu negocio?",
     date: "2026-05-20",
-    readingMinutes: 4,
+    updated: "2026-08-05",
+    readingMinutes: 5,
     tags: ["verifactu", "contasimple", "comparativa", "software", "autonomos"],
     seoDescription:
-      "ContaSimple vs Simple*Factu para Veri*Factu: diferencias, casos de uso y cuál elegir según el tipo de negocio y necesidades de integración con la AEAT.",
+      "ContaSimple Veri*Factu: diferencias, API y cuándo elegir una alternativa. Comparativa clara para autónomos, ERPs e integraciones con la AEAT en 2026.",
+    faqs: [
+      {
+        question: "¿ContaSimple y Simple*Factu son lo mismo?",
+        answer:
+          "No. Son productos de empresas distintas. ContaSimple cubre contabilidad y facturación todo-en-uno; Simple*Factu se especializa en el envío Veri*Factu a la AEAT vía panel o API REST.",
+      },
+      {
+        question: "¿ContaSimple tiene API para Veri*Factu?",
+        answer:
+          "El acceso API de ContaSimple es limitado según plan. Si necesitas automatizar envíos, webhooks y un ledger de registros AEAT desde tu ERP, una API Veri*Factu dedicada (como Simple*Factu) suele encajar mejor.",
+      },
+      {
+        question: "¿Cuándo buscar una alternativa a ContaSimple?",
+        answer:
+          "Cuando ya tienes contabilidad/ERP y solo te falta el cumplimiento Veri*Factu, cuando necesitas API completa, o cuando tu plan de ContaSimple no incluye el módulo de envío a la AEAT.",
+      },
+      {
+        question: "¿Puedo usar ContaSimple y enviar Veri*Factu por otro sistema?",
+        answer:
+          "En la práctica depende de si ContaSimple te deja exportar o integrar. La arquitectura habitual es: contabilidad en una herramienta y remisión Veri*Factu vía API especializada.",
+      },
+    ],
     content: `
 <p>
   <strong>¿Buscas ContaSimple API?</strong> Si necesitas una API REST completa para Veri*Factu (automatización, webhooks, ERP), consulta la
@@ -1767,11 +2219,18 @@ rm /tmp/cert.pem</code></pre>
 <p>
   Si ya tienes un programa de contabilidad y solo necesitas añadir Veri*Factu, o si tienes un sistema propio que necesita integrarse vía API, Simple*Factu cubre exactamente ese caso sin añadir capas innecesarias.
 </p>
+<p>
+  Si buscas una <strong>alternativa a ContaSimple centrada en API Veri*Factu</strong>,
+  mira la <a href="/integraciones/contasimple-verifactu">landing ContaSimple → Veri*Factu</a>,
+  <a href="/sign-up">crea una cuenta gratis</a>
+  o vuelve a la <a href="/">home de Simple*Factu</a>.
+</p>
     `.trim(),
   },
   {
     slug: "que-es-verifactu-por-que-tu-excel-ya-no-sirve",
     title: "¿Qué es Veri*Factu y por qué hacer facturas en Excel ya no será legal?",
+    seoTitle: "Veri*Factu: por qué facturar en Excel deja de ser legal",
     excerpt:
       "Si eres autónomo o pyme, el panorama de la facturación en España cambia radicalmente. Descubre por qué las facturas en Word o Excel dejan de ser válidas con Veri*Factu.",
     date: "2026-06-15",
@@ -1815,6 +2274,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "que-es-encadenamiento-facturas-blockchain-verifactu",
     title: "¿Qué es el encadenamiento de facturas en Veri*Factu y la huella digital?",
+    seoTitle: "Encadenamiento de facturas y huella digital Veri*Factu",
     excerpt:
       "Descubre cómo funciona el encadenamiento criptográfico y la huella digital SHA-256 que usa Hacienda para garantizar la inalterabilidad de las facturas.",
     date: "2026-06-15",
@@ -1862,13 +2322,14 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-para-gestorias-ventaja-competitiva",
     title: "Veri*Factu para gestorías y asesorías: Cómo adaptar a tus clientes a la normativa",
+    seoTitle: "Veri*Factu para gestorías: cómo adaptar a tus clientes",
     excerpt:
       "La llegada de Veri*Factu es un reto, pero también una oportunidad de oro para las gestorías. Aprende a centralizar la facturación de tus clientes fácilmente.",
     date: "2026-06-15",
     readingMinutes: 5,
     tags: ["verifactu", "gestorias", "asesorias", "b2b", "despachos"],
     seoDescription:
-      "Guía sobre Veri*Factu para gestorías y asesorías fiscales. Descubre cómo centralizar la facturación de tus clientes y convertirlos a la nueva normativa sin fricciones.",
+      "Veri*Factu para gestorías y asesorías: cómo centralizar la facturación de tus clientes y migrarlos a la nueva normativa sin fricciones ni trabajo manual.",
     content: `
 <h2>La revolución digital en las Asesorías Fiscales</h2>
 <p>
@@ -1908,6 +2369,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "5-mitos-verifactu-facturacion-electronica",
     title: "5 mitos sobre Veri*Factu y la facturación electrónica obligatoria en España",
+    seoTitle: "5 mitos sobre Veri*Factu que conviene desmontar",
     excerpt:
       "Desmentimos los 5 miedos y mitos más comunes sobre la facturación en tiempo real con Hacienda para que adaptes tu empresa o negocio sin estrés.",
     date: "2026-06-15",
@@ -1950,6 +2412,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "error-frustrante-facturacion-aeat-timeouts",
     title: "Errores comunes al conectar Veri*Factu con la AEAT y cómo solucionarlos",
+    seoTitle: "Errores al conectar Veri*Factu con la AEAT: soluciones",
     excerpt:
       "Si tu aplicación de facturación depende de llamadas síncronas a la AEAT, tendrás problemas. Aprende por qué una arquitectura asíncrona evita los timeouts.",
     date: "2026-06-15",
@@ -1999,6 +2462,35 @@ export function getArticle(slug: string): Article | undefined {
 
 export function getAllSlugs(): string[] {
   return articles.map((a) => a.slug);
+}
+
+/**
+ * Entry points of the Veri*Factu cluster, in reading order. Surfaced on the
+ * blog index so the pages we want to rank get internal links that do not decay
+ * as new articles push them down the chronological list.
+ */
+export const CORNERSTONE_SLUGS = [
+  "que-es-verifactu-guia-autonomos-2026",
+  "certificado-digital-fnmt-verifactu",
+  "primera-factura-electronica-aeat-verifactu",
+  "factusol-verifactu-compatibilidad-migracion",
+] as const;
+
+export function getCornerstoneArticles(): Article[] {
+  return CORNERSTONE_SLUGS.map((slug) => getArticle(slug)).filter(
+    (a): a is Article => Boolean(a)
+  );
+}
+
+/** Last meaningful edit, used for `dateModified` and sitemap freshness. */
+export function getArticleLastModified(article: Article): string {
+  return article.updated ?? article.date;
+}
+
+export function getRelatedArticles(article: Article): Article[] {
+  return (article.relatedSlugs ?? [])
+    .map((slug) => getArticle(slug))
+    .filter((a): a is Article => Boolean(a));
 }
 
 export function formatArticleDate(iso: string): string {
