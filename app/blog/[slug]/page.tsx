@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { absoluteTitle, appDocumentTitle } from "@/lib/branding";
 import {
   articles,
   formatArticleDate,
   getAllSlugs,
   getArticle,
+  getArticleLastModified,
+  getRelatedArticles,
 } from "@/lib/blog/articles";
 import { BrandWordmark } from "../../BrandWordmark";
 import { publicRobots } from "@/lib/seo/robots";
-import { canonicalUrl, getSiteUrl } from "@/lib/seo/site-url";
+import { canonicalUrl } from "@/lib/seo/site-url";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -25,20 +28,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return {};
 
   const url = canonicalUrl(`/blog/${article.slug}`);
+
   return {
-    title: `${article.title} — Simple*Factu`,
+    // A crafted `seoTitle` is final: appending the brand would push it past
+    // Google's truncation limit and waste the pixels that drive clicks.
+    title: absoluteTitle(article.seoTitle ?? appDocumentTitle(article.title)),
     description: article.seoDescription,
     robots: publicRobots,
     alternates: { canonical: url },
     openGraph: {
-      title: article.title,
+      title: article.seoTitle ?? article.title,
       description: article.seoDescription,
       url,
       siteName: "Simple*Factu",
       locale: "es_ES",
       type: "article",
       publishedTime: article.date,
+      modifiedTime: getArticleLastModified(article),
       tags: article.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.seoTitle ?? article.title,
+      description: article.seoDescription,
     },
   };
 }
@@ -46,6 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 import {
   buildArticleSchema,
   buildBreadcrumbSchema,
+  buildFAQSchema,
 } from "@/lib/seo/schema";
 
 function jsonLd(article: ReturnType<typeof getArticle>) {
@@ -55,6 +68,7 @@ function jsonLd(article: ReturnType<typeof getArticle>) {
     description: article.seoDescription,
     slug: article.slug,
     datePublished: article.date,
+    dateModified: getArticleLastModified(article),
   });
 
   const breadcrumbSchema = buildBreadcrumbSchema([
@@ -63,7 +77,11 @@ function jsonLd(article: ReturnType<typeof getArticle>) {
     { name: article.title, url: `/blog/${article.slug}` },
   ]);
 
-  return [articleSchema, breadcrumbSchema];
+  const faqSchema = article.faqs ? buildFAQSchema(article.faqs) : null;
+
+  return faqSchema
+    ? [articleSchema, breadcrumbSchema, faqSchema]
+    : [articleSchema, breadcrumbSchema];
 }
 
 const sorted = [...articles].sort(
@@ -78,6 +96,9 @@ export default async function ArticlePage({ params }: Props) {
   const currentIndex = sorted.findIndex((a) => a.slug === slug);
   const prev = sorted[currentIndex + 1] ?? null;
   const next = sorted[currentIndex - 1] ?? null;
+  const related = getRelatedArticles(article);
+  const lastModified = getArticleLastModified(article);
+  const wasUpdated = lastModified !== article.date;
 
   return (
     <>
@@ -129,6 +150,17 @@ export default async function ArticlePage({ params }: Props) {
               <time dateTime={article.date} className="text-xs text-fg-subtle">
                 {formatArticleDate(article.date)}
               </time>
+              {wasUpdated && (
+                <>
+                  <span className="text-xs text-fg-subtle">·</span>
+                  <span className="text-xs text-fg-subtle">
+                    Actualizado el{" "}
+                    <time dateTime={lastModified}>
+                      {formatArticleDate(lastModified)}
+                    </time>
+                  </span>
+                </>
+              )}
               <span className="text-xs text-fg-subtle">·</span>
               <span className="text-xs text-fg-subtle">
                 {article.readingMinutes} min de lectura
@@ -156,6 +188,53 @@ export default async function ArticlePage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
 
+          {/* FAQ — also emitted as FAQPage structured data */}
+          {article.faqs && article.faqs.length > 0 && (
+            <section className="mt-12 border-t border-outline-soft pt-8">
+              <h2 className="mb-6 text-xl font-semibold text-fg">
+                Preguntas frecuentes
+              </h2>
+              <dl className="space-y-6">
+                {article.faqs.map((faq) => (
+                  <div key={faq.question}>
+                    <dt className="mb-1.5 text-base font-semibold text-fg">
+                      {faq.question}
+                    </dt>
+                    <dd className="text-sm leading-relaxed text-fg-muted">
+                      {faq.answer}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          {/* Topical cluster links */}
+          {related.length > 0 && (
+            <section className="mt-12 border-t border-outline-soft pt-8">
+              <h2 className="mb-4 text-xl font-semibold text-fg">
+                Sigue leyendo
+              </h2>
+              <ul className="space-y-3">
+                {related.map((item) => (
+                  <li key={item.slug}>
+                    <Link
+                      href={`/blog/${item.slug}`}
+                      className="group block rounded-lg border border-outline-soft px-4 py-3 transition-colors hover:border-brand"
+                    >
+                      <span className="block text-sm font-medium text-fg group-hover:text-brand">
+                        {item.title}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-fg-muted">
+                        {item.excerpt}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {/* CTA */}
           <div className="mt-12 rounded-xl border border-outline-soft bg-surface-muted px-6 py-5">
             <p className="mb-1 text-sm font-semibold text-fg">
@@ -170,8 +249,8 @@ export default async function ArticlePage({ params }: Props) {
             </Link>
           </div>
 
-          {/* Prev / Next */}
-          {(prev || next) && (
+          {/* Chronological fallback when the article has no topical cluster */}
+          {related.length === 0 && (prev || next) && (
             <nav className="mt-10 flex items-start justify-between gap-4 border-t border-outline-soft pt-8 text-sm">
               {prev ? (
                 <Link

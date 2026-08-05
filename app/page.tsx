@@ -7,11 +7,12 @@ import { HeroTabs } from "./HeroTabs";
 import { LeadForm } from "./LeadForm";
 import { BlogCarousel } from "./BlogCarousel";
 import { articles } from "@/lib/blog/articles";
+import { absoluteTitle } from "@/lib/branding";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl, getSiteUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
-  title: "Simple*Factu — API y software Veri*Factu (AEAT)",
+  title: absoluteTitle("Simple*Factu — API y software Veri*Factu (AEAT)"),
   description:
     "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
   robots: publicRobots,

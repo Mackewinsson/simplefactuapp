@@ -1,4 +1,4 @@
-import { docsBrowserPageTitle } from "@/lib/branding";
+import { absoluteTitle, docsBrowserPageTitle } from "@/lib/branding";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl } from "@/lib/seo/site-url";
 import { getSimplefactuDocsApiBaseUrl } from "@/lib/simplefactu/client";
@@ -23,7 +23,7 @@ import { ApiReferenceClient } from "./ApiReferenceClient";
  */
 
 export const metadata = {
-  title: docsBrowserPageTitle("Referencia API"),
+  title: absoluteTitle(docsBrowserPageTitle("Referencia API")),
   robots: publicRobots,
   alternates: { canonical: canonicalUrl("/docs/api-reference") },
 };

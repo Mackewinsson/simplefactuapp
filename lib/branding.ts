@@ -23,3 +23,12 @@ export function appDocumentTitle(pageTitle: string): string {
 export function docsBrowserPageTitle(docPageTitle: string): string {
   return `${docPageTitle} — ${APP_DOCS_LABEL}`;
 }
+
+/**
+ * Marks a title that already carries the product name as final, so Next.js
+ * does not apply the root layout's `%s — Simple*Factu` template on top of it
+ * and ship a duplicated brand to the SERP.
+ */
+export function absoluteTitle(title: string): { absolute: string } {
+  return { absolute: title };
+}

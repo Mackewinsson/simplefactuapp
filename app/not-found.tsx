@@ -4,7 +4,7 @@ import { BrandWordmark } from "./BrandWordmark";
 import { privateRobots } from "@/lib/seo/robots";
 
 export const metadata: Metadata = {
-  title: "Página no encontrada — Simple*Factu",
+  title: "Página no encontrada",
   robots: privateRobots,
 };
 

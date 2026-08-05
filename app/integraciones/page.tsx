@@ -5,6 +5,7 @@ import {
   buildIntegrationsHubJsonLd,
   INTEGRATION_PAGES,
 } from "@/lib/seo/integration-pages";
+import { absoluteTitle } from "@/lib/branding";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl } from "@/lib/seo/site-url";
 
@@ -13,7 +14,7 @@ const description =
   "Conectores API REST para cumplir Veri*Factu desde FactuSOL, ContaSimple, Odoo u otro ERP. Sin SOAP ni mTLS en tu código. Docs y sandbox gratis.";
 
 export const metadata: Metadata = {
-  title,
+  title: absoluteTitle(title),
   description,
   robots: publicRobots,
   alternates: { canonical: canonicalUrl("/integraciones") },
