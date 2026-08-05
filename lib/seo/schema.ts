@@ -69,7 +69,9 @@ export function buildArticleSchema(params: {
 
   return {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
+    // BlogPosting unlocks article rich results; TechArticle keeps the
+    // technical how-to signal for Veri*Factu / AEAT guides.
+    "@type": ["BlogPosting", "TechArticle"],
     "@id": `${url}#article`,
     isPartOf: {
       "@type": "WebPage",

@@ -193,9 +193,9 @@ export const articles: Article[] = [
     updated: "2026-08-05",
     readingMinutes: 9,
     tags: ["verifactu", "tutorial", "facturacion-electronica", "aeat"],
-    seoTitle: "Primera factura electrónica a la AEAT con Veri*Factu",
+    seoTitle: "Factura FNMT y Veri*Factu: primera factura a la AEAT",
     seoDescription:
-      "Guía paso a paso para enviar tu primera factura electrónica a la AEAT con Veri*Factu: requisitos, envío, CSV, código QR y los errores más comunes del primer intento.",
+      "Factura FNMT con certificado digital: cómo emitir y enviar tu primera factura electrónica a la AEAT (CSV, QR, errores). Guía Veri*Factu paso a paso.",
     relatedSlugs: [
       "certificado-digital-fnmt-verifactu",
       "verifactu-para-autonomos-pasos-certificado-primera-factura",
@@ -346,6 +346,11 @@ rm /tmp/cert.pem</code></pre>
   <li><strong>Los cambios de serie</strong>, que inician una cadena nueva marcada como primer registro.</li>
   <li><strong>Los envíos en estado incorrecto</strong>, que conviene revisar periódicamente para que no se acumulen registros sin anotar.</li>
 </ul>
+<p>
+  Si quieres hacerlo sin montar SOAP ni mTLS a mano,
+  <a href="/sign-up">crea una cuenta gratis en Simple*Factu</a>
+  o vuelve a la <a href="/">página de inicio</a> para ver planes y documentación.
+</p>
     `.trim(),
   },
   {
@@ -433,10 +438,9 @@ rm /tmp/cert.pem</code></pre>
     updated: "2026-08-05",
     readingMinutes: 11,
     tags: ["fnmt", "certificado-digital", "verifactu", "facturas", "tutorial"],
-    seoTitle:
-      "Certificado digital FNMT para facturas (Veri*Factu 2026)",
+    seoTitle: "Descargar certificado FNMT para facturas (CERES)",
     seoDescription:
-      "Cómo obtener el certificado digital FNMT, exportarlo a .pfx y emitir facturas ante la AEAT con Veri*Factu. Guía 2026 con comandos, errores frecuentes y renovación.",
+      "Cómo descargar el certificado digital FNMT/CERES (.pfx) para emitir facturas Veri*Factu: solicitud, exportación, renovación y errores frecuentes.",
     relatedSlugs: [
       "primera-factura-electronica-aeat-verifactu",
       "verifactu-para-autonomos-pasos-certificado-primera-factura",
@@ -485,6 +489,11 @@ rm /tmp/cert.pem</code></pre>
 </ol>
 <p>
   El certificado se usa en cada envío para establecer la conexión mTLS con la AEAT y firmar el registro de facturación. Sin él, tu software no puede remitir nada.
+</p>
+<p>
+  La solicitud y descarga se hacen en el portal <strong>CERES de la FNMT</strong>
+  (<a href="https://www.sede.fnmt.gob.es/certificados" target="_blank" rel="noreferrer">sede.fnmt.gob.es/certificados</a>):
+  ahí eliges persona física o representante, generas la solicitud y, tras acreditar identidad, descargas el certificado al equipo.
 </p>
 
 <h2>¿Se pueden hacer facturas con el certificado FNMT?</h2>
@@ -646,20 +655,53 @@ rm /tmp/cert.pem</code></pre>
     <tr><td>DNI electrónico (DNIe)</td><td>No</td><td>La clave privada vive en el chip y no puede exportarse a un servidor</td></tr>
   </tbody>
 </table>
+<p>
+  Cuando tengas el .pfx listo,
+  <a href="/sign-up">empieza gratis en Simple*Factu</a>
+  o consulta la <a href="/">oferta y documentación</a> en la home.
+</p>
     `.trim(),
   },
 
   {
     slug: "verifactu-y-aeat-como-se-conecta-facturacion-hacienda",
     title: "Veri*Factu y AEAT: cómo se conecta tu facturación con Hacienda",
-    seoTitle: "Veri*Factu y AEAT: cómo se conecta tu facturación",
+    seoTitle: "Cómo se conecta Veri*Factu con la AEAT (flujo)",
     excerpt:
       "Cada factura que emites viaja en tiempo real a los servidores de la Agencia Tributaria. Te explicamos qué pasa técnicamente, qué datos recibe Hacienda y qué garantías ofrece el sistema para ti y tu cliente.",
     date: "2026-05-20",
+    updated: "2026-08-05",
     readingMinutes: 6,
     tags: ["verifactu", "aeat", "software-facturacion"],
     seoDescription:
-      "Cómo se conecta Veri*Factu con la AEAT: flujo técnico completo (certificado mTLS, XML SOAP, huella SHA-256, CSV) explicado para autónomos y pymes en 2026.",
+      "Así viaja tu factura a Hacienda: certificado mTLS, XML SOAP, huella SHA-256, CSV y QR. Flujo Veri*Factu–AEAT explicado sin tecnicismos innecesarios.",
+    relatedSlugs: [
+      "primera-factura-electronica-aeat-verifactu",
+      "certificado-digital-fnmt-verifactu",
+      "verifactu-agencia-tributaria-tramites-sede-electronica",
+    ],
+    faqs: [
+      {
+        question: "¿La AEAT recibe el PDF de mi factura?",
+        answer:
+          "No. Recibe el registro de facturación (metadatos fiscales, importes, descripción y huella SHA-256), no el PDF ni adjuntos. El diseño y el envío del documento al cliente siguen siendo tuyos.",
+      },
+      {
+        question: "¿Qué es el CSV que devuelve Hacienda?",
+        answer:
+          "El CSV (Código Seguro de Verificación) identifica el registro aceptado en los sistemas de la AEAT. Se imprime en el PDF junto al QR para que el receptor pueda verificar la factura en la sede electrónica.",
+      },
+      {
+        question: "¿Qué pasa si falla la conexión con la AEAT?",
+        answer:
+          "Un software conforme debe reintentar el envío. La factura queda registrada localmente; el registro se remite cuando el servicio de la AEAT vuelve a estar disponible. La obligación es remitir, no que acepte al primer intento.",
+      },
+      {
+        question: "¿Puedo probar sin consecuencias fiscales?",
+        answer:
+          "Sí. La AEAT ofrece un entorno de preproducción (prewww1.aeat.es) con el mismo certificado real pero sin efectos fiscales. Úsalo para validar certificado, huellas y XML antes de producción.",
+      },
+    ],
     content: `
 <h2>La idea detrás de la conexión</h2>
 <p>
@@ -736,6 +778,11 @@ rm /tmp/cert.pem</code></pre>
 <h2>Resumen</h2>
 <p>
   La conexión entre tu facturación y la AEAT es técnicamente sencilla: un mensaje XML firmado con tu certificado, que incluye una huella encadenada con la factura anterior. Lo que hace especial a Veri*Factu no es la tecnología, sino la consecuencia: <strong>cada factura queda registrada de forma inmutable en Hacienda en el momento de emitirla</strong>. Para la mayoría de autónomos y pymes, esto es transparente si el software está bien configurado.
+</p>
+<p>
+  Para ponerlo en marcha sin implementar SOAP a mano,
+  <a href="/sign-up">crea tu cuenta en Simple*Factu</a>
+  o empieza desde la <a href="/">home del producto</a>.
 </p>
     `.trim(),
   },
@@ -989,14 +1036,42 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "verifactu-agencia-tributaria-tramites-sede-electronica",
     title: "Veri*Factu en la Agencia Tributaria: trámites, sede electrónica y enlaces útiles",
-    seoTitle: "Veri*Factu en la Agencia Tributaria: trámites y enlaces",
+    seoTitle: "Veri*Factu en la AEAT: validar QR, CSV y trámites",
     excerpt:
       "Dónde verificar una factura Veri*Factu, cómo acceder al validador QR de la AEAT y qué trámites puedes hacer desde la sede electrónica relacionados con Veri*Factu.",
     date: "2026-05-20",
-    readingMinutes: 4,
+    updated: "2026-08-05",
+    readingMinutes: 5,
     tags: ["verifactu", "aeat", "sede-electronica", "tramites"],
     seoDescription:
-      "Cómo usar la sede electrónica de la AEAT con Veri*Factu: validar facturas con el QR, acceder al historial de registros y trámites relacionados con el RD 1007/2023.",
+      "Trámites Veri*Factu en la sede electrónica de la AEAT: validar facturas con QR, CSV, VNIF y enlaces oficiales de preproducción y producción.",
+    relatedSlugs: [
+      "verifactu-y-aeat-como-se-conecta-facturacion-hacienda",
+      "primera-factura-electronica-aeat-verifactu",
+      "certificado-digital-fnmt-verifactu",
+    ],
+    faqs: [
+      {
+        question: "¿Necesito certificado para validar el QR de una factura?",
+        answer:
+          "No. El validador QR de la AEAT es público: con el QR del PDF o los datos de la factura (NIF, número, fecha e importe) cualquiera puede comprobar la autenticidad.",
+      },
+      {
+        question: "¿Puedo ver todas mis facturas Veri*Factu en la sede de la AEAT?",
+        answer:
+          "La AEAT no ofrece hoy un portal de consulta masiva para el contribuyente. Tu fuente de verdad es el ledger de tu programa de facturación (en Simple*Factu, GET /me/invoice-records).",
+      },
+      {
+        question: "¿Qué es el CSV de una factura Veri*Factu?",
+        answer:
+          "Es el Código Seguro de Verificación que la AEAT asigna al registro aceptado (formato A-XXXXXXXXXXXX). Identifica el alta en sus sistemas y conviene guardarlo con cada factura.",
+      },
+      {
+        question: "¿Qué pasa si la AEAT no está disponible?",
+        answer:
+          "Puede haber caídas puntuales. Un buen software reintenta automáticamente: la factura se genera igual y el envío se completa cuando vuelve la conexión.",
+      },
+    ],
     content: `
 <h2>La AEAT como registro central</h2>
 <p>
@@ -1057,11 +1132,13 @@ rm /tmp/cert.pem</code></pre>
     <tr><td>SOAP producción</td><td><code>www1.agenciatributaria.gob.es/…/VerifactuSOAP</code></td><td>Envío de facturas reales</td></tr>
   </tbody>
 </table>
-
-<h2>Preguntas frecuentes sobre la sede</h2>
-<p><strong>¿Necesito certificado para validar el QR?</strong> No. El validador QR es público. Solo necesitas los datos de la factura (o escanear el QR).</p>
-<p><strong>¿Puedo ver todas mis facturas registradas en Veri*Factu?</strong> La AEAT no ofrece actualmente un portal de consulta masiva para el contribuyente. Tu fuente de verdad es el ledger de tu programa de facturación (Simple*Factu lo expone en <code>GET /me/invoice-records</code>).</p>
-<p><strong>¿Qué pasa si la AEAT no está disponible?</strong> El sistema tiene downtime ocasional. Un buen software gestiona esto con reintentos automáticos. La factura se genera igualmente; el envío se completa cuando la conexión se restablece.</p>
+<p>
+  Si quieres validar QRs sin ir a la sede, prueba también nuestra
+  <a href="/herramientas/validador-qr-verifactu">herramienta Validador QR Veri*Factu</a>.
+  Para emitir y enviar registros,
+  <a href="/sign-up">crea una cuenta gratis</a>
+  o vuelve a la <a href="/">home de Simple*Factu</a>.
+</p>
     `.trim(),
   },
 
@@ -1935,9 +2012,9 @@ rm /tmp/cert.pem</code></pre>
     updated: "2026-08-05",
     readingMinutes: 6,
     tags: ["verifactu", "factusol", "software", "migracion", "compatibilidad"],
-    seoTitle: "FactuSOL y Veri*Factu: ¿es compatible? (guía 2026)",
+    seoTitle: "FactuSOL Veri*Factu: ¿compatible? Versión y migración",
     seoDescription:
-      "¿FactuSOL cumple Veri*Factu? Cómo comprobar tu versión, pedir la declaración responsable a Software DELSOL y migrar o integrar por API si no es conforme.",
+      "¿FactuSOL cumple Veri*Factu? Comprueba tu versión, pide la declaración responsable a DELSOL y migra o integra por API si tu edición no es conforme.",
     relatedSlugs: [
       "contasimple-verifactu-diferencias-cuando-usar-cada-uno",
       "odoo-verifactu-integracion-modulos-cumplimiento",
@@ -2020,6 +2097,12 @@ rm /tmp/cert.pem</code></pre>
 <p>
   En cualquier migración, asegúrate de <strong>exportar el histórico de facturas</strong> de FactuSOL antes de cambiar de sistema. El historial de facturas es un documento contable obligatorio independientemente de Veri*Factu.
 </p>
+<p>
+  ¿Prefieres API en la nube sin instalación local?
+  <a href="/integraciones/factusol-verifactu">Ver integración FactuSOL → Veri*Factu</a>,
+  <a href="/sign-up">crear cuenta gratis</a>
+  o ir a la <a href="/">home de Simple*Factu</a>.
+</p>
     `.trim(),
   },
 
@@ -2027,7 +2110,7 @@ rm /tmp/cert.pem</code></pre>
   {
     slug: "contasimple-verifactu-diferencias-cuando-usar-cada-uno",
     title: "ContaSimple y Veri*Factu: diferencias y cuándo usar cada uno",
-    seoTitle: "ContaSimple y Veri*Factu: diferencias y cuál elegir",
+    seoTitle: "Alternativa a ContaSimple para Veri*Factu (API)",
     relatedSlugs: [
       "factusol-verifactu-compatibilidad-migracion",
       "verifactu-gratis-software-planes-opciones",
@@ -2036,10 +2119,33 @@ rm /tmp/cert.pem</code></pre>
     excerpt:
       "ContaSimple es una herramienta de contabilidad y facturación para autónomos. ¿Es lo mismo que Simple*Factu? ¿Cuál cumple mejor con Veri*Factu para tu negocio?",
     date: "2026-05-20",
-    readingMinutes: 4,
+    updated: "2026-08-05",
+    readingMinutes: 5,
     tags: ["verifactu", "contasimple", "comparativa", "software", "autonomos"],
     seoDescription:
-      "ContaSimple vs Simple*Factu para Veri*Factu: diferencias, casos de uso y cuál elegir según el tipo de negocio y necesidades de integración con la AEAT.",
+      "ContaSimple Veri*Factu: diferencias, API y cuándo elegir una alternativa. Comparativa clara para autónomos, ERPs e integraciones con la AEAT en 2026.",
+    faqs: [
+      {
+        question: "¿ContaSimple y Simple*Factu son lo mismo?",
+        answer:
+          "No. Son productos de empresas distintas. ContaSimple cubre contabilidad y facturación todo-en-uno; Simple*Factu se especializa en el envío Veri*Factu a la AEAT vía panel o API REST.",
+      },
+      {
+        question: "¿ContaSimple tiene API para Veri*Factu?",
+        answer:
+          "El acceso API de ContaSimple es limitado según plan. Si necesitas automatizar envíos, webhooks y un ledger de registros AEAT desde tu ERP, una API Veri*Factu dedicada (como Simple*Factu) suele encajar mejor.",
+      },
+      {
+        question: "¿Cuándo buscar una alternativa a ContaSimple?",
+        answer:
+          "Cuando ya tienes contabilidad/ERP y solo te falta el cumplimiento Veri*Factu, cuando necesitas API completa, o cuando tu plan de ContaSimple no incluye el módulo de envío a la AEAT.",
+      },
+      {
+        question: "¿Puedo usar ContaSimple y enviar Veri*Factu por otro sistema?",
+        answer:
+          "En la práctica depende de si ContaSimple te deja exportar o integrar. La arquitectura habitual es: contabilidad en una herramienta y remisión Veri*Factu vía API especializada.",
+      },
+    ],
     content: `
 <p>
   <strong>¿Buscas ContaSimple API?</strong> Si necesitas una API REST completa para Veri*Factu (automatización, webhooks, ERP), consulta la
@@ -2112,6 +2218,12 @@ rm /tmp/cert.pem</code></pre>
 </p>
 <p>
   Si ya tienes un programa de contabilidad y solo necesitas añadir Veri*Factu, o si tienes un sistema propio que necesita integrarse vía API, Simple*Factu cubre exactamente ese caso sin añadir capas innecesarias.
+</p>
+<p>
+  Si buscas una <strong>alternativa a ContaSimple centrada en API Veri*Factu</strong>,
+  mira la <a href="/integraciones/contasimple-verifactu">landing ContaSimple → Veri*Factu</a>,
+  <a href="/sign-up">crea una cuenta gratis</a>
+  o vuelve a la <a href="/">home de Simple*Factu</a>.
 </p>
     `.trim(),
   },
