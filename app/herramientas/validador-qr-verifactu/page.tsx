@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { absoluteTitle } from "@/lib/branding";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl } from "@/lib/seo/site-url";
 import { BrandWordmark } from "../../BrandWordmark";
 import { QRValidatorClient } from "./QRValidatorClient";
 
 export const metadata: Metadata = {
-  title: "Validador QR Veri*Factu AEAT — Comprobador Gratis de Factura Electrónica",
+  title: absoluteTitle(
+    "Validador QR Veri*Factu: comprueba una factura gratis"
+  ),
   description:
-    "Herramienta gratuita para comprobar y validar códigos QR Veri*Factu de la Agencia Tributaria. Decodifica NIF emisor, huella SHA-256, importe y verifica requisitos del RD 1007/2023.",
+    "Comprueba gratis cualquier código QR Veri*Factu de la AEAT: decodifica NIF del emisor, importe y huella, y verifica los requisitos del RD 1007/2023.",
   robots: publicRobots,
   alternates: {
     canonical: canonicalUrl("/herramientas/validador-qr-verifactu"),

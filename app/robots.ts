@@ -25,6 +25,8 @@ export default function robots(): MetadataRoute.Robots {
           "/partner",
           "/partner/",
           "/onboarding",
+          "/welcome",
+          "/welcome/",
           "/sign-in",
           "/sign-up",
           "/admin-access-denied",

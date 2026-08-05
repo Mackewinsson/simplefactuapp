@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { APP_DOCS_LABEL } from "@/lib/branding";
+import { absoluteTitle, APP_DOCS_LABEL } from "@/lib/branding";
 import { getDocPage } from "@/lib/docs/source";
 import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl } from "@/lib/seo/site-url";
@@ -15,9 +15,9 @@ export default async function DocsIndexPage() {
 
 export async function generateMetadata() {
   const page = await getDocPage(undefined);
-  if (!page) return { title: APP_DOCS_LABEL };
+  if (!page) return { title: absoluteTitle(APP_DOCS_LABEL) };
   return {
-    title: APP_DOCS_LABEL,
+    title: absoluteTitle(APP_DOCS_LABEL),
     description: page.frontmatter.description,
     robots: publicRobots,
     alternates: { canonical: canonicalUrl("/docs") },
