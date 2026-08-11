@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requirePartner } from "@/lib/auth/partner";
+import { getPartnerOnboardingStatus } from "@/lib/partner/onboarding-status";
 import { listPartnerSubtenants } from "@/lib/simplefactu/partner-server";
+import { AddNifModalButton } from "@/app/(chrome)/partner/AddNifModal";
 import { PartnerHierarchyTree } from "@/app/(chrome)/partner/PartnerHierarchyTree";
+import { PartnerOnboardingBanner } from "@/app/(chrome)/partner/PartnerOnboardingBanner";
 
 export default async function PartnerHomePage() {
   const { userId } = await requirePartner();
@@ -15,12 +19,33 @@ export default async function PartnerHomePage() {
     err = e instanceof Error ? e.message : "Error al cargar NIFs emisores";
   }
 
+  // Soft redirect: empty console → guided onboarding
+  if (!err && subtenants.length === 0) {
+    redirect("/partner/onboarding");
+  }
+
+  let onboardingIncomplete = false;
+  let onboardingCompleted = 0;
+  let onboardingTotal = 4;
+  try {
+    const status = await getPartnerOnboardingStatus(userId);
+    onboardingIncomplete = !status.complete;
+    onboardingCompleted = status.steps.filter((s) => s.done).length;
+    onboardingTotal = status.steps.length;
+  } catch {
+    // ignore — banner optional
+  }
+
   const active = subtenants.filter((t) => t.status === "ACTIVE");
-  const suspended = subtenants.filter((t) => t.status !== "ACTIVE");
+  const inactive = subtenants.filter((t) => t.status !== "ACTIVE");
   const noCert = subtenants.filter((t) => !t.has_certificate);
 
   return (
     <div className="space-y-8 animate-fade-in-up">
+      {onboardingIncomplete ? (
+        <PartnerOnboardingBanner completed={onboardingCompleted} total={onboardingTotal} />
+      ) : null}
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-fg font-display">
@@ -30,9 +55,7 @@ export default async function PartnerHomePage() {
             NIFs emisores gestionados bajo tu cuenta, certificados digitales y facturación AEAT.
           </p>
         </div>
-        <Link href="/partner/tenants/new" className="btn btn-md btn-accent">
-          + Alta de NIF Emisor
-        </Link>
+        <AddNifModalButton />
       </div>
 
       {err && (
@@ -46,9 +69,9 @@ export default async function PartnerHomePage() {
         <KpiCard label="NIFs Emisores Total" value={subtenants.length} delay={0} />
         <KpiCard label="NIFs Activos" value={active.length} accent="success" delay={1} />
         <KpiCard
-          label="NIFs Suspendidos"
-          value={suspended.length}
-          accent={suspended.length > 0 ? "danger" : undefined}
+          label="NIFs Inactivos"
+          value={inactive.length}
+          accent={inactive.length > 0 ? "warning" : undefined}
           delay={2}
         />
         <KpiCard
@@ -64,34 +87,6 @@ export default async function PartnerHomePage() {
         partnerId={partnerId}
         subtenants={subtenants}
       />
-
-      {/* Empty state */}
-      {subtenants.length === 0 && !err && (
-        <div className="panel-premium rounded-2xl p-10 text-center max-w-lg mx-auto my-4">
-          <svg
-            className="h-12 w-12 text-accent/60 mx-auto mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
-          <p className="text-base font-bold text-fg mb-1 font-display">
-            Aún no tienes NIFs emisores vinculados
-          </p>
-          <p className="text-sm text-fg-muted mb-5 font-medium">
-            Da de alta tu primer NIF o empresa cliente para gestionar sus facturas y certificados ante la AEAT desde esta consola.
-          </p>
-          <Link href="/partner/tenants/new" className="btn btn-md btn-accent">
-            Alta de NIF Emisor
-          </Link>
-        </div>
-      )}
 
       {/* Clients table */}
       {subtenants.length > 0 && (
@@ -176,11 +171,11 @@ function StatusBadge({ status }: { status: string }) {
       className={`inline-flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full ${
         isActive
           ? "text-success-foreground bg-success/60 border border-success-outline/25"
-          : "text-danger-foreground bg-danger/60 border border-danger-outline/25"
+          : "text-fg-subtle bg-surface-muted border border-outline-soft/60"
       }`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-success-emphasis" : "bg-danger-emphasis"}`} />
-      {isActive ? "Activo" : "Suspendido"}
+      <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-success-emphasis" : "bg-fg-subtle/40"}`} />
+      {isActive ? "Activo" : "Inactivo"}
     </span>
   );
 }

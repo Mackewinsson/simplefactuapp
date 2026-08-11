@@ -5,6 +5,11 @@ description: Cambios relevantes del contrato API para integradores ERP.
 
 Entradas breves orientadas a quien ya tenía una integración antigua. Para el diccionario actual: [Envío de facturas](/docs/envio-facturas).
 
+## 2026-08 — Diccionario `tipoFactura` (F1–F5 / R1–R5)
+
+- Nueva sección [Tipos de factura](/docs/envio-facturas#tipos-de-factura-tipofactura) en Envío: significado de cada código AEAT (`F1` ordinaria, `F2` simplificada, `F3` sustitución de simplificadas, `F4` asiento resumen; `R1`–`R5` según art. 80 LIVA / simplificadas).
+- Enlace desde [Inicio rápido](/docs/quickstart).
+
 ## 2026-07 — `sistemaInformatico` opcional (SIF de plataforma)
 
 - **Cambio:** en el camino feliz **no envíes** `sistemaInformatico`. La API lo inyecta (Simple\*Factu = SIF).

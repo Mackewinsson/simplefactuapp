@@ -93,7 +93,7 @@ export function ActivationRequestForm({ defaultEmail }: Props) {
         </p>
       ) : null}
 
-      <button type="submit" disabled={pending} className="btn btn-primary w-full sm:w-auto">
+      <button type="submit" disabled={pending} className="btn btn-md btn-primary">
         {pending ? "Enviando…" : "Enviar solicitud"}
       </button>
     </form>

@@ -11,9 +11,11 @@ import {
 export function PartnerSubtenantActions({
   childId,
   status,
+  hasCertificate,
 }: {
   childId: string;
   status: string;
+  hasCertificate: boolean;
 }) {
   const [keyState, keyAction, keyPending] = useActionState(
     createSubtenantApiKeyFormAction,
@@ -26,10 +28,14 @@ export function PartnerSubtenantActions({
     null as PartnerActionState | null
   );
 
+  const isActive = status === "ACTIVE";
+  // Activation requires the durable requirement (certificate). Deactivating is always allowed.
+  const canToggle = isActive || hasCertificate;
+
   async function toggleStatus() {
     setStatusPending(true);
     setStatusMsg(null);
-    const next = status === "SUSPENDED" ? "ACTIVE" : "SUSPENDED";
+    const next = isActive ? "SUSPENDED" : "ACTIVE";
     const res = await updateSubtenantStatusAction(childId, next);
     setStatusMsg(res.ok ? res.message : res.errors.join(", "));
     setStatusPending(false);
@@ -41,15 +47,17 @@ export function PartnerSubtenantActions({
         <button
           type="button"
           onClick={() => void toggleStatus()}
-          disabled={statusPending}
-          className={`btn btn-sm ${status === "SUSPENDED" ? "btn-accent" : "btn-danger"}`}
+          disabled={statusPending || !canToggle}
+          className={`btn btn-sm ${isActive ? "btn-danger" : "btn-accent"}`}
+          title={!canToggle ? "Sube el certificado PFX antes de activar." : undefined}
         >
-          {statusPending
-            ? "…"
-            : status === "SUSPENDED"
-              ? "Reactivar cliente"
-              : "Suspender cliente"}
+          {statusPending ? "…" : isActive ? "Desactivar cliente" : "Activar cliente"}
         </button>
+        {!canToggle ? (
+          <p className="text-xs text-warning-emphasis font-semibold">
+            Sube el certificado PFX para poder activarlo.
+          </p>
+        ) : null}
         {statusMsg ? <p className="text-sm text-fg-muted font-medium">{statusMsg}</p> : null}
       </div>
 

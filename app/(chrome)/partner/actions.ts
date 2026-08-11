@@ -35,8 +35,19 @@ export async function createSubtenantAction(
     };
   }
 
+  // Los NIFs nacen inactivos: el partner los activa cuando cumplen requisitos
+  // (certificado + API key). Best-effort: si el PATCH falla, queda activo.
+  await partnerFetch(userId, `/partner/tenants/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status: "SUSPENDED" }),
+  }).catch(() => undefined);
+
   revalidatePath("/partner");
-  return { ok: true, message: `NIF Emisor ${name || id} registrado correctamente.` };
+  revalidatePath("/partner/onboarding");
+  return {
+    ok: true,
+    message: `NIF Emisor ${name || id} registrado. Quedará inactivo hasta que lo actives.`,
+  };
 }
 
 export async function updateSubtenantStatusAction(
@@ -56,6 +67,7 @@ export async function updateSubtenantStatusAction(
   }
 
   revalidatePath("/partner");
+  revalidatePath("/partner/onboarding");
   revalidatePath(`/partner/tenants/${childId}`);
   return {
     ok: true,
@@ -94,6 +106,7 @@ export async function createSubtenantApiKeyFormAction(
   }
 
   revalidatePath(`/partner/tenants/${childId}`);
+  revalidatePath("/partner/onboarding");
   return {
     ok: true,
     message: "Clave creada. Cópiala ahora; no se volverá a mostrar.",
@@ -137,6 +150,7 @@ export async function uploadSubtenantCertificateAction(
 
   revalidatePath(`/partner/tenants/${childId}`);
   revalidatePath("/partner");
+  revalidatePath("/partner/onboarding");
   const nif = json.certificate?.nif;
   return {
     ok: true,

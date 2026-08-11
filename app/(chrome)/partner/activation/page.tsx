@@ -72,7 +72,7 @@ export default async function PartnerActivationPage() {
           href={`${sandboxUrl}/sign-up`}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn btn-primary mt-4 inline-flex"
+          className="btn btn-md btn-accent mt-4 inline-flex"
         >
           Ir a {sandboxUrl.replace(/^https?:\/\//, "")} →
         </a>

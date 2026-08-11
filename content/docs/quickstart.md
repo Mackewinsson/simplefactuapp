@@ -63,7 +63,7 @@ curl -s -X POST "https://api.qa.simplefactu.com/v1/send-invoice" \
 | `nif` / `nombre` | Emisor (obligado tributario) |
 | `numSerie` | Número de factura (único en la serie) |
 | `fecha` | Expedición `DD-MM-YYYY` |
-| `tipoFactura` | `F1` = factura normal |
+| `tipoFactura` | `F1` = factura ordinaria. Otros códigos (`F2`–`F5`, `R1`–`R5`): [Envío → Tipos de factura](/docs/envio-facturas#tipos-de-factura-tipofactura) |
 | `descripcion` | Texto de la operación (obligatorio) |
 | `destNif` / `destNombre` | Cliente |
 | `cuotaTotal` / `total` | IVA y total |

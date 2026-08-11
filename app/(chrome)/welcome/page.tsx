@@ -19,7 +19,7 @@ export default async function WelcomePage() {
     redirect("/invoices");
   }
   if (accountType === "integrator") {
-    redirect(isSandboxAutoApproveIntegrators() ? "/partner" : "/partner/activation");
+    redirect(isSandboxAutoApproveIntegrators() ? "/partner/onboarding" : "/partner/activation");
   }
 
   if (await shouldSkipWelcome(userId)) {

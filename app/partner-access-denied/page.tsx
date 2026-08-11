@@ -14,7 +14,7 @@ export default async function PartnerAccessDeniedPage() {
           Tu cuenta de integrador aún no tiene acceso a la consola de producción.
           Prueba primero en sandbox y solicita la activación.
         </p>
-        <Link href="/partner/activation" className="btn btn-primary inline-flex">
+        <Link href="/partner/activation" className="btn btn-md btn-accent inline-flex">
           Ir a activación →
         </Link>
       </div>

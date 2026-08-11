@@ -49,7 +49,7 @@ export async function setAccountTypeAction(
   }
 
   if (isSandboxAutoApproveIntegrators()) {
-    redirect("/partner");
+    redirect("/partner/onboarding");
   }
 
   redirect("/partner/activation");

@@ -90,11 +90,11 @@ export default async function PartnerTenantDetailPage({
             className={`inline-flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full ${
               isActive
                 ? "text-success-foreground bg-success/60 border border-success-outline/25"
-                : "text-danger-foreground bg-danger/60 border border-danger-outline/25"
+                : "text-fg-subtle bg-surface-muted border border-outline-soft/60"
             }`}
           >
-            <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-success-emphasis" : "bg-danger-emphasis"}`} />
-            {isActive ? "Activo" : "Suspendido"}
+            <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-success-emphasis" : "bg-fg-subtle/40"}`} />
+            {isActive ? "Activo" : "Inactivo"}
           </span>
           <span
             className={`inline-flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full ${
@@ -219,7 +219,11 @@ curl -s -X POST "$API_BASE/send-invoice" \\
           <h2 className="text-base font-bold text-fg font-display tracking-tight border-b border-outline-soft/60 pb-2 mb-5">
             Acciones y credenciales
           </h2>
-          <PartnerSubtenantActions childId={tenant.id} status={tenant.status} />
+          <PartnerSubtenantActions
+            childId={tenant.id}
+            status={tenant.status}
+            hasCertificate={hasCert}
+          />
         </section>
 
         <section className="panel-premium rounded-2xl p-6">

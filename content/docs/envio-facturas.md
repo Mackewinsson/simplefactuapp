@@ -28,13 +28,41 @@ Guía de referencia para `POST /v1/send-invoice`. Para el tutorial paso a paso c
 | `nombre` | Sí | Nombre o razón social del emisor. |
 | `numSerie` | Sí | Número de serie de la factura (único en la serie). La “serie” de encadenamiento es el prefijo antes de `/`, `-` o `_`. |
 | `fecha` | Sí | Fecha de expedición `DD-MM-YYYY`. |
-| `tipoFactura` | Sí | `F1`–`F5` o `R1`–`R5`. |
+| `tipoFactura` | Sí | Código AEAT `F1`–`F5` o `R1`–`R5`. Ver [Tipos de factura](#tipos-de-factura-tipofactura). |
 | `descripcion` | Sí | Descripción de la operación (1–500 caracteres). |
 | `fechaOperacion` | No | `DD-MM-YYYY`. No puede ser posterior a `fecha` salvo claves de régimen 14/15 (AEAT 1146). |
 | `refExterna` | No | Referencia libre del ERP (máx. 60). Omitir si no usas referencia propia. |
 | `sistemaInformatico` | No* | **Omitir.** Simple\*Factu rellena el SIF. Solo obligatorio con `clientSifEnabled` (modo excepcional). |
 
 \*En el camino feliz no envíes este objeto.
+
+## Tipos de factura (`tipoFactura`)
+
+Códigos del campo `TipoFactura` según AEAT (RD 1619/2012 y art. 80 LIVA). El valor habitual en integraciones nuevas es **`F1`**.
+
+### Altas (`F*`)
+
+| Código | Significado |
+|--------|-------------|
+| `F1` | **Factura ordinaria** (factura completa / con identificación del destinatario; arts. 6, 7.2 y 7.3 del RD 1619/2012). Incluye también las simplificadas *cualificadas* que identifican al destinatario. |
+| `F2` | **Factura simplificada** y facturas sin identificación del destinatario (art. 6.1.d RD 1619/2012). **No** envíes `destNif` / `destNombre` / `destIdOtro` (AEAT 1190). Límite de importe €3000. |
+| `F3` | **Sustitución de facturas simplificadas** ya facturadas y declaradas. |
+| `F4` | **Asiento resumen** de facturas (agrupación de varias simplificadas / tickets). |
+| `F5` | Caso menos habitual (la API lo admite si aplica a tu operación; consulta la FAQ / XSD AEAT vigentes). |
+
+### Rectificativas (`R*`)
+
+| Código | Significado |
+|--------|-------------|
+| `R1` | Rectificativa por **error fundado en derecho** o causas del art. 80.Uno, Dos y Seis LIVA (devoluciones, descuentos posteriores, resolución de operaciones, etc.). |
+| `R2` | Rectificativa por **concurso de acreedores** (art. 80.Tres LIVA). |
+| `R3` | Rectificativa por **crédito incobrable** (art. 80.Cuatro LIVA). |
+| `R4` | Rectificativa por **otros motivos** (resto de causas distintas de R1–R3). |
+| `R5` | Rectificativa de **factura simplificada** (cualquier motivo sobre una F2 / sin identificación del destinatario). |
+
+Cuando uses `R1`–`R5` debes enviar también `tipoRectificativa` y el resto de campos de [Rectificativas](#rectificativas-r1r5).
+
+Fuente AEAT: [FAQ Veri\*Factu — Procedimientos de facturación](https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/preguntas-frecuentes/procedimientos-facturacion.html).
 
 ## Destinatario
 

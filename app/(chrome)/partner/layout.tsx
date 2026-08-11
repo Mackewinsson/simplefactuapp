@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { requirePartner } from "@/lib/auth/partner";
+import { getPartnerOnboardingStatus } from "@/lib/partner/onboarding-status";
 import { PartnerNav } from "./PartnerNav";
 import { privatePageMetadata } from "@/lib/seo/robots";
 
@@ -22,7 +23,15 @@ export default async function PartnerLayout({ children }: { children: React.Reac
     return <div className="animate-fade-in-up">{children}</div>;
   }
 
-  await requirePartner();
+  const { userId } = await requirePartner();
+
+  let showOnboardingGuide = false;
+  try {
+    const status = await getPartnerOnboardingStatus(userId);
+    showOnboardingGuide = !status.complete;
+  } catch {
+    showOnboardingGuide = true;
+  }
 
   return (
     <div className="space-y-8 animate-fade-in-up">
@@ -32,7 +41,7 @@ export default async function PartnerLayout({ children }: { children: React.Reac
           Consola de integrador — gestiona los clientes vinculados a tu cuenta, sus certificados y envíos AEAT.
         </span>
       </div>
-      <PartnerNav />
+      <PartnerNav showOnboardingGuide={showOnboardingGuide} />
       {children}
     </div>
   );

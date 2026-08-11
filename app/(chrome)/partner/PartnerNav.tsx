@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function PartnerNav() {
+export function PartnerNav({ showOnboardingGuide = false }: { showOnboardingGuide?: boolean }) {
   const pathname = usePathname();
 
+  // Alta de NIFs: un único camino — la guía (primer NIF) o el modal de la consola (siguientes).
   const links = [
     { href: "/partner", label: "Resumen", exact: true },
-    { href: "/partner/tenants/new", label: "Agregar cliente" },
+    ...(showOnboardingGuide
+      ? [{ href: "/partner/onboarding", label: "Guía de inicio", exact: false }]
+      : []),
   ];
 
   const getLinkClass = (href: string, exact = false) => {
@@ -21,11 +24,14 @@ export function PartnerNav() {
   return (
     <nav className="flex flex-wrap gap-2 border-b border-outline-soft/65 pb-4 items-center">
       {links.map((link) => (
-        <Link key={link.href} href={link.href} className={getLinkClass(link.href, "exact" in link && link.exact)}>
+        <Link key={link.href} href={link.href} className={getLinkClass(link.href, link.exact)}>
           {link.label}
         </Link>
       ))}
-      <Link href="/invoices" className="rounded-lg border border-accent/20 bg-accent-muted/40 px-3 py-1.5 text-xs font-bold text-accent hover:bg-accent-muted transition-all font-display ml-auto">
+      <Link
+        href="/invoices"
+        className="rounded-lg border border-accent/20 bg-accent-muted/40 px-3 py-1.5 text-xs font-bold text-accent hover:bg-accent-muted transition-all font-display ml-auto"
+      >
         Volver a la app
       </Link>
     </nav>
