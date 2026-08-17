@@ -186,16 +186,16 @@ export const articles: Article[] = [
   },
   {
     slug: "primera-factura-electronica-aeat-verifactu",
-    title: "Cómo enviar tu primera factura electrónica a la AEAT con Veri*Factu",
+    title: "Factura FNMT: envía tu primera factura electrónica a la AEAT",
     excerpt:
       "Paso a paso: desde configurar tu programa de facturación hasta ver el CSV y el QR en el PDF de tu factura. Sin tecnicismos innecesarios.",
     date: "2026-05-05",
-    updated: "2026-08-05",
+    updated: "2026-08-17",
     readingMinutes: 9,
     tags: ["verifactu", "tutorial", "facturacion-electronica", "aeat"],
-    seoTitle: "Factura FNMT y Veri*Factu: primera factura a la AEAT",
+    seoTitle: "Factura FNMT: envía tu primera factura a Hacienda",
     seoDescription:
-      "Factura FNMT con certificado digital: cómo emitir y enviar tu primera factura electrónica a la AEAT (CSV, QR, errores). Guía Veri*Factu paso a paso.",
+      "Cómo hacer una factura FNMT con certificado digital: emitir, enviar a la AEAT y leer CSV/QR. Guía Veri*Factu para autónomos, paso a paso.",
     relatedSlugs: [
       "certificado-digital-fnmt-verifactu",
       "verifactu-para-autonomos-pasos-certificado-primera-factura",
@@ -431,22 +431,27 @@ rm /tmp/cert.pem</code></pre>
   },
   {
     slug: "certificado-digital-fnmt-verifactu",
-    title: "Certificado digital FNMT para facturas y Veri*Factu",
+    title: "Certificado digital FNMT para emitir facturas (CERES)",
     excerpt:
       "Todo lo que necesitas saber sobre el certificado FNMT para emitir facturas y enviarlas a la AEAT: cómo solicitarlo, exportarlo en formato .pfx y configurarlo en tu programa de facturación.",
     date: "2026-04-20",
-    updated: "2026-08-05",
+    updated: "2026-08-17",
     readingMinutes: 11,
     tags: ["fnmt", "certificado-digital", "verifactu", "facturas", "tutorial"],
-    seoTitle: "Descargar certificado FNMT para facturas (CERES)",
+    seoTitle: "Certificado FNMT para facturas: descarga .pfx (CERES)",
     seoDescription:
-      "Cómo descargar el certificado digital FNMT/CERES (.pfx) para emitir facturas Veri*Factu: solicitud, exportación, renovación y errores frecuentes.",
+      "Cómo obtener el certificado digital FNMT/CERES para emitir facturas: solicitud, descarga .pfx y uso con Veri*Factu. No es la consulta de facturas de Hacienda.",
     relatedSlugs: [
       "primera-factura-electronica-aeat-verifactu",
       "verifactu-para-autonomos-pasos-certificado-primera-factura",
       "que-es-verifactu-guia-autonomos-2026",
     ],
     faqs: [
+      {
+        question: "¿Esta guía sirve para consultar o descargar facturas en FNMT/CERES?",
+        answer:
+          "No. Esta página es para obtener el certificado digital FNMT con el que TÚ emites facturas (Veri*Factu). Si lo que buscas es consultar facturas ya recibidas, usa la sede electrónica de la AEAT, no el certificado de emisor.",
+      },
       {
         question: "¿Se pueden hacer facturas con el certificado digital FNMT?",
         answer:
