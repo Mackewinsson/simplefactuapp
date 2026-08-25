@@ -10,7 +10,7 @@ const CORNERSTONE = new Set<string>(CORNERSTONE_SLUGS);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
-  const staticLastMod = new Date("2026-06-12T00:00:00.000Z");
+  const staticLastMod = new Date("2026-08-25T00:00:00.000Z");
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: base, lastModified: staticLastMod, changeFrequency: "monthly", priority: 1 },

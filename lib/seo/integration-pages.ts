@@ -44,10 +44,10 @@ export const INTEGRATION_PAGES: IntegrationPageContent[] = [
     navLabel: "FactuSOL",
     badge: "Integración API · FactuSOL",
     title: "API FactuSOL Veri*Factu",
-    metaTitle: "API FactuSOL Veri*Factu | Integra con AEAT en minutos",
+    metaTitle: "API FactuSOL: REST Veri*Factu para la AEAT",
     metaDescription:
-      "Conecta FactuSOL (o tu ERP) a Veri*Factu con nuestra API REST. Huella SHA-256, SOAP AEAT y CSV sin montar mTLS. Docs + sandbox gratis.",
-    h1: "API Veri*Factu para FactuSOL",
+      "API FactuSOL (FactuSOL API) para Veri*Factu: conecta tu ERP por REST. Huella SHA-256, SOAP AEAT y CSV sin montar mTLS. Docs + sandbox gratis.",
+    h1: "API FactuSOL Veri*Factu para la AEAT",
     intro:
       "FactuSOL no expone una API pública completa para Veri*Factu. Simple*Factu actúa como capa REST: tu conector o ERP envía la factura y nosotros gestionamos huella, SOAP AEAT, reintentos y CSV.",
     about: ["FactuSOL", "Veri*Factu", "API de facturación electrónica"],

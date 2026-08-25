@@ -19,7 +19,7 @@ const CONTENT: Record<
   }
 > = {
   autonomos: {
-    headline: "Cumple Veri*Factu. Sin coste.",
+    headline: "Software Veri*Factu. Gratis para autónomos.",
     sub: "Factura, envía a Hacienda y guarda el CSV en segundos. Huellas, encadenamiento y firma SOAP gestionados por nosotros — en el plan gratuito.",
     bullets: [
       "Alta en minutos con tu certificado FNMT",
@@ -37,7 +37,7 @@ const CONTENT: Record<
     note: "Sin tarjeta · Sin permanencia · Gratis",
   },
   empresas: {
-    headline: "API Veri*Factu lista para integrar.",
+    headline: "API Veri*Factu para FactuSOL, Odoo y ERP.",
     sub: "API REST con idempotencia, trabajos asíncronos y firma mTLS por cuenta. Tu sistema sigue emitiendo; nosotros hablamos con AEAT.",
     bullets: [
       "POST /send-invoice, consulta de trabajos y webhooks salientes",

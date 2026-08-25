@@ -97,7 +97,7 @@ export const articles: Article[] = [
 </p>
 <p>
   Cómo solicitarlo, exportarlo al formato correcto y resolver los errores más frecuentes está detallado en la guía del
-  <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para facturas</a>.
+  <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para Veri*Factu</a>.
 </p>
 <p>
   Simple*Factu almacena tu certificado cifrado con AES-256-GCM. Nunca sale del servidor en texto claro.
@@ -186,16 +186,16 @@ export const articles: Article[] = [
   },
   {
     slug: "primera-factura-electronica-aeat-verifactu",
-    title: "Factura FNMT: envía tu primera factura electrónica a la AEAT",
+    title: "Tu primera factura Veri*Factu: envío a la AEAT paso a paso",
     excerpt:
       "Paso a paso: desde configurar tu programa de facturación hasta ver el CSV y el QR en el PDF de tu factura. Sin tecnicismos innecesarios.",
     date: "2026-05-05",
-    updated: "2026-08-17",
+    updated: "2026-08-25",
     readingMinutes: 9,
     tags: ["verifactu", "tutorial", "facturacion-electronica", "aeat"],
-    seoTitle: "Factura FNMT: envía tu primera factura a Hacienda",
+    seoTitle: "Primera factura Veri*Factu: envío a la AEAT",
     seoDescription:
-      "Cómo hacer una factura FNMT con certificado digital: emitir, enviar a la AEAT y leer CSV/QR. Guía Veri*Factu para autónomos, paso a paso.",
+      "Cómo emitir y enviar tu primera factura electrónica Veri*Factu a Hacienda: certificado digital, CSV y QR. Guía para autónomos, paso a paso.",
     relatedSlugs: [
       "certificado-digital-fnmt-verifactu",
       "verifactu-para-autonomos-pasos-certificado-primera-factura",
@@ -232,11 +232,22 @@ export const articles: Article[] = [
         answer:
           "No para las operaciones sujetas a la obligación. Desde la entrada en vigor del RD 1007/2023, las facturas deben generarse con un sistema informático de facturación conforme que produzca el registro encadenado con huella SHA-256. Una plantilla de Word o Excel no cumple los requisitos de inalterabilidad y trazabilidad.",
       },
+      {
+        question: "¿Esta guía sirve para descargar la factura de mi certificado FNMT?",
+        answer:
+          "No. La factura que te cobra la FNMT por emitir el certificado se gestiona en la sede CERES (sede.fnmt.gob.es). Esta guía cubre otra cosa: emitir TUS facturas a clientes y enviar el registro Veri*Factu a la AEAT usando ese certificado para firmar.",
+      },
     ],
     content: `
+<h2>¿Buscas la factura de cobro de la FNMT?</h2>
+<p>
+  Si quieres <strong>descargar la factura que te emitió la FNMT</strong> por tu certificado digital, esa gestión está en la
+  <a href="https://www.sede.fnmt.gob.es/" target="_blank" rel="noreferrer">sede electrónica CERES</a>,
+  no aquí. Esta guía es para emitir <em>tus</em> facturas a clientes y enviarlas a Hacienda con Veri*Factu.
+</p>
 <h2>Lo que necesitas antes de empezar</h2>
 <ol>
-  <li><strong>Un certificado digital</strong> en formato .pfx o .p12 (con clave privada). Si aún no lo tienes, empieza por la guía del <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para facturas</a>, que cubre solicitud, exportación y errores.</li>
+  <li><strong>Un certificado digital</strong> en formato .pfx o .p12 (con clave privada). Si aún no lo tienes, empieza por la guía del <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para Veri*Factu</a>, que cubre solicitud, exportación y errores.</li>
   <li><strong>Contraseña del certificado</strong> que estableciste al exportarlo.</li>
   <li><strong>Tu NIF</strong>: debe coincidir exactamente con el del certificado. Extráelo con: <code>openssl pkcs12 -info -in certificado.p12 -passin pass:TU_PASS -noout</code></li>
   <li><strong>Los datos fiscales del cliente</strong>: nombre o razón social y NIF válido.</li>
@@ -431,16 +442,16 @@ rm /tmp/cert.pem</code></pre>
   },
   {
     slug: "certificado-digital-fnmt-verifactu",
-    title: "Certificado digital FNMT para emitir facturas (CERES)",
+    title: "Certificado digital FNMT para Veri*Factu: exportar .pfx",
     excerpt:
-      "Todo lo que necesitas saber sobre el certificado FNMT para emitir facturas y enviarlas a la AEAT: cómo solicitarlo, exportarlo en formato .pfx y configurarlo en tu programa de facturación.",
+      "Todo lo que necesitas saber sobre el certificado FNMT para firmar facturas Veri*Factu y enviarlas a la AEAT: cómo solicitarlo, exportarlo en formato .pfx y configurarlo en tu programa de facturación.",
     date: "2026-04-20",
-    updated: "2026-08-17",
+    updated: "2026-08-25",
     readingMinutes: 11,
     tags: ["fnmt", "certificado-digital", "verifactu", "facturas", "tutorial"],
-    seoTitle: "Certificado FNMT para facturas: descarga .pfx (CERES)",
+    seoTitle: "Certificado FNMT para Veri*Factu: exportar .pfx",
     seoDescription:
-      "Cómo obtener el certificado digital FNMT/CERES para emitir facturas: solicitud, descarga .pfx y uso con Veri*Factu. No es la consulta de facturas de Hacienda.",
+      "Cómo solicitar y exportar el certificado digital FNMT/CERES en .pfx para firmar facturas Veri*Factu. No es la factura de cobro ni la consulta CERES de la FNMT.",
     relatedSlugs: [
       "primera-factura-electronica-aeat-verifactu",
       "verifactu-para-autonomos-pasos-certificado-primera-factura",
@@ -1257,7 +1268,7 @@ rm /tmp/cert.pem</code></pre>
 </p>
 <p>
   Aquí va el resumen. Si te atascas en algún punto, la guía específica del
-  <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para facturas</a>
+  <a href="/blog/certificado-digital-fnmt-verifactu">certificado digital FNMT para Veri*Factu</a>
   cubre la exportación en Windows, macOS y Firefox, además de los errores más habituales.
 </p>
 <p><strong>Cómo obtenerlo si no lo tienes:</strong></p>
@@ -2014,12 +2025,12 @@ rm /tmp/cert.pem</code></pre>
     excerpt:
       "FactuSOL es uno de los programas de facturación gratuitos más usados en España. ¿Es compatible con Veri*Factu? Qué versión necesitas y cómo migrar si no lo es.",
     date: "2026-05-20",
-    updated: "2026-08-05",
+    updated: "2026-08-25",
     readingMinutes: 6,
     tags: ["verifactu", "factusol", "software", "migracion", "compatibilidad"],
-    seoTitle: "FactuSOL Veri*Factu: ¿compatible? Versión y migración",
+    seoTitle: "FactuSOL Veri*Factu: compatibilidad, versión y API",
     seoDescription:
-      "¿FactuSOL cumple Veri*Factu? Comprueba tu versión, pide la declaración responsable a DELSOL y migra o integra por API si tu edición no es conforme.",
+      "¿FactuSOL cumple Veri*Factu? Comprueba tu versión, pide la declaración responsable a DELSOL y migra o integra por API REST si tu edición no es conforme.",
     relatedSlugs: [
       "contasimple-verifactu-diferencias-cuando-usar-cada-uno",
       "odoo-verifactu-integracion-modulos-cumplimiento",
