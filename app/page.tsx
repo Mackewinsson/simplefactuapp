@@ -12,17 +12,17 @@ import { publicRobots } from "@/lib/seo/robots";
 import { canonicalUrl, getSiteUrl } from "@/lib/seo/site-url";
 
 export const metadata: Metadata = {
-  title: absoluteTitle("Simple*Factu — API y software Veri*Factu (AEAT)"),
+  title: absoluteTitle("Software Veri*Factu para autónomos y pymes | Simple*Factu"),
   description:
-    "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
+    "Programa y API Veri*Factu para enviar facturas a la AEAT. Integra FactuSOL, ContaSimple u Odoo. Plan gratuito y sandbox para developers.",
   robots: publicRobots,
   alternates: {
     canonical: canonicalUrl("/"),
   },
   openGraph: {
-    title: "Simple*Factu — API y software Veri*Factu (AEAT)",
+    title: "Software Veri*Factu para autónomos y pymes | Simple*Factu",
     description:
-      "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
+      "Programa y API Veri*Factu para enviar facturas a la AEAT. Integra FactuSOL, ContaSimple u Odoo. Plan gratuito y sandbox para developers.",
     url: canonicalUrl("/"),
     siteName: "Simple*Factu",
     locale: "es_ES",
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Simple*Factu — API y software Veri*Factu (AEAT)",
+    title: "Software Veri*Factu para autónomos y pymes | Simple*Factu",
     description:
-      "API REST y panel para cumplir Veri*Factu. Integra FactuSOL, Odoo o tu ERP sin SOAP. Para developers, autónomos y pymes. Sandbox gratis.",
+      "Programa y API Veri*Factu para enviar facturas a la AEAT. Integra FactuSOL, ContaSimple u Odoo. Plan gratuito y sandbox para developers.",
   },
 };
 
