@@ -40,6 +40,11 @@ export function AdminOpsAlerts({ diag, ready }: Props) {
               Probar ↗
             </a>
           </dd>
+          {!ready.ok && ready.networkError ? (
+            <p className="mt-2 text-xs text-danger-foreground font-semibold bg-danger/40 p-2 rounded-lg border border-danger-outline/40">
+              {ready.networkError}
+            </p>
+          ) : null}
           {!ready.ok && ready.errors?.length ? (
             <ul className="mt-2 list-inside list-disc text-xs text-danger-foreground font-semibold bg-danger/40 p-2 rounded-lg border border-danger-outline/40">
               {ready.errors.map((e) => (

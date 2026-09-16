@@ -1,5 +1,6 @@
 import "server-only";
 
+import { wrapSimplefactuFetchError } from "@/lib/simplefactu/api-errors";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensurePartnerApiKey } from "@/lib/partner/provision";
 
@@ -26,7 +27,11 @@ export async function partnerFetch(
   }
   headers.set("x-api-key", apiKey);
 
-  return fetch(joinUrl(baseUrl, path), { ...init, headers });
+  try {
+    return await fetch(joinUrl(baseUrl, path), { ...init, headers });
+  } catch (e) {
+    throw wrapSimplefactuFetchError(e);
+  }
 }
 
 export type PartnerSubtenant = {

@@ -1,3 +1,4 @@
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 
 /** API origin without the `/v1` suffix (`/ready` and `/health` live at root). */
@@ -10,6 +11,8 @@ export type PublicReadyProbe = {
   status: number;
   checks?: Record<string, unknown>;
   errors?: string[];
+  /** Present when the probe never got an HTTP response (TLS, DNS, timeout). */
+  networkError?: string;
 };
 
 export async function probeApiReady(): Promise<PublicReadyProbe> {
@@ -23,7 +26,7 @@ export async function probeApiReady(): Promise<PublicReadyProbe> {
     };
     const ok = res.ok && body.ready !== false;
     return { ok, status: res.status, checks: body.checks, errors: body.errors };
-  } catch {
-    return { ok: false, status: 0 };
+  } catch (e) {
+    return { ok: false, status: 0, networkError: formatVerifactuActionError(e) };
   }
 }

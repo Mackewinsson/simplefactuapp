@@ -2,7 +2,31 @@
 
 import { humanizeAeatError } from "@/lib/simplefactu/aeat-error-messages";
 
-function errnoCodeFromUnknown(e: unknown): string | undefined {
+const TLS_EXPIRED_CODES = new Set([
+  "CERT_HAS_EXPIRED",
+  "ERR_CERT_DATE_INVALID",
+  "CERT_NOT_YET_VALID",
+]);
+
+const TLS_TRUST_CODES = new Set([
+  "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+  "UNABLE_TO_GET_ISSUER_CERT",
+  "UNABLE_TO_GET_ISSUER_CERT_LOCALLY",
+  "DEPTH_ZERO_SELF_SIGNED_CERT",
+  "SELF_SIGNED_CERT_IN_CHAIN",
+  "CERT_UNTRUSTED",
+  "ERR_TLS_CERT_ALTNAME_INVALID",
+]);
+
+const NETWORK_CODES = new Set([
+  "ECONNREFUSED",
+  "ENOTFOUND",
+  "ETIMEDOUT",
+  "ECONNRESET",
+  "UND_ERR_CONNECT_TIMEOUT",
+]);
+
+export function errnoCodeFromUnknown(e: unknown): string | undefined {
   if (!e || typeof e !== "object") return undefined;
   const err = e as Error & { cause?: unknown; code?: string };
   if (typeof err.code === "string") return err.code;
@@ -17,12 +41,29 @@ function errnoCodeFromUnknown(e: unknown): string | undefined {
   return undefined;
 }
 
+const TLS_EXPIRED_MESSAGE =
+  "El certificado HTTPS del servicio de registro Verifactu ha caducado. El API puede seguir en marcha, pero Node rechaza el TLS (error CERT_HAS_EXPIRED). Renueva el certificado Let's Encrypt en el VPS (`certbot renew`) y recarga nginx.";
+
+const TLS_TRUST_MESSAGE =
+  "El certificado HTTPS del servicio de registro Verifactu no es de confianza. Revisa que el certificado del VPS coincida con el hostname de SIMPLEFACTU_API_BASE_URL.";
+
 /**
  * When `fetch` to simplefactu fails before any HTTP response (servicio caído,
- * puerto incorrecto, DNS, etc.). Evita propagar `TypeError: fetch failed` al usuario.
+ * puerto incorrecto, DNS, certificado TLS caducado, etc.). Evita propagar
+ * `TypeError: fetch failed` al usuario.
  */
 export function formatSimplefactuNetworkError(err: unknown): string {
   const code = errnoCodeFromUnknown(err);
+  if (code && TLS_EXPIRED_CODES.has(code)) return TLS_EXPIRED_MESSAGE;
+  if (code && TLS_TRUST_CODES.has(code)) return TLS_TRUST_MESSAGE;
+  const causeMsg =
+    err instanceof Error && err.cause instanceof Error ? err.cause.message : undefined;
+  if (
+    (typeof causeMsg === "string" && /certificate has expired/i.test(causeMsg)) ||
+    (err instanceof Error && /certificate has expired/i.test(err.message))
+  ) {
+    return TLS_EXPIRED_MESSAGE;
+  }
   if (code === "ECONNREFUSED") {
     return "No se pudo conectar con el servicio de registro Verifactu (conexión rechazada). Comprueba que el servicio está en marcha y que la URL configurada para el entorno apunta al host y puerto correctos (en desarrollo local, la app y el servicio de registro suelen usar puertos distintos).";
   }
@@ -39,13 +80,15 @@ function isLikelyNetworkFetchFailure(e: unknown): boolean {
   if (!(e instanceof Error)) return false;
   if (e instanceof TypeError && e.message === "fetch failed") return true;
   const code = errnoCodeFromUnknown(e);
-  return (
-    code === "ECONNREFUSED" ||
-    code === "ENOTFOUND" ||
-    code === "ETIMEDOUT" ||
-    code === "ECONNRESET" ||
-    code === "UND_ERR_CONNECT_TIMEOUT"
-  );
+  if (!code) return false;
+  return NETWORK_CODES.has(code) || TLS_EXPIRED_CODES.has(code) || TLS_TRUST_CODES.has(code);
+}
+
+/** Re-throw a network/TLS `fetch` failure with a user-facing Spanish message. */
+export function wrapSimplefactuFetchError(e: unknown): Error {
+  const err = new Error(formatVerifactuActionError(e));
+  err.cause = e;
+  return err;
 }
 
 /**
