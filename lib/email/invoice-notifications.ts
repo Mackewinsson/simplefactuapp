@@ -1,4 +1,4 @@
-import { getFromEmail, getResend } from "./client";
+import { getAdminNotifyEmail, getFromEmail, getResend } from "./client";
 
 /* ── Lead notification ──────────────────────────────── */
 
@@ -7,49 +7,107 @@ type LeadNotificationParams = {
   email: string;
   type: string;
   message?: string | null;
+  id?: string;
 };
 
-export async function sendLeadNotificationEmail(params: LeadNotificationParams): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
-  const notifyTo = process.env.LEAD_NOTIFY_EMAIL;
-  if (!notifyTo) return;
+function leadTypeLabel(type: string): string {
+  return type === "autonomo" ? "Autónomo" : "Empresa / API";
+}
 
-  const typeLabel = params.type === "autonomo" ? "Autónomo" : "Empresa / API";
-  const messageBlock = params.message
-    ? `<p style="margin:16px 0 0;font-size:14px;color:#3f3f46;white-space:pre-wrap;">${params.message}</p>`
-    : "";
+function leadAdminUrl(id?: string): string {
+  const origin = (process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://simplefactu.com").replace(
+    /\/$/,
+    ""
+  );
+  return id ? `${origin}/admin/leads/${encodeURIComponent(id)}` : `${origin}/admin/leads`;
+}
 
-  const html = baseHtml(`Nuevo lead: ${params.name}`, `
+/** Build the HTML + text bodies for a landing lead (exported for tests). */
+export function buildLeadNotificationContent(params: LeadNotificationParams): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const typeLabel = leadTypeLabel(params.type);
+  const message = (params.message ?? "").trim();
+  const messageHtml = message
+    ? `<p style="margin:8px 0 0;font-size:14px;color:#18181b;white-space:pre-wrap;word-break:break-word;">${escapeHtml(message)}</p>`
+    : `<p style="margin:8px 0 0;font-size:13px;color:#a1a1aa;">(sin mensaje)</p>`;
+  const adminUrl = leadAdminUrl(params.id);
+  const subject = `Nuevo lead: ${params.name} (${typeLabel})`;
+
+  const html = baseHtml(subject, `
     <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#18181b;">
       Nuevo lead en la landing
     </h1>
     <table style="border-collapse:collapse;width:100%;margin-top:12px;">
       <tr>
         <td style="padding:6px 0;font-size:13px;color:#71717a;width:80px;">Nombre</td>
-        <td style="padding:6px 0;font-size:14px;color:#18181b;font-weight:500;">${params.name}</td>
+        <td style="padding:6px 0;font-size:14px;color:#18181b;font-weight:500;">${escapeHtml(params.name)}</td>
       </tr>
       <tr>
         <td style="padding:6px 0;font-size:13px;color:#71717a;">Email</td>
         <td style="padding:6px 0;font-size:14px;color:#18181b;">
-          <a href="mailto:${params.email}" style="color:#18181b;">${params.email}</a>
+          <a href="mailto:${escapeHtml(params.email)}" style="color:#18181b;">${escapeHtml(params.email)}</a>
         </td>
       </tr>
       <tr>
         <td style="padding:6px 0;font-size:13px;color:#71717a;">Perfil</td>
-        <td style="padding:6px 0;font-size:14px;color:#18181b;">${typeLabel}</td>
+        <td style="padding:6px 0;font-size:14px;color:#18181b;">${escapeHtml(typeLabel)}</td>
       </tr>
     </table>
-    ${messageBlock}
+    <p style="margin:20px 0 0;font-size:12px;font-weight:600;color:#71717a;letter-spacing:.04em;text-transform:uppercase;">Mensaje</p>
+    ${messageHtml}
+    <p style="margin:20px 0 0;font-size:13px;">
+      <a href="${escapeHtml(adminUrl)}" style="color:#18181b;">Ver el mensaje completo en el admin →</a>
+    </p>
   `);
 
+  const text = [
+    "Nuevo lead en la landing",
+    `Nombre: ${params.name}`,
+    `Email: ${params.email}`,
+    `Perfil: ${typeLabel}`,
+    "",
+    "Mensaje:",
+    message || "(sin mensaje)",
+    "",
+    `Ver en admin: ${adminUrl}`,
+  ].join("\n");
+
+  return { subject, html, text };
+}
+
+export async function sendLeadNotificationEmail(params: LeadNotificationParams): Promise<void> {
+  const resend = getResend();
+  const notifyTo = getAdminNotifyEmail();
+  if (!resend) {
+    console.warn("[lead email] RESEND_API_KEY no está definida; no se envía aviso al admin.");
+    return;
+  }
+  if (!notifyTo) {
+    console.warn(
+      "[lead email] ADMIN_NOTIFY_EMAIL (o LEAD_NOTIFY_EMAIL) no está definida; no se envía aviso."
+    );
+    return;
+  }
+
+  const { subject, html, text } = buildLeadNotificationContent(params);
   await resend.emails.send({
     from: getFromEmail(),
     to: notifyTo,
     replyTo: params.email,
-    subject: `Nuevo lead: ${params.name} (${typeLabel})`,
+    subject,
     html,
+    text,
   });
 }
 

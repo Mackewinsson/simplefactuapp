@@ -28,7 +28,8 @@
     "test:cert-upload": "tsx scripts/test-cert-upload.ts",
     "test:provision": "tsx scripts/test-provision.ts",
     "test:api-errors": "tsx scripts/test-api-errors.ts",
-    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles && npm run test:billing && npm run test:job-sync && npm run test:crypto && npm run test:lemon-webhook && npm run test:cert-upload && npm run test:provision && npm run test:api-errors",
+    "test:lead-email": "tsx scripts/test-lead-email.ts",
+    "test": "npm run test:money && npm run test:payloads && npm run test:csv && npm run test:validation && npm run test:roles && npm run test:billing && npm run test:job-sync && npm run test:crypto && npm run test:lemon-webhook && npm run test:cert-upload && npm run test:provision && npm run test:api-errors && npm run test:lead-email",
     "prepare": "node -e \"if(!process.env.CI && !process.env.DOCKER_BUILD){require('child_process').execSync('husky',{stdio:'inherit'})}\" || true"
   },
   "lint-staged": {

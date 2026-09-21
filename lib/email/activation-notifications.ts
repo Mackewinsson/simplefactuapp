@@ -1,4 +1,4 @@
-import { getFromEmail, getResend } from "./client";
+import { getAdminNotifyEmail, getFromEmail, getResend } from "./client";
 
 function escapeHtml(value: string): string {
   return value
@@ -36,7 +36,7 @@ function baseHtml(title: string, body: string): string {
 }
 
 function adminNotifyEmail(): string | undefined {
-  return process.env.ADMIN_NOTIFY_EMAIL?.trim() || process.env.LEAD_NOTIFY_EMAIL?.trim();
+  return getAdminNotifyEmail();
 }
 
 export async function sendActivationRequestAdminEmail(params: {
