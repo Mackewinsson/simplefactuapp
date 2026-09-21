@@ -7,6 +7,7 @@ import {
   getExpiringCertificates,
   getRateLimitConfig,
 } from "@/lib/simplefactu/admin-server";
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { probeApiReady } from "@/lib/simplefactu/public-health";
 import { AdminOpsAlerts } from "../AdminOpsAlerts";
 
@@ -37,7 +38,7 @@ export default async function AdminSystemPage({
   try {
     diag = await getDiagnostics();
   } catch (e: unknown) {
-    diagErr = e instanceof Error ? e.message : "Error";
+    diagErr = formatVerifactuActionError(e);
   }
 
   let rate: Awaited<ReturnType<typeof getRateLimitConfig>> | null = null;
@@ -45,7 +46,7 @@ export default async function AdminSystemPage({
   try {
     rate = await getRateLimitConfig();
   } catch (e: unknown) {
-    rateErr = e instanceof Error ? e.message : "Error";
+    rateErr = formatVerifactuActionError(e);
   }
 
   let globalMetrics: Awaited<ReturnType<typeof getAdminMetricsGlobal>> | null = null;
@@ -53,7 +54,7 @@ export default async function AdminSystemPage({
   try {
     globalMetrics = await getAdminMetricsGlobal(from, to);
   } catch (e: unknown) {
-    globalMetricsErr = e instanceof Error ? e.message : "Error";
+    globalMetricsErr = formatVerifactuActionError(e);
   }
 
   let metrics: Awaited<ReturnType<typeof getAdminMetrics>> | null = null;
@@ -62,7 +63,7 @@ export default async function AdminSystemPage({
     try {
       metrics = await getAdminMetrics(tenantId, from, to);
     } catch (e: unknown) {
-      metricsErr = e instanceof Error ? e.message : "Error";
+      metricsErr = formatVerifactuActionError(e);
     }
   }
 
@@ -71,7 +72,7 @@ export default async function AdminSystemPage({
   try {
     expiring = await getExpiringCertificates(certDays);
   } catch (e: unknown) {
-    expiringErr = e instanceof Error ? e.message : "Error";
+    expiringErr = formatVerifactuActionError(e);
   }
 
   return (

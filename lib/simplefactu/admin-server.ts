@@ -1,3 +1,4 @@
+import { wrapSimplefactuFetchError } from "@/lib/simplefactu/api-errors";
 import { getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 
 export class SimplefactuAdminError extends Error {
@@ -34,15 +35,19 @@ export async function adminFetch(path: string, init: RequestInit = {}): Promise<
   const url = `${base.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
   const ms = adminFetchTimeoutMs();
   const signal = init.signal ?? AbortSignal.timeout(ms);
-  return fetch(url, {
-    ...init,
-    signal,
-    headers: {
-      "Content-Type": "application/json",
-      "x-admin-key": adminKey,
-      ...init.headers,
-    },
-  });
+  try {
+    return await fetch(url, {
+      ...init,
+      signal,
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": adminKey,
+        ...init.headers,
+      },
+    });
+  } catch (e) {
+    throw wrapSimplefactuFetchError(e);
+  }
 }
 
 export async function adminJson<T>(path: string, init: RequestInit = {}): Promise<T> {

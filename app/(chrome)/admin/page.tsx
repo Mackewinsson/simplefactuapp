@@ -4,6 +4,7 @@ import {
   getAdminOpsStatus,
   getExpiringCertificates,
 } from "@/lib/simplefactu/admin-server";
+import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { probeApiReady } from "@/lib/simplefactu/public-health";
 import Link from "next/link";
 import { AdminOpsAlerts } from "./AdminOpsAlerts";
@@ -26,7 +27,7 @@ export default async function AdminDashboardPage() {
     status = s;
     expiring = e;
   } catch (e: unknown) {
-    err = e instanceof Error ? e.message : "No se pudo cargar diagnóstico";
+    err = formatVerifactuActionError(e);
   }
 
   const deadCount = status?.jobs?.byStatus?.DEAD ?? diag?.jobs?.byStatus?.DEAD ?? 0;
@@ -40,9 +41,18 @@ export default async function AdminDashboardPage() {
       </h1>
 
       {err ? (
-        <p className="rounded-xl border border-danger-outline/50 bg-danger/80 px-4 py-3 text-sm text-danger-foreground font-semibold">
-          {err}
-        </p>
+        <div className="space-y-2 rounded-xl border border-danger-outline/50 bg-danger/80 px-4 py-3 text-sm text-danger-foreground">
+          <p className="font-semibold">{err}</p>
+          <p className="text-xs font-medium">
+            Sonda GET /ready:{" "}
+            {ready.ok
+              ? "OK — el API público responde; el fallo está en /admin/diagnostics (clave o ruta)."
+              : ready.networkError && ready.networkError !== err
+                ? ready.networkError
+                : "sin respuesta HTTP (TLS, DNS o timeout)."}
+            {ready.status ? ` · HTTP ${ready.status}` : ""}
+          </p>
+        </div>
       ) : diag ? (
         <div className="grid gap-5 sm:grid-cols-2">
           {(flags?.readOnlyMode || flags?.disableAeatSend || stuckCount > 0 || deadCount > 0) && (
