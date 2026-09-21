@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 const PAGE_SIZE = 25;
@@ -7,6 +8,16 @@ const TYPE_LABEL: Record<string, string> = {
   empresa: "Empresa / API",
 };
 
+function formatLeadDate(d: Date): string {
+  return d.toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default async function AdminLeadsPage({
   searchParams,
 }: {
@@ -15,14 +26,16 @@ export default async function AdminLeadsPage({
   const { page: pageParam, type, q } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
+  const query = q?.trim() ?? "";
 
   const where = {
     ...(type ? { type } : {}),
-    ...(q
+    ...(query
       ? {
           OR: [
-            { name: { contains: q, mode: "insensitive" as const } },
-            { email: { contains: q, mode: "insensitive" as const } },
+            { name: { contains: query, mode: "insensitive" as const } },
+            { email: { contains: query, mode: "insensitive" as const } },
+            { message: { contains: query, mode: "insensitive" as const } },
           ],
         }
       : {}),
@@ -39,6 +52,7 @@ export default async function AdminLeadsPage({
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const qs = `${type ? `&type=${encodeURIComponent(type)}` : ""}${query ? `&q=${encodeURIComponent(query)}` : ""}`;
 
   return (
     <div className="space-y-6">
@@ -51,12 +65,11 @@ export default async function AdminLeadsPage({
         </div>
       </div>
 
-      {/* Filtros */}
       <form method="GET" className="flex flex-wrap gap-3">
         <input
           name="q"
-          defaultValue={q}
-          placeholder="Buscar nombre o email…"
+          defaultValue={query}
+          placeholder="Buscar nombre, email o mensaje…"
           className="rounded-md border border-outline px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-outline"
         />
         <select
@@ -68,100 +81,71 @@ export default async function AdminLeadsPage({
           <option value="autonomo">Autónomo</option>
           <option value="empresa">Empresa / API</option>
         </select>
-        <button
-          type="submit"
-          className="btn btn-sm btn-primary"
-        >
+        <button type="submit" className="btn btn-sm btn-primary">
           Filtrar
         </button>
-        {(q || type) && (
-          <a
-            href="/admin/leads"
-            className="btn btn-sm btn-secondary"
-          >
+        {(query || type) && (
+          <Link href="/admin/leads" className="btn btn-sm btn-secondary">
             Limpiar
-          </a>
+          </Link>
         )}
       </form>
 
-      {/* Tabla */}
       {leads.length === 0 ? (
         <p className="text-sm text-fg-subtle">No hay leads con estos filtros.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-outline-soft">
-          <table className="w-full text-sm">
-            <thead className="bg-surface-hover text-left text-xs font-medium uppercase tracking-wide text-fg-subtle">
-              <tr>
-                <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Perfil</th>
-                <th className="px-4 py-3">Mensaje</th>
-                <th className="px-4 py-3">Fecha</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-soft">
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-surface-hover">
-                  <td className="px-4 py-3 font-medium text-fg">
-                    {lead.name}
-                  </td>
-                  <td className="px-4 py-3">
-                    <a
-                      href={`mailto:${lead.email}`}
-                      className="text-accent hover:underline"
-                    >
+        <div className="space-y-4">
+          {leads.map((lead) => (
+            <article
+              key={lead.id}
+              className="rounded-xl border border-outline-soft bg-surface p-4 shadow-sm"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold text-fg">{lead.name}</h2>
+                  <p className="mt-0.5 text-sm">
+                    <a href={`mailto:${lead.email}`} className="text-accent hover:underline">
                       {lead.email}
                     </a>
-                  </td>
-                  <td className="px-4 py-3">
+                    <span className="mx-2 text-fg-subtle">·</span>
                     <span className="inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-fg-muted">
                       {TYPE_LABEL[lead.type] ?? lead.type}
                     </span>
-                  </td>
-                  <td className="max-w-xs px-4 py-3 text-fg-muted">
-                    {lead.message ? (
-                      <span className="line-clamp-2">{lead.message}</span>
-                    ) : (
-                      <span className="text-fg-subtle">—</span>
-                    )}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-fg-subtle">
-                    {new Date(lead.createdAt).toLocaleString("es-ES", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </p>
+                </div>
+                <p className="text-xs text-fg-subtle">{formatLeadDate(lead.createdAt)}</p>
+              </div>
+              {lead.message?.trim() ? (
+                <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-fg">
+                  {lead.message}
+                </p>
+              ) : (
+                <p className="mt-3 text-sm text-fg-subtle">Sin mensaje</p>
+              )}
+              <p className="mt-3">
+                <Link href={`/admin/leads/${lead.id}`} className="text-xs font-semibold text-accent hover:underline">
+                  Ver mensaje completo →
+                </Link>
+              </p>
+            </article>
+          ))}
         </div>
       )}
 
-      {/* Paginación */}
       {totalPages > 1 && (
         <div className="flex items-center gap-2 text-sm">
           {page > 1 && (
-            <a
-              href={`?page=${page - 1}${type ? `&type=${type}` : ""}${q ? `&q=${q}` : ""}`}
-              className="btn btn-sm btn-secondary"
-            >
+            <Link href={`?page=${page - 1}${qs}`} className="btn btn-sm btn-secondary">
               ← Anterior
-            </a>
+            </Link>
           )}
           <span className="text-fg-subtle">
             Página {page} de {totalPages}
           </span>
           {page < totalPages && (
-            <a
-              href={`?page=${page + 1}${type ? `&type=${type}` : ""}${q ? `&q=${q}` : ""}`}
-              className="btn btn-sm btn-secondary"
-            >
+            <Link href={`?page=${page + 1}${qs}`} className="btn btn-sm btn-secondary">
               Siguiente →
-            </a>
+            </Link>
           )}
         </div>
       )}

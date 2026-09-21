@@ -60,10 +60,14 @@ export async function submitLead(
 
     const { consent: _consent, ...leadData } = parsed.data;
     const consentAt = new Date();
-    await prisma.lead.create({
+    const lead = await prisma.lead.create({
       data: { ...leadData, source: "landing", consentAt, submitterIp },
     });
-    void sendLeadNotificationEmail(leadData);
+    try {
+      await sendLeadNotificationEmail({ ...leadData, id: lead.id });
+    } catch (err) {
+      console.error("[lead email] no se pudo avisar al admin", err);
+    }
     return { ok: true };
   } catch {
     return { ok: false, error: "No hemos podido guardar tu mensaje. Inténtalo de nuevo." };
