@@ -2,6 +2,7 @@ import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import { NewInvoiceForm } from "./NewInvoiceForm";
 import { VerifactuReadinessBanner } from "./VerifactuReadinessBanner";
+import { ActivationGateBanner } from "../ActivationGateBanner";
 import { prisma } from "@/lib/prisma";
 import { extractSerie } from "@/lib/simplefactu/invoice-series";
 import { getVerifactuReadiness } from "@/lib/verifactu/readiness";
@@ -32,6 +33,7 @@ export default async function NewInvoicePage() {
         </Link>
       </div>
       <h1 className="mb-6 text-2xl font-semibold">Nueva factura</h1>
+      <ActivationGateBanner />
       <VerifactuReadinessBanner readiness={readiness} />
       <NewInvoiceForm
         defaultCreatedByFirstName={user?.firstName ?? ""}

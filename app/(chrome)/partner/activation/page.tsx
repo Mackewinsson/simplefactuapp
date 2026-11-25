@@ -41,7 +41,7 @@ export default async function PartnerActivationPage() {
     "";
 
   const latestRequest = await prisma.activationRequest.findFirst({
-    where: { userId },
+    where: { userId, kind: "INTEGRATOR" },
     orderBy: { createdAt: "desc" },
   });
 

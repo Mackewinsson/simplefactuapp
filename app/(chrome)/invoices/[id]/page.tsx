@@ -5,6 +5,7 @@ import { formatCents } from "@/lib/money";
 import { verifactuQrDataUrl } from "@/lib/verifactu/qr-image";
 import { requireAppUser } from "@/lib/auth/app-user";
 import { VerifactuSendPanel } from "./VerifactuSendPanel";
+import { ActivationGateBanner } from "../ActivationGateBanner";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -43,6 +44,8 @@ export default async function InvoiceDetailPage({ params, searchParams }: Props)
           ← Volver a facturas
         </Link>
       </div>
+
+      <ActivationGateBanner />
 
       <div className="rounded border border-outline-soft bg-surface">
         <div className="border-b border-outline-soft px-4 py-4">

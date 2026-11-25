@@ -66,6 +66,7 @@ export async function getNavLinks(
         { href: "/customers", label: "Clientes" },
         { href: "/products", label: "Productos" },
         { href: "/settings/verifactu", label: "Ajustes AEAT" },
+        { href: "/settings/activation", label: "Activación" },
         { href: "/docs", label: "Documentación" },
       ];
       if (options.billingEnabled) {
@@ -99,6 +100,7 @@ export async function getNavLinks(
     { href: "/customers", label: "Clientes" },
     { href: "/products", label: "Productos" },
     { href: "/settings/verifactu", label: "Ajustes AEAT" },
+    { href: "/settings/activation", label: "Activación" },
     { href: "/docs", label: "Documentación" },
   ];
 

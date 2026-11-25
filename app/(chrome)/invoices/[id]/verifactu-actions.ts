@@ -10,6 +10,8 @@ import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefact
 import { formatSimplefactuHttpError, formatVerifactuActionError, formatUserFacingError } from "@/lib/simplefactu/api-errors";
 import { resyncVerifactuQrFromJob, syncJobStatusToInvoice } from "@/lib/simplefactu/job-sync";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
+import { isAutonomoProductionActivated } from "@/lib/verifactu/activation";
+import { isUserAdmin } from "@/lib/auth/admin";
 import { adminFetch } from "@/lib/simplefactu/admin-server";
 
 function sleep(ms: number) {
@@ -70,6 +72,15 @@ export async function sendInvoiceToVerifactuAction(invoiceId: string): Promise<S
 
   if (invoice.aeatStatus === AeatJobStatus.SUCCEEDED) {
     return { ok: false, message: "Esta factura ya fue aceptada por Verifactu." };
+  }
+
+  const adminSession = await isUserAdmin(sessionUserId);
+  if (!adminSession && !(await isAutonomoProductionActivated(userId))) {
+    return {
+      ok: false,
+      message:
+        "Tu cuenta aún no está activada. Envía la solicitud de activación y espera la aprobación para poder registrar facturas en AEAT.",
+    };
   }
 
   const account = await prisma.userVerifactuAccount.findUnique({ where: { userId } });

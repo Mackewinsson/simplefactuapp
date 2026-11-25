@@ -35,6 +35,12 @@ export function VerifactuReadinessBanner({ readiness }: Props) {
   if (!readiness.certificateReady) {
     missing.push({ label: "Certificado AEAT (.pfx)", href: "/settings/verifactu" });
   }
+  if (!readiness.activationReady) {
+    missing.push({
+      label: "Activación de cuenta (solicitud aprobada)",
+      href: "/settings/activation",
+    });
+  }
 
   if (missing.length === 0) return null;
 

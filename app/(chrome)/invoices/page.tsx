@@ -6,6 +6,7 @@ import { extractSerie } from "@/lib/simplefactu/invoice-series";
 import { registrationStatusBadge } from "@/lib/simplefactu/aeat-status-ui";
 import { requireAppUser } from "@/lib/auth/app-user";
 import { InvoiceViewTabs, type InvoiceVista } from "./InvoiceViewTabs";
+import { ActivationGateBanner } from "./ActivationGateBanner";
 
 const PAGE_SIZE = 50;
 const dateFormat = new Intl.DateTimeFormat("es", { dateStyle: "short" });
@@ -193,6 +194,8 @@ export default async function InvoicesPage({
           </Link>
         </div>
       </div>
+
+      <ActivationGateBanner />
 
       <InvoiceViewTabs
         current={vista}

@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
+import { hasSubmittedAutonomoActivation } from "@/lib/verifactu/activation";
 
 export type OnboardingStep = {
-  id: "issuer" | "vnif" | "cert" | "invoice";
+  id: "issuer" | "vnif" | "cert" | "activation";
   label: string;
   done: boolean;
   /** Recommended but not required for onboarding complete */
@@ -14,23 +15,22 @@ export type OnboardingStatus = {
   complete: boolean;
   issuerProfileDone: boolean;
   certificateDone: boolean;
-  firstInvoiceDone: boolean;
+  activationSubmitted: boolean;
   steps: OnboardingStep[];
   certificateNotAfter: string | null;
   certificateExpiresWithin30Days: boolean;
 };
 
 export async function getOnboardingStatus(userId: string): Promise<OnboardingStatus> {
-  const [account, invoiceCount] = await Promise.all([
+  const [account, activationSubmitted] = await Promise.all([
     prisma.userVerifactuAccount.findUnique({ where: { userId } }),
-    prisma.invoice.count({ where: { userId, aeatStatus: "SUCCEEDED" } }),
+    hasSubmittedAutonomoActivation(userId),
   ]);
 
   const issuerProfileDone = Boolean(
     account?.issuerNif?.trim() && account?.issuerLegalName?.trim()
   );
   const vnifVerifiedDone = Boolean(account?.vnifVerifiedAt);
-  const firstInvoiceDone = invoiceCount > 0;
 
   let certificateDone = Boolean(account?.certificateUploadedAt);
   let certificateNotAfter: string | null = null;
@@ -75,7 +75,11 @@ export async function getOnboardingStatus(userId: string): Promise<OnboardingSta
       optional: true,
     },
     { id: "cert", label: "Certificado AEAT", done: certificateDone },
-    { id: "invoice", label: "Primera factura registrada", done: firstInvoiceDone },
+    {
+      id: "activation",
+      label: "Solicitud de activación",
+      done: activationSubmitted,
+    },
   ];
 
   const requiredSteps = steps.filter((s) => !s.optional);
@@ -84,7 +88,7 @@ export async function getOnboardingStatus(userId: string): Promise<OnboardingSta
     complete: requiredSteps.every((s) => s.done),
     issuerProfileDone,
     certificateDone,
-    firstInvoiceDone,
+    activationSubmitted,
     steps,
     certificateNotAfter,
     certificateExpiresWithin30Days,

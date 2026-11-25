@@ -180,7 +180,12 @@ enum ActivationRequestStatus {
   REJECTED
 }
 
-/// Integrator requests production access after sandbox testing (admin approves).
+enum ActivationRequestKind {
+  AUTONOMO
+  INTEGRATOR
+}
+
+/// Production activation requests (autónomo send access or integrator partner role).
 model ActivationRequest {
   id           String                   @id @default(cuid())
   userId       String
@@ -188,6 +193,7 @@ model ActivationRequest {
   companyName  String
   nif          String
   message      String?                  @db.Text
+  kind         ActivationRequestKind    @default(INTEGRATOR)
   status       ActivationRequestStatus  @default(PENDING)
   createdAt    DateTime                 @default(now())
   decidedAt    DateTime?
@@ -196,6 +202,7 @@ model ActivationRequest {
 
   @@index([userId])
   @@index([status])
+  @@index([kind])
   @@index([createdAt])
   @@map("activation_requests")
 }

@@ -9,18 +9,26 @@ const STATUS_LABEL: Record<string, string> = {
   REJECTED: "Rechazada",
 };
 
+const KIND_LABEL: Record<string, string> = {
+  AUTONOMO: "Autónomo",
+  INTEGRATOR: "Integrador",
+};
+
 export default async function AdminRequestsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; kind?: string }>;
 }) {
-  const { page: pageParam, status } = await searchParams;
+  const { page: pageParam, status, kind } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
   const where = {
     ...(status === "PENDING" || status === "APPROVED" || status === "REJECTED"
       ? { status: status as "PENDING" | "APPROVED" | "REJECTED" }
+      : {}),
+    ...(kind === "AUTONOMO" || kind === "INTEGRATOR"
+      ? { kind: kind as "AUTONOMO" | "INTEGRATOR" }
       : {}),
   };
 
@@ -36,6 +44,13 @@ export default async function AdminRequestsPage({
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  const filterQs = [
+    status ? `status=${status}` : "",
+    kind ? `kind=${kind}` : "",
+  ]
+    .filter(Boolean)
+    .join("&");
 
   return (
     <div className="space-y-6">
@@ -59,10 +74,19 @@ export default async function AdminRequestsPage({
           <option value="APPROVED">Aprobadas</option>
           <option value="REJECTED">Rechazadas</option>
         </select>
+        <select
+          name="kind"
+          defaultValue={kind ?? ""}
+          className="rounded-md border border-outline px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-outline"
+        >
+          <option value="">Todos los tipos</option>
+          <option value="AUTONOMO">Autónomos</option>
+          <option value="INTEGRATOR">Integradores</option>
+        </select>
         <button type="submit" className="btn btn-sm btn-primary">
           Filtrar
         </button>
-        {status ? (
+        {status || kind ? (
           <a href="/admin/requests" className="btn btn-sm btn-secondary">
             Limpiar
           </a>
@@ -80,7 +104,12 @@ export default async function AdminRequestsPage({
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold text-fg">{req.companyName}</h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="font-semibold text-fg">{req.companyName}</h2>
+                    <span className="inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
+                      {KIND_LABEL[req.kind] ?? req.kind}
+                    </span>
+                  </div>
                   <p className="mt-0.5 text-sm text-fg-muted">
                     NIF <span className="font-mono">{req.nif}</span>
                     {" · "}
@@ -149,7 +178,7 @@ export default async function AdminRequestsPage({
         <div className="flex items-center gap-2 text-sm">
           {page > 1 ? (
             <a
-              href={`?page=${page - 1}${status ? `&status=${status}` : ""}`}
+              href={`?page=${page - 1}${filterQs ? `&${filterQs}` : ""}`}
               className="btn btn-sm btn-secondary"
             >
               ← Anterior
@@ -160,7 +189,7 @@ export default async function AdminRequestsPage({
           </span>
           {page < totalPages ? (
             <a
-              href={`?page=${page + 1}${status ? `&status=${status}` : ""}`}
+              href={`?page=${page + 1}${filterQs ? `&${filterQs}` : ""}`}
               className="btn btn-sm btn-secondary"
             >
               Siguiente →
