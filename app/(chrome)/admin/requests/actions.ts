@@ -31,17 +31,19 @@ export async function adminApproveActivationRequestAction(
   }
 
   try {
-    const api = await clerkClient();
-    const user = await api.users.getUser(request.userId);
-    const currentMeta = (user.publicMetadata ?? {}) as Record<string, unknown>;
+    if (request.kind === "INTEGRATOR") {
+      const api = await clerkClient();
+      const user = await api.users.getUser(request.userId);
+      const currentMeta = (user.publicMetadata ?? {}) as Record<string, unknown>;
 
-    await api.users.updateUser(request.userId, {
-      publicMetadata: {
-        ...currentMeta,
-        accountType: "integrator",
-        role: "partner",
-      },
-    });
+      await api.users.updateUser(request.userId, {
+        publicMetadata: {
+          ...currentMeta,
+          accountType: "integrator",
+          role: "partner",
+        },
+      });
+    }
 
     await prisma.activationRequest.update({
       where: { id: requestId },
@@ -61,17 +63,27 @@ export async function adminApproveActivationRequestAction(
         requestId,
         companyName: request.companyName,
         nif: request.nif,
+        kind: request.kind,
       },
     });
 
     void sendActivationApprovedEmail({
       to: request.email,
       companyName: request.companyName,
+      kind: request.kind,
     });
 
     revalidatePath("/admin/requests");
     revalidatePath("/partner/activation");
-    return { ok: true, message: `Aprobado: ${request.companyName} (rol partner asignado).` };
+    revalidatePath("/settings/activation");
+    revalidatePath("/onboarding");
+    revalidatePath("/invoices");
+
+    const msg =
+      request.kind === "INTEGRATOR"
+        ? `Aprobado: ${request.companyName} (rol partner asignado).`
+        : `Aprobado: ${request.companyName} (envío de facturas activado).`;
+    return { ok: true, message: msg };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error al aprobar";
     return { ok: false, error: msg };
@@ -112,6 +124,7 @@ export async function adminRejectActivationRequestAction(
         requestId,
         companyName: request.companyName,
         decisionNote,
+        kind: request.kind,
       },
     });
 
@@ -119,10 +132,13 @@ export async function adminRejectActivationRequestAction(
       to: request.email,
       companyName: request.companyName,
       note: decisionNote,
+      kind: request.kind,
     });
 
     revalidatePath("/admin/requests");
     revalidatePath("/partner/activation");
+    revalidatePath("/settings/activation");
+    revalidatePath("/onboarding");
     return { ok: true, message: `Rechazada: ${request.companyName}.` };
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error al rechazar";

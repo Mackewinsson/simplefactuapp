@@ -10,7 +10,7 @@ import {
 import { getOnboardingStatus, isOnboardingExemptPath } from "@/lib/verifactu/onboarding-status";
 
 /**
- * Redirects new users to /onboarding until issuer, certificate and first AEAT invoice are done.
+ * Redirects new users to /onboarding until issuer, certificate and activation request are done.
  * Integrators and users who still need /welcome skip autónomo onboarding.
  */
 export async function OnboardingRedirect() {

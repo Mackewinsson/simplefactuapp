@@ -2,16 +2,18 @@ import { prisma } from "@/lib/prisma";
 import { createSimplefactuClient, getSimplefactuBaseUrl } from "@/lib/simplefactu/client";
 import { formatVerifactuActionError } from "@/lib/simplefactu/api-errors";
 import { ensureVerifactuApiKey } from "@/lib/verifactu/provision";
+import { isAutonomoProductionActivated } from "@/lib/verifactu/activation";
 import { getEffectiveUserId } from "@/lib/auth/admin-impersonate";
 
 export type VerifactuReadiness = {
   issuerReady: boolean;
   certificateReady: boolean;
+  activationReady: boolean;
   provisionError: string | null;
 };
 
 /**
- * Whether the user can send invoices to AEAT (issuer profile + certificate on API).
+ * Whether the user can send invoices to AEAT (issuer + certificate + activation).
  * `sessionUserId` is the Clerk session (admin when impersonating).
  */
 export async function getVerifactuReadiness(sessionUserId: string): Promise<VerifactuReadiness> {
@@ -37,5 +39,7 @@ export async function getVerifactuReadiness(sessionUserId: string): Promise<Veri
     provisionError = formatVerifactuActionError(e);
   }
 
-  return { issuerReady, certificateReady, provisionError };
+  const activationReady = await isAutonomoProductionActivated(dataUserId);
+
+  return { issuerReady, certificateReady, activationReady, provisionError };
 }

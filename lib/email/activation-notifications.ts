@@ -1,3 +1,4 @@
+import type { ActivationRequestKind } from "@prisma/client";
 import { getAdminNotifyEmail, getFromEmail, getResend } from "./client";
 
 function escapeHtml(value: string): string {
@@ -39,12 +40,17 @@ function adminNotifyEmail(): string | undefined {
   return getAdminNotifyEmail();
 }
 
+function kindLabel(kind: ActivationRequestKind): string {
+  return kind === "AUTONOMO" ? "Autónomo / free" : "Integrador API";
+}
+
 export async function sendActivationRequestAdminEmail(params: {
   companyName: string;
   email: string;
   nif: string;
   message?: string | null;
   userId: string;
+  kind: ActivationRequestKind;
 }): Promise<void> {
   const resend = getResend();
   const notifyTo = adminNotifyEmail();
@@ -54,14 +60,23 @@ export async function sendActivationRequestAdminEmail(params: {
     ? `<p style="margin:16px 0 0;font-size:14px;color:#3f3f46;white-space:pre-wrap;">${escapeHtml(params.message)}</p>`
     : "";
 
+  const intro =
+    params.kind === "AUTONOMO"
+      ? "Un autónomo pide activar el envío de facturas a AEAT tras completar la configuración."
+      : "Un integrador pide activar el acceso a producción tras probar en sandbox.";
+
   const html = baseHtml(`Solicitud de activación: ${params.companyName}`, `
     <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#18181b;">
       Nueva solicitud de producción
     </h1>
     <p style="margin:0 0 12px;font-size:14px;color:#52525b;">
-      Un integrador pide activar el acceso a producción tras probar en sandbox.
+      ${intro}
     </p>
     <table style="border-collapse:collapse;width:100%;margin-top:12px;">
+      <tr>
+        <td style="padding:6px 0;font-size:13px;color:#71717a;width:100px;">Tipo</td>
+        <td style="padding:6px 0;font-size:14px;color:#18181b;font-weight:500;">${escapeHtml(kindLabel(params.kind))}</td>
+      </tr>
       <tr>
         <td style="padding:6px 0;font-size:13px;color:#71717a;width:100px;">Empresa</td>
         <td style="padding:6px 0;font-size:14px;color:#18181b;font-weight:500;">${escapeHtml(params.companyName)}</td>
@@ -88,7 +103,7 @@ export async function sendActivationRequestAdminEmail(params: {
     from: getFromEmail(),
     to: notifyTo,
     replyTo: params.email,
-    subject: `Activación producción: ${params.companyName}`,
+    subject: `Activación (${kindLabel(params.kind)}): ${params.companyName}`,
     html,
   });
 }
@@ -96,21 +111,31 @@ export async function sendActivationRequestAdminEmail(params: {
 export async function sendActivationApprovedEmail(params: {
   to: string;
   companyName: string;
+  kind: ActivationRequestKind;
 }): Promise<void> {
   const resend = getResend();
   if (!resend) return;
+
+  const isAutonomo = params.kind === "AUTONOMO";
+  const body = isAutonomo
+    ? `Hemos aprobado la solicitud de <strong>${escapeHtml(params.companyName)}</strong>.
+      Ya puedes enviar facturas a Veri*Factu / AEAT.`
+    : `Hemos aprobado la solicitud de <strong>${escapeHtml(params.companyName)}</strong>.
+      Ya puedes entrar en la consola de integrador en producción.`;
+
+  const ctaHref = isAutonomo ? "https://simplefactu.com/invoices" : "https://simplefactu.com/partner";
+  const ctaLabel = isAutonomo ? "Ir a facturas" : "Abrir consola";
 
   const html = baseHtml("Acceso a producción activado", `
     <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#18181b;">
       Acceso a producción activado ✓
     </h1>
     <p style="margin:0;font-size:15px;color:#3f3f46;">
-      Hemos aprobado la solicitud de <strong>${escapeHtml(params.companyName)}</strong>.
-      Ya puedes entrar en la consola de integrador en producción.
+      ${body}
     </p>
     <p style="margin:16px 0 0;">
-      <a href="https://simplefactu.com/partner" style="display:inline-block;padding:10px 16px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;">
-        Abrir consola
+      <a href="${ctaHref}" style="display:inline-block;padding:10px 16px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;">
+        ${ctaLabel}
       </a>
     </p>
   `);
@@ -127,6 +152,7 @@ export async function sendActivationRejectedEmail(params: {
   to: string;
   companyName: string;
   note?: string | null;
+  kind: ActivationRequestKind;
 }): Promise<void> {
   const resend = getResend();
   if (!resend) return;
@@ -135,18 +161,29 @@ export async function sendActivationRejectedEmail(params: {
     ? `<p style="margin:12px 0 0;font-size:14px;color:#52525b;white-space:pre-wrap;">${escapeHtml(params.note)}</p>`
     : "";
 
+  const isAutonomo = params.kind === "AUTONOMO";
+  const retryHint = isAutonomo
+    ? "Puedes corregir los datos y volver a solicitar la activación desde Ajustes."
+    : "Puedes seguir probando en sandbox y volver a solicitarlo.";
+
   const html = baseHtml("Solicitud de activación rechazada", `
     <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#18181b;">
       Solicitud rechazada
     </h1>
     <p style="margin:0;font-size:15px;color:#3f3f46;">
-      No hemos podido activar aún el acceso a producción para <strong>${escapeHtml(params.companyName)}</strong>.
-      Puedes seguir probando en sandbox y volver a solicitarlo.
+      No hemos podido activar aún la cuenta de <strong>${escapeHtml(params.companyName)}</strong>.
+      ${retryHint}
     </p>
     ${noteBlock}
-    <p style="margin:16px 0 0;font-size:14px;color:#52525b;">
+    ${
+      isAutonomo
+        ? `<p style="margin:16px 0 0;font-size:14px;color:#52525b;">
+      Activación: <a href="https://simplefactu.com/settings/activation" style="color:#18181b;">/settings/activation</a>
+    </p>`
+        : `<p style="margin:16px 0 0;font-size:14px;color:#52525b;">
       Sandbox: <a href="https://qa.simplefactu.com" style="color:#18181b;">qa.simplefactu.com</a>
-    </p>
+    </p>`
+    }
   `);
 
   await resend.emails.send({
