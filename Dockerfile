@@ -4,7 +4,7 @@
 # Apply DB schema: docker run ... simplefactuapp npx prisma migrate deploy  (or run migrate before start in orchestration)
 
 FROM node:22-bookworm-slim AS base
-RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y curl openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9 --activate
 
